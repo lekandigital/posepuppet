@@ -20,6 +20,18 @@ download URL, and license text recorded alongside it. `public/avatars/*.vrm`
 stays gitignored until that record exists. Candidates 2–3 below are kept as
 fallbacks.
 
+### CHOSEN: "Astronaut" (048, 100Avatars R1) — in use since 2026-06-10
+- **File:** `public/avatars/astronaut.vrm` (gitignored binary; 1.7 MB, VRM 0.x)
+- **Download URL:** https://arweave.net/T0c0z_XEPQHy3vyXz31XB22s_6JTqHdnau8exq_I8tI
+  (registry entry: `data/avatars/100avatars-r1.json`, name "Astronaut", number 048,
+  in [ToxSam/open-source-avatars](https://github.com/ToxSam/open-source-avatars))
+- **License evidence:** registry `projects.json` lists 100Avatars R1 as
+  `"license": "CC0"`; **the file's own embedded VRM meta says
+  `licenseName: "CC0"`, title "Astronaut"** (inspected from the glb JSON
+  chunk after download — strongest possible evidence, carried in the asset
+  itself). Creator: Polygonal Mind.
+- To fetch on a fresh checkout: `curl -L -o public/avatars/astronaut.vrm <URL above>`
+
 ### 1. 100Avatars series (Polygonal Mind) — APPROVED
 - **Source:** [open-source-avatars registry](https://github.com/ToxSam/open-source-avatars) / [opensourceavatars.com](https://www.opensourceavatars.com/en/gallery)
 - **License:** CC0 1.0 — registry states "Our own free avatars, no attribution needed"; 300+ VRM avatars

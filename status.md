@@ -1,3 +1,10 @@
+## 2026-06-10 ~18:35 (M4 complete, awaiting second live gate)
+Done: VRM astronaut (100Avatars 048, CC0-in-meta) via raw-bone driving (autoUpdateHumanBones=false was THE fix), live switcher, name-match BoneMap layer, eval --avatar support
+Sync metric: robot/vrm — arms 9.51/10.86°, torso 2.17/2.28°, fast 19.18/20.26° (M4 bars ≤15/≤15/≤25 all ✓ both avatars)
+FPS: pose ~29.5, render ~117 both avatars; suite 18/18 headless; README numbers refreshed
+Blockers: M4 USER ACTION gate — second live test, both avatars (incl. lean-right + legs re-check)
+Next: gate report → fixes if any → M5 polish (trails, confidence meter) + final eval + DEMO_SCRIPT/POSTS finalization
+
 ## 2026-06-10 ~17:50 (M3 complete, awaiting re-test)
 Done: gate feedback fixes (body-frame fallback, per-axis clamp), legs/full-body toggle, calibration 3-2-1 + per-bone offsets persisted, video-file input, record button; ASSETS.md 100Avatars approved
 Sync metric: arms 9.37° / torso 2.22° / fast 18.96° (unchanged within noise after robustness fixes)

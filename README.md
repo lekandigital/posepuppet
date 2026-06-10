@@ -28,7 +28,7 @@ npm run dev   # → http://localhost:5173, allow camera
 6. Render tick slerps each bone toward its target (second smoothing stage); invisible landmarks make a bone relax to rest over ~0.7 s.
 7. Root motion (subtle x/y + depth hint from shoulder width) is clamped and heavily smoothed.
 8. The 2D skeleton overlay draws the raw normalized landmarks on a canvas aligned with the video.
-9. The avatar is a procedural robot built from primitives in a real bone hierarchy (VRM avatar planned — see ASSETS.md).
+9. Two avatars behind one interface: a procedural robot built from primitives, and a CC0 VRM astronaut (100Avatars, see ASSETS.md) driven through the same retargeting layer — live-switchable mid-motion.
 10. An eval mode (`?eval=<fixture>`) replays clips through the whole pipeline and writes metrics to `eval/results.json`.
 
 The **● rec** button composites the side-by-side view into one canvas and
@@ -37,11 +37,12 @@ written by your browser to your disk and never leaves your machine.
 
 ## Current numbers
 
-From `eval/results.json` (2026-06-10, 60 s per fixture, headed Chromium on
-Apple M5, GPU delegate): detection 100% on all three test clips; pose loop
-~29.9 fps (capped by 30 fps clips); render ~119 fps; upper-limb sync error
-9.4° (arms clip), 2.2° (torso clip), 18.9° (fast shadowboxing clip); memory
-flat over 60 s.
+From `eval/results.json` (2026-06-10, 60 s per fixture per avatar, headed
+Chromium on Apple M5, GPU delegate): detection 100% on all three test clips
+for both avatars; pose loop ~29.5 fps (capped by 30 fps clips); render
+~117 fps; upper-limb sync error robot/astronaut: 9.5°/10.9° (arms clip),
+2.2°/2.3° (torso clip), 19.2°/20.3° (fast shadowboxing clip); memory flat
+over 60 s.
 
 ## Limitations (honest)
 

@@ -8,6 +8,7 @@ import { LM } from '../src/pose/indices';
 import type { LandmarkPoint } from '../src/pose/types';
 import { createRobot } from '../src/rig/robot';
 import { Retargeter } from '../src/rig/retarget';
+import { matchBonesByName } from '../src/rig/vrm';
 import { config } from '../src/config';
 
 function lm(x: number, y: number, z: number, visibility = 1): LandmarkPoint {
@@ -255,6 +256,40 @@ test('calibration maps the held pose to rest', () => {
   rt.calibrate(); // this held pose becomes neutral
   settle();
   expect(bone.quaternion.angleTo(rest)).toBeLessThan(0.1); // …so it now reads as rest
+});
+
+function hierarchyOf(names: string[]): THREE.Object3D {
+  const root = new THREE.Object3D();
+  for (const n of names) {
+    const o = new THREE.Object3D();
+    o.name = n;
+    root.add(o);
+  }
+  return root;
+}
+
+test('bone name matching: VRoid, Mixamo, and generic rigs map correctly', () => {
+  const vroid = matchBonesByName(
+    hierarchyOf([
+      'J_Bip_C_Hips', 'J_Bip_C_Chest', 'J_Bip_C_Neck', 'J_Bip_C_Head',
+      'J_Bip_L_UpperArm', 'J_Bip_L_LowerArm', 'J_Bip_R_UpperArm', 'J_Bip_R_LowerArm',
+      'J_Bip_L_UpperLeg', 'J_Bip_L_LowerLeg', 'J_Bip_R_UpperLeg', 'J_Bip_R_LowerLeg',
+    ]),
+  );
+  expect(Object.keys(vroid)).toHaveLength(12);
+  expect(vroid.leftUpperArm!.name).toBe('J_Bip_L_UpperArm');
+  expect(vroid.rightLowerLeg!.name).toBe('J_Bip_R_LowerLeg');
+
+  const mixamo = matchBonesByName(
+    hierarchyOf(['mixamorig:Hips', 'mixamorig:Spine2', 'mixamorig:Neck', 'mixamorig:Head',
+      'mixamorig:LeftArm', 'mixamorig:LeftForeArm', 'mixamorig:RightArm', 'mixamorig:RightForeArm']),
+  );
+  expect(mixamo.leftUpperArm!.name).toBe('mixamorig:LeftArm');
+  expect(mixamo.leftLowerArm!.name).toBe('mixamorig:LeftForeArm');
+  expect(mixamo.chest!.name).toBe('mixamorig:Spine2');
+
+  const junk = matchBonesByName(hierarchyOf(['Cube', 'Sphere.001', 'Light']));
+  expect(Object.keys(junk)).toHaveLength(0);
 });
 
 test('low-visibility torso invalidates the frame but keeps previous values', () => {
