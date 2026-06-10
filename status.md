@@ -1,3 +1,10 @@
+## 2026-06-10 ~18:55 (SHIPPED — goal contract green)
+Done: M4 gate APPROVED live by Lekan (lean-right, turns, legs, calibrate, mid-motion switch all good); DEMO_SCRIPT finalized; POSTS.md drafted (3 variants + thread + self-reply + verification table); trails/confidence/theme skipped per contract (DECISIONS.md)
+Sync metric: robot/vrm — arms 9.51/10.86°, torso 2.17/2.28°, fast 19.18/20.26° (all bars ✓)
+FPS: pose ~29.5, render ~117; suite 18/18 headless; both user gates passed
+Blockers: none — remaining mission step is Lekan's own filming session + post approval (his action, deliverables ready)
+Next: film with DEMO_SCRIPT.md, pick a POSTS.md variant; future work listed in README
+
 ## 2026-06-10 ~18:35 (M4 complete, awaiting second live gate)
 Done: VRM astronaut (100Avatars 048, CC0-in-meta) via raw-bone driving (autoUpdateHumanBones=false was THE fix), live switcher, name-match BoneMap layer, eval --avatar support
 Sync metric: robot/vrm — arms 9.51/10.86°, torso 2.17/2.28°, fast 19.18/20.26° (M4 bars ≤15/≤15/≤25 all ✓ both avatars)

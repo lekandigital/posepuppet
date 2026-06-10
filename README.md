@@ -54,7 +54,8 @@ over 60 s.
 ## Future work (deliberately out of scope for v1)
 
 Fingers/hand tracking, face/expressions, physics/IK chains, multi-person,
-mobile beyond "it loads", animation export, segmentation compositing.
+mobile beyond "it loads", animation export, segmentation compositing, hand
+motion trails, confidence meter, style/theme toggle.
 
 ## Verification
 

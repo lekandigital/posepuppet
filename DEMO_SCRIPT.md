@@ -1,19 +1,21 @@
-# Demo script (DRAFT — finalize at M5)
+# Demo script
 
-Status: robot avatar is live; shots marked **[after M4]** need the VRM
-avatar + switcher, **[after M5]** need trails/record. Everything else is
-performable today. Target: one 15–20 s take.
+Everything below is performable in the current build. Target: one 15–20 s
+take, recorded with the in-app **● rec 15s** button (side-by-side composite
+→ .webm, saved locally).
 
 ## Framing & setup
 
-- Waist-up in frame, camera at chest height, ~1.2–1.8 m back.
+- Waist-up in frame, camera at chest height, ~1.2–1.8 m back. For the
+  full-body beat, step back until hips and knees are clearly in frame and
+  switch ⚙ → **full body (legs)** ON.
 - Light from the front (window or lamp behind the laptop), plain wall behind
   you, no backlight.
 - Wear something that contrasts the wall; avoid loose sleeves past the wrists.
 - Mirror ON (default). The character is your reflection.
-- In-app record: **[after M5]** quick-record preset, 15 s, side-by-side
-  composite → .webm. Until then: macOS screen record (⌘⇧5) of the browser
-  window works for test takes.
+- Run ⚙ → **calibrate (3-2-1)** standing neutral before the take so your
+  natural posture reads as neutral.
+- Press **● rec 15s** right before the first beat; it stops itself.
 
 ## Shot list (~18 s)
 
@@ -21,10 +23,10 @@ performable today. Target: one 15–20 s take.
 |---|---|---|
 | 0–2 s | open on split screen, neutral stance | let the stillness register — no jitter is the first selling point |
 | 2–5 s | both arms raise, hold a beat at the top | the cleanest "it's copying me" read |
-| 5–8 s | lean left, lean right **[trails after M5]** | head tilts with the lean |
+| 5–8 s | lean left, lean right | head tilts with the lean; both directions land |
 | 8–10 s | cross-body reach (right hand to left shoulder) | shows articulation, not just mirroring |
 | 10–14 s | fast shadowbox, 3–4 punches | the money shot; slight lag on the fastest punch is acceptable |
-| 14–16 s | avatar switch robot → VRM mid-motion **[after M4]** | switch while still moving — no pause |
+| 14–16 s | mid-motion click `avatar: robot` → astronaut | switch while still moving — no pause |
 | 16–18 s | end on a held pose (one fist forward, hold) | freeze for the thumbnail |
 
 ## Fallback take (if tracking is unreliable on the day)
@@ -32,4 +34,5 @@ performable today. Target: one 15–20 s take.
 Drop the shadowbox tempo by half and swap the cross-body reach for a second
 both-arms raise; keep everything waist-up and slower. The pipeline is
 upper-body-first by design — a slower take that looks locked-on beats a fast
-take that smears.
+take that smears. If legs are noisy on your setup, leave full-body OFF; the
+idle legs read fine in a waist-up frame.
