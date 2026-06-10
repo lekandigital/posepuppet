@@ -8,6 +8,7 @@ import { LM } from '../src/pose/indices';
 import type { LandmarkPoint } from '../src/pose/types';
 import { createRobot } from '../src/rig/robot';
 import { Retargeter } from '../src/rig/retarget';
+import { config } from '../src/config';
 
 function lm(x: number, y: number, z: number, visibility = 1): LandmarkPoint {
   return { x, y, z, visibility };
@@ -33,6 +34,10 @@ function canonicalPerson(): LandmarkPoint[] {
   w[LM.nose] = lm(0, -0.65, -0.08);
   w[LM.leftEar] = lm(0.07, -0.62, 0);
   w[LM.rightEar] = lm(-0.07, -0.62, 0);
+  w[LM.leftKnee] = lm(0.1, 0.45, 0);
+  w[LM.rightKnee] = lm(-0.1, 0.45, 0);
+  w[LM.leftAnkle] = lm(0.1, 0.9, 0);
+  w[LM.rightAnkle] = lm(-0.1, 0.9, 0);
   return w;
 }
 
@@ -72,20 +77,62 @@ test('body frame is identity for an upright person facing the camera', () => {
   expect(bf.shoulderWidth).toBeCloseTo(0.36, 1);
 });
 
-test('body frame captures a sideways lean as roll about z', () => {
+/** Shoulders rotated by `lean` radians about the hip center in mp space.
+ *  Positive lean shifts shoulders toward +x (person's left side). */
+function leanedPerson(lean: number): LandmarkPoint[] {
   const w = canonicalPerson();
-  // lean: shoulders shift toward +x (person's left) in mp space, hips fixed
-  const leanAngle = 0.3; // rad
   for (const i of [LM.leftShoulder, LM.rightShoulder]) {
     const p = w[i];
-    const y = p.y; // rotate shoulder points around the hip center (0,0)
-    p.x = p.x * Math.cos(leanAngle) - y * Math.sin(leanAngle);
-    p.y = p.x * Math.sin(leanAngle) * 0 + y * Math.cos(leanAngle) + p.x * 0;
+    const x = p.x;
+    const y = p.y;
+    p.x = x * Math.cos(lean) - y * Math.sin(lean);
+    p.y = x * Math.sin(lean) + y * Math.cos(lean);
   }
+  return w;
+}
+
+test('body frame captures BOTH lean directions as opposite-sign roll', () => {
+  const bfL = new BodyFrame();
+  const bfR = new BodyFrame();
+  expect(bfL.update(leanedPerson(0.3))).toBe(true);
+  expect(bfR.update(leanedPerson(-0.3))).toBe(true);
+  const eL = new THREE.Euler().setFromQuaternion(bfL.quat, 'ZYX');
+  const eR = new THREE.Euler().setFromQuaternion(bfR.quat, 'ZYX');
+  expect(Math.abs(eL.z)).toBeGreaterThan(0.1);
+  expect(Math.abs(eR.z)).toBeGreaterThan(0.1);
+  // mp +x lean → up tilts toward +x in three space → negative roll about z
+  // (rotating +y toward +x is −z); the directions must mirror, not rectify
+  expect(Math.sign(eL.z)).toBe(-1);
+  expect(Math.sign(eR.z)).toBe(1);
+  expect(eL.z + eR.z).toBeCloseTo(0, 1);
+});
+
+test('hips occluded (desk): shoulders-only frame still leans, stays valid', () => {
+  const w = leanedPerson(0.3);
+  w[LM.leftHip].visibility = 0.1;
+  w[LM.rightHip].visibility = 0.1;
+  const bf = new BodyFrame();
+  expect(bf.update(w)).toBe(true); // limbs keep tracking
+  expect(bf.valid).toBe(true);
+  const e = new THREE.Euler().setFromQuaternion(bf.quat, 'ZYX');
+  expect(Math.abs(e.z)).toBeGreaterThan(0.1); // lean still reads
+});
+
+test('side turn with a dimmed far shoulder keeps the frame alive', () => {
+  const w = canonicalPerson();
+  const turn = 1.2; // rad — deep turn toward profile
+  for (const i of [LM.leftShoulder, LM.rightShoulder, LM.leftHip, LM.rightHip]) {
+    const p = w[i];
+    const x = p.x;
+    const z = p.z;
+    p.x = x * Math.cos(turn) - z * Math.sin(turn);
+    p.z = x * Math.sin(turn) + z * Math.cos(turn);
+  }
+  w[LM.rightShoulder].visibility = 0.45; // far shoulder dims — used to kill the frame at 0.5
   const bf = new BodyFrame();
   expect(bf.update(w)).toBe(true);
-  const e = new THREE.Euler().setFromQuaternion(bf.quat, 'ZYX');
-  expect(Math.abs(e.z)).toBeGreaterThan(0.1); // lean shows up as roll
+  const e = new THREE.Euler().setFromQuaternion(bf.quat, 'YXZ');
+  expect(Math.abs(e.y)).toBeGreaterThan(0.8);
 });
 
 test('body frame captures a torso turn as yaw about y', () => {
@@ -147,6 +194,38 @@ test('off-screen hand: bone relaxes toward rest gradually, never snaps', () => {
     robot.object.updateWorldMatrix(true, true);
   }
   expect(bone.quaternion.angleTo(rest)).toBeLessThan(0.2);
+});
+
+test('legs: knee raise drives the upper leg in full-body mode only', () => {
+  const norm = blank();
+  norm[LM.leftShoulder] = lm(0.6, 0.3, 0);
+  norm[LM.rightShoulder] = lm(0.4, 0.3, 0);
+  norm[LM.leftHip] = lm(0.55, 0.55, 0);
+  norm[LM.rightHip] = lm(0.45, 0.55, 0);
+
+  const raised = canonicalPerson();
+  raised[LM.rightKnee] = lm(-0.1, 0.05, -0.35); // knee up, toward camera
+
+  const run = (mode: 'upper' | 'full') => {
+    config.bodyMode = mode;
+    const robot = createRobot();
+    const rt = new Retargeter(robot);
+    const bone = robot.bones.rightUpperLeg!;
+    const rest = bone.quaternion.clone();
+    for (let i = 0; i < 40; i++) {
+      rt.updateFromPose(raised, norm);
+      rt.tick(0.033);
+      robot.object.updateWorldMatrix(true, true);
+    }
+    return bone.quaternion.angleTo(rest);
+  };
+
+  try {
+    expect(run('full')).toBeGreaterThan(0.7); // ~90° hip flex enacted
+    expect(run('upper')).toBeLessThan(0.05); // legs stay in idle
+  } finally {
+    config.bodyMode = 'upper';
+  }
 });
 
 test('low-visibility torso invalidates the frame but keeps previous values', () => {

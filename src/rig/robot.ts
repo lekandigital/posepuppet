@@ -134,11 +134,18 @@ export function createRobot(): Avatar {
     upper.position.set(sx * 0.09, -0.05, 0);
     hips.add(upper);
     bones[`${prefix}UpperLeg`] = upper;
+    joints[`${prefix}Hip`] = upper;
 
     const lower = limbSegment(0.38, 0.048);
     lower.position.set(0, -0.4, 0);
     upper.add(lower);
     bones[`${prefix}LowerLeg`] = lower;
+    joints[`${prefix}Knee`] = lower;
+
+    const ankle = new THREE.Object3D();
+    ankle.position.set(0, -0.38, 0);
+    lower.add(ankle);
+    joints[`${prefix}Ankle`] = ankle;
 
     const foot = shadowed(new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.05, 0.19), DARK));
     foot.position.set(0, -0.39, 0.04);

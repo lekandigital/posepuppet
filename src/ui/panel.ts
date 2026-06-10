@@ -49,8 +49,15 @@ export function createPanel(): void {
   host.id = 'panel';
   host.classList.add('hidden');
 
+  const fullBody = document.createElement('input');
+  fullBody.type = 'checkbox';
+  fullBody.id = 'full-body-toggle';
+  fullBody.checked = config.bodyMode === 'full';
+  fullBody.onchange = () => setConfig('bodyMode', fullBody.checked ? 'full' : 'upper');
+
   host.append(
     row('mirror', toggle('mirror')),
+    row('full body (legs)', fullBody),
     row('smoothing', toggle('smoothing')),
     row('root motion', toggle('rootMotion')),
     row('minCutoff', slider('minCutoff', 0.1, 3, 0.05)),

@@ -25,7 +25,13 @@ export type JointName =
   | 'leftWrist'
   | 'rightShoulder'
   | 'rightElbow'
-  | 'rightWrist';
+  | 'rightWrist'
+  | 'leftHip'
+  | 'leftKnee'
+  | 'leftAnkle'
+  | 'rightHip'
+  | 'rightKnee'
+  | 'rightAnkle';
 
 export interface Avatar {
   name: string;
