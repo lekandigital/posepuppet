@@ -8,9 +8,7 @@ fixtures/
 public/mediapipe-wasm/
 public/models/
 
-# Third-party avatar binaries stay out of git until license approval is recorded in ASSETS.md
-public/avatars/*.vrm
-!public/avatars/woody.vrm
+# Unconverted avatar sources stay out of git (runtime .vrm files are committed)
 public/avatars/*.glb
 public/avatars/*.fbx
 public/avatars/*.gltf

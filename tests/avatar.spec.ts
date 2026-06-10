@@ -1,5 +1,5 @@
 // Live avatar switcher: robot → astronaut → woody → robot.
-// woody.vrm is committed for production; astronaut stays optional (see ASSETS.md).
+// VRM files live in public/avatars/ and ship with production builds.
 import { test, expect } from '@playwright/test';
 import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
