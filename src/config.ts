@@ -1,6 +1,8 @@
 // Settings store: plain object + subscribers, persisted to localStorage.
 // The hot loop reads fields directly; no per-frame allocations or events.
 
+import type { AvatarId } from './rig/avatarRegistry';
+
 export interface Config {
   mirror: boolean;
   smoothing: boolean;
@@ -9,7 +11,7 @@ export interface Config {
   slerpRate: number; // 1/s — render-tick slerp toward bone targets
   relaxSec: number; // time constant for decay-to-rest on lost visibility
   model: 'full' | 'lite';
-  avatar: 'robot' | 'vrm';
+  avatar: AvatarId;
   bodyMode: 'upper' | 'full';
   rootMotion: boolean;
 }
@@ -25,7 +27,7 @@ const DEFAULTS: Config = {
   slerpRate: 28,
   relaxSec: 0.7,
   model: 'full',
-  avatar: 'robot',
+  avatar: 'woody',
   bodyMode: 'upper',
   rootMotion: true,
 };

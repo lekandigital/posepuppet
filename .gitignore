@@ -11,6 +11,10 @@ public/models/
 # Third-party avatar binaries stay out of git until license approval is recorded in ASSETS.md
 public/avatars/*.vrm
 public/avatars/*.glb
+public/avatars/*.fbx
+public/avatars/*.gltf
+public/avatars/*.blend
+public/avatars/textures/
 
 # Test/eval transients (eval/results.json IS committed)
 test-results/
@@ -20,3 +24,4 @@ media/
 
 .DS_Store
 *.local
+.vercel

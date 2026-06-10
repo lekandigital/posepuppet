@@ -1,0 +1,11 @@
+fixtures/
+media/
+recordings/
+test-results/
+playwright-report/
+node_modules/
+dist/
+public/mediapipe-wasm/
+public/models/
+public/avatars/*.vrm
+public/avatars/*.glb

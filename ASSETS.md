@@ -57,3 +57,48 @@ fallbacks.
 **Decision needed from Lekan:** pick one (or rank two) at the M2 gate reply.
 The chosen file will live in `public/avatars/` (gitignored until this section
 records the approval + exact license text alongside the download URL).
+
+---
+
+### Licensed Woody avatar — user supplied
+
+- **FBX source:** `/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx`
+- **Texture directory:** `/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/textures`
+- **Reference GLB:** `/Users/lekan/Downloads/woody/woody_toy_story_rig_free_download.glb`
+- **Runtime VRM path:** `public/avatars/woody.vrm`
+- **Rig type:** Mixamo (`mixamorig:Hips`, `mixamorig:LeftArm`, etc. — 64 bones)
+- **Status:** user-provided licensed asset — **not committed to git** by default.
+  License terms must be recorded before any public redistribution.
+  The app only expects the final VRM file to exist locally at the runtime path above.
+
+#### Local usage
+
+```sh
+cd /Users/lekan/Dev/posepuppet
+
+mkdir -p public/avatars
+
+/Applications/Blender.app/Contents/MacOS/Blender \
+  -b \
+  --python tools/export_fbx_to_vrm.py \
+  -- "/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx" \
+  public/avatars/woody.vrm
+
+npm run dev
+```
+
+Then open: `http://localhost:5173?avatar=woody`
+
+#### Likely failure modes
+
+| symptom | cause |
+|---|---|
+| `blender: command not found` | Blender not at `/Applications/Blender.app/Contents/MacOS/Blender` |
+| `VRM Add-on is not installed` | Script uses GLB+VRM-injection path; this should not happen |
+| `No armature found` | FBX has no skeleton data |
+| `Incomplete humanoid bone mapping` | Auto-map failed; pass `--mapping tools/woody-bone-map.json` |
+| Pink/missing materials | Texture path mismatch in FBX; repair in Blender GUI, re-export |
+| Model facing wrong direction | May need 180° rotation in Blender or a root transform |
+| Model too large/small | Scale factor; adjust in Blender export settings |
+| Long limbs/proportions | Calibrate in-app or apply per-bone offsets in the settings panel |
+
