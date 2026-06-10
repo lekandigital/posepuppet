@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "date": "2026-06-10T12:38:49.494Z",
+    "machine": "darwin arm64 — Apple M5",
+    "mode": "headed",
+    "durationSecPerFixture": 60,
+    "note": "headed run on real hardware; FPS numbers are representative"
+  },
+  "results": [
+    {
+      "fixture": "arms",
+      "durationSec": 60,
+      "videoFrames": 1658,
+      "detectedFrames": 1658,
+      "detectionRate": 1,
+      "poseFps": 29.32,
+      "renderFps": 116.58,
+      "droppedFrames": 142,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 28,
+        "t30": 23,
+        "t60": 21
+      },
+      "sync": {
+        "leftUpperArm": 35.52,
+        "leftForearm": 101.68,
+        "rightUpperArm": 38.06,
+        "rightForearm": 100.23,
+        "torso": 0.52,
+        "upperLimbsMean": 68.87
+      },
+      "finishedAt": "2026-06-10T12:36:46.533Z",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "mode": "headed"
+    },
+    {
+      "fixture": "torso",
+      "durationSec": 60,
+      "videoFrames": 1792,
+      "detectedFrames": 1792,
+      "detectionRate": 1,
+      "poseFps": 29.87,
+      "renderFps": 118.74,
+      "droppedFrames": 8,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 28,
+        "t30": 21,
+        "t60": 21
+      },
+      "sync": {
+        "leftUpperArm": 12.27,
+        "leftForearm": 9.52,
+        "rightUpperArm": 9.09,
+        "rightForearm": 8.3,
+        "torso": 3.83,
+        "upperLimbsMean": 9.8
+      },
+      "finishedAt": "2026-06-10T12:37:48.322Z",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "mode": "headed"
+    },
+    {
+      "fixture": "fast",
+      "durationSec": 60,
+      "videoFrames": 1793,
+      "detectedFrames": 1793,
+      "detectionRate": 1,
+      "poseFps": 29.89,
+      "renderFps": 118.51,
+      "droppedFrames": 7,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 28,
+        "t30": 21,
+        "t60": 21
+      },
+      "sync": {
+        "leftUpperArm": 22.01,
+        "leftForearm": 107.87,
+        "rightUpperArm": 31.02,
+        "rightForearm": 150.53,
+        "torso": 4.22,
+        "upperLimbsMean": 77.86
+      },
+      "finishedAt": "2026-06-10T12:38:49.398Z",
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "mode": "headed"
+    }
+  ]
+}
