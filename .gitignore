@@ -1,0 +1,22 @@
+node_modules/
+dist/
+
+# NEVER commit fixtures — personal camera footage (mission non-negotiable)
+fixtures/
+
+# Generated at install time (postinstall copies/downloads these)
+public/mediapipe-wasm/
+public/models/
+
+# Third-party avatar binaries stay out of git until license approval is recorded in ASSETS.md
+public/avatars/*.vrm
+public/avatars/*.glb
+
+# Test/eval transients (eval/results.json IS committed)
+test-results/
+playwright-report/
+recordings/
+media/raw/
+
+.DS_Store
+*.local

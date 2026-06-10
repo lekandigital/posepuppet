@@ -1,0 +1,124 @@
+:root {
+  --bg: #0e0f13;
+  --panel: #15171e;
+  --edge: #262a35;
+  --text: #d8dce6;
+  --dim: #8a90a0;
+  --accent: #4cc2ff;
+  --live: #ff4c5b;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 14px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--edge);
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand-name { font-weight: 700; letter-spacing: 0.04em; }
+
+.live-badge {
+  background: var(--live);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  letter-spacing: 0.1em;
+  animation: live-pulse 2s ease-in-out infinite;
+}
+.live-badge.hidden { display: none; }
+@keyframes live-pulse { 50% { opacity: 0.55; } }
+
+.hud { display: flex; gap: 14px; color: var(--dim); }
+.hud span { min-width: 110px; }
+
+.controls { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.controls button, .controls select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+.controls button:hover { border-color: var(--accent); }
+.controls button.active { border-color: var(--accent); color: var(--accent); }
+
+.split {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+}
+
+.pane {
+  flex: 1 1 50%;
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.camera-pane { background: #000; border-right: 1px solid var(--edge); }
+
+#video {
+  position: absolute;
+  /* JS lays this out to the object-fit:contain rect */
+  transform: scaleX(-1);
+}
+#video.unmirrored { transform: none; }
+
+#overlay {
+  position: absolute;
+  pointer-events: none;
+  transform: scaleX(-1);
+}
+#overlay.unmirrored { transform: none; }
+
+.camera-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dim);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px;
+  pointer-events: none;
+}
+.camera-status.hidden { display: none; }
+
+.stage-pane { background: var(--bg); }
+#stage { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+#footer {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--dim);
+  background: var(--panel);
+  border-top: 1px solid var(--edge);
+  text-align: center;
+}
