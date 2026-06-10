@@ -1,0 +1,22 @@
+{
+  "_comment": "VRM humanoid bone mapping: VRM bone name → source armature bone name. Fill in the right-hand values with the actual bone names from your FBX/GLB. Use --mapping <this-file> with export_fbx_to_vrm.py.",
+  "hips": "",
+  "spine": "",
+  "chest": "",
+  "neck": "",
+  "head": "",
+  "leftShoulder": "",
+  "leftUpperArm": "",
+  "leftLowerArm": "",
+  "leftHand": "",
+  "rightShoulder": "",
+  "rightUpperArm": "",
+  "rightLowerArm": "",
+  "rightHand": "",
+  "leftUpperLeg": "",
+  "leftLowerLeg": "",
+  "leftFoot": "",
+  "rightUpperLeg": "",
+  "rightLowerLeg": "",
+  "rightFoot": ""
+}

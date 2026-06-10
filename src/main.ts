@@ -6,7 +6,6 @@ import { createStage } from './stage/scene';
 import { createHud } from './ui/hud';
 import { createPanel } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
-import { loadVrmAvatar } from './rig/vrm';
 import { createDetector, type ModelVariant } from './pose/detector';
 import { drawSkeleton } from './overlay/skeleton';
 import { mirrorNorm, mirrorWorld } from './pose/mirror';
@@ -15,6 +14,7 @@ import type { LandmarkPoint, PoseFrame } from './pose/types';
 import { createRobot } from './rig/robot';
 import { Retargeter } from './rig/retarget';
 import type { Avatar } from './rig/types';
+import { type AvatarId, isAvatarId, getAvatarDef, nextAvatarId, loadAvatarById } from './rig/avatarRegistry';
 import { EvalCollector } from './eval/runner';
 import { createRecorder, createRecordButton, updateRecordButton } from './record/recorder';
 
@@ -45,7 +45,10 @@ async function boot() {
   const evalDuration = Number(params.get('dur') ?? 60);
   const modelVariant = (params.get('model') ?? config.model) as ModelVariant;
   if (params.has('mirror')) config.mirror = params.get('mirror') !== '0';
-  if (params.has('avatar')) config.avatar = params.get('avatar') === 'vrm' ? 'vrm' : 'robot';
+  if (params.has('avatar')) {
+    const av = params.get('avatar')!;
+    config.avatar = isAvatarId(av) ? av : 'woody';
+  }
   // ?src=file plays the fixture mp4 directly (manual eval without fake cam)
   const videoSrc =
     params.get('video') ?? (evalFixture && params.get('src') === 'file' ? `/fixtures/${evalFixture}.mp4` : null);
@@ -91,20 +94,27 @@ async function boot() {
     setCorrectionEuler: (b, e) => retargeter.setCorrectionEuler(b, e),
   });
 
-  // live avatar switcher: robot ↔ VRM (astronaut, CC0 — see ASSETS.md)
+  // live avatar switcher: robot → astronaut → woody → robot (see ASSETS.md)
   let avatarLoading = false;
-  async function setAvatar(kind: 'robot' | 'vrm'): Promise<void> {
-    if (avatarLoading || avatar.name === (kind === 'vrm' ? 'vrm' : 'robot')) return;
+  let currentAvatarId: AvatarId = 'robot';
+  async function setAvatar(id: AvatarId): Promise<void> {
+    if (avatarLoading || currentAvatarId === id) return;
     avatarLoading = true;
     try {
-      const next = kind === 'vrm' ? await loadVrmAvatar('/avatars/astronaut.vrm') : createRobot();
+      const next = await loadAvatarById(id);
       stage.scene.add(next.object);
       avatar.dispose();
       avatar = next;
       retargeter.bind(avatar);
+      currentAvatarId = id;
     } catch (err) {
-      console.warn('avatar load failed, keeping current:', err);
-      setConfig('avatar', 'robot');
+      const def = getAvatarDef(id);
+      console.warn(
+        `Failed to load avatar "${id}" from ${def.url ?? '(procedural)'}. ` +
+        `Is the licensed VRM file present?`,
+        err,
+      );
+      setConfig('avatar', currentAvatarId); // revert config to current
     } finally {
       avatarLoading = false;
     }
@@ -112,10 +122,10 @@ async function boot() {
   const avatarBtn = document.createElement('button');
   avatarBtn.id = 'avatar-btn';
   const avatarLabel = () => {
-    avatarBtn.textContent = config.avatar === 'vrm' ? 'avatar: astronaut' : 'avatar: robot';
+    avatarBtn.textContent = `avatar: ${getAvatarDef(config.avatar).label}`;
   };
   avatarLabel();
-  avatarBtn.onclick = () => setConfig('avatar', config.avatar === 'robot' ? 'vrm' : 'robot');
+  avatarBtn.onclick = () => setConfig('avatar', nextAvatarId(config.avatar));
   onConfigChange((key) => {
     if (key === 'avatar') {
       avatarLabel();
@@ -214,7 +224,7 @@ async function boot() {
 
   // settle the initial avatar before detection/eval starts, so eval mode
   // measures the avatar it claims to measure
-  if (config.avatar === 'vrm') await setAvatar('vrm');
+  if (config.avatar !== 'robot') await setAvatar(config.avatar);
 
   statusEl.textContent = 'loading pose model…';
   statusEl.classList.remove('hidden');
