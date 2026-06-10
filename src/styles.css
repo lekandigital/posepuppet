@@ -66,6 +66,7 @@ body {
 }
 .controls button:hover { border-color: var(--accent); }
 .controls button.active { border-color: var(--accent); color: var(--accent); }
+#record-btn.recording { border-color: #ff5a5a; color: #ff5a5a; }
 
 .split {
   flex: 1 1 auto;
