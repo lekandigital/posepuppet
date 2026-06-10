@@ -10,6 +10,7 @@ public/models/
 
 # Third-party avatar binaries stay out of git until license approval is recorded in ASSETS.md
 public/avatars/*.vrm
+!public/avatars/woody.vrm
 public/avatars/*.glb
 public/avatars/*.fbx
 public/avatars/*.gltf

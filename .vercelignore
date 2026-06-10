@@ -8,4 +8,5 @@ dist/
 public/mediapipe-wasm/
 public/models/
 public/avatars/*.vrm
+!public/avatars/woody.vrm
 public/avatars/*.glb
