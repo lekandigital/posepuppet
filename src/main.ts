@@ -5,7 +5,8 @@ import { startCamera, startVideoFile, watchLayout, layoutOverlay, setMirrored } 
 import { createStage } from './stage/scene';
 import { createHud } from './ui/hud';
 import { createPanel } from './ui/panel';
-import { config, onConfigChange } from './config';
+import { config, onConfigChange, setConfig } from './config';
+import { loadVrmAvatar } from './rig/vrm';
 import { createDetector, type ModelVariant } from './pose/detector';
 import { drawSkeleton } from './overlay/skeleton';
 import { mirrorNorm, mirrorWorld } from './pose/mirror';
@@ -44,6 +45,7 @@ async function boot() {
   const evalDuration = Number(params.get('dur') ?? 60);
   const modelVariant = (params.get('model') ?? config.model) as ModelVariant;
   if (params.has('mirror')) config.mirror = params.get('mirror') !== '0';
+  if (params.has('avatar')) config.avatar = params.get('avatar') === 'vrm' ? 'vrm' : 'robot';
   // ?src=file plays the fixture mp4 directly (manual eval without fake cam)
   const videoSrc =
     params.get('video') ?? (evalFixture && params.get('src') === 'file' ? `/fixtures/${evalFixture}.mp4` : null);
@@ -88,6 +90,39 @@ async function boot() {
     getCorrectionEuler: (b) => retargeter.getCorrectionEuler(b),
     setCorrectionEuler: (b, e) => retargeter.setCorrectionEuler(b, e),
   });
+
+  // live avatar switcher: robot ↔ VRM (astronaut, CC0 — see ASSETS.md)
+  let avatarLoading = false;
+  async function setAvatar(kind: 'robot' | 'vrm'): Promise<void> {
+    if (avatarLoading || avatar.name === (kind === 'vrm' ? 'vrm' : 'robot')) return;
+    avatarLoading = true;
+    try {
+      const next = kind === 'vrm' ? await loadVrmAvatar('/avatars/astronaut.vrm') : createRobot();
+      stage.scene.add(next.object);
+      avatar.dispose();
+      avatar = next;
+      retargeter.bind(avatar);
+    } catch (err) {
+      console.warn('avatar load failed, keeping current:', err);
+      setConfig('avatar', 'robot');
+    } finally {
+      avatarLoading = false;
+    }
+  }
+  const avatarBtn = document.createElement('button');
+  avatarBtn.id = 'avatar-btn';
+  const avatarLabel = () => {
+    avatarBtn.textContent = config.avatar === 'vrm' ? 'avatar: astronaut' : 'avatar: robot';
+  };
+  avatarLabel();
+  avatarBtn.onclick = () => setConfig('avatar', config.avatar === 'robot' ? 'vrm' : 'robot');
+  onConfigChange((key) => {
+    if (key === 'avatar') {
+      avatarLabel();
+      void setAvatar(config.avatar);
+    }
+  });
+  document.getElementById('controls')!.append(avatarBtn);
 
   const smoother = new LandmarkSmoother();
   smoother.setParams(config.minCutoff, config.beta);
@@ -176,6 +211,10 @@ async function boot() {
     });
   };
   document.getElementById('controls')!.append(fileBtn);
+
+  // settle the initial avatar before detection/eval starts, so eval mode
+  // measures the avatar it claims to measure
+  if (config.avatar === 'vrm') await setAvatar('vrm');
 
   statusEl.textContent = 'loading pose model…';
   statusEl.classList.remove('hidden');

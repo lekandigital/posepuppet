@@ -11,6 +11,7 @@ import { sampleLimbAngles, SyncAccumulator, type LimbName } from './sync';
 
 export interface EvalResult {
   fixture: string;
+  avatar: string;
   durationSec: number;
   videoFrames: number;
   detectedFrames: number;
@@ -109,6 +110,7 @@ export class EvalCollector {
 
     const result: EvalResult = {
       fixture: this.fixture,
+      avatar: this.deps.getAvatar().name, // actual, not requested
       durationSec: this.durationSec,
       videoFrames: this.videoFrames,
       detectedFrames: this.detectedFrames,

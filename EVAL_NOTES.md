@@ -1,5 +1,25 @@
 # Eval notes
 
+## M4 — VRM avatar (2026-06-10)
+Avatar: "Astronaut" 048 from 100Avatars R1 (CC0 — the license is embedded in
+the file's own VRM meta; full provenance in ASSETS.md), driven through the
+same Retargeter behind the Avatar interface via RAW humanoid bones. The one
+real bug: three-vrm's humanoid.autoUpdateHumanBones defaults true and copies
+the static normalized rig over the raw bones every vrm.update(), freezing
+the model in T-pose — disabling it brought the astronaut to life with zero
+other changes. Combined 60s×6 eval (robot/vrm per fixture, headed, M5 GPU):
+all M4 bars met on BOTH avatars — arms 9.51°/10.86°, torso 2.17°/2.28°,
+fast 19.18°/20.26° (bars ≤15/≤15/≤25), detection 100%, pose ~29.5 fps,
+render ~117 fps, zero console errors. Vision review (12 VRM frames across
+all fixtures): hands-up, single-arm raise, guard and punch poses all mirror
+correctly with real elbow articulation; the side turn reads beautifully
+(helmet in profile) and the deep lean lands with a head dip; no candy-wrapper
+twist, no possession. Honest notes: the astronaut's stylized short limbs
+read ~1° worse than the robot on the metric and make extreme reaches look
+compressed; springbone antenna adds charm for free. Switcher robot↔astronaut
+is instant and Playwright-tested (skips gracefully when the gitignored VRM
+isn't downloaded).
+
 ## M3 — calibration + robustness (2026-06-10)
 Driven by the M2 live-test gate report (lean-right and side turns dying live,
 legs requested). Root cause for the torso failures was not the rotation math

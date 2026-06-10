@@ -17,6 +17,8 @@ const root = resolve(here, '..');
 const argv = process.argv.slice(2);
 const headless = argv.includes('--headless');
 const dur = Number((argv.find((a) => a.startsWith('--dur=')) ?? '--dur=60').split('=')[1]);
+// --avatar=robot | vrm | robot,vrm (one results entry per fixture × avatar)
+const avatars = (argv.find((a) => a.startsWith('--avatar=')) ?? '--avatar=robot').split('=')[1].split(',');
 const names = argv.filter((a) => !a.startsWith('--'));
 const fixtures = names.length ? names : ['arms', 'torso', 'fast'];
 const BASE = 'http://localhost:5173';
@@ -45,9 +47,10 @@ if (!(await serverUp())) {
 
 const results = [];
 try {
+  for (const avatar of avatars)
   for (const fixture of fixtures) {
     const y4m = resolve(root, 'fixtures', `${fixture}.y4m`);
-    console.log(`eval: ${fixture} (${dur}s, ${headless ? 'headless' : 'headed'})`);
+    console.log(`eval: ${fixture} (${dur}s, ${headless ? 'headless' : 'headed'}, avatar=${avatar})`);
     const browser = await chromium.launch({
       headless,
       args: [
@@ -63,7 +66,7 @@ try {
     page.on('console', (m) => m.type() === 'error' && consoleErrors.push(m.text()));
     page.on('pageerror', (e) => consoleErrors.push(String(e)));
 
-    await page.goto(`${BASE}/?eval=${fixture}&dur=${dur}`);
+    await page.goto(`${BASE}/?eval=${fixture}&dur=${dur}&avatar=${avatar}`);
     const handle = await page.waitForFunction(() => window.__EVAL_RESULT, undefined, {
       timeout: (dur + 120) * 1000,
     });

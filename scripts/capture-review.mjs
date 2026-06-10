@@ -22,6 +22,8 @@ const timesArg = process.argv.find((a) => a.startsWith('--times='));
 const SNAP_TIMES = timesArg
   ? timesArg.slice('--times='.length).split(',').map(Number)
   : [2, 4.5, 7, 9.5, 12];
+// --avatar=vrm captures the VRM instead of the robot (prefixes filenames)
+const avatar = (process.argv.find((a) => a.startsWith('--avatar=')) ?? '--avatar=robot').split('=')[1];
 const BASE = 'http://localhost:5173';
 
 async function serverUp() {
@@ -52,14 +54,15 @@ try {
       ],
     });
     const page = await browser.newPage({ viewport: { width: 1440, height: 810 } });
-    await page.goto(BASE);
+    await page.goto(`${BASE}/?avatar=${avatar}`);
     await page.waitForFunction(() => window.__PP?.detectionCount > 5, undefined, { timeout: 45_000 });
 
+    const prefix = avatar === 'robot' ? '' : `${avatar}-`;
     let last = 0;
     for (const t of SNAP_TIMES) {
       await page.waitForTimeout((t - last) * 1000);
       last = t;
-      await page.screenshot({ path: resolve(outDir, `${fixture}-t${String(t).replace('.', '_')}.png`) });
+      await page.screenshot({ path: resolve(outDir, `${prefix}${fixture}-t${String(t).replace('.', '_')}.png`) });
     }
     await browser.close();
     console.log(`captured ${SNAP_TIMES.length} frames for ${fixture}`);
