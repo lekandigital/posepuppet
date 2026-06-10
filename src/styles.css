@@ -113,6 +113,37 @@ body {
 .stage-pane { background: var(--bg); }
 #stage { position: absolute; inset: 0; width: 100%; height: 100%; }
 
+#panel {
+  position: fixed;
+  right: 12px;
+  bottom: 40px;
+  z-index: 50;
+  background: #15171ef0;
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 11px;
+  width: 230px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#panel.hidden { display: none; }
+.panel-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.panel-row > span { color: var(--dim); }
+.panel-slider { display: flex; align-items: center; gap: 6px; }
+.panel-slider input { width: 110px; }
+.panel-slider em { font-style: normal; min-width: 36px; text-align: right; }
+#panel button {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  padding: 4px;
+  cursor: pointer;
+  font: inherit;
+}
+
 #footer {
   flex: 0 0 auto;
   padding: 6px 14px;
