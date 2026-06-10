@@ -11,13 +11,16 @@
 Fixture videos are personal camera footage and are never committed (gitignored
 from commit 1).
 
-## VRM avatar shortlist — PROPOSED, awaiting approval
+## VRM avatar shortlist
 
-**Mission non-negotiable: no third-party asset is downloaded into the repo or
-committed until Lekan approves one of these in writing.** All three are
-redistributable in a public repo + public demo per the licenses below.
+**APPROVED 2026-06-10 by Lekan (in-session structured reply): candidate 1,
+100Avatars (CC0).** The specific avatar file will be chosen from the registry
+at M4 prep; before it is committed, this section gets the exact avatar name,
+download URL, and license text recorded alongside it. `public/avatars/*.vrm`
+stays gitignored until that record exists. Candidates 2–3 below are kept as
+fallbacks.
 
-### 1. 100Avatars series (Polygonal Mind) — RECOMMENDED
+### 1. 100Avatars series (Polygonal Mind) — APPROVED
 - **Source:** [open-source-avatars registry](https://github.com/ToxSam/open-source-avatars) / [opensourceavatars.com](https://www.opensourceavatars.com/en/gallery)
 - **License:** CC0 1.0 — registry states "Our own free avatars, no attribution needed"; 300+ VRM avatars
 - **Why:** cleanest possible license, big stylized variety — easy to pick one

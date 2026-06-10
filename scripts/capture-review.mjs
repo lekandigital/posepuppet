@@ -17,7 +17,11 @@ mkdirSync(outDir, { recursive: true });
 
 const names = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const fixtures = names.length ? names : ['arms', 'torso', 'fast'];
-const SNAP_TIMES = [2, 4.5, 7, 9.5, 12]; // seconds after detection starts
+// seconds after detection starts; override: --times=1,2.5,4,...
+const timesArg = process.argv.find((a) => a.startsWith('--times='));
+const SNAP_TIMES = timesArg
+  ? timesArg.slice('--times='.length).split(',').map(Number)
+  : [2, 4.5, 7, 9.5, 12];
 const BASE = 'http://localhost:5173';
 
 async function serverUp() {

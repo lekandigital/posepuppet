@@ -30,6 +30,12 @@ const LIMB_SPECS: LimbSpec[] = [
   { bone: 'leftLowerArm', from: LM.leftElbow, to: LM.leftWrist, joints: ['leftElbow', 'leftWrist'] },
   { bone: 'rightUpperArm', from: LM.rightShoulder, to: LM.rightElbow, joints: ['rightShoulder', 'rightElbow'] },
   { bone: 'rightLowerArm', from: LM.rightElbow, to: LM.rightWrist, joints: ['rightElbow', 'rightWrist'] },
+  // legs gate on config.bodyMode AND per-bone visibility — at a desk the
+  // knees/ankles never clear VIS_ON, so legs hold the relaxed idle.
+  { bone: 'leftUpperLeg', from: LM.leftHip, to: LM.leftKnee, joints: ['leftHip', 'leftKnee'], legs: true },
+  { bone: 'leftLowerLeg', from: LM.leftKnee, to: LM.leftAnkle, joints: ['leftKnee', 'leftAnkle'], legs: true },
+  { bone: 'rightUpperLeg', from: LM.rightHip, to: LM.rightKnee, joints: ['rightHip', 'rightKnee'], legs: true },
+  { bone: 'rightLowerLeg', from: LM.rightKnee, to: LM.rightAnkle, joints: ['rightKnee', 'rightAnkle'], legs: true },
 ];
 
 interface BoneState {
@@ -50,7 +56,12 @@ const tmpV2 = new THREE.Vector3();
 const tmpQ1 = new THREE.Quaternion();
 const tmpQ2 = new THREE.Quaternion();
 const tmpM = new THREE.Matrix4();
+const tmpE = new THREE.Euler();
 const IDENTITY = new THREE.Quaternion();
+
+const MAX_YAW = (65 * Math.PI) / 180;
+const MAX_PITCH = (30 * Math.PI) / 180;
+const MAX_LEAN = (45 * Math.PI) / 180;
 
 export class Retargeter {
   private body = new BodyFrame();
@@ -83,6 +94,7 @@ export class Retargeter {
     const allBones: BoneName[] = [
       'chest', 'neck', 'head',
       'leftUpperArm', 'leftLowerArm', 'rightUpperArm', 'rightLowerArm',
+      'leftUpperLeg', 'leftLowerLeg', 'rightUpperLeg', 'rightLowerLeg',
     ];
     for (const name of allBones) {
       const node = this.avatar.bones[name];
@@ -138,6 +150,11 @@ export class Retargeter {
       const st = this.states.get(spec.bone);
       if (!st || !st.restDirParentLocal) continue;
 
+      if (spec.legs && config.bodyMode !== 'full') {
+        st.confident = false; // relaxed idle in upper-body mode
+        continue;
+      }
+
       const vis = Math.min(world[spec.from].visibility, world[spec.to].visibility);
       st.visible = st.visible ? vis > VIS_OFF : vis > VIS_ON;
       if (!st.visible || !bodyOk) {
@@ -146,22 +163,28 @@ export class Retargeter {
       }
       st.confident = true;
 
-      // person's limb direction → body frame
       mpToThree(world[spec.from], tmpV1);
       mpToThree(world[spec.to], tmpV2);
-      const dBody = tmpV2.sub(tmpV1).normalize().applyQuaternion(this.body.quatInv);
+      const dir = tmpV2.sub(tmpV1).normalize();
 
-      // body frame → avatar world, through the torso rotation the avatar is
-      // currently enacting: qDelta = chestWorldNow ⊗ chestWorldRest⁻¹
-      const chest = this.states.get('chest');
-      if (chest) {
-        chest.node.getWorldQuaternion(tmpQ1);
-        dBody.applyQuaternion(chest.restWorldInv).applyQuaternion(tmpQ1);
+      if (!spec.legs) {
+        // arms: person's limb direction → body frame, then body frame →
+        // avatar world through the torso rotation the avatar is currently
+        // enacting: qDelta = chestWorldNow ⊗ chestWorldRest⁻¹
+        dir.applyQuaternion(this.body.quatInv);
+        const chest = this.states.get('chest');
+        if (chest) {
+          chest.node.getWorldQuaternion(tmpQ1);
+          dir.applyQuaternion(chest.restWorldInv).applyQuaternion(tmpQ1);
+        }
       }
+      // legs: raw mirrored camera space — the avatar's hips don't enact the
+      // torso lean, so anchoring legs to the leaned body frame would splay
+      // them sideways every time the person leans.
 
       // world → bone parent-local
       st.node.parent!.getWorldQuaternion(tmpQ1).invert();
-      const dParentLocal = dBody.applyQuaternion(tmpQ1);
+      const dParentLocal = dir.applyQuaternion(tmpQ1);
 
       // swing from rest direction, on top of rest local, then correction
       tmpQ2.setFromUnitVectors(st.restDirParentLocal, dParentLocal);
@@ -169,17 +192,20 @@ export class Retargeter {
     }
   }
 
-  /** Chest enacts the person's torso orientation (clamped). */
+  /** Chest enacts the person's torso orientation (clamped per axis). */
   private updateChest(): void {
     const st = this.states.get('chest');
     if (!st) return;
     st.confident = true;
 
-    // clamp total rotation to 55°
-    tmpQ1.copy(this.body.quat);
-    const angle = 2 * Math.acos(Math.min(1, Math.abs(tmpQ1.w)));
-    const max = (55 * Math.PI) / 180;
-    if (angle > max) tmpQ1.slerp(IDENTITY, 1 - max / angle);
+    // per-axis clamp: a real side turn should read as a turn (yaw up to 65°)
+    // without letting lean or pitch go owl — the old 55° total clamp ate
+    // most of a genuine 90° turn.
+    tmpE.setFromQuaternion(tmpQ1.copy(this.body.quat), 'YXZ');
+    tmpE.y = THREE.MathUtils.clamp(tmpE.y, -MAX_YAW, MAX_YAW);
+    tmpE.x = THREE.MathUtils.clamp(tmpE.x, -MAX_PITCH, MAX_PITCH);
+    tmpE.z = THREE.MathUtils.clamp(tmpE.z, -MAX_LEAN, MAX_LEAN);
+    tmpQ1.setFromEuler(tmpE);
 
     // desired world = qBody ⊗ restWorld → parent-local
     tmpQ2.copy(tmpQ1).multiply(st.restWorld);

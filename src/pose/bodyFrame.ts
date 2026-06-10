@@ -29,7 +29,10 @@ export class BodyFrame {
   private b = new THREE.Vector3();
 
   /** Computes the frame from (already mirrored, smoothed) world landmarks.
-   *  On low-confidence torso the previous frame is kept and valid=false. */
+   *  Hips occluded (desk, tight framing) degrades to a shoulders-only frame —
+   *  lean and turn still read, only hip-relative pitch is lost — so limbs
+   *  keep tracking instead of decaying every time the desk hides the hips.
+   *  On low-confidence shoulders the previous frame is kept and valid=false. */
   update(world: LandmarkPoint[]): boolean {
     const ls = world[LM.leftShoulder];
     const rs = world[LM.rightShoulder];
@@ -37,7 +40,9 @@ export class BodyFrame {
     const rh = world[LM.rightHip];
     const shoulderVis = Math.min(ls.visibility, rs.visibility);
     const hipVis = Math.min(lh.visibility, rh.visibility);
-    if (shoulderVis < 0.5 || hipVis < 0.3) {
+    // 0.4, not 0.5: a side turn dims the far shoulder; killing the frame there
+    // is what made "turn to the side" read as nothing at all.
+    if (shoulderVis < 0.4) {
       this.valid = false;
       return false;
     }
@@ -49,11 +54,22 @@ export class BodyFrame {
     // bodyX: right-shoulder → left-shoulder ≈ +x when facing the viewer
     this.vx.subVectors(this.a, this.b).normalize();
 
-    mpToThree(lh, this.a);
-    mpToThree(rh, this.b);
-    this.hipCenter.addVectors(this.a, this.b).multiplyScalar(0.5);
-
-    this.vy.subVectors(this.shoulderCenter, this.hipCenter).normalize();
+    if (hipVis >= 0.3) {
+      mpToThree(lh, this.a);
+      mpToThree(rh, this.b);
+      this.hipCenter.addVectors(this.a, this.b).multiplyScalar(0.5);
+      this.vy.subVectors(this.shoulderCenter, this.hipCenter);
+    } else {
+      // shoulders-only: up = world-up made orthogonal to the shoulder line,
+      // so a tilted shoulder line still produces roll (lean) and a rotated
+      // one still produces yaw (turn). hipCenter keeps its previous value.
+      this.vy.set(0, 1, 0).addScaledVector(this.vx, -this.vx.y);
+    }
+    if (this.vy.lengthSq() < 0.0004) {
+      this.valid = false; // degenerate (torso collapsed / shoulder line vertical)
+      return false;
+    }
+    this.vy.normalize();
     this.vz.crossVectors(this.vx, this.vy).normalize(); // ≈ +z facing viewer
     this.vx.crossVectors(this.vy, this.vz).normalize(); // re-orthogonalize
 
