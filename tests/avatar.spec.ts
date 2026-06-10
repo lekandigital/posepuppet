@@ -1,6 +1,5 @@
 // Live avatar switcher: robot → astronaut → woody → robot.
-// Skips VRM steps if the (gitignored, license-gated) VRM files haven't been
-// downloaded — see ASSETS.md.
+// woody.vrm is committed for production; astronaut stays optional (see ASSETS.md).
 import { test, expect } from '@playwright/test';
 import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -9,6 +8,14 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const astronautVrm = resolve(root, 'public', 'avatars', 'astronaut.vrm');
 const woodyVrm = resolve(root, 'public', 'avatars', 'woody.vrm');
+
+test('defaults to woody on a fresh visit', async ({ page }) => {
+  test.skip(!existsSync(woodyVrm), 'woody.vrm missing');
+
+  await page.goto('/');
+  await page.waitForFunction(() => window.__PP?.detectionCount > 5, undefined, { timeout: 45_000 });
+  await expect(page.locator('#avatar-btn')).toHaveText('avatar: woody');
+});
 
 test('avatar switcher cycles robot → astronaut → woody → robot', async ({ page }) => {
   const hasAstronaut = existsSync(astronautVrm);

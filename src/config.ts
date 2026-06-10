@@ -32,7 +32,7 @@ const DEFAULTS: Config = {
   rootMotion: true,
 };
 
-const KEY = 'posepuppet-config-v2';
+const KEY = 'posepuppet-config-v3';
 
 function load(): Config {
   try {
