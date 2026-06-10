@@ -228,6 +228,35 @@ test('legs: knee raise drives the upper leg in full-body mode only', () => {
   }
 });
 
+test('calibration maps the held pose to rest', () => {
+  const robot = createRobot();
+  const rt = new Retargeter(robot);
+  const world = canonicalPerson();
+  world[LM.leftWrist] = lm(0.2, -0.25, -0.35); // forearm at the camera
+  const norm = blank();
+  norm[LM.leftShoulder] = lm(0.6, 0.4, 0);
+  norm[LM.rightShoulder] = lm(0.4, 0.4, 0);
+  norm[LM.leftHip] = lm(0.55, 0.7, 0);
+  norm[LM.rightHip] = lm(0.45, 0.7, 0);
+
+  const bone = robot.bones.leftLowerArm!;
+  const rest = bone.quaternion.clone();
+  const settle = () => {
+    for (let i = 0; i < 60; i++) {
+      rt.updateFromPose(world, norm);
+      rt.tick(0.033);
+      robot.object.updateWorldMatrix(true, true);
+    }
+  };
+
+  settle();
+  expect(bone.quaternion.angleTo(rest)).toBeGreaterThan(0.8); // pose is far from rest
+
+  rt.calibrate(); // this held pose becomes neutral
+  settle();
+  expect(bone.quaternion.angleTo(rest)).toBeLessThan(0.1); // …so it now reads as rest
+});
+
 test('low-visibility torso invalidates the frame but keeps previous values', () => {
   const bf = new BodyFrame();
   bf.update(canonicalPerson());

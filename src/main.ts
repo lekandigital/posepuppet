@@ -51,11 +51,43 @@ async function boot() {
   const els = { video, overlay, pane };
   const hud = createHud();
   const stage = createStage(stageCanvas);
-  createPanel();
 
   let avatar: Avatar = createRobot();
   stage.scene.add(avatar.object);
   let retargeter = new Retargeter(avatar);
+
+  // 3-2-1 countdown over the camera pane, then capture the neutral pose
+  let countdownActive = false;
+  function calibrateWithCountdown(): void {
+    if (countdownActive) return;
+    countdownActive = true;
+    const el = document.createElement('div');
+    el.className = 'countdown';
+    el.textContent = '3';
+    pane.appendChild(el);
+    let n = 3;
+    const timer = setInterval(() => {
+      n--;
+      if (n > 0) {
+        el.textContent = String(n);
+        return;
+      }
+      clearInterval(timer);
+      retargeter.calibrate();
+      el.textContent = 'calibrated ✓';
+      setTimeout(() => {
+        el.remove();
+        countdownActive = false;
+      }, 900);
+    }, 1000);
+  }
+
+  createPanel({
+    calibrate: calibrateWithCountdown,
+    clearCalibration: () => retargeter.clearCalibration(),
+    getCorrectionEuler: (b) => retargeter.getCorrectionEuler(b),
+    setCorrectionEuler: (b, e) => retargeter.setCorrectionEuler(b, e),
+  });
 
   const smoother = new LandmarkSmoother();
   smoother.setParams(config.minCutoff, config.beta);
@@ -108,6 +140,42 @@ async function boot() {
     onState: updateRecordButton,
   });
   createRecordButton(recorder);
+
+  // video-file input through the same pipeline (M3); toggles back to camera
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'video/*';
+  fileInput.style.display = 'none';
+  document.body.append(fileInput);
+  const fileBtn = document.createElement('button');
+  fileBtn.id = 'video-file-btn';
+  fileBtn.textContent = 'load video';
+  let fileMode = false;
+  fileBtn.onclick = () => {
+    if (fileMode) {
+      void startCamera(video).then(() => {
+        fileMode = false;
+        fileBtn.textContent = 'load video';
+        hud.setLive(true);
+        smoother.reset();
+        layoutOverlay(els);
+      });
+    } else {
+      fileInput.click();
+    }
+  };
+  fileInput.onchange = () => {
+    const f = fileInput.files?.[0];
+    if (!f) return;
+    void startVideoFile(video, f).then(() => {
+      fileMode = true;
+      fileBtn.textContent = '↩ camera';
+      hud.setLive(false);
+      smoother.reset();
+      layoutOverlay(els);
+    });
+  };
+  document.getElementById('controls')!.append(fileBtn);
 
   statusEl.textContent = 'loading pose model…';
   statusEl.classList.remove('hidden');
