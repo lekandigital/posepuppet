@@ -17,6 +17,8 @@ test-results/
 playwright-report/
 recordings/
 media/raw/
+# regenerable vision-review sets — only the one milestone screenshot is committed
+media/review/
 
 .DS_Store
 *.local

@@ -1,6 +1,26 @@
 # Eval notes
 
-## M1 — detection + eval rig baseline (2026-06-10)
+## M2 — procedural robot alive (2026-06-10)
+Headed 60 s eval per fixture (Apple M5, GPU delegate), all numbers from
+eval/results.json: detection 100% on all three, pose ~29.9 fps, render
+~119 fps, memory flat over 60 s, zero console errors. Sync upperLimbsMean:
+arms 9.42°, torso 2.22°, fast 18.89° — vs the M1 static baseline of
+68.9°/9.8°/77.9°, and already under the M4 bars (≤15° arms/torso, ≤25° fast),
+with the M2 bar (arms ≤20°) cleared by 2x. Vision review of 15 fresh paired
+frames (media/review/, post-smoothing-fix): mirroring is correct everywhere —
+single-arm raises come up on the matching screen side, both-hands-up and
+guard poses read instantly; elbow articulation is real, torso lean and the
+clamped turn both land, head tilts with the lean. No twisted joints, no
+possession, in any frame. Jitter check (12 stage-only frames over 10 s,
+media/review/jitter/): consecutive frames 0.9 s apart during the held
+single-arm raise are pixel-identical — the rest-state jitter that beta=0.007
+produced is gone. Honest flaws: on fast.mp4 the fastest punches land slightly
+under-extended and a beat late (forearms are the worst limbs at 19–23.5°,
+matching the smoothing lag you'd expect at this beta), and the robot's elbows
+read a touch more bent than the person's at full extension. Off-screen decay
+is now covered by a unit test (gradual relax to rest over ~2 s, no snap);
+live-webcam feel, latency, and a true hand-out-of-frame pass are what the M2
+user gate is for.
 Headed 60 s eval on this machine (Apple M5), GPU delegate, all metrics from
 eval/results.json: detection 100% on all three fixtures, pose loop ~29.5 fps
 (capped by the 30 fps y4m), render ~117 fps, memory stable (28→21 MB over
