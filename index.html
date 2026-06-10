@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PosePuppet</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <header id="topbar">
+      <div class="brand">
+        <span class="brand-name">PosePuppet</span>
+        <span id="live-badge" class="live-badge hidden">LIVE</span>
+      </div>
+      <div id="hud" class="hud">
+        <span id="hud-pose">pose — fps</span>
+        <span id="hud-render">render — fps</span>
+      </div>
+      <div id="controls" class="controls"></div>
+    </header>
+    <main id="split" class="split">
+      <section class="pane camera-pane" id="camera-pane">
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div id="camera-status" class="camera-status">waiting for camera…</div>
+      </section>
+      <section class="pane stage-pane" id="stage-pane">
+        <canvas id="stage"></canvas>
+      </section>
+    </main>
+    <footer id="footer">
+      all inference runs in your browser — no frame, landmark, or recording ever
+      leaves this machine
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
