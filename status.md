@@ -1,3 +1,10 @@
+## 2026-06-10 ~17:50 (M3 complete, awaiting re-test)
+Done: gate feedback fixes (body-frame fallback, per-axis clamp), legs/full-body toggle, calibration 3-2-1 + per-bone offsets persisted, video-file input, record button; ASSETS.md 100Avatars approved
+Sync metric: arms 9.37° / torso 2.22° / fast 18.96° (unchanged within noise after robustness fixes)
+FPS: pose 29.5, render ~118 (headed, Apple M5); suite 16/16 headless
+Blockers: lean-right + legs need Lekan's live re-test (fixtures can't show them); then M4 VRM
+Next: quick live re-test of lean/turn/legs → M4 VRM via 100Avatars + BoneMap + switcher
+
 ## 2026-06-10 ~17:15 (M2 verification complete)
 Done: full 60s eval all 3 fixtures; vision review (15 frames) + jitter burst (12 frames) reviewed; decay unit test added; EVAL_NOTES M2 entry written
 Sync metric: arms 9.42° / torso 2.22° / fast 18.89° upperLimbsMean (M2 bar ≤20° ✓; already under M4 bars)

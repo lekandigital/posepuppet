@@ -2,6 +2,23 @@
 // loop reads config directly. Toggle with the ⚙ button or "d".
 
 import { config, setConfig, resetConfig, type Config } from '../config';
+import type { BoneName } from '../rig/types';
+
+/** Calibration hooks the panel drives; implemented by main over the live
+ *  retargeter so avatar swaps keep working. */
+export interface PanelRigApi {
+  calibrate(): void;
+  clearCalibration(): void;
+  getCorrectionEuler(bone: BoneName): { x: number; y: number; z: number };
+  setCorrectionEuler(bone: BoneName, e: { x: number; y: number; z: number }): void;
+}
+
+const OFFSET_BONES: BoneName[] = [
+  'chest', 'neck', 'head',
+  'leftUpperArm', 'leftLowerArm', 'rightUpperArm', 'rightLowerArm',
+  'leftUpperLeg', 'leftLowerLeg', 'rightUpperLeg', 'rightLowerLeg',
+];
+const DEG = Math.PI / 180;
 
 function row(label: string, input: HTMLElement): HTMLElement {
   const div = document.createElement('div');
@@ -44,7 +61,7 @@ function toggle(key: keyof Config & ('mirror' | 'smoothing' | 'rootMotion')): HT
   return input;
 }
 
-export function createPanel(): void {
+export function createPanel(rig?: PanelRigApi): void {
   const host = document.createElement('div');
   host.id = 'panel';
   host.classList.add('hidden');
@@ -77,12 +94,74 @@ export function createPanel(): void {
   modelSel.onchange = () => setConfig('model', modelSel.value as Config['model']);
   host.append(row('model', modelSel));
 
+  if (rig) {
+    const calBtn = document.createElement('button');
+    calBtn.id = 'calibrate-btn';
+    calBtn.textContent = 'calibrate (3-2-1)';
+    calBtn.title = 'stand neutral; your held pose becomes the rest pose';
+    calBtn.onclick = () => rig.calibrate();
+
+    const clearBtn = document.createElement('button');
+    clearBtn.textContent = 'clear calib';
+    clearBtn.onclick = () => {
+      rig.clearCalibration();
+      syncOffsetSliders();
+    };
+    const calRow = document.createElement('div');
+    calRow.className = 'panel-row';
+    calRow.append(calBtn, clearBtn);
+    host.append(calRow);
+
+    // per-bone offset: bone selector + xyz degree sliders, persisted
+    const boneSel = document.createElement('select');
+    boneSel.id = 'offset-bone';
+    for (const b of OFFSET_BONES) {
+      const o = document.createElement('option');
+      o.value = b;
+      o.textContent = b;
+      boneSel.append(o);
+    }
+    host.append(row('offset bone', boneSel));
+
+    const axisSliders: { axis: 'x' | 'y' | 'z'; input: HTMLInputElement; val: HTMLElement }[] = [];
+    for (const axis of ['x', 'y', 'z'] as const) {
+      const wrap = document.createElement('div');
+      wrap.className = 'panel-slider';
+      const input = document.createElement('input');
+      input.type = 'range';
+      input.min = '-45';
+      input.max = '45';
+      input.step = '1';
+      const val = document.createElement('em');
+      input.oninput = () => {
+        const bone = boneSel.value as BoneName;
+        const e = rig.getCorrectionEuler(bone);
+        e[axis] = Number(input.value) * DEG;
+        rig.setCorrectionEuler(bone, e);
+        val.textContent = `${input.value}°`;
+      };
+      wrap.append(input, val);
+      host.append(row(`offset ${axis}`, wrap));
+      axisSliders.push({ axis, input, val });
+    }
+    function syncOffsetSliders(): void {
+      const e = rig!.getCorrectionEuler(boneSel.value as BoneName);
+      for (const s of axisSliders) {
+        const deg = Math.round(e[s.axis] / DEG);
+        s.input.value = String(deg);
+        s.val.textContent = `${deg}°`;
+      }
+    }
+    boneSel.onchange = syncOffsetSliders;
+    syncOffsetSliders();
+  }
+
   const reset = document.createElement('button');
   reset.textContent = 'reset defaults';
   reset.onclick = () => {
     resetConfig();
     host.remove();
-    createPanel();
+    createPanel(rig);
     document.getElementById('panel')!.classList.remove('hidden');
   };
   host.append(reset);

@@ -83,6 +83,19 @@ body {
 
 .camera-pane { background: #000; border-right: 1px solid var(--edge); }
 
+.countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 88px;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 2px 18px #000;
+  z-index: 5;
+  pointer-events: none;
+}
+
 #video {
   position: absolute;
   /* JS lays this out to the object-fit:contain rect */

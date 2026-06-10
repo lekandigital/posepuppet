@@ -1,5 +1,25 @@
 # Eval notes
 
+## M3 — calibration + robustness (2026-06-10)
+Driven by the M2 live-test gate report (lean-right and side turns dying live,
+legs requested). Root cause for the torso failures was not the rotation math
+(sign-symmetric, now pinned by unit tests) but the visibility gates: desk
+occlusion of hips or a dimmed far shoulder killed the whole body frame and
+decayed chest and limbs to rest. Fixes: shoulders-only body-frame fallback,
+shoulder gate 0.5→0.4, per-axis chest clamp (yaw 65°, lean 45°, pitch 30°).
+Dense 10-frame torso review: deep lean fully enacted with head tilt, and the
+~90° side turn now visibly reads on the robot where the old 55° total clamp
+ate it. Eval after the changes is unchanged within noise — arms 9.37°, torso
+2.22°, fast 18.96°, detection 100%, pose ~29.5 fps, render ~118 fps — so the
+robustness came free. New: legs (raw-mirrored-space targets, gated on the
+full-body toggle + per-bone visibility; knee-raise unit test), neutral-pose
+calibration (3-2-1 countdown; held pose maps to rest — verified by unit
+test), per-bone offset sliders persisted to JSON, video-file input button.
+media/m3-calibration.png shows the panel with the new controls live. Honest
+caveat: the lean-right fix addresses the diagnosed gate-kill mechanism, but
+the fixtures contain no clean right-lean segment — Lekan's next live test is
+the real confirmation; legs are similarly fixture-unverifiable at a desk.
+
 ## M2 — procedural robot alive (2026-06-10)
 Headed 60 s eval per fixture (Apple M5, GPU delegate), all numbers from
 eval/results.json: detection 100% on all three, pose ~29.9 fps, render

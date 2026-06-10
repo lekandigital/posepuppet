@@ -46,8 +46,16 @@ interface BoneState {
   restDirParentLocal: THREE.Vector3 | null; // limbs only
   target: THREE.Quaternion;
   correction: THREE.Quaternion;
+  lastSwing: THREE.Quaternion | null; // limbs: last rest→target swing, for calibration
   visible: boolean; // hysteresis state
   confident: boolean; // drives decay vs track
+}
+
+const CALIB_KEY = 'posepuppet-calib-v1';
+
+interface CalibStore {
+  bodyZeroInv: number[];
+  corrections: Record<string, number[]>;
 }
 
 // scratch
@@ -67,6 +75,8 @@ export class Retargeter {
   private body = new BodyFrame();
   private states = new Map<BoneName, BoneState>();
   private avatar: Avatar;
+  /** torso rotation is enacted relative to this zero pose (calibration). */
+  private bodyZeroInv = new THREE.Quaternion();
 
   // root motion state
   private rootRest = new THREE.Vector3();
@@ -108,11 +118,13 @@ export class Retargeter {
         restDirParentLocal: null,
         target: node.quaternion.clone(),
         correction: new THREE.Quaternion(),
+        lastSwing: null,
         visible: false,
         confident: false,
       };
       this.states.set(name, st);
     }
+    this.loadCalibration();
 
     for (const spec of LIMB_SPECS) {
       const st = this.states.get(spec.bone);
@@ -188,7 +200,69 @@ export class Retargeter {
 
       // swing from rest direction, on top of rest local, then correction
       tmpQ2.setFromUnitVectors(st.restDirParentLocal, dParentLocal);
+      (st.lastSwing ??= new THREE.Quaternion()).copy(tmpQ2);
       st.target.copy(tmpQ2).multiply(st.restLocal).multiply(st.correction);
+    }
+  }
+
+  /** Neutral-pose calibration: the pose held right now becomes "rest".
+   *  Torso gets a zero-reference; each tracking limb gets a correction that
+   *  maps its captured swing back to the avatar's rest. Persisted. */
+  calibrate(): void {
+    if (this.body.valid) this.bodyZeroInv.copy(this.body.quat).invert();
+    for (const st of this.states.values()) {
+      if (!st.lastSwing || !st.confident) continue;
+      // C = R⁻¹ · S₀⁻¹ · R  ⇒  swing S₀ composes to exactly restLocal
+      tmpQ1.copy(st.lastSwing).invert();
+      st.correction.copy(st.restLocal).invert().multiply(tmpQ1).multiply(st.restLocal);
+    }
+    this.persistCalibration();
+  }
+
+  clearCalibration(): void {
+    this.bodyZeroInv.identity();
+    for (const st of this.states.values()) st.correction.identity();
+    try {
+      localStorage.removeItem(CALIB_KEY);
+    } catch {
+      /* node / private mode */
+    }
+  }
+
+  getCorrectionEuler(bone: BoneName): { x: number; y: number; z: number } {
+    const st = this.states.get(bone);
+    if (!st) return { x: 0, y: 0, z: 0 };
+    tmpE.setFromQuaternion(st.correction, 'XYZ');
+    return { x: tmpE.x, y: tmpE.y, z: tmpE.z };
+  }
+
+  setCorrectionEuler(bone: BoneName, e: { x: number; y: number; z: number }): void {
+    this.setCorrection(bone, e);
+    this.persistCalibration();
+  }
+
+  private persistCalibration(): void {
+    const store: CalibStore = { bodyZeroInv: this.bodyZeroInv.toArray(), corrections: {} };
+    for (const [name, st] of this.states) store.corrections[name] = st.correction.toArray();
+    try {
+      localStorage.setItem(CALIB_KEY, JSON.stringify(store));
+    } catch {
+      /* node / private mode */
+    }
+  }
+
+  private loadCalibration(): void {
+    try {
+      const raw = localStorage.getItem(CALIB_KEY);
+      if (!raw) return;
+      const store = JSON.parse(raw) as CalibStore;
+      if (store.bodyZeroInv?.length === 4) this.bodyZeroInv.fromArray(store.bodyZeroInv);
+      for (const [name, arr] of Object.entries(store.corrections ?? {})) {
+        const st = this.states.get(name as BoneName);
+        if (st && arr.length === 4) st.correction.fromArray(arr);
+      }
+    } catch {
+      /* node / corrupt JSON → defaults */
     }
   }
 
@@ -200,8 +274,8 @@ export class Retargeter {
 
     // per-axis clamp: a real side turn should read as a turn (yaw up to 65°)
     // without letting lean or pitch go owl — the old 55° total clamp ate
-    // most of a genuine 90° turn.
-    tmpE.setFromQuaternion(tmpQ1.copy(this.body.quat), 'YXZ');
+    // most of a genuine 90° turn. Rotation is relative to the calibrated zero.
+    tmpE.setFromQuaternion(tmpQ1.copy(this.bodyZeroInv).multiply(this.body.quat), 'YXZ');
     tmpE.y = THREE.MathUtils.clamp(tmpE.y, -MAX_YAW, MAX_YAW);
     tmpE.x = THREE.MathUtils.clamp(tmpE.x, -MAX_PITCH, MAX_PITCH);
     tmpE.z = THREE.MathUtils.clamp(tmpE.z, -MAX_LEAN, MAX_LEAN);
