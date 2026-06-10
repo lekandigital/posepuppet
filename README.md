@@ -31,6 +31,10 @@ npm run dev   # → http://localhost:5173, allow camera
 9. The avatar is a procedural robot built from primitives in a real bone hierarchy (VRM avatar planned — see ASSETS.md).
 10. An eval mode (`?eval=<fixture>`) replays clips through the whole pipeline and writes metrics to `eval/results.json`.
 
+The **● rec** button composites the side-by-side view into one canvas and
+records 15 s to a downloadable `.webm` via MediaRecorder — the recording is
+written by your browser to your disk and never leaves your machine.
+
 ## Current numbers
 
 From `eval/results.json` (2026-06-10, 60 s per fixture, headed Chromium on

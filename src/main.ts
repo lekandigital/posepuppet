@@ -15,6 +15,7 @@ import { createRobot } from './rig/robot';
 import { Retargeter } from './rig/retarget';
 import type { Avatar } from './rig/types';
 import { EvalCollector } from './eval/runner';
+import { createRecorder, createRecordButton, updateRecordButton } from './record/recorder';
 
 declare global {
   interface Window {
@@ -25,6 +26,7 @@ declare global {
       poseFps: () => number;
       lastDetectionAt: number;
       detectionCount: number;
+      lastRecording: { size: number; type: string } | null;
     };
   }
 }
@@ -76,6 +78,7 @@ async function boot() {
     poseFps: () => 0,
     lastDetectionAt: 0,
     detectionCount: 0,
+    lastRecording: null,
   };
 
   watchLayout(els);
@@ -97,6 +100,14 @@ async function boot() {
     statusEl.textContent = `camera unavailable: ${msg} — allow camera access and reload`;
     return;
   }
+
+  const recorder = createRecorder({
+    video,
+    overlay,
+    stage: stageCanvas,
+    onState: updateRecordButton,
+  });
+  createRecordButton(recorder);
 
   statusEl.textContent = 'loading pose model…';
   statusEl.classList.remove('hidden');

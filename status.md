@@ -4,7 +4,7 @@ Sync metric: arms 9.42° / torso 2.22° / fast 18.89° upperLimbsMean (M2 bar �
 FPS: pose 29.9, render ~119 (headed, Apple M5, GPU delegate); memory flat 60s; 0 console errors
 Blockers: none — awaiting M2 USER ACTION gate (live webcam test)
 Next: user runs 90s live test script; fix reported issues; then M3 calibration + robustness
-Also done while gated: VRM shortlist researched + proposed in ASSETS.md (2 CC0 families + Seed-san VPL1.0, approval pending); README.md written with privacy line, eval numbers, limitations
+Also done while gated: VRM shortlist researched + proposed in ASSETS.md (2 CC0 families + Seed-san VPL1.0, approval pending); README.md written with privacy line, eval numbers, limitations; DEMO_SCRIPT draft + POSTS scaffold; record button → .webm built + Playwright-tested (suite 12/12 headless)
 
 ## 2026-06-10 ~12:47 (post-smoothing-fix eval)
 Done: M0, M1, M2 robot pipeline; One Euro beta corrected to 8 (metric space); eval re-run
