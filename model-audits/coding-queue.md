@@ -45,3 +45,46 @@
 - Darth Vader has now cleared source dry-run, Blender inspect, candidate conversion, and candidate validation.
 - The next blocking proof is a runtime browser load smoke test, not more source conversion work.
 - Keep `public/avatars/darth-vader.vrm` untouched until that runtime smoke test passes and the user explicitly approves promotion.
+
+## Batch A completion (2026-06-11)
+
+Fortnite Batman, Iron Man, and Shrek have been converted, validated, and browser-smoke-tested.
+They are no longer in the coding queue for conversion.
+Next action: runtime quality review (pose tracking fidelity, deformation quality).
+
+### Recommended Batch B candidates
+
+Based on pre-mega-run analysis (Blender inspect passed):
+- `amazing-spider-man-2` — 22 bones, good humanoid mapping
+- `terminator-t-800` — 22 bones, good humanoid mapping
+- `spider-man-no-way-home` — high humanoid mapping, GLB source
+
+## Post-Batch B Queue Status (2026-06-11)
+
+### Completed (browser smoke pass, not public UI)
+
+| Model | Batch | Status |
+|-------|-------|--------|
+| woody | Pre-batch | browser_smoke_pass, experimental |
+| darth-vader | Pre-batch | browser_smoke_pass, experimental |
+| fortnite-batman | A | browser_smoke_pass, experimental |
+| iron-man | A | browser_smoke_pass, experimental |
+| shrek | A | browser_smoke_pass, experimental |
+| amazing-spider-man-2 | B | browser_smoke_pass, experimental |
+| terminator-t-800 | B | browser_smoke_pass, experimental |
+| spider-man-no-way-home | B | browser_smoke_pass, experimental |
+
+### Remaining for future batches
+
+- spider-man-playstation
+- jack-sparrow
+- elsa
+- buzz-lightyear
+- teal-v2
+- rigged-hand
+- grogu
+- olaf
+- baby-yoda
+- xenomorph
+- godzilla
+- king-kong

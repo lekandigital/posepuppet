@@ -1,0 +1,57 @@
+{
+  "armature_count": 1,
+  "blender_log_path": "/home/o/Dev/posepuppet/model-audits/spider-man-no-way-home/rig-prep-inspect/blender.log",
+  "created_at": "2026-06-11T16:51:45+00:00",
+  "deformation_risks": [
+    "face-touch remains deferred until runtime tests",
+    "runtime browser smoke is not attempted"
+  ],
+  "finger_support": "missing",
+  "foot_support": "good",
+  "hand_support": "good",
+  "humanoid_bone_count": 22,
+  "humanoid_mapping": {
+    "chest": "mixamorig:Spine1_83_07",
+    "head": "mixamorig:Head_2_010",
+    "hips": "mixamorig:Hips_95_05",
+    "jaw": null,
+    "leftEye": null,
+    "leftFoot": "mixamorig:LeftFoot_87_00",
+    "leftHand": "mixamorig:LeftHand_39_017",
+    "leftLowerArm": "mixamorig:LeftForeArm_40_016",
+    "leftLowerLeg": "mixamorig:LeftLeg_88_0133",
+    "leftShoulder": "mixamorig:LeftShoulder_42_014",
+    "leftToes": "mixamorig:LeftToeBase_86_0134",
+    "leftUpperArm": "mixamorig:LeftArm_41_015",
+    "leftUpperLeg": "mixamorig:LeftUpLeg_89_0132",
+    "neck": "mixamorig:Neck_3_09",
+    "rightEye": null,
+    "rightFoot": "mixamorig:RightFoot_92_0140",
+    "rightHand": "mixamorig:RightHand_78_076",
+    "rightLowerArm": "mixamorig:RightForeArm_79_075",
+    "rightLowerLeg": "mixamorig:RightLeg_93_0139",
+    "rightShoulder": "mixamorig:RightShoulder_81_073",
+    "rightToes": "mixamorig:RightToeBase_91_0141",
+    "rightUpperArm": "mixamorig:RightArm_80_074",
+    "rightUpperLeg": "mixamorig:RightUpLeg_94_0138",
+    "spine": "mixamorig:Spine_84_06",
+    "upperChest": "mixamorig:Spine2_82_08"
+  },
+  "material_count": 8,
+  "mesh_count": 9,
+  "primary_armature": "Object_8",
+  "scale_orientation": {
+    "estimated_height": 2.80721,
+    "rest_pose_guess": "unknown"
+  },
+  "schema_version": "posepuppet-source-rig-cleanup-v1",
+  "selected_source_path": "OtherSpiderman/spider-man_no_way_home_rigged.glb",
+  "slug": "spider-man-no-way-home",
+  "status": "pass",
+  "texture_count": 0,
+  "warnings": [
+    "License unknown; do not redistribute this model or generated converted files.",
+    "No finger bones detected; use palm-only hand control.",
+    "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+  ]
+}

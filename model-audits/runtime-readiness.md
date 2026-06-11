@@ -44,3 +44,19 @@
 - All 4 Playwright tests: **pass** (21.5s)
 - 18/18 remaining models: dry-run source resolution **pass** on Ubuntu
 - 5/18 next-batch models: Blender inspect **pass** (batman, iron-man, shrek, asm2, t-800)
+| Fortnite Batman | fortnite-batman | convert_then_test | humanoid | `fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend` | `public/avatars/fortnite-batman.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | medium | `model-audits/fortnite-batman/expansion-readiness.json` | 2 | VRM browser-loads via query param. Runtime tracking accuracy not yet tested. |
+| Iron Man | iron-man | convert_then_test | humanoid | `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend` | `public/avatars/iron-man.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | medium | `model-audits/iron-man/expansion-readiness.json` | 3 | VRM browser-loads via query param. Runtime tracking accuracy not yet tested. |
+| Shrek | shrek | convert_then_test | humanoid | `shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx` | `public/avatars/shrek.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | medium | `model-audits/shrek/expansion-readiness.json` | 4 | VRM browser-loads via query param. Runtime tracking accuracy not yet tested. |
+
+## Batch B browser smoke update (2026-06-11)
+
+- Amazing Spider-Man 2 browser smoke: **pass** (`?generatedAvatar=amazing-spider-man-2&smoke=avatar-load-only`)
+- Terminator T-800 browser smoke: **pass** (`?generatedAvatar=terminator-t-800&smoke=avatar-load-only`)
+- Spider-Man No Way Home browser smoke: **pass** (`?generatedAvatar=spider-man-no-way-home&smoke=avatar-load-only`)
+- All 10 Playwright tests: **pass** (28.5s)
+- Public UI promotion: **none**
+- Generated VRMs staged: **no**
+
+| Amazing Spider-Man 2 | amazing-spider-man-2 | convert_then_test | humanoid | FBX source | `/avatars/generated/amazing-spider-man-2.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | medium | `model-audits/amazing-spider-man-2/expansion-readiness.json` | B-1 | VRM browser-loads via query param. Fingers missing. Scale 55.74. |
+| Terminator T-800 | terminator-t-800 | convert_then_test | humanoid | Blend source | `/avatars/generated/terminator-t-800.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | light | `model-audits/terminator-t-800/expansion-readiness.json` | B-2 | VRM browser-loads via query param. Endo-skeleton. Fingers missing. Scale 213.55. |
+| Spider-Man No Way Home | spider-man-no-way-home | convert_then_test | humanoid | GLB source | `/avatars/generated/spider-man-no-way-home.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | heavy | `model-audits/spider-man-no-way-home/expansion-readiness.json` | B-3 | VRM browser-loads via query param. Fingers missing. 15.2 MB VRM. |

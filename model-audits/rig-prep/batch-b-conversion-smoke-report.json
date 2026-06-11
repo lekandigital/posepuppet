@@ -1,0 +1,61 @@
+{
+  "schema_version": "posepuppet-batch-conversion-report-v1",
+  "batch": "B",
+  "created_at": "2026-06-11T16:52:00+00:00",
+  "models_attempted": ["amazing-spider-man-2", "terminator-t-800", "spider-man-no-way-home"],
+  "models_converted": 3,
+  "models_validated": 3,
+  "models_browser_smoke_pass": 3,
+  "models_failed": 0,
+  "per_model": {
+    "amazing-spider-man-2": {
+      "conversion": "pass",
+      "vrm_size_bytes": 11212744,
+      "humanoid_bone_count": 22,
+      "vrmc_vrm_present": true,
+      "validation": "pass",
+      "browser_smoke": "pass",
+      "source_format": ".fbx",
+      "fingers_preserved": "missing",
+      "hands_preserved": "good",
+      "feet_preserved": "good"
+    },
+    "terminator-t-800": {
+      "conversion": "pass",
+      "vrm_size_bytes": 755120,
+      "humanoid_bone_count": 22,
+      "vrmc_vrm_present": true,
+      "validation": "pass",
+      "browser_smoke": "pass",
+      "source_format": ".blend",
+      "fingers_preserved": "missing",
+      "hands_preserved": "good",
+      "feet_preserved": "good"
+    },
+    "spider-man-no-way-home": {
+      "conversion": "pass",
+      "vrm_size_bytes": 15974984,
+      "humanoid_bone_count": 22,
+      "vrmc_vrm_present": true,
+      "validation": "pass",
+      "browser_smoke": "pass",
+      "source_format": ".glb",
+      "fingers_preserved": "missing",
+      "hands_preserved": "good",
+      "feet_preserved": "good"
+    }
+  },
+  "playwright_tests": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "duration_seconds": 28.5
+  },
+  "safety_invariants": {
+    "npm_build": "pass",
+    "generated_vrms_staged": false,
+    "public_ui_promotion": false,
+    "normal_avatar_cycling_unchanged": true,
+    "generated_vrms_ignored": true
+  }
+}

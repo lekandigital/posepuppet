@@ -54,3 +54,25 @@
 ### Dry-run source resolution
 
 All 18 remaining models resolve their source on Ubuntu. See `rig-prep/remaining-model-inventory-delta.md`.
+
+## Batch A conversion results (2026-06-11)
+
+| Model | VRM candidate | VRM size | Bones | Conversion | Validation | Browser smoke | Public UI |
+|-------|--------------|----------|-------|-----------|-----------|--------------|-----------|
+| Fortnite Batman | `/home/o/posepuppet-working/generated-vrms/fortnite-batman.vrm` | 16.0 MB | 24 | ✅ pass | ✅ pass | ✅ pass | not promoted |
+| Iron Man | `/home/o/posepuppet-working/generated-vrms/iron-man.vrm` | 841 KB | 21 | ✅ pass | ✅ pass | ✅ pass | not promoted |
+| Shrek | `/home/o/posepuppet-working/generated-vrms/shrek.vrm` | 4.1 MB | 20 | ✅ pass | ✅ pass | ✅ pass | not promoted |
+
+All 3 Batch A models converted, validated, and browser-smoke-tested successfully.
+Playwright: 7/7 tests pass (including existing Woody, Darth Vader, fallback, and cycling tests).
+No generated VRMs staged. No public UI promotion.
+
+## Batch B Conversion Results (2026-06-11)
+
+| Model | Source Format | Conversion | VRM Size | Bones | VRMC | Validation | Browser Smoke | Status |
+|-------|-------------|-----------|----------|-------|------|-----------|---------------|--------|
+| amazing-spider-man-2 | .fbx | pass | 10.7 MB | 22 | ✓ | pass | pass | experimental |
+| terminator-t-800 | .blend | pass | 737 KB | 22 | ✓ | pass | pass | experimental |
+| spider-man-no-way-home | .glb | pass | 15.2 MB | 22 | ✓ | pass | pass | experimental |
+
+All Batch B models: `conversion_pass`, `validation_pass`, `browser_smoke_pass`, `experimental`, `query_param_only`, `not_public_ui`.

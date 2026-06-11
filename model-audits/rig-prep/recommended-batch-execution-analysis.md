@@ -73,3 +73,42 @@ Rigged-hand needs `hand_only_mode`. Creatures need `creature_profile_system`.
 **9 of 20 models (Batches 0-2) can be processed with ZERO new feature work.** The existing
 pipeline handles them end-to-end. A mega-run covering Batches 0-2 would take ~5.5 hours
 and produce 9 browser-loadable avatars.
+
+## Batch A execution results (2026-06-11)
+
+Batch A executed: fortnite-batman, iron-man, shrek
+All 3 models: conversion pass, validation pass, browser smoke pass.
+No blockers encountered.
+
+### Batch B recommendation
+
+| Candidate | Bones | Inspect status | Source format | Risk |
+|-----------|-------|---------------|--------------|------|
+| amazing-spider-man-2 | 22 | pass | fbx | low |
+| terminator-t-800 | 22 | pass | blend | low |
+| spider-man-no-way-home | high mapping | not inspected | glb | low |
+
+Recommendation: proceed to Batch B with the above 3 models.
+Pre-condition: Batch A safety invariants confirmed (no staged VRMs, no public promotion).
+
+## Post-Batch B Analysis (2026-06-11)
+
+### Recommended next batch (Batch C)
+
+Based on model-family-strategies and remaining inventory:
+
+1. **spider-man-playstation** — Another spider variant, humanoid, convert_then_test
+2. **jack-sparrow** — Humanoid with offsets, convert_then_test
+3. **elsa** — Humanoid with offsets, cleanup_then_convert (needs more prep)
+
+### Models requiring custom work (later batches)
+
+- buzz-lightyear, teal-v2: cleanup_then_convert (manual bone map needed)
+- grogu, olaf, baby-yoda, xenomorph, godzilla, king-kong: custom_profile (creature)
+- rigged-hand: hand_test_only (not a full avatar)
+
+### Batch B summary
+
+- All 3 Batch B models converted and passed browser smoke on first attempt.
+- Source formats: .fbx, .blend, .glb — all three major formats worked.
+- Pipeline is proving reliable across varied source types.

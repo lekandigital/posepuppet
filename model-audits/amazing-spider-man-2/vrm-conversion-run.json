@@ -1,0 +1,27 @@
+{
+  "candidate_vrm_exists": true,
+  "candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm",
+  "candidate_vrm_size_bytes": 11212744,
+  "command": [
+    "/home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/blender",
+    "-b",
+    "--python",
+    "/home/o/Dev/posepuppet/tools/export_source_to_vrm.py",
+    "--",
+    "/home/o/posepuppet-working/model-working/amazing-spider-man-2/conversion-input/amazing-spider-man-2/Amazing_Spider_Man_2_Rigged.fbx",
+    "/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm",
+    "--mapping",
+    "/home/o/Dev/posepuppet/model-audits/amazing-spider-man-2/suggested-bone-map.json"
+  ],
+  "created_at": "2026-06-11T16:51:08+00:00",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/amazing-spider-man-2/suggested-bone-map.json",
+  "materialized_source_path": "/home/o/posepuppet-working/model-working/amazing-spider-man-2/conversion-input/amazing-spider-man-2/Amazing_Spider_Man_2_Rigged.fbx",
+  "public_avatar_written": false,
+  "runtime_browser_smoke": "not_attempted",
+  "schema_version": "posepuppet-vrm-conversion-run-v1",
+  "selected_source_path": "OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx",
+  "slug": "amazing-spider-man-2",
+  "status": "pass",
+  "stderr": "",
+  "stdout": "FBX version: 7700\nArmature: Armature\nFinal mapped bones: 22\nWARNING: could not pack base_color_texture: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/amazing-spider-man-2/conversion-input/amazing-spider-man-2/skins_a094904e-1adc-4416-962c-8c6ac8a97df9.fbm/Model001_Material001_baseColor.png' not found\n\nWARNING: could not pack normalmap_texture: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/amazing-spider-man-2/conversion-input/amazing-spider-man-2/skins_a094904e-1adc-4416-962c-8c6ac8a97df9.fbm/Model001_Material001_normal.png' not found\n\nWARNING: could not pack normalmap_texture.001: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/amazing-spider-man-2/conversion-input/amazing-spider-man-2/skins_a094904e-1adc-4416-962c-8c6ac8a97df9.fbm/Model001_Material003_normal.png' not found\n\nINFO Draco mesh compression is available, use library at /home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/5.1/scripts/addons_core/io_scene_gltf2/libextern_draco.so\n12:51:07 | INFO: Starting glTF 2.0 export\n12:51:07 | INFO: Extracting primitive: Object_2_Model001_Material003_0.001\n12:51:08 | INFO: Primitives created: 7\n12:51:08 | WARNING: There are more than 4 joint vertex influences.The 4 with highest weight will be used (and normalized).\n12:51:08 | INFO: Finished glTF 2.0 export in 0.19474339485168457 s\n\nVRM written: /home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm\nBlender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 02:18:37)\n\nBlender quit\n"
+}

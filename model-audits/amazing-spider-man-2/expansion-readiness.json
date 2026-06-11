@@ -1,0 +1,17 @@
+{
+  "schema_version": "posepuppet-expansion-readiness-v1",
+  "slug": "amazing-spider-man-2",
+  "conversion_pass": true,
+  "validation_pass": true,
+  "browser_smoke_pass": true,
+  "humanoid_bone_count": 22,
+  "vrm_size_bytes": 11212744,
+  "public_ui_ready": false,
+  "works_well": false,
+  "batch": "B",
+  "next_step": "runtime_quality_review",
+  "blockers": [],
+  "experimental": true,
+  "query_param_only": true,
+  "not_public_ui": true
+}

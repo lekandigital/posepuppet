@@ -568,3 +568,34 @@ Start with Level 1. Open Level 2 only if implementation needs reasoning context.
 - Target: `public/avatars/baby-yoda.vrm`
 - Read first: `model-audits/baby-yoda/avatar-adapter-spec.json`
 - Do not implement: Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.; Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.; Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.; Do not enable fingers; use palm-only or curl presets.; Do not enable facial expressions for this model yet.; Do not enable feet for this model yet.; Do not force standard full-body humanoid mode; use a creature profile.
+
+---
+
+## Batch B Browser Smoke Results (2026-06-11)
+
+### amazing-spider-man-2
+- Source: `OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx`
+- VRM: `/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm` (10.7 MB)
+- Bones: 22, Hands: good, Feet: good, Fingers: missing
+- Conversion: pass, Validation: pass, Browser smoke: pass
+- Status: `conversion_pass`, `validation_pass`, `browser_smoke_pass`, `experimental`, `query_param_only`, `not_public_ui`
+
+### terminator-t-800
+- Source: `terminator-t-800-endo-skeleton-damaged.zip!/source/.../t-800_LP.blend`
+- VRM: `/home/o/posepuppet-working/generated-vrms/terminator-t-800.vrm` (737 KB)
+- Bones: 22, Hands: good, Feet: good, Fingers: missing
+- Conversion: pass, Validation: pass, Browser smoke: pass
+- Status: `conversion_pass`, `validation_pass`, `browser_smoke_pass`, `experimental`, `query_param_only`, `not_public_ui`
+
+### spider-man-no-way-home
+- Source: `OtherSpiderman/spider-man_no_way_home_rigged.glb`
+- VRM: `/home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm` (15.2 MB)
+- Bones: 22, Hands: good, Feet: good, Fingers: missing
+- Conversion: pass, Validation: pass, Browser smoke: pass
+- Status: `conversion_pass`, `validation_pass`, `browser_smoke_pass`, `experimental`, `query_param_only`, `not_public_ui`
+
+### Aggregate after Batch B
+- Browser-smoke-passing generated avatars: 8/20 total models
+- Playwright tests: 10 passed, 0 failed
+- Public UI promotion: none
+- Generated VRMs staged in git: none

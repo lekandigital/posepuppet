@@ -40,3 +40,25 @@
 
 Scale values > 5m are from FBX/Blender cm-scale models. The VRM exporter normalizes these
 during conversion. This is not a blocker.
+
+## Batch A delta (2026-06-11)
+
+| Model | Pre-batch status | Post-batch status | Delta |
+|-------|-----------------|-------------------|-------|
+| fortnite-batman | inspect_pass | browser_smoke_pass | converted + validated + smoke tested |
+| iron-man | inspect_pass | browser_smoke_pass | converted + validated + smoke tested |
+| shrek | inspect_pass | browser_smoke_pass | converted + validated + smoke tested |
+
+Total browser-smoke-passing generated VRMs: 5 (woody, darth-vader, fortnite-batman, iron-man, shrek)
+Playwright tests: 7/7 pass
+
+## Post-Batch B Delta (2026-06-11)
+
+| Model | Before Batch B | After Batch B |
+|-------|---------------|---------------|
+| amazing-spider-man-2 | convert_then_test | browser_smoke_pass, experimental, query_param_only |
+| terminator-t-800 | convert_then_test | browser_smoke_pass, experimental, query_param_only |
+| spider-man-no-way-home | convert_then_test | browser_smoke_pass, experimental, query_param_only |
+
+Total browser-smoke-passing generated avatars: **8** (woody, darth-vader, fortnite-batman, iron-man, shrek, amazing-spider-man-2, terminator-t-800, spider-man-no-way-home)
+Total Playwright tests: **10** (8 avatar loads + 1 missing fallback + 1 UI cycling guard)

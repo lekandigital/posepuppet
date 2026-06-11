@@ -1,0 +1,29 @@
+{
+  "created_at": "2026-06-11T16:51:39+00:00",
+  "display_name": "Spider-Man No Way Home",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/spider-man-no-way-home/spider-man_no_way_home_rigged.glb",
+  "gates": {
+    "dry_run_resolved": true,
+    "inspect_required_before_attempt": true,
+    "runtime_smoke_test": "not_attempted"
+  },
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/spider-man-no-way-home/suggested-bone-map.json",
+  "risk_notes": [
+    "face-touch remains deferred until runtime tests",
+    "orientation",
+    "runtime browser smoke is not attempted",
+    "scale",
+    "shoulders/wrists if humanoid",
+    "unsupported controls"
+  ],
+  "runtime_glb_companion": "",
+  "schema_version": "posepuppet-rig-prep-plan-v1",
+  "selected_source_format": ".glb",
+  "selected_source_kind": "file",
+  "selected_source_path": "OtherSpiderman/spider-man_no_way_home_rigged.glb",
+  "slug": "spider-man-no-way-home",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/spider-man-no-way-home",
+  "zip_nested_source_chain": []
+}
