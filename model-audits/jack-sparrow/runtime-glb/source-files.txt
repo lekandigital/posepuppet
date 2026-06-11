@@ -1,0 +1,11 @@
+# Source files for Jack Sparrow
+
+Selected source: jack_sparrow_ready_for_animation.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- jack-sparrow-ready-for-animation.zip
+- jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend
+- jack_sparrow_ready_for_animation (1).glb
+- jack_sparrow_ready_for_animation.glb

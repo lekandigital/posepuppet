@@ -1,0 +1,336 @@
+{
+  "archives": [
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 2,
+      "zip": "adi-20-buzz-lightyear-fully-rigged.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 0,
+      "zip": "baby-yoda-mandalorian-low-poly-basic-rig.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 0,
+      "nested_zip_count": 1,
+      "texture_count": 3,
+      "zip": "elsa-free-fall-frozen-with-rig-included (1).zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 0,
+      "nested_zip_count": 1,
+      "texture_count": 3,
+      "zip": "elsa-free-fall-frozen-with-rig-included (2).zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 0,
+      "nested_zip_count": 1,
+      "texture_count": 3,
+      "zip": "elsa-free-fall-frozen-with-rig-included.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 8,
+      "zip": "fortnite-batman-advanced-rig.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 10,
+      "zip": "fortnite-darth-vader-advanced-rig.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 3,
+      "zip": "godzilla-rigged-animated.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 0,
+      "nested_zip_count": 1,
+      "texture_count": 4,
+      "zip": "iron-man-rig.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 17,
+      "zip": "jack-sparrow-ready-for-animation.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 2,
+      "zip": "king-kong-animated.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 3,
+      "zip": "olaf-3d-rigged.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 0,
+      "nested_zip_count": 0,
+      "texture_count": 8,
+      "zip": "OtherSpiderman/spider-man-no-way-home-rigged.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 4,
+      "zip": "OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 4,
+      "zip": "realistic-xenomorph-rig.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 4,
+      "zip": "rigged-hand.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 0,
+      "nested_zip_count": 1,
+      "texture_count": 4,
+      "zip": "shrek-rig.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 7,
+      "zip": "spider-man-playstation-rigged.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 8,
+      "zip": "teal-v2.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 0,
+      "nested_zip_count": 1,
+      "texture_count": 17,
+      "zip": "terminator-t-800-endo-skeleton-damaged.zip"
+    },
+    {
+      "errors": [],
+      "model_source_count": 1,
+      "nested_zip_count": 0,
+      "texture_count": 4,
+      "zip": "the-mandalorian-grogu-advanced-rig.zip"
+    }
+  ],
+  "audits": [
+    {
+      "label": "partial",
+      "name": "The Amazing Spider-Man 2",
+      "overall": 81,
+      "profile": "humanoid",
+      "selected_source": "OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx",
+      "slug": "amazing-spider-man-2"
+    },
+    {
+      "label": "non-humanoid / creature-profile-needed",
+      "name": "Baby Yoda",
+      "overall": 27,
+      "profile": "creature",
+      "selected_source": "baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend",
+      "slug": "baby-yoda"
+    },
+    {
+      "label": "experimental",
+      "name": "Buzz Lightyear",
+      "overall": 21,
+      "profile": "humanoid-with-offsets",
+      "selected_source": "adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend",
+      "slug": "buzz-lightyear"
+    },
+    {
+      "label": "well-developed",
+      "name": "Darth Vader",
+      "overall": 93,
+      "profile": "humanoid",
+      "selected_source": "fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend",
+      "slug": "darth-vader"
+    },
+    {
+      "label": "experimental",
+      "name": "Elsa",
+      "overall": 67,
+      "profile": "humanoid-with-offsets",
+      "selected_source": "elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb",
+      "slug": "elsa"
+    },
+    {
+      "label": "well-developed",
+      "name": "Fortnite Batman",
+      "overall": 93,
+      "profile": "humanoid",
+      "selected_source": "fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend",
+      "slug": "fortnite-batman"
+    },
+    {
+      "label": "non-humanoid / creature-profile-needed",
+      "name": "Godzilla",
+      "overall": 59,
+      "profile": "creature",
+      "selected_source": "godzilla-rigged-animated.zip!/source/Godzilla (New Glow).blend",
+      "slug": "godzilla"
+    },
+    {
+      "label": "non-humanoid / creature-profile-needed",
+      "name": "Grogu",
+      "overall": 68,
+      "profile": "creature",
+      "selected_source": "the-mandalorian-grogu-advanced-rig.zip!/source/Grogurig.blend",
+      "slug": "grogu"
+    },
+    {
+      "label": "well-developed",
+      "name": "Iron Man",
+      "overall": 87,
+      "profile": "humanoid",
+      "selected_source": "iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend",
+      "slug": "iron-man"
+    },
+    {
+      "label": "partial",
+      "name": "Jack Sparrow",
+      "overall": 81,
+      "profile": "humanoid",
+      "selected_source": "jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend",
+      "slug": "jack-sparrow"
+    },
+    {
+      "label": "non-humanoid / creature-profile-needed",
+      "name": "King Kong",
+      "overall": 68,
+      "profile": "creature",
+      "selected_source": "king-kong-animated.zip!/source/king kong.glb",
+      "slug": "king-kong"
+    },
+    {
+      "label": "non-humanoid / creature-profile-needed",
+      "name": "Olaf",
+      "overall": 60,
+      "profile": "creature",
+      "selected_source": "olaf-3d-rigged.zip!/source/OlafRig.blend",
+      "slug": "olaf"
+    },
+    {
+      "label": "hand-only",
+      "name": "Rigged Hand",
+      "overall": 32,
+      "profile": "hand-only",
+      "selected_source": "rigged-hand.zip!/source/handRig_02.fbx",
+      "slug": "rigged-hand"
+    },
+    {
+      "label": "well-developed",
+      "name": "Shrek",
+      "overall": 86,
+      "profile": "humanoid",
+      "selected_source": "shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx",
+      "slug": "shrek"
+    },
+    {
+      "label": "partial",
+      "name": "Spider-Man No Way Home",
+      "overall": 81,
+      "profile": "humanoid",
+      "selected_source": "OtherSpiderman/spider-man_no_way_home_rigged.glb",
+      "slug": "spider-man-no-way-home"
+    },
+    {
+      "label": "partial",
+      "name": "Spider-Man PlayStation",
+      "overall": 81,
+      "profile": "humanoid",
+      "selected_source": "spider-man-playstation-rigged.zip!/source/spider man playstation realistic.blend",
+      "slug": "spider-man-playstation"
+    },
+    {
+      "label": "experimental",
+      "name": "Teal v2",
+      "overall": 53,
+      "profile": "humanoid-with-offsets",
+      "selected_source": "teal-v2.zip!/source/Tealv2.fbx",
+      "slug": "teal-v2"
+    },
+    {
+      "label": "partial",
+      "name": "Terminator T-800",
+      "overall": 81,
+      "profile": "humanoid",
+      "selected_source": "terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend",
+      "slug": "terminator-t-800"
+    },
+    {
+      "label": "non-humanoid / creature-profile-needed",
+      "name": "Xenomorph",
+      "overall": 60,
+      "profile": "creature",
+      "selected_source": "realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx",
+      "slug": "xenomorph"
+    }
+  ],
+  "created_at": "2026-06-11T02:01:42+00:00",
+  "failure_count": 0,
+  "failures": [],
+  "groups": [
+    "amazing-spider-man-2",
+    "baby-yoda",
+    "buzz-lightyear",
+    "darth-vader",
+    "elsa",
+    "fortnite-batman",
+    "godzilla",
+    "grogu",
+    "iron-man",
+    "jack-sparrow",
+    "king-kong",
+    "olaf",
+    "rigged-hand",
+    "shrek",
+    "spider-man-no-way-home",
+    "spider-man-playstation",
+    "teal-v2",
+    "terminator-t-800",
+    "xenomorph"
+  ],
+  "model_count": 19,
+  "prior_evidence": {
+    "bone_trees.md": "/Users/lekan/Dev/posepuppet/models_for_animation/model-glb-probe-20260610-203336/bone_trees.md",
+    "model_glb_probe.json": "/Users/lekan/Dev/posepuppet/models_for_animation/model-glb-probe-20260610-203336/model_glb_probe.json",
+    "model_glb_probe.md": "/Users/lekan/Dev/posepuppet/models_for_animation/model-glb-probe-20260610-203336/model_glb_probe.md"
+  },
+  "schema_version": "posepuppet-avatar-audit-summary-v1"
+}

@@ -1,0 +1,11 @@
+# Source files for Godzilla
+
+Selected source: godzilla_rigged_animated.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- godzilla-rigged-animated.zip
+- godzilla-rigged-animated.zip!/source/Godzilla (New Glow).blend
+- godzilla_rigged_animated (1).glb
+- godzilla_rigged_animated.glb

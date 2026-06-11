@@ -1,0 +1,16 @@
+# Source files for Grogu
+
+Selected source: the-mandalorian-grogu-advanced-rig.zip!/source/Grogurig.blend
+Runtime GLB companion: the_mandalorian_grogu_advanced_rig.glb
+
+## All known variants
+
+- `the-mandalorian-grogu-advanced-rig.zip!/source/Grogurig.blend` (zip-entry, .blend, 10.25 MB)
+- `the_mandalorian_grogu_advanced_rig (1).glb` (file, .glb, 2.54 MB, sha256=6ee2702a797c)
+- `the_mandalorian_grogu_advanced_rig.glb` (file, .glb, 6.70 MB, sha256=d5a1f5f7f281)
+- `the-mandalorian-grogu-advanced-rig.zip` (file, .zip, 16.15 MB, sha256=6bd5dabb80e8)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

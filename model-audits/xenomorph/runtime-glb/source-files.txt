@@ -1,0 +1,11 @@
+# Source files for Xenomorph
+
+Selected source: realistic_xenomorph_rig.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- realistic-xenomorph-rig.zip
+- realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx
+- realistic_xenomorph_rig (1).glb
+- realistic_xenomorph_rig.glb

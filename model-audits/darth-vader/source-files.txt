@@ -1,0 +1,18 @@
+# Source files for Darth Vader
+
+Selected source: fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend
+Runtime GLB companion: fortnite_darth_vader_advanced_rig (2).glb
+
+## All known variants
+
+- `fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend` (zip-entry, .blend, 32.61 MB)
+- `fortnite_darth_vader_advanced_rig (1).glb` (file, .glb, 5.44 MB, sha256=d7252a24c620)
+- `fortnite_darth_vader_advanced_rig (2).glb` (file, .glb, 14.57 MB, sha256=8da60ea9c792)
+- `fortnite_darth_vader_advanced_rig (3).glb` (file, .glb, 5.44 MB, sha256=d7252a24c620)
+- `fortnite_darth_vader_advanced_rig.glb` (file, .glb, 14.57 MB, sha256=8da60ea9c792)
+- `fortnite-darth-vader-advanced-rig.zip` (file, .zip, 45.07 MB, sha256=58fae0d365b0)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

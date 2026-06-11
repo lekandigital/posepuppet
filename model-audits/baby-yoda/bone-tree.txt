@@ -1,0 +1,11 @@
+Bone
+  Bone.009
+    Bone.001
+      Bone.002
+        Bone.004
+          Bone.005
+      Bone.003
+        Bone.006
+          Bone.007
+      Bone.008
+    Bone.010

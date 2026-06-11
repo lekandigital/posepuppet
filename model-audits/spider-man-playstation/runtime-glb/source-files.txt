@@ -1,0 +1,11 @@
+# Source files for Spider-Man PlayStation
+
+Selected source: spider_man_playstation_rigged.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- spider-man-playstation-rigged.zip
+- spider-man-playstation-rigged.zip!/source/spider man playstation realistic.blend
+- spider_man_playstation_rigged (1).glb
+- spider_man_playstation_rigged.glb

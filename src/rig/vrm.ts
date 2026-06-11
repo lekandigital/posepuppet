@@ -12,7 +12,8 @@ import type { Avatar, BoneName, JointName } from './types';
 /** humanoid bone → our BoneName (VRM names match ours for the driven set) */
 const VRM_BONES: BoneName[] = [
   'hips', 'chest', 'neck', 'head',
-  'leftUpperArm', 'leftLowerArm', 'rightUpperArm', 'rightLowerArm',
+  'leftUpperArm', 'leftLowerArm', 'leftHand',
+  'rightUpperArm', 'rightLowerArm', 'rightHand',
   'leftUpperLeg', 'leftLowerLeg', 'rightUpperLeg', 'rightLowerLeg',
 ];
 
@@ -63,6 +64,14 @@ export async function loadVrmAvatar(url: string): Promise<Avatar> {
     const node = vrm.humanoid.getRawBoneNode(name);
     if (node) bones[name] = node;
   }
+
+  // Capability diagnostics: log which bones were found for this avatar
+  const found = VRM_BONES.filter(b => bones[b]);
+  const missing = VRM_BONES.filter(b => !bones[b]);
+  console.info(`[VRM] bones found: ${found.join(', ')}${missing.length ? `\n[VRM] missing: ${missing.join(', ')}` : ''}`);
+  if (!bones.leftHand || !bones.rightHand) {
+    console.info('[VRM] hand bones not found — wrist driving unavailable for this avatar');
+  }
   // chest is optional in VRM; fall back to spine so torso enactment works
   if (!bones.chest) bones.chest = vrm.humanoid.getRawBoneNode('spine') ?? undefined;
 
@@ -97,8 +106,10 @@ export const BONE_NAME_PATTERNS: Record<BoneName, RegExp> = {
   head: /^(J_Bip_C_Head|mixamorig:?Head|.*\bhead\b.*)$/i,
   leftUpperArm: /^(J_Bip_L_UpperArm|mixamorig:?LeftArm|.*\b(left|l)[._ ]?(upper_?arm|arm)\b.*)$/i,
   leftLowerArm: /^(J_Bip_L_LowerArm|mixamorig:?LeftForeArm|.*\b(left|l)[._ ]?(lower_?arm|fore_?arm)\b.*)$/i,
+  leftHand: /^(J_Bip_L_Hand|mixamorig:?LeftHand|.*\b(left|l)[._ ]?hand\b.*)$/i,
   rightUpperArm: /^(J_Bip_R_UpperArm|mixamorig:?RightArm|.*\b(right|r)[._ ]?(upper_?arm|arm)\b.*)$/i,
   rightLowerArm: /^(J_Bip_R_LowerArm|mixamorig:?RightForeArm|.*\b(right|r)[._ ]?(lower_?arm|fore_?arm)\b.*)$/i,
+  rightHand: /^(J_Bip_R_Hand|mixamorig:?RightHand|.*\b(right|r)[._ ]?hand\b.*)$/i,
   leftUpperLeg: /^(J_Bip_L_UpperLeg|mixamorig:?LeftUpLeg|.*\b(left|l)[._ ]?(upper_?leg|up_?leg|thigh)\b.*)$/i,
   leftLowerLeg: /^(J_Bip_L_LowerLeg|mixamorig:?LeftLeg|.*\b(left|l)[._ ]?(lower_?leg|leg|shin|calf)\b.*)$/i,
   rightUpperLeg: /^(J_Bip_R_UpperLeg|mixamorig:?RightUpLeg|.*\b(right|r)[._ ]?(upper_?leg|up_?leg|thigh)\b.*)$/i,

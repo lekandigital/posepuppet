@@ -1,0 +1,19 @@
+Bone.002
+  Bone.003
+    Bone.005
+    Bone.008
+      Bone.009
+        Bone.010
+          Bone.011
+        Bone.013
+    Bone.014
+      Bone.015
+        Bone.016
+          Bone.017
+        Bone.019
+  Bone.021
+    Bone.022
+      Bone.024
+  Bone.025
+    Bone.026
+      Bone.028

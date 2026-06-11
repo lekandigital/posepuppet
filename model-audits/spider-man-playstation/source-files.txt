@@ -1,0 +1,16 @@
+# Source files for Spider-Man PlayStation
+
+Selected source: spider-man-playstation-rigged.zip!/source/spider man playstation realistic.blend
+Runtime GLB companion: spider_man_playstation_rigged.glb
+
+## All known variants
+
+- `spider-man-playstation-rigged.zip!/source/spider man playstation realistic.blend` (zip-entry, .blend, 35.37 MB)
+- `spider_man_playstation_rigged (1).glb` (file, .glb, 12.65 MB, sha256=12fd24bc4f31)
+- `spider_man_playstation_rigged.glb` (file, .glb, 18.31 MB, sha256=a252976a1c78)
+- `spider-man-playstation-rigged.zip` (file, .zip, 48.07 MB, sha256=8306efaaa4ec)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

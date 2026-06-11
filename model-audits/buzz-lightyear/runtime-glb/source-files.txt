@@ -1,0 +1,10 @@
+# Source files for Buzz Lightyear
+
+Selected source: adi_2.0_buzz_lightyear_fully_rigged.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- adi-20-buzz-lightyear-fully-rigged.zip
+- adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend
+- adi_2.0_buzz_lightyear_fully_rigged.glb

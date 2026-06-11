@@ -1,0 +1,16 @@
+# Source files for Godzilla
+
+Selected source: godzilla-rigged-animated.zip!/source/Godzilla (New Glow).blend
+Runtime GLB companion: godzilla_rigged_animated.glb
+
+## All known variants
+
+- `godzilla-rigged-animated.zip!/source/Godzilla (New Glow).blend` (zip-entry, .blend, 44.66 MB)
+- `godzilla_rigged_animated (1).glb` (file, .glb, 7.60 MB, sha256=ddb6ed06ab80)
+- `godzilla_rigged_animated.glb` (file, .glb, 9.47 MB, sha256=67e13520e983)
+- `godzilla-rigged-animated.zip` (file, .zip, 47.90 MB, sha256=8a87ed354907)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

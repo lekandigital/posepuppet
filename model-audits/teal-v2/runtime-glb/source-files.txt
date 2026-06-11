@@ -1,0 +1,11 @@
+# Source files for Teal v2
+
+Selected source: teal_v.2.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- teal-v2.zip
+- teal-v2.zip!/source/Tealv2.fbx
+- teal_v.2 (1).glb
+- teal_v.2.glb

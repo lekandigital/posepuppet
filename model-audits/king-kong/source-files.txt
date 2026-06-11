@@ -1,0 +1,16 @@
+# Source files for King Kong
+
+Selected source: king-kong-animated.zip!/source/king kong.glb
+Runtime GLB companion: king_kong_animated.glb
+
+## All known variants
+
+- `king-kong-animated.zip!/source/king kong.glb` (zip-entry, .glb, 13.64 MB)
+- `king_kong_animated (1).glb` (file, .glb, 19.36 MB, sha256=e049b771bbdf)
+- `king_kong_animated.glb` (file, .glb, 21.60 MB, sha256=29ca9dcb05a2)
+- `king-kong-animated.zip` (file, .zip, 18.83 MB, sha256=bf763c9a2680)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

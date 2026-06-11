@@ -1,5 +1,26 @@
 # Eval notes
 
+## M5 — Hand/wrist expressiveness (2026-06-10)
+Added `leftHand`/`rightHand` bone driving across all avatars (robot, astronaut,
+Woody). The retargeter now builds a palm orientation from BlazePose landmarks
+17–22 (pinky, index, thumb tips) and applies it as a wrist twist relative to
+the forearm. Configurable `wristGain` (default 1.25) amplifies the rotation;
+angular clamping at ±80° prevents unnatural spinning. Hand bones use slightly
+slower slerp (70% of arm rate) for a natural lag feel. Visibility gating with
+hysteresis ensures smooth relaxation to rest when hand landmarks go out of
+frame. Debug panel updated with hand bone offset sliders and wrist gain tuner.
+VRM loader now logs bone capabilities at load time — console shows which bones
+were found/missing for each avatar.
+
+**Important limitation**: This is wrist/palm orientation derived from BlazePose
+pose landmarks, NOT full hand or finger tracking. The six landmarks used
+(indices 17–22) are fingertip positions from the body pose model, sufficient to
+infer palm facing direction and wrist twist, but not individual finger
+articulation. Real finger animation would require MediaPipe Hands or a
+dedicated hand-tracking pass. If a VRM's hand bone exists in the skeleton but
+does not visibly affect the mesh, the issue is likely skinning/vertex weighting
+in the source VRM/FBX model rather than retargeting.
+
 ## M4 — VRM avatar (2026-06-10)
 Avatar: "Astronaut" 048 from 100Avatars R1 (CC0 — the license is embedded in
 the file's own VRM meta; full provenance in ASSETS.md), driven through the

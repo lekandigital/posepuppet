@@ -1,0 +1,15 @@
+# Source files for Shrek
+
+Selected source: shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx
+Runtime GLB companion: shrek_rig.glb
+
+## All known variants
+
+- `shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx` (nested-zip-entry, .fbx, 6.35 MB)
+- `shrek_rig.glb` (file, .glb, 3.25 MB, sha256=6880ac489414)
+- `shrek-rig.zip` (file, .zip, 10.47 MB, sha256=f02d50d0dcb7)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

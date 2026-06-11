@@ -1,0 +1,11 @@
+# Source files for Olaf
+
+Selected source: olaf_3d_rigged.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- olaf-3d-rigged.zip
+- olaf-3d-rigged.zip!/source/OlafRig.blend
+- olaf_3d_rigged (1).glb
+- olaf_3d_rigged.glb

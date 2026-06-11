@@ -1,8 +1,41 @@
 node_modules/
 dist/
+__pycache__/
+*.pyc
 
 # NEVER commit fixtures — personal camera footage (mission non-negotiable)
 fixtures/
+
+# Downloaded/local character source material for audit only.
+# Keep generated reports under model-audits/ trackable.
+ModelsForAnimation/
+models_for_animation/
+*.blend
+*.fbx
+*.glb
+*.gltf
+*.vrm
+*.obj
+*.dae
+*.stl
+*.zip
+*.rar
+*.7z
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.tga
+*.bmp
+*.tif
+*.tiff
+*.exr
+!model-audits/**/*.md
+!model-audits/**/*.json
+!model-audits/**/bone-tree.txt
+!model-audits/**/source-files.txt
+!model-audits/**/warnings.md
+model-audits/**/*.log
 
 # Generated at install time (postinstall copies/downloads these)
 public/mediapipe-wasm/

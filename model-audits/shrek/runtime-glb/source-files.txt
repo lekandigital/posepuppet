@@ -1,0 +1,10 @@
+# Source files for Shrek
+
+Selected source: shrek_rig.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- shrek-rig.zip
+- shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx
+- shrek_rig.glb

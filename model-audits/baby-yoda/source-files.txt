@@ -1,0 +1,15 @@
+# Source files for Baby Yoda
+
+Selected source: baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend
+Runtime GLB companion: baby_yoda_mandalorian_-_low_poly_-_basic_rig.glb
+
+## All known variants
+
+- `baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend` (zip-entry, .blend, 4.15 MB)
+- `baby_yoda_mandalorian_-_low_poly_-_basic_rig.glb` (file, .glb, 2.04 MB, sha256=13c3d9540d37)
+- `baby-yoda-mandalorian-low-poly-basic-rig.zip` (file, .zip, 4.15 MB, sha256=bc1778131852)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

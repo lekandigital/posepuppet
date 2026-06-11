@@ -1,0 +1,16 @@
+# Source files for Olaf
+
+Selected source: olaf-3d-rigged.zip!/source/OlafRig.blend
+Runtime GLB companion: olaf_3d_rigged.glb
+
+## All known variants
+
+- `olaf-3d-rigged.zip!/source/OlafRig.blend` (zip-entry, .blend, 10.89 MB)
+- `olaf_3d_rigged (1).glb` (file, .glb, 3.65 MB, sha256=ad3eb20719eb)
+- `olaf_3d_rigged.glb` (file, .glb, 10.32 MB, sha256=039b9cf743f8)
+- `olaf-3d-rigged.zip` (file, .zip, 20.27 MB, sha256=afd7d8d38a0d)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.
