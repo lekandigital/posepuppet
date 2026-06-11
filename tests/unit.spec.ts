@@ -302,3 +302,173 @@ test('low-visibility torso invalidates the frame but keeps previous values', () 
   expect(bf.valid).toBe(false);
   expect(bf.quat.angleTo(prevQuat)).toBeCloseTo(0);
 });
+
+// ---- hand/wrist bone tests ------------------------------------------------
+
+test('robot has leftHand and rightHand bones', () => {
+  const robot = createRobot();
+  expect(robot.bones.leftHand).toBeDefined();
+  expect(robot.bones.rightHand).toBeDefined();
+  // hand bone should be a child of the lower arm (forearm)
+  expect(robot.bones.leftHand!.parent).toBe(robot.bones.leftLowerArm);
+  expect(robot.bones.rightHand!.parent).toBe(robot.bones.rightLowerArm);
+});
+
+test('bone name matching includes hand bones for VRoid and Mixamo rigs', () => {
+  const vroid = matchBonesByName(
+    hierarchyOf([
+      'J_Bip_C_Hips', 'J_Bip_C_Chest', 'J_Bip_C_Neck', 'J_Bip_C_Head',
+      'J_Bip_L_UpperArm', 'J_Bip_L_LowerArm', 'J_Bip_L_Hand',
+      'J_Bip_R_UpperArm', 'J_Bip_R_LowerArm', 'J_Bip_R_Hand',
+      'J_Bip_L_UpperLeg', 'J_Bip_L_LowerLeg', 'J_Bip_R_UpperLeg', 'J_Bip_R_LowerLeg',
+    ]),
+  );
+  expect(Object.keys(vroid)).toHaveLength(14);
+  expect(vroid.leftHand!.name).toBe('J_Bip_L_Hand');
+  expect(vroid.rightHand!.name).toBe('J_Bip_R_Hand');
+
+  const mixamo = matchBonesByName(
+    hierarchyOf([
+      'mixamorig:Hips', 'mixamorig:Spine2', 'mixamorig:Neck', 'mixamorig:Head',
+      'mixamorig:LeftArm', 'mixamorig:LeftForeArm', 'mixamorig:LeftHand',
+      'mixamorig:RightArm', 'mixamorig:RightForeArm', 'mixamorig:RightHand',
+    ]),
+  );
+  expect(mixamo.leftHand!.name).toBe('mixamorig:LeftHand');
+  expect(mixamo.rightHand!.name).toBe('mixamorig:RightHand');
+
+  // Generic naming
+  const generic = matchBonesByName(
+    hierarchyOf(['left_hand', 'right_hand']),
+  );
+  expect(generic.leftHand!.name).toBe('left_hand');
+  expect(generic.rightHand!.name).toBe('right_hand');
+});
+
+test('hand landmark indices are the correct BlazePose values', () => {
+  expect(LM.leftPinky).toBe(17);
+  expect(LM.rightPinky).toBe(18);
+  expect(LM.leftIndex).toBe(19);
+  expect(LM.rightIndex).toBe(20);
+  expect(LM.leftThumb).toBe(21);
+  expect(LM.rightThumb).toBe(22);
+});
+
+/** Canonical person with hand landmarks for direction-swing testing. */
+function personWithHands(): LandmarkPoint[] {
+  const w = canonicalPerson();
+  // Hand landmarks: fingers pointing down from wrist (in mp space, +y = down)
+  // Left hand: wrist at (0.2, 0, 0)
+  w[LM.leftPinky] = lm(0.17, 0.1, 0);    // pinky slightly left of wrist
+  w[LM.leftIndex] = lm(0.23, 0.1, 0);     // index slightly right of wrist
+  // Right hand: mirror
+  w[LM.rightPinky] = lm(-0.23, 0.1, 0);
+  w[LM.rightIndex] = lm(-0.17, 0.1, 0);
+  return w;
+}
+
+test('hand orientation: hand bone rotates when wrist bends', () => {
+  const robot = createRobot();
+  const rt = new Retargeter(robot);
+  const norm = blank();
+  norm[LM.leftShoulder] = lm(0.6, 0.4, 0);
+  norm[LM.rightShoulder] = lm(0.4, 0.4, 0);
+  norm[LM.leftHip] = lm(0.55, 0.7, 0);
+  norm[LM.rightHip] = lm(0.45, 0.7, 0);
+
+  const bone = robot.bones.leftHand!;
+  const rest = bone.quaternion.clone();
+
+  // Bend the wrist: fingers pointing FORWARD (toward camera, mp -z)
+  // instead of straight down the arm. This creates a ~90° wrist bend.
+  const world = personWithHands();
+  world[LM.leftIndex] = lm(0.22, 0.0, -0.15);  // index forward from wrist
+  world[LM.leftPinky] = lm(0.18, 0.0, -0.15);  // pinky forward from wrist
+  for (let i = 0; i < 40; i++) {
+    rt.updateFromPose(world, norm);
+    rt.tick(0.033);
+    robot.object.updateWorldMatrix(true, true);
+  }
+  const bentAngle = bone.quaternion.angleTo(rest);
+  const bentQuat = bone.quaternion.clone();
+
+  // The hand bone should have moved meaningfully from rest
+  expect(bentAngle).toBeGreaterThan(0.3);
+
+  // Now bend the other way: fingers pointing BACKWARD (mp +z)
+  world[LM.leftIndex] = lm(0.22, 0.0, 0.15);
+  world[LM.leftPinky] = lm(0.18, 0.0, 0.15);
+  for (let i = 0; i < 60; i++) {
+    rt.updateFromPose(world, norm);
+    rt.tick(0.033);
+    robot.object.updateWorldMatrix(true, true);
+  }
+  // The bone should now be in a meaningfully different orientation
+  expect(bone.quaternion.angleTo(bentQuat)).toBeGreaterThan(0.3);
+});
+
+test('retargeter does not crash when hand bones are missing', () => {
+  const robot = createRobot();
+  // Remove hand bones to simulate a VRM without them
+  delete robot.bones.leftHand;
+  delete robot.bones.rightHand;
+
+  // Should construct without error
+  const rt = new Retargeter(robot);
+
+  const world = personWithHands();
+  const norm = blank();
+  norm[LM.leftShoulder] = lm(0.6, 0.4, 0);
+  norm[LM.rightShoulder] = lm(0.4, 0.4, 0);
+  norm[LM.leftHip] = lm(0.55, 0.7, 0);
+  norm[LM.rightHip] = lm(0.45, 0.7, 0);
+
+  // Should run without error
+  for (let i = 0; i < 10; i++) {
+    rt.updateFromPose(world, norm);
+    rt.tick(0.033);
+    robot.object.updateWorldMatrix(true, true);
+  }
+
+  // Arms should still work fine
+  const arm = robot.bones.leftLowerArm!;
+  const armRest = new THREE.Quaternion(); // will have moved from rest
+  expect(arm.quaternion).toBeDefined();
+});
+
+test('hand bones relax to rest when landmarks lose visibility', () => {
+  const robot = createRobot();
+  const rt = new Retargeter(robot);
+  const norm = blank();
+  norm[LM.leftShoulder] = lm(0.6, 0.4, 0);
+  norm[LM.rightShoulder] = lm(0.4, 0.4, 0);
+  norm[LM.leftHip] = lm(0.55, 0.7, 0);
+  norm[LM.rightHip] = lm(0.45, 0.7, 0);
+
+  const bone = robot.bones.leftHand!;
+  const rest = bone.quaternion.clone();
+
+  // Drive with a wrist bend (fingers forward)
+  const world = personWithHands();
+  world[LM.leftIndex] = lm(0.22, 0.0, -0.15);
+  world[LM.leftPinky] = lm(0.18, 0.0, -0.15);
+  for (let i = 0; i < 40; i++) {
+    rt.updateFromPose(world, norm);
+    rt.tick(0.033);
+    robot.object.updateWorldMatrix(true, true);
+  }
+  const tracked = bone.quaternion.angleTo(rest);
+  expect(tracked).toBeGreaterThan(0.15); // measurably away from rest
+
+  // Kill visibility on hand landmarks
+  world[LM.leftPinky].visibility = 0.1;
+  world[LM.leftIndex].visibility = 0.1;
+
+  // After enough time, should relax back to rest
+  for (let i = 0; i < 80; i++) {
+    rt.updateFromPose(world, norm);
+    rt.tick(0.033);
+    robot.object.updateWorldMatrix(true, true);
+  }
+  expect(bone.quaternion.angleTo(rest)).toBeLessThan(0.15);
+});

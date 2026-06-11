@@ -1,0 +1,11 @@
+# Source files for King Kong
+
+Selected source: king_kong_animated.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- king-kong-animated.zip
+- king-kong-animated.zip!/source/king kong.glb
+- king_kong_animated (1).glb
+- king_kong_animated.glb

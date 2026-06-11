@@ -1,0 +1,11 @@
+# Source files for Iron Man
+
+Selected source: iron_man_rig.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- iron-man-rig.zip
+- iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend
+- iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.fbx
+- iron_man_rig.glb

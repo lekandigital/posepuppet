@@ -119,6 +119,7 @@ export function createRobot(): Avatar {
     wrist.position.set(0, -0.24, 0);
     lower.add(wrist);
     joints[`${prefix}Wrist`] = wrist;
+    bones[`${prefix}Hand`] = wrist;
     const hand = shadowed(new THREE.Mesh(new THREE.SphereGeometry(0.055, 12, 10), DARK));
     hand.position.y = -0.02;
     hand.scale.set(0.9, 1.1, 0.7);

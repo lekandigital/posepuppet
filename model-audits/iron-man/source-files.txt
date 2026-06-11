@@ -1,0 +1,16 @@
+# Source files for Iron Man
+
+Selected source: iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend
+Runtime GLB companion: iron_man_rig.glb
+
+## All known variants
+
+- `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend` (nested-zip-entry, .blend, 3.99 MB)
+- `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.fbx` (nested-zip-entry, .fbx, 1.84 MB)
+- `iron_man_rig.glb` (file, .glb, 2.95 MB, sha256=7cd0d123f77a)
+- `iron-man-rig.zip` (file, .zip, 5.51 MB, sha256=f8af4595c231)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

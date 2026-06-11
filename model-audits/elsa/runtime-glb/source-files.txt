@@ -1,0 +1,17 @@
+# Source files for Elsa
+
+Selected source: elsa_free_fall_frozen_with_rig_included (2).glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- elsa-free-fall-frozen-with-rig-included (1).zip
+- elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb
+- elsa-free-fall-frozen-with-rig-included (2).zip
+- elsa-free-fall-frozen-with-rig-included (2).zip!/source/elsa free fall.zip!/Elsa (merge).glb
+- elsa-free-fall-frozen-with-rig-included.zip
+- elsa-free-fall-frozen-with-rig-included.zip!/source/elsa free fall.zip!/Elsa (merge).glb
+- elsa_free_fall_frozen_with_rig_included (1).glb
+- elsa_free_fall_frozen_with_rig_included (2).glb
+- elsa_free_fall_frozen_with_rig_included (3).glb
+- elsa_free_fall_frozen_with_rig_included.glb

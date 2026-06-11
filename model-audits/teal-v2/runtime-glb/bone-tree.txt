@@ -1,0 +1,112 @@
+_rootJoint
+  Bone_01
+    Spine_02
+      Leg.L_095
+        Leg.L.001_096
+          Leg.L.002_097
+            Leg Jet.L_098
+              Foot.L_099
+                Foot.L.001_0100
+              Leg Jet.L.001_0101
+              Leg Jet.L.002_0102
+      Leg.R_0103
+        Leg.R.001_0104
+          Leg.R.002_0105
+            Leg Jet.R_0106
+              Foot.R_0107
+                Foot.R.001_0108
+              Leg Jet.R.001_0109
+              Leg Jet.R.002_0110
+      Spine.001_03
+        Spine.002_04
+          Spine.003_05
+            Arm.L_043
+              Arm.L.001_044
+                Arm.L.002_045
+                  Arm Cannon.L_046
+                    Arm Cannon.L.001_047
+                      Arm Cannon.L.004_066
+                      Arm Gun Shield.L.001_068
+                      Arm Gun Shield.L_067
+                      Arm Hand.L_048
+                        Arm Hand.L.001_049
+                          Arm Hand.L.002_050
+                            Arm Hand.L.003_051
+                              Arm Hand.L.004_052
+                        Arm Hand.L.005_053
+                          Arm Hand.L.006_054
+                            Arm Hand.L.007_055
+                              Arm Hand.L.008_056
+                        Arm Hand.L.009_057
+                          Arm Hand.L.010_058
+                            Arm Hand.L.011_059
+                              Arm Hand.L.012_060
+                        Arm Hand.L.013_061
+                          Arm Hand.L.014_062
+                            Arm Hand.L.015_063
+                              Arm Hand.L.016_064
+                                Arm Hand.L.017_065
+            Arm.R_069
+              Arm.R.001_070
+                Arm.R.002_071
+                  Arm Cannon.R_072
+                    Arm Cannon.R.001_073
+                      Arm Cannon.R.004_092
+                      Arm Gun Shield.R.001_094
+                      Arm Gun Shield.R_093
+                      Arm Hand.R_074
+                        Arm Hand.R.001_075
+                          Arm Hand.R.002_076
+                            Arm Hand.R.003_077
+                              Arm Hand.R.004_078
+                        Arm Hand.R.005_079
+                          Arm Hand.R.006_080
+                            Arm Hand.R.007_081
+                              Arm Hand.R.008_082
+                        Arm Hand.R.009_083
+                          Arm Hand.R.010_084
+                            Arm Hand.R.011_085
+                              Arm Hand.R.012_086
+                        Arm Hand.R.013_087
+                          Arm Hand.R.014_088
+                            Arm Hand.R.015_089
+                              Arm Hand.R.016_090
+                                Arm Hand.R.017_091
+            Head Piston.L.001_041
+            Head Piston.R.001_042
+            Head_06
+              Head.001_07
+                Head.002_08
+                  Eye Control.L_010
+                    Eyes.L.001_012
+                    Eyes.L.002_013
+                    Eyes.L.003_014
+                    Eyes.L.004_015
+                    Eyes.L.005_016
+                    Eyes.L.006_017
+                    Eyes.L.007_018
+                    Eyes.L_011
+                  Eye Control.R_019
+                    Eyes.R.001_021
+                    Eyes.R.002_022
+                    Eyes.R.003_023
+                    Eyes.R.004_024
+                    Eyes.R.005_025
+                    Eyes.R.006_026
+                    Eyes.R.007_027
+                    Eyes.R_020
+                  Head Piston.L_00
+                  Head Piston.R_09
+                  Mouth Control_028
+                    Mouth.006_035
+                    Mouth.L.001_031
+                    Mouth.L.002_032
+                    Mouth.L.003_033
+                    Mouth.L.004_034
+                    Mouth.L_030
+                    Mouth.R.001_037
+                    Mouth.R.002_038
+                    Mouth.R.003_039
+                    Mouth.R.004_040
+                    Mouth.R_036
+                    Mouth_029

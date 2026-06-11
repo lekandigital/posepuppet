@@ -1,0 +1,10 @@
+# Source files for Baby Yoda
+
+Selected source: baby_yoda_mandalorian_-_low_poly_-_basic_rig.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- baby-yoda-mandalorian-low-poly-basic-rig.zip
+- baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend
+- baby_yoda_mandalorian_-_low_poly_-_basic_rig.glb

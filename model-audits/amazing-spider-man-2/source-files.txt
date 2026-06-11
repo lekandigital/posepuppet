@@ -1,0 +1,16 @@
+# Source files for The Amazing Spider-Man 2
+
+Selected source: OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx
+Runtime GLB companion: OtherSpiderman/the_amazing_spider_man_2_rigged_model.glb
+
+## All known variants
+
+- `OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx` (zip-entry, .fbx, 11.18 MB)
+- `OtherSpiderman/the_amazing_spider_man_2_rigged_model (1).glb` (file, .glb, 3.94 MB, sha256=497c078d035f)
+- `OtherSpiderman/the_amazing_spider_man_2_rigged_model.glb` (file, .glb, 10.96 MB, sha256=b35842d3db84)
+- `OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip` (file, .zip, 21.30 MB, sha256=d77a62883320)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

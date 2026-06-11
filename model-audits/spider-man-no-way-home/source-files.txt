@@ -1,0 +1,15 @@
+# Source files for Spider-Man No Way Home
+
+Selected source: OtherSpiderman/spider-man_no_way_home_rigged.glb
+Runtime GLB companion: none
+
+## All known variants
+
+- `OtherSpiderman/spider-man_no_way_home_rigged (1).glb` (file, .glb, 8.43 MB, sha256=4939c0b94c9f)
+- `OtherSpiderman/spider-man_no_way_home_rigged.glb` (file, .glb, 16.16 MB, sha256=06350131aa37)
+- `OtherSpiderman/spider-man-no-way-home-rigged.zip` (file, .zip, 25.94 MB, sha256=5d734686c27e)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

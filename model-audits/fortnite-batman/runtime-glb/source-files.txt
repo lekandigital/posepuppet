@@ -1,0 +1,11 @@
+# Source files for Fortnite Batman
+
+Selected source: fortnite_batman_advanced_rig.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- fortnite-batman-advanced-rig.zip
+- fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend
+- fortnite_batman_advanced_rig (1).glb
+- fortnite_batman_advanced_rig.glb

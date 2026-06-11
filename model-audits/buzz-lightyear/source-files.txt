@@ -1,0 +1,15 @@
+# Source files for Buzz Lightyear
+
+Selected source: adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend
+Runtime GLB companion: adi_2.0_buzz_lightyear_fully_rigged.glb
+
+## All known variants
+
+- `adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend` (zip-entry, .blend, 0.76 MB)
+- `adi_2.0_buzz_lightyear_fully_rigged.glb` (file, .glb, 0.14 MB, sha256=40e213a8c6a4)
+- `adi-20-buzz-lightyear-fully-rigged.zip` (file, .zip, 0.78 MB, sha256=397c62d35618)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

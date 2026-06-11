@@ -15,7 +15,8 @@ export interface PanelRigApi {
 
 const OFFSET_BONES: BoneName[] = [
   'chest', 'neck', 'head',
-  'leftUpperArm', 'leftLowerArm', 'rightUpperArm', 'rightLowerArm',
+  'leftUpperArm', 'leftLowerArm', 'leftHand',
+  'rightUpperArm', 'rightLowerArm', 'rightHand',
   'leftUpperLeg', 'leftLowerLeg', 'rightUpperLeg', 'rightLowerLeg',
 ];
 const DEG = Math.PI / 180;
@@ -30,7 +31,7 @@ function row(label: string, input: HTMLElement): HTMLElement {
 }
 
 function slider(
-  key: 'minCutoff' | 'beta' | 'slerpRate' | 'relaxSec',
+  key: 'minCutoff' | 'beta' | 'slerpRate' | 'relaxSec' | 'wristGain',
   min: number,
   max: number,
   step: number,
@@ -81,6 +82,7 @@ export function createPanel(rig?: PanelRigApi): void {
     row('beta', slider('beta', 0, 30, 0.5)),
     row('slerp rate', slider('slerpRate', 5, 40, 1)),
     row('relax sec', slider('relaxSec', 0.2, 2, 0.1)),
+    row('wrist gain', slider('wristGain', 0.5, 2.0, 0.05)),
   );
 
   const modelSel = document.createElement('select');

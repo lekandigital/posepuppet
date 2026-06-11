@@ -1,0 +1,12 @@
+Armature_rootJoint
+  Bone_Armature
+    Bone.009_Armature
+      Bone.001_Armature
+        Bone.002_Armature
+          Bone.004_Armature
+            Bone.005_Armature
+        Bone.003_Armature
+          Bone.006_Armature
+            Bone.007_Armature
+        Bone.008_Armature
+      Bone.010_Armature

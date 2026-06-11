@@ -1,0 +1,16 @@
+# Source files for Teal v2
+
+Selected source: teal-v2.zip!/source/Tealv2.fbx
+Runtime GLB companion: teal_v.2.glb
+
+## All known variants
+
+- `teal-v2.zip!/source/Tealv2.fbx` (zip-entry, .fbx, 5.48 MB)
+- `teal_v.2 (1).glb` (file, .glb, 6.97 MB, sha256=3a933cf8647b)
+- `teal_v.2.glb` (file, .glb, 32.32 MB, sha256=634d099dda63)
+- `teal-v2.zip` (file, .zip, 47.35 MB, sha256=5a72d45fffe5)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

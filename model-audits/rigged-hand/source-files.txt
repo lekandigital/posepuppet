@@ -1,0 +1,16 @@
+# Source files for Rigged Hand
+
+Selected source: rigged-hand.zip!/source/handRig_02.fbx
+Runtime GLB companion: rigged_hand.glb
+
+## All known variants
+
+- `rigged-hand.zip!/source/handRig_02.fbx` (zip-entry, .fbx, 1.49 MB)
+- `rigged_hand (1).glb` (file, .glb, 2.13 MB, sha256=11fcdb53fd5c)
+- `rigged_hand.glb` (file, .glb, 3.64 MB, sha256=19c5e8013213)
+- `rigged-hand.zip` (file, .zip, 5.87 MB, sha256=932877868101)
+
+## Notes
+
+- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
+- License remains unknown until manually verified from the original download source.

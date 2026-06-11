@@ -38,6 +38,22 @@ const LIMB_SPECS: LimbSpec[] = [
   { bone: 'rightLowerLeg', from: LM.rightKnee, to: LM.rightAnkle, joints: ['rightKnee', 'rightAnkle'], legs: true },
 ];
 
+/** Hand/wrist spec: direction from wrist to hand center (avg of index+pinky). */
+interface HandSpec {
+  bone: BoneName;
+  wrist: number;
+  index: number;
+  pinky: number;
+}
+
+const HAND_SPECS: HandSpec[] = [
+  { bone: 'leftHand', wrist: LM.leftWrist, index: LM.leftIndex, pinky: LM.leftPinky },
+  { bone: 'rightHand', wrist: LM.rightWrist, index: LM.rightIndex, pinky: LM.rightPinky },
+];
+
+/** Maximum wrist deviation from the forearm in radians (~80°). */
+const MAX_WRIST_ANGLE = (80 * Math.PI) / 180;
+
 interface BoneState {
   node: THREE.Object3D;
   restLocal: THREE.Quaternion;
@@ -49,6 +65,7 @@ interface BoneState {
   lastSwing: THREE.Quaternion | null; // limbs: last rest→target swing, for calibration
   visible: boolean; // hysteresis state
   confident: boolean; // drives decay vs track
+  isHand?: boolean; // hand bones get extra smoothing
 }
 
 const CALIB_KEY = 'posepuppet-calib-v1';
@@ -61,6 +78,7 @@ interface CalibStore {
 // scratch
 const tmpV1 = new THREE.Vector3();
 const tmpV2 = new THREE.Vector3();
+const tmpV3 = new THREE.Vector3();
 const tmpQ1 = new THREE.Quaternion();
 const tmpQ2 = new THREE.Quaternion();
 const tmpM = new THREE.Matrix4();
@@ -103,7 +121,8 @@ export class Retargeter {
 
     const allBones: BoneName[] = [
       'chest', 'neck', 'head',
-      'leftUpperArm', 'leftLowerArm', 'rightUpperArm', 'rightLowerArm',
+      'leftUpperArm', 'leftLowerArm', 'leftHand',
+      'rightUpperArm', 'rightLowerArm', 'rightHand',
       'leftUpperLeg', 'leftLowerLeg', 'rightUpperLeg', 'rightLowerLeg',
     ];
     for (const name of allBones) {
@@ -121,6 +140,7 @@ export class Retargeter {
         lastSwing: null,
         visible: false,
         confident: false,
+        isHand: name === 'leftHand' || name === 'rightHand',
       };
       this.states.set(name, st);
     }
@@ -136,6 +156,18 @@ export class Retargeter {
       const dWorld = tmpV2.sub(tmpV1).normalize();
       st.node.parent!.getWorldQuaternion(tmpQ1).invert();
       st.restDirParentLocal = dWorld.applyQuaternion(tmpQ1).clone();
+    }
+
+    // Hand bones: rest direction from the bone's position relative to its
+    // parent. In T-pose, the hand continues along the forearm axis, so
+    // node.position (forearm → hand offset) gives the correct rest direction.
+    for (const spec of HAND_SPECS) {
+      const st = this.states.get(spec.bone);
+      if (!st) continue;
+      const pos = st.node.position.clone();
+      if (pos.lengthSq() > 0.0001) {
+        st.restDirParentLocal = pos.normalize();
+      }
     }
   }
 
@@ -155,6 +187,7 @@ export class Retargeter {
     if (bodyOk) {
       this.updateChest();
       this.updateHead(world);
+      this.updateHands(world);
       this.updateRootTarget(norm);
     }
 
@@ -337,6 +370,70 @@ export class Retargeter {
     headSt.target.copy(tmpQ1).multiply(tmpQ2).multiply(headSt.correction);
   }
 
+  /** Hand/wrist direction from wrist → hand center (avg of index + pinky).
+   *  Uses the same direction-swing approach as limbs: compute a direction
+   *  vector, transform through body frame → parent-local, swing from rest.
+   *  This avoids the rotation-space confusion of full 3-DOF orientation. */
+  private updateHands(world: LandmarkPoint[]): void {
+    for (const spec of HAND_SPECS) {
+      const st = this.states.get(spec.bone);
+      if (!st || !st.restDirParentLocal) continue;
+
+      // Visibility gate: need wrist + at least one of index/pinky
+      const vis = Math.min(
+        world[spec.wrist].visibility,
+        Math.max(world[spec.index].visibility, world[spec.pinky].visibility),
+      );
+      st.visible = st.visible ? vis > VIS_OFF : vis > VIS_ON;
+      if (!st.visible) {
+        st.confident = false;
+        continue;
+      }
+
+      // Hand direction: wrist → midpoint(index, pinky)
+      mpToThree(world[spec.wrist], tmpV1);
+      mpToThree(world[spec.index], tmpV2);
+      mpToThree(world[spec.pinky], tmpV3);
+      // hand center = average of index and pinky positions
+      tmpV2.add(tmpV3).multiplyScalar(0.5);
+      // direction = hand center − wrist
+      const dir = tmpV2.sub(tmpV1);
+      if (dir.lengthSq() < 0.0001) { st.confident = false; continue; }
+      dir.normalize();
+
+      // Same body-frame → chest transform as arm limbs
+      dir.applyQuaternion(this.body.quatInv);
+      const chest = this.states.get('chest');
+      if (chest) {
+        chest.node.getWorldQuaternion(tmpQ1);
+        dir.applyQuaternion(chest.restWorldInv).applyQuaternion(tmpQ1);
+      }
+
+      // World → parent-local
+      st.node.parent!.getWorldQuaternion(tmpQ1).invert();
+      const dParentLocal = dir.applyQuaternion(tmpQ1);
+
+      // Swing from rest direction to target (same as limbs)
+      tmpQ2.setFromUnitVectors(st.restDirParentLocal, dParentLocal);
+
+      // Apply wrist gain: amplify the swing
+      if (config.wristGain !== 1.0) {
+        const amplified = IDENTITY.clone().slerp(tmpQ2, config.wristGain);
+        tmpQ2.copy(amplified);
+      }
+
+      // Clamp extreme wrist deviation
+      const angle = 2 * Math.acos(Math.min(1, Math.abs(tmpQ2.w)));
+      if (angle > MAX_WRIST_ANGLE) {
+        tmpQ2.slerp(IDENTITY, 1 - MAX_WRIST_ANGLE / angle);
+      }
+
+      (st.lastSwing ??= new THREE.Quaternion()).copy(tmpQ2);
+      st.target.copy(tmpQ2).multiply(st.restLocal).multiply(st.correction);
+      st.confident = true;
+    }
+  }
+
   /** Root motion targets from normalized (mirrored) hip center + shoulder
    *  width depth hint. Baselines auto-capture over the first second. */
   private updateRootTarget(norm: LandmarkPoint[]): void {
@@ -371,15 +468,17 @@ export class Retargeter {
     this.rootTarget.set(dx, dy, dz);
   }
 
-  /** Render tick: slerp bones toward targets; decay unconfident bones. */
+  /** Render tick: slerp bones toward targets; decay unconfident bones.
+   *  Hand bones use slightly slower slerp for a natural wrist lag. */
   tick(dt: number): void {
     const k = 1 - Math.exp(-config.slerpRate * dt);
+    const kHand = 1 - Math.exp(-config.slerpRate * 0.7 * dt); // wrist lag
     const kDecay = 1 - Math.exp(-dt / config.relaxSec);
     for (const st of this.states.values()) {
       if (!st.confident) {
         st.target.slerp(st.restLocal, kDecay);
       }
-      st.node.quaternion.slerp(st.target, k);
+      st.node.quaternion.slerp(st.target, st.isHand ? kHand : k);
     }
 
     // root: heavily smoothed, never skates

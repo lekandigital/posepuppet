@@ -1,0 +1,112 @@
+Ctrl_ArmPole_IK_Left
+Ctrl_ArmPole_IK_Right
+Ctrl_Foot_IK_Left
+  Ctrl_FootRoll_Cursor_Left
+  Foot_IK_Left
+    Foot_Snap_Left
+    ToeTrack_Left
+      Toe01_IK_Left
+        Toe02_Left
+  FootHeelOut_Left
+    FootHeelIn_Left
+      FootHeelMid_Left
+        ToeEnd_Left
+          Ctrl_Foot_01_Left
+            Foot_01_Pole_Left
+            Foot_IK_target_Left
+          Ctrl_Toe_IK_Left
+          ToeEnd_01_Left
+Ctrl_Foot_IK_Right
+  Ctrl_FootRoll_Cursor_Right
+  Foot_IK_Right
+    Foot_Snap_Right
+    ToeTrack_Right
+      Toe01_IK_Right
+        Toe02_Right
+  FootHeelOut_Right
+    FootHeelIn_Right
+      FootHeelMid_Right
+        ToeEnd_Right
+          Ctrl_Foot_01_Right
+            Foot_01_Pole_Right
+            Foot_IK_target_Right
+          Ctrl_Toe_IK_Right
+          ToeEnd_01_Right
+Ctrl_Hand_IK_Left
+Ctrl_Hand_IK_Right
+Ctrl_LegPole_IK_Left
+Ctrl_LegPole_IK_Right
+Ctrl_Master
+  Ctrl_Hips
+    Ctrl_Hips_Free
+      Ctrl_UpLeg_FK_Left
+        Ctrl_Leg_FK_Left
+          Ctrl_Foot_FK_Left
+            Foot_FK_Left
+              Ctrl_Toe_FK_Left
+      Ctrl_UpLeg_FK_Right
+        Ctrl_Leg_FK_Right
+          Ctrl_Foot_FK_Right
+            Foot_FK_Right
+              Ctrl_Toe_FK_Right
+      Hips_Free_Helper
+      UpLeg_IK_Left
+        Leg_IK_Left
+      UpLeg_IK_Right
+        Leg_IK_Right
+    Ctrl_Spine
+      Ctrl_Spine1
+        Ctrl_Spine2
+          Ctrl_Arm_FK_Left
+            Ctrl_ForeArm_FK_Left
+              Ctrl_Hand_FK_Left
+          Ctrl_Arm_FK_Right
+            Ctrl_ForeArm_FK_Right
+              Ctrl_Hand_FK_Right
+          Ctrl_Neck
+            Ctrl_Head
+          Ctrl_Shoulder_Left
+            Arm_IK_Left
+              ForeArm_IK_Left
+          Ctrl_Shoulder_Right
+            Arm_IK_Right
+              ForeArm_IK_Right
+mixamorig:Hips
+  mixamorig:LeftUpLeg
+    mixamorig:LeftLeg
+      mixamorig:LeftFoot
+        mixamorig:LeftToeBase
+          mixamorig:LeftToe_End
+  mixamorig:RightUpLeg
+    mixamorig:RightLeg
+      mixamorig:RightFoot
+        mixamorig:RightToeBase
+          mixamorig:RightToe_End
+  mixamorig:Spine
+    mixamorig:Spine1
+      mixamorig:Spine2
+        mixamorig:LeftShoulder
+          mixamorig:LeftArm
+            mixamorig:LeftForeArm
+              mixamorig:LeftHand
+                Ctrl_Index1_Left
+                  Ctrl_Index2_Left
+                    Ctrl_Index3_Left
+                mixamorig:LeftHandIndex1
+                  mixamorig:LeftHandIndex2
+                    mixamorig:LeftHandIndex3
+                      mixamorig:LeftHandIndex4
+        mixamorig:Neck
+          mixamorig:Head
+            mixamorig:HeadTop_End
+        mixamorig:RightShoulder
+          mixamorig:RightArm
+            mixamorig:RightForeArm
+              mixamorig:RightHand
+                Ctrl_Index1_Right
+                  Ctrl_Index2_Right
+                    Ctrl_Index3_Right
+                mixamorig:RightHandIndex1
+                  mixamorig:RightHandIndex2
+                    mixamorig:RightHandIndex3
+                      mixamorig:RightHandIndex4

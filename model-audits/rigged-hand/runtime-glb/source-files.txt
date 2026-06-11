@@ -1,0 +1,11 @@
+# Source files for Rigged Hand
+
+Selected source: rigged_hand.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- rigged-hand.zip
+- rigged-hand.zip!/source/handRig_02.fbx
+- rigged_hand (1).glb
+- rigged_hand.glb
