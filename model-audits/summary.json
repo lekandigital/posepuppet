@@ -1,336 +1,209 @@
 {
-  "archives": [
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 2,
-      "zip": "adi-20-buzz-lightyear-fully-rigged.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 0,
-      "zip": "baby-yoda-mandalorian-low-poly-basic-rig.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 0,
-      "nested_zip_count": 1,
-      "texture_count": 3,
-      "zip": "elsa-free-fall-frozen-with-rig-included (1).zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 0,
-      "nested_zip_count": 1,
-      "texture_count": 3,
-      "zip": "elsa-free-fall-frozen-with-rig-included (2).zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 0,
-      "nested_zip_count": 1,
-      "texture_count": 3,
-      "zip": "elsa-free-fall-frozen-with-rig-included.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 8,
-      "zip": "fortnite-batman-advanced-rig.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 10,
-      "zip": "fortnite-darth-vader-advanced-rig.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 3,
-      "zip": "godzilla-rigged-animated.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 0,
-      "nested_zip_count": 1,
-      "texture_count": 4,
-      "zip": "iron-man-rig.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 17,
-      "zip": "jack-sparrow-ready-for-animation.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 2,
-      "zip": "king-kong-animated.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 3,
-      "zip": "olaf-3d-rigged.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 0,
-      "nested_zip_count": 0,
-      "texture_count": 8,
-      "zip": "OtherSpiderman/spider-man-no-way-home-rigged.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 4,
-      "zip": "OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 4,
-      "zip": "realistic-xenomorph-rig.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 4,
-      "zip": "rigged-hand.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 0,
-      "nested_zip_count": 1,
-      "texture_count": 4,
-      "zip": "shrek-rig.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 7,
-      "zip": "spider-man-playstation-rigged.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 8,
-      "zip": "teal-v2.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 0,
-      "nested_zip_count": 1,
-      "texture_count": 17,
-      "zip": "terminator-t-800-endo-skeleton-damaged.zip"
-    },
-    {
-      "errors": [],
-      "model_source_count": 1,
-      "nested_zip_count": 0,
-      "texture_count": 4,
-      "zip": "the-mandalorian-grogu-advanced-rig.zip"
-    }
-  ],
   "audits": [
     {
-      "label": "partial",
-      "name": "The Amazing Spider-Man 2",
+      "action": "convert_then_test",
+      "name": "Woody",
       "overall": 81,
       "profile": "humanoid",
-      "selected_source": "OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx",
-      "slug": "amazing-spider-man-2"
+      "selected_source": "/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx",
+      "slug": "woody",
+      "target_vrm": "public/avatars/woody.vrm"
     },
     {
-      "label": "non-humanoid / creature-profile-needed",
-      "name": "Baby Yoda",
-      "overall": 27,
-      "profile": "creature",
-      "selected_source": "baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend",
-      "slug": "baby-yoda"
-    },
-    {
-      "label": "experimental",
-      "name": "Buzz Lightyear",
-      "overall": 21,
-      "profile": "humanoid-with-offsets",
-      "selected_source": "adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend",
-      "slug": "buzz-lightyear"
-    },
-    {
-      "label": "well-developed",
+      "action": "convert_then_test",
       "name": "Darth Vader",
       "overall": 93,
       "profile": "humanoid",
       "selected_source": "fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend",
-      "slug": "darth-vader"
+      "slug": "darth-vader",
+      "target_vrm": "public/avatars/darth-vader.vrm"
     },
     {
-      "label": "experimental",
-      "name": "Elsa",
-      "overall": 67,
-      "profile": "humanoid-with-offsets",
-      "selected_source": "elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb",
-      "slug": "elsa"
-    },
-    {
-      "label": "well-developed",
+      "action": "convert_then_test",
       "name": "Fortnite Batman",
       "overall": 93,
       "profile": "humanoid",
       "selected_source": "fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend",
-      "slug": "fortnite-batman"
+      "slug": "fortnite-batman",
+      "target_vrm": "public/avatars/fortnite-batman.vrm"
     },
     {
-      "label": "non-humanoid / creature-profile-needed",
-      "name": "Godzilla",
-      "overall": 59,
-      "profile": "creature",
-      "selected_source": "godzilla-rigged-animated.zip!/source/Godzilla (New Glow).blend",
-      "slug": "godzilla"
-    },
-    {
-      "label": "non-humanoid / creature-profile-needed",
-      "name": "Grogu",
-      "overall": 68,
-      "profile": "creature",
-      "selected_source": "the-mandalorian-grogu-advanced-rig.zip!/source/Grogurig.blend",
-      "slug": "grogu"
-    },
-    {
-      "label": "well-developed",
+      "action": "convert_then_test",
       "name": "Iron Man",
       "overall": 87,
       "profile": "humanoid",
       "selected_source": "iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend",
-      "slug": "iron-man"
+      "slug": "iron-man",
+      "target_vrm": "public/avatars/iron-man.vrm"
     },
     {
-      "label": "partial",
-      "name": "Jack Sparrow",
-      "overall": 81,
-      "profile": "humanoid",
-      "selected_source": "jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend",
-      "slug": "jack-sparrow"
-    },
-    {
-      "label": "non-humanoid / creature-profile-needed",
-      "name": "King Kong",
-      "overall": 68,
-      "profile": "creature",
-      "selected_source": "king-kong-animated.zip!/source/king kong.glb",
-      "slug": "king-kong"
-    },
-    {
-      "label": "non-humanoid / creature-profile-needed",
-      "name": "Olaf",
-      "overall": 60,
-      "profile": "creature",
-      "selected_source": "olaf-3d-rigged.zip!/source/OlafRig.blend",
-      "slug": "olaf"
-    },
-    {
-      "label": "hand-only",
-      "name": "Rigged Hand",
-      "overall": 32,
-      "profile": "hand-only",
-      "selected_source": "rigged-hand.zip!/source/handRig_02.fbx",
-      "slug": "rigged-hand"
-    },
-    {
-      "label": "well-developed",
+      "action": "convert_then_test",
       "name": "Shrek",
       "overall": 86,
       "profile": "humanoid",
       "selected_source": "shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx",
-      "slug": "shrek"
+      "slug": "shrek",
+      "target_vrm": "public/avatars/shrek.vrm"
     },
     {
-      "label": "partial",
+      "action": "convert_then_test",
       "name": "Spider-Man No Way Home",
       "overall": 81,
       "profile": "humanoid",
       "selected_source": "OtherSpiderman/spider-man_no_way_home_rigged.glb",
-      "slug": "spider-man-no-way-home"
+      "slug": "spider-man-no-way-home",
+      "target_vrm": "public/avatars/spider-man-no-way-home.vrm"
     },
     {
-      "label": "partial",
+      "action": "convert_then_test",
       "name": "Spider-Man PlayStation",
       "overall": 81,
       "profile": "humanoid",
       "selected_source": "spider-man-playstation-rigged.zip!/source/spider man playstation realistic.blend",
-      "slug": "spider-man-playstation"
+      "slug": "spider-man-playstation",
+      "target_vrm": "public/avatars/spider-man-playstation.vrm"
     },
     {
-      "label": "experimental",
-      "name": "Teal v2",
-      "overall": 53,
-      "profile": "humanoid-with-offsets",
-      "selected_source": "teal-v2.zip!/source/Tealv2.fbx",
-      "slug": "teal-v2"
+      "action": "convert_then_test",
+      "name": "The Amazing Spider-Man 2",
+      "overall": 81,
+      "profile": "humanoid",
+      "selected_source": "OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx",
+      "slug": "amazing-spider-man-2",
+      "target_vrm": "public/avatars/amazing-spider-man-2.vrm"
     },
     {
-      "label": "partial",
+      "action": "convert_then_test",
       "name": "Terminator T-800",
       "overall": 81,
       "profile": "humanoid",
       "selected_source": "terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend",
-      "slug": "terminator-t-800"
+      "slug": "terminator-t-800",
+      "target_vrm": "public/avatars/terminator-t-800.vrm"
     },
     {
-      "label": "non-humanoid / creature-profile-needed",
+      "action": "convert_then_test",
+      "name": "Jack Sparrow",
+      "overall": 81,
+      "profile": "humanoid_with_offsets",
+      "selected_source": "jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend",
+      "slug": "jack-sparrow",
+      "target_vrm": "public/avatars/jack-sparrow.vrm"
+    },
+    {
+      "action": "cleanup_then_convert",
+      "name": "Elsa",
+      "overall": 67,
+      "profile": "humanoid_with_offsets",
+      "selected_source": "elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb",
+      "slug": "elsa",
+      "target_vrm": "public/avatars/elsa.vrm"
+    },
+    {
+      "action": "custom_profile",
+      "name": "Grogu",
+      "overall": 68,
+      "profile": "creature",
+      "selected_source": "the-mandalorian-grogu-advanced-rig.zip!/source/Grogurig.blend",
+      "slug": "grogu",
+      "target_vrm": "public/avatars/grogu.vrm"
+    },
+    {
+      "action": "custom_profile",
+      "name": "King Kong",
+      "overall": 68,
+      "profile": "creature",
+      "selected_source": "king-kong-animated.zip!/source/king kong.glb",
+      "slug": "king-kong",
+      "target_vrm": "public/avatars/king-kong.vrm"
+    },
+    {
+      "action": "custom_profile",
+      "name": "Olaf",
+      "overall": 60,
+      "profile": "creature",
+      "selected_source": "olaf-3d-rigged.zip!/source/OlafRig.blend",
+      "slug": "olaf",
+      "target_vrm": "public/avatars/olaf.vrm"
+    },
+    {
+      "action": "custom_profile",
+      "name": "Godzilla",
+      "overall": 59,
+      "profile": "creature",
+      "selected_source": "godzilla-rigged-animated.zip!/source/Godzilla (New Glow).blend",
+      "slug": "godzilla",
+      "target_vrm": "public/avatars/godzilla.vrm"
+    },
+    {
+      "action": "custom_profile",
       "name": "Xenomorph",
       "overall": 60,
       "profile": "creature",
       "selected_source": "realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx",
-      "slug": "xenomorph"
+      "slug": "xenomorph",
+      "target_vrm": "public/avatars/xenomorph.vrm"
+    },
+    {
+      "action": "hand_test_only",
+      "name": "Rigged Hand",
+      "overall": 32,
+      "profile": "hand_only",
+      "selected_source": "rigged-hand.zip!/source/handRig_02.fbx",
+      "slug": "rigged-hand",
+      "target_vrm": "public/avatars/rigged-hand.vrm"
+    },
+    {
+      "action": "cleanup_then_convert",
+      "name": "Teal v2",
+      "overall": 53,
+      "profile": "humanoid_with_offsets",
+      "selected_source": "teal-v2.zip!/source/Tealv2.fbx",
+      "slug": "teal-v2",
+      "target_vrm": "public/avatars/teal-v2.vrm"
+    },
+    {
+      "action": "cleanup_then_convert",
+      "name": "Buzz Lightyear",
+      "overall": 21,
+      "profile": "humanoid_with_offsets",
+      "selected_source": "adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend",
+      "slug": "buzz-lightyear",
+      "target_vrm": "public/avatars/buzz-lightyear.vrm"
+    },
+    {
+      "action": "custom_profile",
+      "name": "Baby Yoda",
+      "overall": 27,
+      "profile": "creature",
+      "selected_source": "baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend",
+      "slug": "baby-yoda",
+      "target_vrm": "public/avatars/baby-yoda.vrm"
     }
   ],
-  "created_at": "2026-06-11T02:01:42+00:00",
-  "failure_count": 0,
-  "failures": [],
+  "created_at": "2026-06-11T13:21:41+00:00",
   "groups": [
-    "amazing-spider-man-2",
-    "baby-yoda",
-    "buzz-lightyear",
+    "woody",
     "darth-vader",
-    "elsa",
     "fortnite-batman",
-    "godzilla",
-    "grogu",
     "iron-man",
-    "jack-sparrow",
-    "king-kong",
-    "olaf",
-    "rigged-hand",
     "shrek",
     "spider-man-no-way-home",
     "spider-man-playstation",
-    "teal-v2",
+    "amazing-spider-man-2",
     "terminator-t-800",
-    "xenomorph"
+    "jack-sparrow",
+    "elsa",
+    "grogu",
+    "king-kong",
+    "olaf",
+    "godzilla",
+    "xenomorph",
+    "rigged-hand",
+    "teal-v2",
+    "buzz-lightyear",
+    "baby-yoda"
   ],
-  "model_count": 19,
-  "prior_evidence": {
-    "bone_trees.md": "/Users/lekan/Dev/posepuppet/models_for_animation/model-glb-probe-20260610-203336/bone_trees.md",
-    "model_glb_probe.json": "/Users/lekan/Dev/posepuppet/models_for_animation/model-glb-probe-20260610-203336/model_glb_probe.json",
-    "model_glb_probe.md": "/Users/lekan/Dev/posepuppet/models_for_animation/model-glb-probe-20260610-203336/model_glb_probe.md"
-  },
-  "schema_version": "posepuppet-avatar-audit-summary-v1"
+  "model_count": 20,
+  "schema_version": "posepuppet-avatar-audit-summary-v2"
 }

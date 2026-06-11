@@ -62,6 +62,7 @@ def character_slug_for(pathish: str) -> str:
     raw = text.replace("-", " ")
 
     checks = [
+        ("woody", "woody"),
         ("amazing spider man 2", "amazing-spider-man-2"),
         ("spider man no way home", "spider-man-no-way-home"),
         ("spider man playstation", "spider-man-playstation"),
@@ -266,6 +267,38 @@ def scan_sources(source_dir: Path) -> tuple[dict[str, list[dict]], list[dict], l
                 groups[zip_record["group"]].append(zip_record)
 
     return dict(groups), all_file_records, archive_reports, prior_evidence
+
+
+def add_woody_source(groups: dict[str, list[dict]], file_records: list[dict], woody_dir: Path) -> None:
+    """Add Woody's external folder as a first-class audit source when present."""
+    source = woody_dir / "woody-toy-story-rig-free-download" / "source" / "T-Pose (9).fbx"
+    reference = woody_dir / "woody_toy_story_rig_free_download.glb"
+    archive = woody_dir / "woody-toy-story-rig-free-download.zip"
+    records = []
+    for path in [source, reference, archive]:
+        if not path.exists():
+            continue
+        stat = path.stat()
+        ext = path.suffix.lower()
+        record = {
+            "kind": "file",
+            "path": str(path),
+            "rel": str(path),
+            "display": str(path),
+            "group": "woody",
+            "ext": ext,
+            "size": stat.st_size,
+            "sha256": sha256_file(path) if ext in SUPPORTED_MODEL_EXTS | ARCHIVE_EXTS else "",
+            "source_zip": "",
+            "nested_zip": "",
+            "archive_entry": "",
+            "nested_chain": [],
+        }
+        records.append(record)
+        file_records.append(record)
+    if records:
+        groups.setdefault("woody", [])
+        groups["woody"].extend(records)
 
 
 def candidate_rank(record: dict) -> tuple[int, int, str]:
@@ -603,7 +636,6 @@ def write_recommendations(output_dir: Path, audits: list[dict], duplicate_sets: 
         "D. Creature/non-humanoid custom-profile candidates": [],
         "E. Bad or static candidates": [],
         "F. Duplicates / ignore for now": [],
-        "G. Models needing license review before any public use": [],
     }
     for audit in sorted(audits, key=lambda item: item["scores"]["overall"], reverse=True):
         label = audit["label"]
@@ -619,7 +651,6 @@ def write_recommendations(output_dir: Path, audits: list[dict], duplicate_sets: 
             categories["D. Creature/non-humanoid custom-profile candidates"].append(line)
         if label in {"not well-developed", "static / not rigged", "reject"} or audit["scores"]["overall"] < 45:
             categories["E. Bad or static candidates"].append(line)
-        categories["G. Models needing license review before any public use"].append(f"- **{audit['model']['name']}**: license unknown; verify original download terms before redistribution.")
 
     for records in duplicate_sets:
         names = ", ".join(f"`{record['display']}`" for record in records)
@@ -748,6 +779,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--screenshots", action="store_true", help="Ask the single-model audit to render best-effort screenshots.")
     parser.add_argument("--timeout", type=int, default=240, help="Per-model Blender timeout in seconds.")
     parser.add_argument("--limit", type=int, default=0, help="Audit only the first N groups after scanning.")
+    parser.add_argument(
+        "--woody-dir",
+        default="/Users/lekan/Downloads/woody",
+        help="Optional external Woody source folder to include as a first-class model.",
+    )
     return parser.parse_args(argv)
 
 
@@ -758,6 +794,10 @@ def main(argv: list[str]) -> int:
     blender = Path(args.blender)
     audit_script = Path(__file__).resolve().parent / "audit_model.py"
 
+    if not source_dir.exists() and source_dir.name == "ModelsForAnimation":
+        fallback = source_dir.parent / "models_for_animation"
+        if fallback.exists():
+            source_dir = fallback.resolve()
     if not source_dir.exists():
         print(f"Source directory does not exist: {source_dir}", file=sys.stderr)
         return 2
@@ -767,6 +807,9 @@ def main(argv: list[str]) -> int:
 
     output_dir.mkdir(parents=True, exist_ok=True)
     groups, file_records, archive_reports, prior_evidence = scan_sources(source_dir)
+    woody_dir = Path(args.woody_dir).expanduser()
+    if woody_dir.exists():
+        add_woody_source(groups, file_records, woody_dir)
     duplicate_sets = exact_duplicate_groups(file_records)
     temp_root_path = Path(tempfile.mkdtemp(prefix="posepuppet-model-audit-"))
     failures: list[dict] = []

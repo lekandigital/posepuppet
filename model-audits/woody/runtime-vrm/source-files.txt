@@ -1,0 +1,8 @@
+# Source files for Woody runtime VRM
+
+Selected source: public/avatars/woody.vrm
+Selected format: vrm
+Selected from ZIP: False
+
+All known source paths:
+- public/avatars/woody.vrm

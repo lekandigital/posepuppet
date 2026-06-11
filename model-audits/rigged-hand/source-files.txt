@@ -1,16 +1,18 @@
 # Source files for Rigged Hand
 
 Selected source: rigged-hand.zip!/source/handRig_02.fbx
+Best conversion source: rigged-hand.zip!/source/handRig_02.fbx
 Runtime GLB companion: rigged_hand.glb
+Target VRM path: public/avatars/rigged-hand.vrm
 
 ## All known variants
 
-- `rigged-hand.zip!/source/handRig_02.fbx` (zip-entry, .fbx, 1.49 MB)
-- `rigged_hand (1).glb` (file, .glb, 2.13 MB, sha256=11fcdb53fd5c)
-- `rigged_hand.glb` (file, .glb, 3.64 MB, sha256=19c5e8013213)
-- `rigged-hand.zip` (file, .zip, 5.87 MB, sha256=932877868101)
+- `rigged-hand.zip`
+- `rigged-hand.zip!/source/handRig_02.fbx`
+- `rigged_hand (1).glb`
+- `rigged_hand.glb`
 
 ## Notes
 
-- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
-- License remains unknown until manually verified from the original download source.
+- Original binaries, textures, ZIPs, screenshots, contact sheets, and converted VRMs are not included in handoff files.
+- Use source-lock hashes before trusting this audit after model files change.

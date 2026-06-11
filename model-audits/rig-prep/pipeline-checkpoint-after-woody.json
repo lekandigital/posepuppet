@@ -1,0 +1,43 @@
+{
+  "schema_version": "posepuppet-pipeline-checkpoint-v1",
+  "created_at": "2026-06-11T14:53:00+00:00",
+  "tools_created": [
+    "tools/rig_prep_model.py",
+    "tools/rig_prep_all_models.py",
+    "tools/convert_avatar_to_vrm.py",
+    "tools/convert_all_avatars_to_vrm.py",
+    "tools/validate_vrm_candidate.py",
+    "tools/rig_prep_pipeline.py",
+    "tools/export_source_to_vrm.py"
+  ],
+  "woody": {
+    "dry_run_status": "pass",
+    "inspect_status": "pass",
+    "conversion_status": "pass",
+    "validation_status": "pass",
+    "generated_vrm_path": "/home/o/posepuppet-working/generated-vrms/woody.vrm",
+    "evidence_source": "user_task_context"
+  },
+  "runtime_smoke_status": "not_attempted",
+  "known_blockers": [
+    "Node 22 required explicit nvm sourcing in noninteractive shells.",
+    "Runtime browser load smoke is still not attempted.",
+    "User-reported validate_model_audits.py baseline issue for amazing-spider-man-2 remains preexisting if reproduced on server."
+  ],
+  "dirty_git_status_summary": {
+    "modified_entries": 85,
+    "staged_entries": 0,
+    "untracked_entries": 283
+  },
+  "node_22_issue_and_fix": {
+    "issue": "noninteractive shells could pick the wrong Node without sourcing nvm",
+    "fixes": [
+      ".nvmrc pinned to 22",
+      "docs/ubuntu-rigging-server-setup.md updated",
+      "docs/avatar-rig-prep-pipeline.md added",
+      "scripts/setup-ubuntu-rigging-env.sh now forces repo Node selection before npm commands"
+    ]
+  },
+  "large_files_staged": false,
+  "next_recommended_model": "darth-vader"
+}

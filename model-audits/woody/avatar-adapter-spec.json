@@ -1,0 +1,173 @@
+{
+  "acceptance_tests": [
+    "VRM loads in @pixiv/three-vrm",
+    "avatar appears upright and facing camera",
+    "head follows webcam rotation",
+    "arms follow shoulders/elbows/wrists",
+    "hands do not detach",
+    "full body mode does not explode when legs are visible"
+  ],
+  "avatar_id": "woody",
+  "bone_map": {
+    "chest": "mixamorig:Spine1",
+    "head": "mixamorig:Head",
+    "hips": "mixamorig:Hips",
+    "jaw": "",
+    "leftEye": "",
+    "leftFoot": "mixamorig:LeftFoot",
+    "leftHand": "mixamorig:LeftHand",
+    "leftLowerArm": "mixamorig:LeftForeArm",
+    "leftLowerLeg": "mixamorig:LeftLeg",
+    "leftShoulder": "mixamorig:LeftShoulder",
+    "leftToes": "mixamorig:LeftToeBase",
+    "leftUpperArm": "mixamorig:LeftArm",
+    "leftUpperLeg": "mixamorig:LeftUpLeg",
+    "neck": "mixamorig:Neck",
+    "rightEye": "",
+    "rightFoot": "mixamorig:RightFoot",
+    "rightHand": "mixamorig:RightHand",
+    "rightLowerArm": "mixamorig:RightForeArm",
+    "rightLowerLeg": "mixamorig:RightLeg",
+    "rightShoulder": "mixamorig:RightShoulder",
+    "rightToes": "mixamorig:RightToeBase",
+    "rightUpperArm": "mixamorig:RightArm",
+    "rightUpperLeg": "mixamorig:RightUpLeg",
+    "spine": "mixamorig:Spine",
+    "upperChest": "mixamorig:Spine2"
+  },
+  "bone_map_confidence": {
+    "arms": "exact",
+    "chest": "exact",
+    "confidence_notes": [
+      "Confidence is based on scripted bone-name and hierarchy mapping, not a visual retargeting run."
+    ],
+    "face": "missing",
+    "feet": "exact",
+    "fingers": "missing",
+    "hands": "exact",
+    "head": "exact",
+    "hips": "exact",
+    "legs": "exact",
+    "neck": "exact",
+    "overall": "high",
+    "spine": "exact",
+    "toes": "exact"
+  },
+  "conversion": {
+    "command": "/Applications/Blender.app/Contents/MacOS/Blender \\\n  -b \\\n  --python tools/export_fbx_to_vrm.py \\\n  -- \"/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx\" \\\n  public/avatars/woody.vrm",
+    "expected_blockers": [],
+    "manual_mapping_needed": false,
+    "target_format": "vrm",
+    "target_path": "public/avatars/woody.vrm"
+  },
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "fingers"
+  ],
+  "display_name": "Woody",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet."
+  ],
+  "do_not_inspect": [
+    "duplicate GLBs",
+    "source ZIP internals",
+    "textures",
+    "full source binaries",
+    "screenshots/contact sheets unless visual review is needed"
+  ],
+  "enabled_controls": [
+    "arms",
+    "feet",
+    "hands",
+    "head",
+    "legs",
+    "root_motion",
+    "toes",
+    "upper_body"
+  ],
+  "face_touch_config": {
+    "mode": "ik_required",
+    "notes": [
+      "Face-touch is not runtime-proven; implement only after IK/target tests."
+    ],
+    "supported": true,
+    "targets": [
+      "head_center",
+      "mouth",
+      "left_cheek",
+      "right_cheek"
+    ]
+  },
+  "implementation_status": "convert_then_enable",
+  "inspect_only_if": [
+    "open bone-tree.txt if automatic mapping fails",
+    "open source binary only if VRM conversion fails"
+  ],
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=woody after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "load_vrm_full_body",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera",
+      "head tracks",
+      "arms track"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "one_paragraph_implementation_summary": "Woody should use profile `humanoid` with action `convert_then_test`. Convert or test `/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx` to `public/avatars/woody.vrm`, enable arms, feet, hands, head, legs, root_motion, toes, upper_body, and disable face_touch, facial_expressions, fingers until runtime tests pass.",
+  "performance": {
+    "desktop_safe": true,
+    "mobile_safe": true,
+    "optimization_required": false,
+    "runtime_weight": "medium"
+  },
+  "priority": 1,
+  "profile": "humanoid",
+  "reference_glb": "/Users/lekan/Downloads/woody/woody_toy_story_rig_free_download.glb",
+  "retargeting_config": {
+    "arm_correction": "test_required",
+    "body_mode": "full",
+    "finger_mode": "palm_only",
+    "foot_orientation": "enabled_after_test",
+    "leg_correction": "test_required",
+    "offset_profile": "",
+    "requires_model_offsets": false,
+    "root_motion": true,
+    "wrist_correction": "test_required"
+  },
+  "runtime": {
+    "expected_loader": "@pixiv/three-vrm",
+    "fallback_if_missing": "current_default",
+    "registry_entry_needed": true,
+    "runtime_test_status": "not_attempted"
+  },
+  "runtime_fallback_policy": {
+    "if_tracking_profile_unsupported": "disable_unsupported_controls",
+    "if_vrm_load_fails": "show_warning_and_fallback",
+    "if_vrm_missing": "show_warning",
+    "recommended_warning_text": "This avatar is experimental. Some controls are disabled because the model does not yet have a verified full PosePuppet rig."
+  },
+  "runtime_vrm_path": "public/avatars/woody.vrm",
+  "schema_version": "posepuppet-avatar-adapter-spec-v1",
+  "selected_source_reasoning": "Use the explicit Woody FBX source requested for conversion; keep the GLB as reference only.",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "d599209431cb344cb414fe7606218325cd6b123ecf54b4943009e022d55d542d",
+    "selected_source_sha256": "eea452c046550ec4be68f8bcae25eb0eebf28a650ad7d28ddc05ad6f6cdc91b3",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx"
+}

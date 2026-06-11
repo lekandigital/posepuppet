@@ -1,0 +1,1210 @@
+{
+  "created_at": "2026-06-11T13:21:41+00:00",
+  "models": [
+    {
+      "action": "convert_to_vrm",
+      "avatar_id": "woody",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "display_name": "Woody",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "face_touch_mode": "ik_required",
+      "finger_mode": "palm_only",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=woody after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_full_body",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "medium",
+      "priority": 1,
+      "profile": "humanoid",
+      "read_first": "model-audits/woody/avatar-adapter-spec.json",
+      "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+      "risk": "medium",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "d599209431cb344cb414fe7606218325cd6b123ecf54b4943009e022d55d542d",
+        "selected_source_sha256": "eea452c046550ec4be68f8bcae25eb0eebf28a650ad7d28ddc05ad6f6cdc91b3",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx",
+      "target_vrm": "public/avatars/woody.vrm"
+    },
+    {
+      "action": "convert_to_vrm",
+      "avatar_id": "darth-vader",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions"
+      ],
+      "display_name": "Darth Vader",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "feet",
+        "fingers",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "face_touch_mode": "ik_required",
+      "finger_mode": "full_finger_retargeting",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=darth-vader after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_full_body",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "heavy",
+      "priority": 2,
+      "profile": "humanoid",
+      "read_first": "model-audits/darth-vader/avatar-adapter-spec.json",
+      "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+      "risk": "medium",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "8da60ea9c7929cec28f70c9329c7266d540fc54356d112e9b8f5a5b70a12cd30",
+        "selected_source_sha256": "d169439142f3ddd3980f93cd22c0fb9b36d19010d1ce9fc8f63f705e32bef940",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend",
+      "target_vrm": "public/avatars/darth-vader.vrm"
+    },
+    {
+      "action": "convert_to_vrm",
+      "avatar_id": "fortnite-batman",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions"
+      ],
+      "display_name": "Fortnite Batman",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "feet",
+        "fingers",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "face_touch_mode": "ik_required",
+      "finger_mode": "full_finger_retargeting",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=fortnite-batman after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_full_body",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "heavy",
+      "priority": 3,
+      "profile": "humanoid",
+      "read_first": "model-audits/fortnite-batman/avatar-adapter-spec.json",
+      "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+      "risk": "medium",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "da0fe87b030d1d4b2d14e6af69542a63111faa6e1fccf61900b0e1cd66d097e8",
+        "selected_source_sha256": "d154639ad18062d9d5e76334cd52cb950f51bbed4f07188f0d6d12d4e35113b8",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend",
+      "target_vrm": "public/avatars/fortnite-batman.vrm"
+    },
+    {
+      "action": "convert_to_vrm",
+      "avatar_id": "iron-man",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions"
+      ],
+      "display_name": "Iron Man",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "feet",
+        "fingers",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "face_touch_mode": "ik_required",
+      "finger_mode": "full_finger_retargeting",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=iron-man after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_full_body",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "heavy",
+      "priority": 4,
+      "profile": "humanoid",
+      "read_first": "model-audits/iron-man/avatar-adapter-spec.json",
+      "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+      "risk": "medium",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "7cd0d123f77a3f4940b03a7c64e8074a2fa5055500ab2ec4960c4ee78be58dc2",
+        "selected_source_sha256": "688d8ecbc0cbc9a07adc021f97ef33798a2a4fdc2c1411a78b657701e6338d30",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend",
+      "target_vrm": "public/avatars/iron-man.vrm"
+    },
+    {
+      "action": "convert_to_vrm",
+      "avatar_id": "shrek",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "toes"
+      ],
+      "display_name": "Shrek",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "upper_body"
+      ],
+      "face_touch_mode": "estimated_targets_only",
+      "finger_mode": "curl_presets",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=shrek after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_full_body",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "medium",
+      "priority": 5,
+      "profile": "humanoid",
+      "read_first": "model-audits/shrek/avatar-adapter-spec.json",
+      "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+      "risk": "medium",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "6880ac4894140c0efd897f438666ca1c708aa6d2e64287b84c2745373ff2c392",
+        "selected_source_sha256": "3b6a373feb96f2bba42666b1d3c2b7dc812d8aad4056e58d708f6012a8f3c459",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx",
+      "target_vrm": "public/avatars/shrek.vrm"
+    },
+    {
+      "action": "convert_to_vrm",
+      "avatar_id": "spider-man-no-way-home",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "display_name": "Spider-Man No Way Home",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "face_touch_mode": "ik_required",
+      "finger_mode": "palm_only",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=spider-man-no-way-home after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_full_body",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "heavy",
+      "priority": 6,
+      "profile": "humanoid",
+      "read_first": "model-audits/spider-man-no-way-home/avatar-adapter-spec.json",
+      "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+      "risk": "medium",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "",
+        "selected_source_sha256": "06350131aa3745490c70ceecab9da83d69cfcd400a85a971f0e978b537ef5c6e",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "OtherSpiderman/spider-man_no_way_home_rigged.glb",
+      "target_vrm": "public/avatars/spider-man-no-way-home.vrm"
+    },
+    {
+      "action": "convert_to_vrm",
+      "avatar_id": "spider-man-playstation",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "display_name": "Spider-Man PlayStation",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "face_touch_mode": "ik_required",
+      "finger_mode": "palm_only",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=spider-man-playstation after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_full_body",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "very_heavy",
+      "priority": 7,
+      "profile": "humanoid",
+      "read_first": "model-audits/spider-man-playstation/avatar-adapter-spec.json",
+      "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+      "risk": "medium",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "a252976a1c78a812170018cca9c32381e63046e8f0c53b70e028d9d372eb912d",
+        "selected_source_sha256": "888f58f282d122d810f40f1ba8556dc6ca4b120c981ab951546488b7d8c1a2f2",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "spider-man-playstation-rigged.zip!/source/spider man playstation realistic.blend",
+      "target_vrm": "public/avatars/spider-man-playstation.vrm"
+    },
+    {
+      "action": "convert_to_vrm",
+      "avatar_id": "amazing-spider-man-2",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "display_name": "The Amazing Spider-Man 2",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "face_touch_mode": "ik_required",
+      "finger_mode": "palm_only",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=amazing-spider-man-2 after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_full_body",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "medium",
+      "priority": 8,
+      "profile": "humanoid",
+      "read_first": "model-audits/amazing-spider-man-2/avatar-adapter-spec.json",
+      "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+      "risk": "medium",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "b35842d3db8485e1f4fc88345fc95c4c6ca069f431a65f6aedfedd7fcb486fe6",
+        "selected_source_sha256": "aa295dc47d106c12d91eefbcd5e0641ea6221d793427847ef7039b10c52ca1ee",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx",
+      "target_vrm": "public/avatars/amazing-spider-man-2.vrm"
+    },
+    {
+      "action": "convert_to_vrm",
+      "avatar_id": "terminator-t-800",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "display_name": "Terminator T-800",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "face_touch_mode": "ik_required",
+      "finger_mode": "palm_only",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=terminator-t-800 after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_full_body",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "medium",
+      "priority": 9,
+      "profile": "humanoid",
+      "read_first": "model-audits/terminator-t-800/avatar-adapter-spec.json",
+      "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+      "risk": "medium",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "5a4b5ebd95c5dadbe94b326034b38dc03f10fa5b31c0027dc0d368aab9f8bf02",
+        "selected_source_sha256": "7a3982027c03745ad7a59debff3a1de13c37221df4ffa57b163a6cf38f3eacc1",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend",
+      "target_vrm": "public/avatars/terminator-t-800.vrm"
+    },
+    {
+      "action": "convert_to_vrm",
+      "avatar_id": "jack-sparrow",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "display_name": "Jack Sparrow",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "toes",
+        "upper_body"
+      ],
+      "face_touch_mode": "ik_required",
+      "finger_mode": "palm_only",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=jack-sparrow after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_full_body",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "very_heavy",
+      "priority": 10,
+      "profile": "humanoid_with_offsets",
+      "read_first": "model-audits/jack-sparrow/avatar-adapter-spec.json",
+      "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+      "risk": "medium",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "3fae0223afcda4329a08d5901ec4ad338118e1f967d1164fcb63e87ae400b0c6",
+        "selected_source_sha256": "26627dfa7c0c41d28c934faf799da7b53805fad7f2fa4a5bfa28915d576be13c",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend",
+      "target_vrm": "public/avatars/jack-sparrow.vrm"
+    },
+    {
+      "action": "cleanup_then_convert",
+      "avatar_id": "elsa",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "feet",
+        "fingers",
+        "toes"
+      ],
+      "display_name": "Elsa",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not enable feet for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "hands",
+        "head",
+        "upper_body"
+      ],
+      "face_touch_mode": "ik_required",
+      "finger_mode": "curl_presets",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=elsa after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_upper_body_only",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "light",
+      "priority": 11,
+      "profile": "humanoid_with_offsets",
+      "read_first": "model-audits/elsa/avatar-adapter-spec.json",
+      "reason": "Partial structure exists, but cleanup or custom mapping is needed first.",
+      "risk": "high",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "9e8c846062c77191cd78a530b81e667b05468477468ef7f8f2559f4308d4fd89",
+        "selected_source_sha256": "d29387993ff09d71f69935e7098525c10a3fbc8704c9a0035e32771608c5763a",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb",
+      "target_vrm": "public/avatars/elsa.vrm"
+    },
+    {
+      "action": "custom_profile",
+      "avatar_id": "grogu",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "display_name": "Grogu",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "enabled_controls": [
+        "arms",
+        "creature_head",
+        "creature_jaw",
+        "legs"
+      ],
+      "face_touch_mode": "none",
+      "finger_mode": "curl_presets",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=grogu after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "custom_creature_preview",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "medium",
+      "priority": 12,
+      "profile": "creature",
+      "read_first": "model-audits/grogu/avatar-adapter-spec.json",
+      "reason": "Nonstandard anatomy should not be forced into standard humanoid full-body mode.",
+      "risk": "high",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "d5a1f5f7f2817b2c520890a26491514d094b3b1c2c0c1fb2d9dde09107390b65",
+        "selected_source_sha256": "05ce7a545062eb0c3824961abef2574406a57dbc1532d39f018433f9bc3d25a0",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "the-mandalorian-grogu-advanced-rig.zip!/source/Grogurig.blend",
+      "target_vrm": "public/avatars/grogu.vrm"
+    },
+    {
+      "action": "custom_profile",
+      "avatar_id": "king-kong",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "display_name": "King Kong",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "enabled_controls": [
+        "arms",
+        "creature_head",
+        "creature_jaw",
+        "legs"
+      ],
+      "face_touch_mode": "none",
+      "finger_mode": "curl_presets",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=king-kong after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "custom_creature_preview",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "very_heavy",
+      "priority": 13,
+      "profile": "creature",
+      "read_first": "model-audits/king-kong/avatar-adapter-spec.json",
+      "reason": "Nonstandard anatomy should not be forced into standard humanoid full-body mode.",
+      "risk": "high",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "29ca9dcb05a2197a8339afe25059791e180058075d95a76cb83083f9b2d56dcd",
+        "selected_source_sha256": "a5025a16affaa9d98becd203f3f73b7ef95ef19d3618958c837716f217574f2c",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "king-kong-animated.zip!/source/king kong.glb",
+      "target_vrm": "public/avatars/king-kong.vrm"
+    },
+    {
+      "action": "custom_profile",
+      "avatar_id": "olaf",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "display_name": "Olaf",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "enabled_controls": [
+        "arms",
+        "creature_head",
+        "legs"
+      ],
+      "face_touch_mode": "none",
+      "finger_mode": "curl_presets",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=olaf after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "custom_creature_preview",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "medium",
+      "priority": 14,
+      "profile": "creature",
+      "read_first": "model-audits/olaf/avatar-adapter-spec.json",
+      "reason": "Nonstandard anatomy should not be forced into standard humanoid full-body mode.",
+      "risk": "high",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "039b9cf743f85c71f87606ef995fec61bc6265bafd6f88c0f2bceb8d1c54e205",
+        "selected_source_sha256": "ff73c414ce93a5b7464eaba60abc4c18715bed2999947ea08179402babbcc9a1",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "olaf-3d-rigged.zip!/source/OlafRig.blend",
+      "target_vrm": "public/avatars/olaf.vrm"
+    },
+    {
+      "action": "custom_profile",
+      "avatar_id": "godzilla",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "display_name": "Godzilla",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "enabled_controls": [
+        "arms",
+        "creature_head",
+        "creature_jaw",
+        "legs"
+      ],
+      "face_touch_mode": "none",
+      "finger_mode": "curl_presets",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=godzilla after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "custom_creature_preview",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "heavy",
+      "priority": 15,
+      "profile": "creature",
+      "read_first": "model-audits/godzilla/avatar-adapter-spec.json",
+      "reason": "Nonstandard anatomy should not be forced into standard humanoid full-body mode.",
+      "risk": "high",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "67e13520e983cdc45ee3d7d19381f7fbe55d3371c5bdd3bba01e83ef618cfea0",
+        "selected_source_sha256": "ec0fdd35507339e6b8d6894f878af41d360d0031aac77f56d41b86473e807d18",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "godzilla-rigged-animated.zip!/source/Godzilla (New Glow).blend",
+      "target_vrm": "public/avatars/godzilla.vrm"
+    },
+    {
+      "action": "custom_profile",
+      "avatar_id": "xenomorph",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "display_name": "Xenomorph",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "enabled_controls": [
+        "creature_head",
+        "creature_jaw",
+        "legs"
+      ],
+      "face_touch_mode": "none",
+      "finger_mode": "curl_presets",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=xenomorph after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "custom_creature_preview",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "heavy",
+      "priority": 16,
+      "profile": "creature",
+      "read_first": "model-audits/xenomorph/avatar-adapter-spec.json",
+      "reason": "Nonstandard anatomy should not be forced into standard humanoid full-body mode.",
+      "risk": "high",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "d39e9fb9902a3926825c95940adf4621c1ffcb164d48a1da8a5011e3b09d0e9b",
+        "selected_source_sha256": "4dbf2cded569bcb08a0f66a7ce481d6942441c254e14c5291b116b522e796800",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx",
+      "target_vrm": "public/avatars/xenomorph.vrm"
+    },
+    {
+      "action": "hand_only_test",
+      "avatar_id": "rigged-hand",
+      "disabled_controls": [
+        "arms",
+        "face_touch",
+        "facial_expressions",
+        "feet",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "torso",
+        "upper_body"
+      ],
+      "display_name": "Rigged Hand",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not enable feet for this model yet.",
+        "Do not treat this as a full avatar; use it only for hand/finger tests."
+      ],
+      "enabled_controls": [
+        "fingers",
+        "hands"
+      ],
+      "face_touch_mode": "none",
+      "finger_mode": "curl_presets",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=rigged-hand after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "hand_test_only",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "medium",
+      "priority": 17,
+      "profile": "hand_only",
+      "read_first": "model-audits/rigged-hand/avatar-adapter-spec.json",
+      "reason": "Use only for hand/finger experiments; it is not a full avatar.",
+      "risk": "high",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "19c5e80132138c94c3ae886ce6c30038369df1dab17f7475bcd7cfbad43a9cea",
+        "selected_source_sha256": "55b5c5ba6eaa9d81109a0e54b325b6ecb673665539fe2c5ead2bb93e73a5a1a1",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "rigged-hand.zip!/source/handRig_02.fbx",
+      "target_vrm": "public/avatars/rigged-hand.vrm"
+    },
+    {
+      "action": "cleanup_then_convert",
+      "avatar_id": "teal-v2",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "toes"
+      ],
+      "display_name": "Teal v2",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "upper_body"
+      ],
+      "face_touch_mode": "none",
+      "finger_mode": "none",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=teal-v2 after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_full_body",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "medium",
+      "priority": 18,
+      "profile": "humanoid_with_offsets",
+      "read_first": "model-audits/teal-v2/avatar-adapter-spec.json",
+      "reason": "Automatic mapping is too weak; inspect hierarchy and create a manual map first.",
+      "risk": "high",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "634d099dda636004f6b797757ad7d2aa5a683676460d3a1aac16c487f9f88198",
+        "selected_source_sha256": "fdf1e89c484fa7d6570716bd7821fbfbe709ea2cee16ca4858af8a7bc0d5f627",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "teal-v2.zip!/source/Tealv2.fbx",
+      "target_vrm": "public/avatars/teal-v2.vrm"
+    },
+    {
+      "action": "cleanup_then_convert",
+      "avatar_id": "buzz-lightyear",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "feet",
+        "fingers",
+        "toes"
+      ],
+      "display_name": "Buzz Lightyear",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not enable feet for this model yet."
+      ],
+      "enabled_controls": [
+        "arms",
+        "hands",
+        "head",
+        "upper_body"
+      ],
+      "face_touch_mode": "none",
+      "finger_mode": "none",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=buzz-lightyear after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "load_vrm_upper_body_only",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera",
+          "head tracks",
+          "arms track"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "light",
+      "priority": 19,
+      "profile": "humanoid_with_offsets",
+      "read_first": "model-audits/buzz-lightyear/avatar-adapter-spec.json",
+      "reason": "Automatic mapping is too weak; inspect hierarchy and create a manual map first.",
+      "risk": "high",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "40e213a8c6a40358750d829a238bbbf39849be1adef33304a988091903195b7d",
+        "selected_source_sha256": "5ad3edb738f16f318b521769623ca6e39839000cbb2c0e935173c50f0bb5bd8e",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend",
+      "target_vrm": "public/avatars/buzz-lightyear.vrm"
+    },
+    {
+      "action": "custom_profile",
+      "avatar_id": "baby-yoda",
+      "disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "display_name": "Baby Yoda",
+      "do_not_implement": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not enable feet for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "enabled_controls": [
+        "creature_head"
+      ],
+      "face_touch_mode": "none",
+      "finger_mode": "none",
+      "minimum_viable_avatar_support": {
+        "acceptance_test": "Run PosePuppet with ?avatar=baby-yoda after adding a gated registry entry and verify basic tracking without runtime errors.",
+        "first_pass_goal": "custom_creature_preview",
+        "may_defer": [
+          "fingers",
+          "face-touch",
+          "facial expressions",
+          "toes"
+        ],
+        "must_work": [
+          "VRM loads",
+          "avatar upright/facing camera"
+        ],
+        "notes": [
+          "Do not attempt every control in the first pass."
+        ]
+      },
+      "performance": "medium",
+      "priority": 20,
+      "profile": "creature",
+      "read_first": "model-audits/baby-yoda/avatar-adapter-spec.json",
+      "reason": "Nonstandard anatomy should not be forced into standard humanoid full-body mode.",
+      "risk": "high",
+      "source_lock": {
+        "audit_status": "fresh",
+        "runtime_reference_sha256": "13c3d9540d37f5d5cd89afd8218a48029627ff181c0da66729616504342d2d62",
+        "selected_source_sha256": "19c08b45b061c72c5af61c418a87640b577bc525704501a61d24d8e258f4c0a9",
+        "source_lock_path": "model-audits/source-lock.json"
+      },
+      "source_to_convert": "baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend",
+      "target_vrm": "public/avatars/baby-yoda.vrm"
+    }
+  ],
+  "purpose": "Coding-ready model implementation configs so future agents do not need to inspect large 3D binaries.",
+  "schema_version": "posepuppet-avatar-adapter-specs-v1"
+}

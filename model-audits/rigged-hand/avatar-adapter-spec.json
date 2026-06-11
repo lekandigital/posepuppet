@@ -1,0 +1,172 @@
+{
+  "acceptance_tests": [
+    "VRM loads in @pixiv/three-vrm",
+    "avatar appears upright and facing camera",
+    "head follows webcam rotation",
+    "arms follow shoulders/elbows/wrists",
+    "hands do not detach",
+    "full body mode does not explode when legs are visible"
+  ],
+  "avatar_id": "rigged-hand",
+  "bone_map": {
+    "chest": "",
+    "head": "",
+    "hips": "",
+    "jaw": "",
+    "leftEye": "",
+    "leftFoot": "",
+    "leftHand": "",
+    "leftLowerArm": "",
+    "leftLowerLeg": "",
+    "leftShoulder": "",
+    "leftToes": "",
+    "leftUpperArm": "",
+    "leftUpperLeg": "",
+    "neck": "",
+    "rightEye": "",
+    "rightFoot": "",
+    "rightHand": "hand.R",
+    "rightLowerArm": "",
+    "rightLowerLeg": "",
+    "rightShoulder": "",
+    "rightToes": "",
+    "rightUpperArm": "",
+    "rightUpperLeg": "",
+    "spine": "",
+    "upperChest": ""
+  },
+  "bone_map_confidence": {
+    "arms": "missing",
+    "chest": "missing",
+    "confidence_notes": [
+      "Confidence is based on scripted bone-name and hierarchy mapping, not a visual retargeting run."
+    ],
+    "face": "missing",
+    "feet": "missing",
+    "fingers": "guessed",
+    "hands": "guessed",
+    "head": "missing",
+    "hips": "missing",
+    "legs": "missing",
+    "neck": "missing",
+    "overall": "low",
+    "spine": "missing",
+    "toes": "missing"
+  },
+  "conversion": {
+    "command": "# Extract/open the selected source in Blender, verify humanoid mapping, then export VRM.\n# Selected source: rigged-hand.zip!/source/handRig_02.fbx\n# Target path: public/avatars/rigged-hand.vrm",
+    "expected_blockers": [
+      "conversion not attempted in this V2 run",
+      "manual mapping and runtime load test still required"
+    ],
+    "manual_mapping_needed": true,
+    "target_format": "vrm",
+    "target_path": "public/avatars/rigged-hand.vrm"
+  },
+  "disabled_controls": [
+    "arms",
+    "face_touch",
+    "facial_expressions",
+    "feet",
+    "head",
+    "legs",
+    "root_motion",
+    "toes",
+    "torso",
+    "upper_body"
+  ],
+  "display_name": "Rigged Hand",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet.",
+    "Do not enable feet for this model yet.",
+    "Do not treat this as a full avatar; use it only for hand/finger tests."
+  ],
+  "do_not_inspect": [
+    "duplicate GLBs",
+    "source ZIP internals",
+    "textures",
+    "full source binaries",
+    "screenshots/contact sheets unless visual review is needed"
+  ],
+  "enabled_controls": [
+    "fingers",
+    "hands"
+  ],
+  "face_touch_config": {
+    "mode": "none",
+    "notes": [
+      "Face-touch is not runtime-proven; implement only after IK/target tests."
+    ],
+    "supported": false,
+    "targets": []
+  },
+  "implementation_status": "hand_test_only",
+  "inspect_only_if": [
+    "open bone-tree.txt if automatic mapping fails",
+    "open source binary only if VRM conversion fails"
+  ],
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=rigged-hand after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "hand_test_only",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "one_paragraph_implementation_summary": "Rigged Hand should use profile `hand_only` with action `hand_test_only`. Convert or test `rigged-hand.zip!/source/handRig_02.fbx` to `public/avatars/rigged-hand.vrm`, enable fingers, hands, and disable arms, face_touch, facial_expressions, feet, head, legs, root_motion, toes, torso, upper_body until runtime tests pass.",
+  "performance": {
+    "desktop_safe": true,
+    "mobile_safe": true,
+    "optimization_required": false,
+    "runtime_weight": "medium"
+  },
+  "priority": 17,
+  "profile": "hand_only",
+  "reference_glb": "rigged_hand.glb",
+  "retargeting_config": {
+    "arm_correction": "none",
+    "body_mode": "disabled",
+    "finger_mode": "curl_presets",
+    "foot_orientation": "disabled",
+    "leg_correction": "none",
+    "offset_profile": "",
+    "requires_model_offsets": false,
+    "root_motion": false,
+    "wrist_correction": "test_required"
+  },
+  "runtime": {
+    "expected_loader": "@pixiv/three-vrm",
+    "fallback_if_missing": "current_default",
+    "registry_entry_needed": true,
+    "runtime_test_status": "not_attempted"
+  },
+  "runtime_fallback_policy": {
+    "if_tracking_profile_unsupported": "disable_unsupported_controls",
+    "if_vrm_load_fails": "show_warning_and_fallback",
+    "if_vrm_missing": "show_warning",
+    "recommended_warning_text": "This avatar is experimental. Some controls are disabled because the model does not yet have a verified full PosePuppet rig."
+  },
+  "runtime_vrm_path": "public/avatars/rigged-hand.vrm",
+  "schema_version": "posepuppet-avatar-adapter-spec-v1",
+  "selected_source_reasoning": "Selected by source-priority audit discovery: prefer editable .blend, then .fbx, then source/runtime .glb.",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "19c5e80132138c94c3ae886ce6c30038369df1dab17f7475bcd7cfbad43a9cea",
+    "selected_source_sha256": "55b5c5ba6eaa9d81109a0e54b325b6ecb673665539fe2c5ead2bb93e73a5a1a1",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "rigged-hand.zip!/source/handRig_02.fbx"
+}

@@ -1,0 +1,170 @@
+{
+  "acceptance_tests": [
+    "VRM loads in @pixiv/three-vrm",
+    "avatar appears upright and facing camera",
+    "head follows webcam rotation",
+    "arms follow shoulders/elbows/wrists",
+    "hands do not detach",
+    "full body mode does not explode when legs are visible"
+  ],
+  "avatar_id": "buzz-lightyear",
+  "bone_map": {
+    "chest": "",
+    "head": "",
+    "hips": "",
+    "jaw": "",
+    "leftEye": "",
+    "leftFoot": "",
+    "leftHand": "",
+    "leftLowerArm": "",
+    "leftLowerLeg": "",
+    "leftShoulder": "",
+    "leftToes": "",
+    "leftUpperArm": "",
+    "leftUpperLeg": "",
+    "neck": "",
+    "rightEye": "",
+    "rightFoot": "",
+    "rightHand": "",
+    "rightLowerArm": "",
+    "rightLowerLeg": "",
+    "rightShoulder": "",
+    "rightToes": "",
+    "rightUpperArm": "",
+    "rightUpperLeg": "",
+    "spine": "",
+    "upperChest": ""
+  },
+  "bone_map_confidence": {
+    "arms": "missing",
+    "chest": "missing",
+    "confidence_notes": [
+      "Confidence is based on scripted bone-name and hierarchy mapping, not a visual retargeting run."
+    ],
+    "face": "missing",
+    "feet": "missing",
+    "fingers": "missing",
+    "hands": "missing",
+    "head": "missing",
+    "hips": "missing",
+    "legs": "missing",
+    "neck": "missing",
+    "overall": "low",
+    "spine": "missing",
+    "toes": "missing"
+  },
+  "conversion": {
+    "command": "# Extract/open the selected source in Blender, verify humanoid mapping, then export VRM.\n# Selected source: adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend\n# Target path: public/avatars/buzz-lightyear.vrm",
+    "expected_blockers": [
+      "conversion not attempted in this V2 run",
+      "manual mapping and runtime load test still required"
+    ],
+    "manual_mapping_needed": true,
+    "target_format": "vrm",
+    "target_path": "public/avatars/buzz-lightyear.vrm"
+  },
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "feet",
+    "fingers",
+    "toes"
+  ],
+  "display_name": "Buzz Lightyear",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet.",
+    "Do not enable feet for this model yet."
+  ],
+  "do_not_inspect": [
+    "duplicate GLBs",
+    "source ZIP internals",
+    "textures",
+    "full source binaries",
+    "screenshots/contact sheets unless visual review is needed"
+  ],
+  "enabled_controls": [
+    "arms",
+    "hands",
+    "head",
+    "upper_body"
+  ],
+  "face_touch_config": {
+    "mode": "none",
+    "notes": [
+      "Face-touch is not runtime-proven; implement only after IK/target tests."
+    ],
+    "supported": false,
+    "targets": []
+  },
+  "implementation_status": "cleanup_then_convert",
+  "inspect_only_if": [
+    "open bone-tree.txt if automatic mapping fails",
+    "open source binary only if VRM conversion fails"
+  ],
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=buzz-lightyear after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "load_vrm_upper_body_only",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera",
+      "head tracks",
+      "arms track"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "one_paragraph_implementation_summary": "Buzz Lightyear should use profile `humanoid_with_offsets` with action `cleanup_then_convert`. Convert or test `adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend` to `public/avatars/buzz-lightyear.vrm`, enable arms, hands, head, upper_body, and disable face_touch, facial_expressions, feet, fingers, toes until runtime tests pass.",
+  "performance": {
+    "desktop_safe": true,
+    "mobile_safe": true,
+    "optimization_required": false,
+    "runtime_weight": "light"
+  },
+  "priority": 19,
+  "profile": "humanoid_with_offsets",
+  "reference_glb": "adi_2.0_buzz_lightyear_fully_rigged.glb",
+  "retargeting_config": {
+    "arm_correction": "test_required",
+    "body_mode": "upper",
+    "finger_mode": "none",
+    "foot_orientation": "disabled",
+    "leg_correction": "none",
+    "offset_profile": "buzz-lightyear-offsets",
+    "requires_model_offsets": true,
+    "root_motion": false,
+    "wrist_correction": "test_required"
+  },
+  "runtime": {
+    "expected_loader": "@pixiv/three-vrm",
+    "fallback_if_missing": "current_default",
+    "registry_entry_needed": true,
+    "runtime_test_status": "not_attempted"
+  },
+  "runtime_fallback_policy": {
+    "if_tracking_profile_unsupported": "disable_unsupported_controls",
+    "if_vrm_load_fails": "show_warning_and_fallback",
+    "if_vrm_missing": "show_warning",
+    "recommended_warning_text": "This avatar is experimental. Some controls are disabled because the model does not yet have a verified full PosePuppet rig."
+  },
+  "runtime_vrm_path": "public/avatars/buzz-lightyear.vrm",
+  "schema_version": "posepuppet-avatar-adapter-spec-v1",
+  "selected_source_reasoning": "Selected by source-priority audit discovery: prefer editable .blend, then .fbx, then source/runtime .glb.",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "40e213a8c6a40358750d829a238bbbf39849be1adef33304a988091903195b7d",
+    "selected_source_sha256": "5ad3edb738f16f318b521769623ca6e39839000cbb2c0e935173c50f0bb5bd8e",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend"
+}

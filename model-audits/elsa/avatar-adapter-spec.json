@@ -1,0 +1,175 @@
+{
+  "acceptance_tests": [
+    "VRM loads in @pixiv/three-vrm",
+    "avatar appears upright and facing camera",
+    "head follows webcam rotation",
+    "arms follow shoulders/elbows/wrists",
+    "hands do not detach",
+    "full body mode does not explode when legs are visible"
+  ],
+  "avatar_id": "elsa",
+  "bone_map": {
+    "chest": "character:jnt_chest",
+    "head": "character:jnt_head",
+    "hips": "character:jnt_hip",
+    "jaw": "character:jnt_jaw",
+    "leftEye": "character:jnt_L_eye",
+    "leftFoot": "",
+    "leftHand": "character:jnt_L_palm",
+    "leftLowerArm": "character:jnt_L_forearm",
+    "leftLowerLeg": "",
+    "leftShoulder": "character:jnt_L_shoulder",
+    "leftToes": "",
+    "leftUpperArm": "character:jnt_L_arm",
+    "leftUpperLeg": "",
+    "neck": "character:jnt_neck",
+    "rightEye": "character:jnt_R_eye",
+    "rightFoot": "",
+    "rightHand": "character:jnt_R_palm",
+    "rightLowerArm": "character:jnt_R_forearm",
+    "rightLowerLeg": "",
+    "rightShoulder": "character:jnt_R_shoulder",
+    "rightToes": "",
+    "rightUpperArm": "character:jnt_R_arm",
+    "rightUpperLeg": "",
+    "spine": "",
+    "upperChest": ""
+  },
+  "bone_map_confidence": {
+    "arms": "exact",
+    "chest": "exact",
+    "confidence_notes": [
+      "Confidence is based on scripted bone-name and hierarchy mapping, not a visual retargeting run."
+    ],
+    "face": "exact",
+    "feet": "missing",
+    "fingers": "exact",
+    "hands": "exact",
+    "head": "exact",
+    "hips": "exact",
+    "legs": "missing",
+    "neck": "exact",
+    "overall": "medium",
+    "spine": "missing",
+    "toes": "missing"
+  },
+  "conversion": {
+    "command": "# Extract/open the selected source in Blender, verify humanoid mapping, then export VRM.\n# Selected source: elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb\n# Target path: public/avatars/elsa.vrm",
+    "expected_blockers": [
+      "conversion not attempted in this V2 run",
+      "manual mapping and runtime load test still required"
+    ],
+    "manual_mapping_needed": true,
+    "target_format": "vrm",
+    "target_path": "public/avatars/elsa.vrm"
+  },
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "feet",
+    "fingers",
+    "toes"
+  ],
+  "display_name": "Elsa",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet.",
+    "Do not enable feet for this model yet."
+  ],
+  "do_not_inspect": [
+    "duplicate GLBs",
+    "source ZIP internals",
+    "textures",
+    "full source binaries",
+    "screenshots/contact sheets unless visual review is needed"
+  ],
+  "enabled_controls": [
+    "arms",
+    "hands",
+    "head",
+    "upper_body"
+  ],
+  "face_touch_config": {
+    "mode": "ik_required",
+    "notes": [
+      "Face-touch is not runtime-proven; implement only after IK/target tests."
+    ],
+    "supported": true,
+    "targets": [
+      "head_center",
+      "mouth",
+      "left_cheek",
+      "right_cheek"
+    ]
+  },
+  "implementation_status": "cleanup_then_convert",
+  "inspect_only_if": [
+    "open bone-tree.txt if automatic mapping fails",
+    "open source binary only if VRM conversion fails"
+  ],
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=elsa after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "load_vrm_upper_body_only",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera",
+      "head tracks",
+      "arms track"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "one_paragraph_implementation_summary": "Elsa should use profile `humanoid_with_offsets` with action `cleanup_then_convert`. Convert or test `elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb` to `public/avatars/elsa.vrm`, enable arms, hands, head, upper_body, and disable face_touch, facial_expressions, feet, fingers, toes until runtime tests pass.",
+  "performance": {
+    "desktop_safe": true,
+    "mobile_safe": true,
+    "optimization_required": false,
+    "runtime_weight": "light"
+  },
+  "priority": 11,
+  "profile": "humanoid_with_offsets",
+  "reference_glb": "elsa_free_fall_frozen_with_rig_included (2).glb",
+  "retargeting_config": {
+    "arm_correction": "test_required",
+    "body_mode": "upper",
+    "finger_mode": "curl_presets",
+    "foot_orientation": "disabled",
+    "leg_correction": "none",
+    "offset_profile": "elsa-offsets",
+    "requires_model_offsets": true,
+    "root_motion": false,
+    "wrist_correction": "test_required"
+  },
+  "runtime": {
+    "expected_loader": "@pixiv/three-vrm",
+    "fallback_if_missing": "current_default",
+    "registry_entry_needed": true,
+    "runtime_test_status": "not_attempted"
+  },
+  "runtime_fallback_policy": {
+    "if_tracking_profile_unsupported": "disable_unsupported_controls",
+    "if_vrm_load_fails": "show_warning_and_fallback",
+    "if_vrm_missing": "show_warning",
+    "recommended_warning_text": "This avatar is experimental. Some controls are disabled because the model does not yet have a verified full PosePuppet rig."
+  },
+  "runtime_vrm_path": "public/avatars/elsa.vrm",
+  "schema_version": "posepuppet-avatar-adapter-spec-v1",
+  "selected_source_reasoning": "Selected by source-priority audit discovery: prefer editable .blend, then .fbx, then source/runtime .glb.",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "9e8c846062c77191cd78a530b81e667b05468477468ef7f8f2559f4308d4fd89",
+    "selected_source_sha256": "d29387993ff09d71f69935e7098525c10a3fbc8704c9a0035e32771608c5763a",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb"
+}

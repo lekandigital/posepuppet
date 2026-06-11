@@ -1,3 +1,3 @@
 # Audit failures
 
-- No audit failures.
+- No V2 generation failures.

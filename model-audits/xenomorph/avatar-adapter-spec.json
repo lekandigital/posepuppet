@@ -1,0 +1,166 @@
+{
+  "acceptance_tests": [
+    "VRM loads in @pixiv/three-vrm",
+    "avatar appears upright and facing camera",
+    "head follows webcam rotation",
+    "arms follow shoulders/elbows/wrists",
+    "hands do not detach",
+    "full body mode does not explode when legs are visible"
+  ],
+  "avatar_id": "xenomorph",
+  "bone_map": {
+    "chest": "",
+    "head": "XenosBiped_Head_TopSHJnt",
+    "hips": "",
+    "jaw": "XenosBiped_Head_JawSHJnt",
+    "leftEye": "",
+    "leftFoot": "XenosBiped_l_Leg_AnkleSHJnt",
+    "leftHand": "",
+    "leftLowerArm": "XenosBiped_l_Arm_Elbow_CurveSHJnt",
+    "leftLowerLeg": "XenosBiped_l_Leg_HipSHJnt",
+    "leftShoulder": "XenosBiped_l_Arm_ShoulderSHJnt",
+    "leftToes": "",
+    "leftUpperArm": "XenosBiped_l_Arm_Lower_Curve1SHJnt",
+    "leftUpperLeg": "",
+    "neck": "XenosBiped_Neck_01SHJnt",
+    "rightEye": "",
+    "rightFoot": "XenosBiped_r_Leg_AnkleSHJnt",
+    "rightHand": "",
+    "rightLowerArm": "XenosBiped_r_Arm_Elbow_CurveSHJnt",
+    "rightLowerLeg": "XenosBiped_r_Leg_HipSHJnt",
+    "rightShoulder": "XenosBiped_r_Arm_ShoulderSHJnt",
+    "rightToes": "",
+    "rightUpperArm": "XenosBiped_r_Arm_Lower_Curve1SHJnt",
+    "rightUpperLeg": "",
+    "spine": "XenosBiped_Spine_01SHJnt",
+    "upperChest": ""
+  },
+  "bone_map_confidence": {
+    "arms": "exact",
+    "chest": "missing",
+    "confidence_notes": [
+      "Confidence is based on scripted bone-name and hierarchy mapping, not a visual retargeting run."
+    ],
+    "face": "guessed",
+    "feet": "exact",
+    "fingers": "missing",
+    "hands": "missing",
+    "head": "exact",
+    "hips": "missing",
+    "legs": "guessed",
+    "neck": "exact",
+    "overall": "medium",
+    "spine": "exact",
+    "toes": "missing"
+  },
+  "conversion": {
+    "command": "# Extract/open the selected source in Blender, verify humanoid mapping, then export VRM.\n# Selected source: realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx\n# Target path: public/avatars/xenomorph.vrm",
+    "expected_blockers": [
+      "conversion not attempted in this V2 run",
+      "manual mapping and runtime load test still required"
+    ],
+    "manual_mapping_needed": true,
+    "target_format": "vrm",
+    "target_path": "public/avatars/xenomorph.vrm"
+  },
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "fingers",
+    "standard_humanoid_full_body"
+  ],
+  "display_name": "Xenomorph",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet.",
+    "Do not force standard full-body humanoid mode; use a creature profile."
+  ],
+  "do_not_inspect": [
+    "duplicate GLBs",
+    "source ZIP internals",
+    "textures",
+    "full source binaries",
+    "screenshots/contact sheets unless visual review is needed"
+  ],
+  "enabled_controls": [
+    "creature_head",
+    "creature_jaw",
+    "legs"
+  ],
+  "face_touch_config": {
+    "mode": "none",
+    "notes": [
+      "Face-touch is not runtime-proven; implement only after IK/target tests."
+    ],
+    "supported": false,
+    "targets": []
+  },
+  "implementation_status": "custom_profile",
+  "inspect_only_if": [
+    "open bone-tree.txt if automatic mapping fails",
+    "open source binary only if VRM conversion fails"
+  ],
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=xenomorph after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "custom_creature_preview",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "one_paragraph_implementation_summary": "Xenomorph should use profile `creature` with action `custom_profile`. Convert or test `realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx` to `public/avatars/xenomorph.vrm`, enable creature_head, creature_jaw, legs, and disable face_touch, facial_expressions, fingers, standard_humanoid_full_body until runtime tests pass.",
+  "performance": {
+    "desktop_safe": true,
+    "mobile_safe": false,
+    "optimization_required": true,
+    "runtime_weight": "heavy"
+  },
+  "priority": 16,
+  "profile": "creature",
+  "reference_glb": "realistic_xenomorph_rig.glb",
+  "retargeting_config": {
+    "arm_correction": "none",
+    "body_mode": "custom",
+    "finger_mode": "curl_presets",
+    "foot_orientation": "disabled",
+    "leg_correction": "test_required",
+    "offset_profile": "",
+    "requires_model_offsets": true,
+    "root_motion": false,
+    "wrist_correction": "none"
+  },
+  "runtime": {
+    "expected_loader": "@pixiv/three-vrm",
+    "fallback_if_missing": "current_default",
+    "registry_entry_needed": true,
+    "runtime_test_status": "not_attempted"
+  },
+  "runtime_fallback_policy": {
+    "if_tracking_profile_unsupported": "disable_unsupported_controls",
+    "if_vrm_load_fails": "show_warning_and_fallback",
+    "if_vrm_missing": "show_warning",
+    "recommended_warning_text": "This avatar is experimental. Some controls are disabled because the model does not yet have a verified full PosePuppet rig."
+  },
+  "runtime_vrm_path": "public/avatars/xenomorph.vrm",
+  "schema_version": "posepuppet-avatar-adapter-spec-v1",
+  "selected_source_reasoning": "Selected by source-priority audit discovery: prefer editable .blend, then .fbx, then source/runtime .glb.",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "d39e9fb9902a3926825c95940adf4621c1ffcb164d48a1da8a5011e3b09d0e9b",
+    "selected_source_sha256": "4dbf2cded569bcb08a0f66a7ce481d6942441c254e14c5291b116b522e796800",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx"
+}

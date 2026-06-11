@@ -1,0 +1,114 @@
+{
+  "created_at": "2026-06-11T13:21:41+00:00",
+  "schema_version": "posepuppet-coding-queue-v1",
+  "tasks": [
+    {
+      "acceptance_tests": [
+        "public/avatars/woody.vrm loads in @pixiv/three-vrm",
+        "PosePuppet fallback is graceful if missing"
+      ],
+      "depends_on": [],
+      "do_not_read": [
+        "source textures unless conversion fails",
+        "duplicate GLBs"
+      ],
+      "models": [
+        "woody"
+      ],
+      "rank": 1,
+      "reads": [
+        "model-audits/woody/avatar-adapter-spec.json",
+        "model-audits/woody/llm-dossier.md"
+      ],
+      "task": "Convert Woody FBX to VRM and verify runtime load"
+    },
+    {
+      "acceptance_tests": [
+        "avatars are hidden or warning-labeled until target VRMs exist"
+      ],
+      "depends_on": [
+        "VRM conversion/load tests"
+      ],
+      "do_not_read": [
+        "source binaries"
+      ],
+      "models": [
+        "woody",
+        "darth-vader",
+        "fortnite-batman",
+        "iron-man",
+        "shrek"
+      ],
+      "rank": 2,
+      "reads": [
+        "model-audits/avatar-registry-plan.json",
+        "model-audits/avatar-adapter-specs.json"
+      ],
+      "task": "Add a gated avatar registry path for converted humanoid VRMs"
+    },
+    {
+      "acceptance_tests": [
+        "missing fingers disable finger controls",
+        "face-touch remains disabled until IK tests pass"
+      ],
+      "depends_on": [
+        "basic registry support"
+      ],
+      "do_not_read": [
+        "duplicate downloads"
+      ],
+      "models": [
+        "spider-man-no-way-home",
+        "spider-man-playstation",
+        "amazing-spider-man-2",
+        "terminator-t-800",
+        "jack-sparrow",
+        "elsa"
+      ],
+      "rank": 3,
+      "reads": [
+        "model-audits/model-family-strategies.md"
+      ],
+      "task": "Implement humanoid offset profiles and palm-only fallback"
+    },
+    {
+      "acceptance_tests": [
+        "standard_humanoid_full_body is disabled for creature models"
+      ],
+      "depends_on": [],
+      "do_not_read": [
+        "source binaries until profile targets are chosen"
+      ],
+      "models": [
+        "godzilla",
+        "king-kong",
+        "xenomorph",
+        "grogu",
+        "olaf",
+        "baby-yoda"
+      ],
+      "rank": 4,
+      "reads": [
+        "model-audits/model-family-strategies.md"
+      ],
+      "task": "Create creature profile prototypes"
+    },
+    {
+      "acceptance_tests": [
+        "hand asset is not exposed as a full avatar"
+      ],
+      "depends_on": [],
+      "do_not_read": [
+        "full avatar folders"
+      ],
+      "models": [
+        "rigged-hand"
+      ],
+      "rank": 5,
+      "reads": [
+        "model-audits/rigged-hand/avatar-adapter-spec.json"
+      ],
+      "task": "Create hand/finger test harness"
+    }
+  ]
+}

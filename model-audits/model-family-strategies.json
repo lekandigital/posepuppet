@@ -1,0 +1,67 @@
+{
+  "created_at": "2026-06-11T13:21:43+00:00",
+  "families": [
+    {
+      "models": [
+        "darth-vader",
+        "fortnite-batman",
+        "iron-man"
+      ],
+      "name": "Humanoid full-body VRM candidates",
+      "shared_conversion_strategy": "Use VRM for humanoids; use custom profiles for creatures; do not inspect large binaries unless conversion fails.",
+      "shared_runtime_profile": "mixed"
+    },
+    {
+      "models": [
+        "woody",
+        "shrek",
+        "spider-man-no-way-home",
+        "spider-man-playstation",
+        "amazing-spider-man-2",
+        "terminator-t-800"
+      ],
+      "name": "Humanoid palm-only / no-finger candidates",
+      "shared_conversion_strategy": "Use VRM for humanoids; use custom profiles for creatures; do not inspect large binaries unless conversion fails.",
+      "shared_runtime_profile": "mixed"
+    },
+    {
+      "models": [
+        "jack-sparrow",
+        "elsa",
+        "teal-v2",
+        "buzz-lightyear"
+      ],
+      "name": "Humanoid-with-offsets / custom mapping candidates",
+      "shared_conversion_strategy": "Use VRM for humanoids; use custom profiles for creatures; do not inspect large binaries unless conversion fails.",
+      "shared_runtime_profile": "mixed"
+    },
+    {
+      "models": [
+        "grogu",
+        "king-kong",
+        "olaf",
+        "godzilla",
+        "xenomorph",
+        "baby-yoda"
+      ],
+      "name": "Creature-profile candidates",
+      "shared_conversion_strategy": "Use VRM for humanoids; use custom profiles for creatures; do not inspect large binaries unless conversion fails.",
+      "shared_runtime_profile": "creature"
+    },
+    {
+      "models": [
+        "rigged-hand"
+      ],
+      "name": "Hand-only candidates",
+      "shared_conversion_strategy": "Use VRM for humanoids; use custom profiles for creatures; do not inspect large binaries unless conversion fails.",
+      "shared_runtime_profile": "hand_only"
+    },
+    {
+      "models": [],
+      "name": "Static-preview / ignore-for-now candidates",
+      "shared_conversion_strategy": "Use VRM for humanoids; use custom profiles for creatures; do not inspect large binaries unless conversion fails.",
+      "shared_runtime_profile": "static_preview"
+    }
+  ],
+  "schema_version": "posepuppet-model-family-strategies-v1"
+}

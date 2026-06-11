@@ -1,0 +1,27 @@
+{
+  "conversion_diff": {
+    "blockers": [
+      "VRM conversion and re-audit were not completed for this model."
+    ],
+    "converted_vrm_path": "public/avatars/spider-man-no-way-home.vrm",
+    "feet_preserved": "unknown",
+    "fingers_preserved": "unknown",
+    "humanoid_mapping_preserved": "unknown",
+    "material_count_after": 0,
+    "material_count_before": 8,
+    "mesh_count_after": 0,
+    "mesh_count_before": 9,
+    "notes": [
+      "# Extract/open the selected source in Blender, verify humanoid mapping, then export VRM.\n# Selected source: OtherSpiderman/spider-man_no_way_home_rigged.glb\n# Target path: public/avatars/spider-man-no-way-home.vrm"
+    ],
+    "orientation_changed": "unknown",
+    "posepuppet_runtime_candidate": true,
+    "scale_changed": "unknown",
+    "shape_keys_preserved": "unknown",
+    "skeleton_preserved": "unknown",
+    "source_path": "OtherSpiderman/spider-man_no_way_home_rigged.glb",
+    "status": "not_attempted",
+    "texture_result": "not_attempted"
+  },
+  "schema_version": "posepuppet-conversion-diff-v1"
+}

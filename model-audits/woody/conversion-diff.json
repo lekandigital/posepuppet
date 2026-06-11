@@ -1,0 +1,28 @@
+{
+  "conversion_diff": {
+    "blockers": [
+      "three-vrm and PosePuppet runtime load tests are still not attempted."
+    ],
+    "converted_vrm_path": "public/avatars/woody.vrm",
+    "feet_preserved": "yes",
+    "fingers_preserved": "not_applicable",
+    "humanoid_mapping_preserved": "yes",
+    "material_count_after": 6,
+    "material_count_before": 6,
+    "mesh_count_after": 7,
+    "mesh_count_before": 6,
+    "notes": [
+      "Local ignored public/avatars/woody.vrm was re-opened with Blender and compared to the FBX audit.",
+      "Mesh count changed because the converted VRM contains one extra unskinned mesh; humanoid skeleton and feet remained usable."
+    ],
+    "orientation_changed": "unknown",
+    "posepuppet_runtime_candidate": true,
+    "scale_changed": "yes",
+    "shape_keys_preserved": "not_applicable",
+    "skeleton_preserved": "yes",
+    "source_path": "/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx",
+    "status": "completed",
+    "texture_result": "embedded"
+  },
+  "schema_version": "posepuppet-conversion-diff-v1"
+}

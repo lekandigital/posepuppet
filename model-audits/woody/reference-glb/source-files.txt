@@ -1,0 +1,8 @@
+# Source files for Woody reference GLB
+
+Selected source: /Users/lekan/Downloads/woody/woody_toy_story_rig_free_download.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- /Users/lekan/Downloads/woody/woody_toy_story_rig_free_download.glb

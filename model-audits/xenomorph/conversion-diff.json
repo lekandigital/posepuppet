@@ -1,0 +1,27 @@
+{
+  "conversion_diff": {
+    "blockers": [
+      "VRM conversion and re-audit were not completed for this model."
+    ],
+    "converted_vrm_path": "public/avatars/xenomorph.vrm",
+    "feet_preserved": "unknown",
+    "fingers_preserved": "unknown",
+    "humanoid_mapping_preserved": "unknown",
+    "material_count_after": 0,
+    "material_count_before": 2,
+    "mesh_count_after": 0,
+    "mesh_count_before": 1,
+    "notes": [
+      "# Extract/open the selected source in Blender, verify humanoid mapping, then export VRM.\n# Selected source: realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx\n# Target path: public/avatars/xenomorph.vrm"
+    ],
+    "orientation_changed": "unknown",
+    "posepuppet_runtime_candidate": false,
+    "scale_changed": "unknown",
+    "shape_keys_preserved": "unknown",
+    "skeleton_preserved": "unknown",
+    "source_path": "realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx",
+    "status": "not_attempted",
+    "texture_result": "not_attempted"
+  },
+  "schema_version": "posepuppet-conversion-diff-v1"
+}

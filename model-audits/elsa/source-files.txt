@@ -1,22 +1,24 @@
 # Source files for Elsa
 
 Selected source: elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb
+Best conversion source: elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb
 Runtime GLB companion: elsa_free_fall_frozen_with_rig_included (2).glb
+Target VRM path: public/avatars/elsa.vrm
 
 ## All known variants
 
-- `elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb` (nested-zip-entry, .glb, 0.42 MB)
-- `elsa-free-fall-frozen-with-rig-included (2).zip!/source/elsa free fall.zip!/Elsa (merge).glb` (nested-zip-entry, .glb, 0.42 MB)
-- `elsa-free-fall-frozen-with-rig-included.zip!/source/elsa free fall.zip!/Elsa (merge).glb` (nested-zip-entry, .glb, 0.42 MB)
-- `elsa_free_fall_frozen_with_rig_included (1).glb` (file, .glb, 2.50 MB, sha256=b059ba520c1d)
-- `elsa_free_fall_frozen_with_rig_included (2).glb` (file, .glb, 3.22 MB, sha256=9e8c846062c7)
-- `elsa_free_fall_frozen_with_rig_included (3).glb` (file, .glb, 2.50 MB, sha256=b059ba520c1d)
-- `elsa_free_fall_frozen_with_rig_included.glb` (file, .glb, 3.22 MB, sha256=9e8c846062c7)
-- `elsa-free-fall-frozen-with-rig-included (1).zip` (file, .zip, 6.13 MB, sha256=04960c60cd6a)
-- `elsa-free-fall-frozen-with-rig-included (2).zip` (file, .zip, 6.13 MB, sha256=04960c60cd6a)
-- `elsa-free-fall-frozen-with-rig-included.zip` (file, .zip, 6.13 MB, sha256=04960c60cd6a)
+- `elsa-free-fall-frozen-with-rig-included (1).zip`
+- `elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb`
+- `elsa-free-fall-frozen-with-rig-included (2).zip`
+- `elsa-free-fall-frozen-with-rig-included (2).zip!/source/elsa free fall.zip!/Elsa (merge).glb`
+- `elsa-free-fall-frozen-with-rig-included.zip`
+- `elsa-free-fall-frozen-with-rig-included.zip!/source/elsa free fall.zip!/Elsa (merge).glb`
+- `elsa_free_fall_frozen_with_rig_included (1).glb`
+- `elsa_free_fall_frozen_with_rig_included (2).glb`
+- `elsa_free_fall_frozen_with_rig_included (3).glb`
+- `elsa_free_fall_frozen_with_rig_included.glb`
 
 ## Notes
 
-- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
-- License remains unknown until manually verified from the original download source.
+- Original binaries, textures, ZIPs, screenshots, contact sheets, and converted VRMs are not included in handoff files.
+- Use source-lock hashes before trusting this audit after model files change.

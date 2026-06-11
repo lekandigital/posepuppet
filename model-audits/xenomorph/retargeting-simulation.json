@@ -1,0 +1,110 @@
+{
+  "avatar_id": "xenomorph",
+  "created_at": "2026-06-11T13:21:42+00:00",
+  "notes": [
+    "Scripted structure was audited; mobility/contact-sheet review remains a follow-up task."
+  ],
+  "overall_retargeting_simulation_verdict": "custom_profile",
+  "schema_version": "posepuppet-retargeting-simulation-v1",
+  "synthetic_pose_tests": {
+    "arms_forward": {
+      "applied": false,
+      "measured_notes": [],
+      "reasoning_notes": [
+        "No synthetic pose or visual deformation pass was completed; treat runtime deformation as unverified."
+      ],
+      "result": "not_tested",
+      "visual_review": "not_available"
+    },
+    "arms_up": {
+      "applied": false,
+      "measured_notes": [],
+      "reasoning_notes": [
+        "No synthetic pose or visual deformation pass was completed; treat runtime deformation as unverified."
+      ],
+      "result": "not_tested",
+      "visual_review": "not_available"
+    },
+    "elbow_bend": {
+      "applied": false,
+      "measured_notes": [],
+      "reasoning_notes": [
+        "No synthetic pose or visual deformation pass was completed; treat runtime deformation as unverified."
+      ],
+      "result": "not_tested",
+      "visual_review": "not_available"
+    },
+    "finger_curl": {
+      "applied": false,
+      "measured_notes": [],
+      "reasoning_notes": [
+        "No synthetic pose or visual deformation pass was completed; treat runtime deformation as unverified."
+      ],
+      "result": "not_tested",
+      "visual_review": "not_available"
+    },
+    "foot_lift": {
+      "applied": false,
+      "measured_notes": [],
+      "reasoning_notes": [
+        "No synthetic pose or visual deformation pass was completed; treat runtime deformation as unverified."
+      ],
+      "result": "not_tested",
+      "visual_review": "not_available"
+    },
+    "foot_rotate": {
+      "applied": false,
+      "measured_notes": [],
+      "reasoning_notes": [
+        "No synthetic pose or visual deformation pass was completed; treat runtime deformation as unverified."
+      ],
+      "result": "not_tested",
+      "visual_review": "not_available"
+    },
+    "hand_to_cheek": {
+      "applied": false,
+      "measured_notes": [],
+      "reasoning_notes": [
+        "No synthetic pose or visual deformation pass was completed; treat runtime deformation as unverified."
+      ],
+      "result": "not_tested",
+      "visual_review": "not_available"
+    },
+    "hand_to_mouth": {
+      "applied": false,
+      "measured_notes": [],
+      "reasoning_notes": [
+        "No synthetic pose or visual deformation pass was completed; treat runtime deformation as unverified."
+      ],
+      "result": "not_tested",
+      "visual_review": "not_available"
+    },
+    "knee_bend": {
+      "applied": false,
+      "measured_notes": [],
+      "reasoning_notes": [
+        "No synthetic pose or visual deformation pass was completed; treat runtime deformation as unverified."
+      ],
+      "result": "not_tested",
+      "visual_review": "not_available"
+    },
+    "neutral": {
+      "applied": false,
+      "measured_notes": [],
+      "reasoning_notes": [
+        "No synthetic pose or visual deformation pass was completed; treat runtime deformation as unverified."
+      ],
+      "result": "not_tested",
+      "visual_review": "not_available"
+    },
+    "wrist_rotate": {
+      "applied": false,
+      "measured_notes": [],
+      "reasoning_notes": [
+        "No synthetic pose or visual deformation pass was completed; treat runtime deformation as unverified."
+      ],
+      "result": "not_tested",
+      "visual_review": "not_available"
+    }
+  }
+}
