@@ -1,0 +1,34 @@
+{
+  "schema_version": "posepuppet-runtime-smoke-report-v1",
+  "created_at": "2026-06-11T15:29:34+00:00",
+  "test_runner": "playwright",
+  "test_file": "tests/generated-avatar-load.spec.ts",
+  "test_duration_seconds": 21.5,
+  "total_tests": 4,
+  "passed": 4,
+  "failed": 0,
+  "test_mode": "generated-avatar-query-param + avatar-load-only smoke",
+  "models": {
+    "woody": {
+      "browser_load_attempted": true,
+      "browser_load_status": "pass",
+      "test_name": "generated Woody candidate loads without crash"
+    },
+    "darth-vader": {
+      "browser_load_attempted": true,
+      "browser_load_status": "pass",
+      "test_name": "generated Darth Vader candidate loads without crash"
+    }
+  },
+  "fallback_test": {
+    "slug": "missing-test",
+    "status": "pass",
+    "result": "avatarStatus=fallback, controlled warning, no crash"
+  },
+  "public_ui_isolation_test": {
+    "status": "pass",
+    "result": "darth-vader not in normal cycle, generated avatars excluded"
+  },
+  "no_generated_vrms_staged": true,
+  "public_ui_unchanged": true
+}

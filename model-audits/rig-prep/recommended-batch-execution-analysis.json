@@ -1,0 +1,93 @@
+{
+  "schema_version": "posepuppet-batch-execution-analysis-v1",
+  "created_at": "2026-06-11T15:49:00+00:00",
+  "recommended_batches": [
+    {
+      "batch": 0,
+      "name": "Proven avatars — promote to public UI",
+      "models": ["woody", "darth-vader"],
+      "action": "Add to avatarRegistry.ts with enabledInUi=true",
+      "prerequisite_features": [],
+      "estimated_time": "30min total",
+      "risk": "low",
+      "notes": "Both already browser-smoke tested. Just needs avatarRegistry entry + commit."
+    },
+    {
+      "batch": 1,
+      "name": "Inspect-passed humanoids — convert + validate + smoke",
+      "models": ["fortnite-batman", "iron-man", "shrek"],
+      "action": "For each: rig_prep --mode convert → validate_vrm → add to generatedAvatarRegistry → smoke test",
+      "prerequisite_features": [],
+      "estimated_time": "2h total",
+      "risk": "medium",
+      "command_pattern": "python3 tools/rig_prep_model.py --slug <slug> --mode convert && python3 tools/validate_vrm_candidate.py --slug <slug>",
+      "notes": [
+        "Batman is the best candidate — correct scale (1.69m), 24 bones, full finger support",
+        "Iron Man needs scale normalize (6.49m) — exporter handles this",
+        "Shrek has poor finger support (curl presets) — disable fingers in adapter"
+      ]
+    },
+    {
+      "batch": 2,
+      "name": "Remaining humanoids — inspect + convert + validate + smoke",
+      "models": ["amazing-spider-man-2", "terminator-t-800", "spider-man-no-way-home", "spider-man-playstation"],
+      "action": "For each: rig_prep --mode inspect → rig_prep --mode convert → validate → smoke",
+      "prerequisite_features": [],
+      "estimated_time": "3h total",
+      "risk": "medium",
+      "notes": [
+        "ASM2 and T-800 already inspected — can skip inspect for those",
+        "Spider-men need Blender inspect first"
+      ]
+    },
+    {
+      "batch": 3,
+      "name": "Cleanup-required humanoids",
+      "models": ["jack-sparrow", "elsa", "teal-v2", "buzz-lightyear"],
+      "action": "Inspect → cleanup bone map → convert → validate → smoke",
+      "prerequisite_features": ["manual_bone_map_cleanup"],
+      "estimated_time": "8-16h total",
+      "risk": "high",
+      "notes": [
+        "These models have low automatic humanoid mapping",
+        "Need manual Blender bone map editing (suggested-bone-map.json exists but may be incomplete)",
+        "Jack Sparrow: humanoid_with_offsets profile, cloth sim concerns",
+        "Elsa: missing spine bone, needs mapping",
+        "Teal-v2: missing hips/chest/neck, very weak auto-mapping",
+        "Buzz: missing hips/spine/chest/neck/head, nearly zero auto-mapping"
+      ]
+    },
+    {
+      "batch": 4,
+      "name": "Hand-only test model",
+      "models": ["rigged-hand"],
+      "action": "Convert + hand-only rendering mode",
+      "prerequisite_features": ["hand_only_mode", "finger_retargeting"],
+      "estimated_time": "1 day",
+      "risk": "medium",
+      "notes": "Specialized model for finger tracking R&D, not a production avatar"
+    },
+    {
+      "batch": 5,
+      "name": "Creature avatars",
+      "models": ["grogu", "olaf", "baby-yoda", "godzilla", "xenomorph", "king-kong"],
+      "action": "Creature profile system + inspect + convert + validate + smoke",
+      "prerequisite_features": ["creature_profile_system"],
+      "estimated_time": "3-5 days total",
+      "risk": "high",
+      "notes": [
+        "Requires new retargeting profile system in src/rig/",
+        "Non-humanoid anatomy cannot use standard humanoid full-body mode",
+        "Each creature may need unique bone mapping strategy",
+        "Performance concerns: king-kong and godzilla are very_heavy models"
+      ]
+    }
+  ],
+  "mega_run_batch_1_command": "for slug in fortnite-batman iron-man shrek; do echo \"=== $slug ===\"; python3 tools/rig_prep_model.py --slug $slug --mode convert 2>&1 | tail -5; python3 tools/validate_vrm_candidate.py --slug $slug 2>&1 | tail -5; done",
+  "total_models": 20,
+  "batch_0_ready": 2,
+  "batch_1_ready": 3,
+  "batch_2_ready": 4,
+  "no_feature_dependency_count": 9,
+  "feature_dependency_count": 11
+}

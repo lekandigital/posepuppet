@@ -1,0 +1,15 @@
+{
+  "mac_path_references_total": 347,
+  "classifications": {
+    "historical_ok": 338,
+    "should_update_to_ubuntu_path": 6,
+    "needs_manual_review": 3
+  },
+  "pipeline_operations_blocked": false,
+  "reason": "resolve_woody_dir() checks /home/o/posepuppet-assets/woody first — Ubuntu pipeline works correctly without changes",
+  "operational_risk_files": [
+    "package.json:15 (audit:models script — not used for VRM conversion)",
+    "tools/generate_model_audit_v2.py:330,1499 (hardcoded woody paths — only matters if regenerating full V2 audit)"
+  ],
+  "immediate_action_required": false
+}

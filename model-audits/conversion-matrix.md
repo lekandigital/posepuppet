@@ -26,8 +26,31 @@
 ## Ubuntu rig-prep update: Darth Vader
 
 - Selected source re-proved by dry-run: `fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend`
-- Candidate VRM written outside the public app tree: `/Users/lekan/posepuppet-working/generated-vrms/darth-vader.vrm`
+- Candidate VRM written outside the public app tree: `/home/o/posepuppet-working/generated-vrms/darth-vader.vrm`
 - Candidate size: `16572736` bytes
 - Validation path: fallback glTF/VRMC inspection with Blender re-audit
 - Result: `pass`
 - Public target `public/avatars/darth-vader.vrm`: `not_attempted`
+
+## Pre-mega-run analysis update (2026-06-11)
+
+### Browser smoke results
+
+| Model | VRM candidate | Browser load | avatarStatus | Public UI |
+|-------|--------------|-------------|--------------|-----------|
+| Woody | `/home/o/posepuppet-working/generated-vrms/woody.vrm` (5.0M) | ✅ pass | loaded | not promoted |
+| Darth Vader | `/home/o/posepuppet-working/generated-vrms/darth-vader.vrm` (16M) | ✅ pass | loaded | not promoted |
+
+### Blender inspect results (new this pass)
+
+| Model | Bones | Fingers | Hands | Feet | Height | Status |
+|-------|-------|---------|-------|------|--------|--------|
+| Fortnite Batman | 24 | good | good | good | 1.69m | ✅ pass |
+| Iron Man | 21 | good | good | good | 6.49m | ✅ pass |
+| Shrek | 20 | poor | good | good | 83.5m | ✅ pass |
+| Amazing Spider-Man 2 | 22 | missing | good | good | 69.0m | ✅ pass |
+| Terminator T-800 | 22 | missing | good | good | 203.7m | ✅ pass |
+
+### Dry-run source resolution
+
+All 18 remaining models resolve their source on Ubuntu. See `rig-prep/remaining-model-inventory-delta.md`.

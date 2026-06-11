@@ -2,8 +2,8 @@
 
 | Model | Slug | Recommended action | Runtime profile | Best conversion source | Target VRM path | Conversion status | PosePuppet load status | Upper body | Hand/finger | Leg | Face/expression | Risk | Disabled controls | Performance | Adapter spec | Priority | Reason |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---:|---|
-| Woody | woody | convert_then_test | humanoid | `/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx` | `public/avatars/woody.vrm` | pass | not_attempted | not_tested | not_tested / missing | not_tested | missing / missing | medium | face_touch, facial_expressions, fingers | medium | `model-audits/woody/avatar-adapter-spec.json` | 1 | Good structural candidate, but runtime load and deformation tests are still required. |
-| Darth Vader | darth-vader | convert_then_test | humanoid | `fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend` | `public/avatars/darth-vader.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | not_tested | not_tested / not_tested | medium | face_touch, facial_expressions | heavy | `model-audits/darth-vader/avatar-adapter-spec.json` | 2 | Good structural candidate, but runtime load and deformation tests are still required. |
+| Woody | woody | convert_then_test | humanoid | `/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx` | `public/avatars/woody.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / missing | not_tested | missing / missing | medium | face_touch, facial_expressions, fingers | medium | `model-audits/woody/avatar-adapter-spec.json` | 1 | VRM browser-loads via query param. Runtime tracking accuracy not yet tested. |
+| Darth Vader | darth-vader | convert_then_test | humanoid | `fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend` | `public/avatars/darth-vader.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / not_tested | not_tested | not_tested / not_tested | medium | face_touch, facial_expressions | heavy | `model-audits/darth-vader/avatar-adapter-spec.json` | 2 | VRM browser-loads via query param. 16MB — performance check needed. |
 | Fortnite Batman | fortnite-batman | convert_then_test | humanoid | `fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend` | `public/avatars/fortnite-batman.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | not_tested | not_tested / not_tested | medium | face_touch, facial_expressions | heavy | `model-audits/fortnite-batman/avatar-adapter-spec.json` | 3 | Good structural candidate, but runtime load and deformation tests are still required. |
 | Iron Man | iron-man | convert_then_test | humanoid | `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend` | `public/avatars/iron-man.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | not_tested | missing / missing | medium | face_touch, facial_expressions | heavy | `model-audits/iron-man/avatar-adapter-spec.json` | 4 | Good structural candidate, but runtime load and deformation tests are still required. |
 | Shrek | shrek | convert_then_test | humanoid | `shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx` | `public/avatars/shrek.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | not_tested | not_tested / not_tested | medium | face_touch, facial_expressions, fingers, toes | medium | `model-audits/shrek/avatar-adapter-spec.json` | 5 | Good structural candidate, but runtime load and deformation tests are still required. |
@@ -28,9 +28,19 @@
 - Dry-run status: `pass`
 - Blender inspect status: `pass`
 - Candidate conversion status: `pass`
-- Candidate VRM path: `/Users/lekan/posepuppet-working/generated-vrms/darth-vader.vrm`
+- Candidate VRM path: `/home/o/posepuppet-working/generated-vrms/darth-vader.vrm`
 - Candidate validation status: `pass`
 - Hands/fingers/feet after fallback glTF/VRMC validation: `good` / `good` / `good`
 - Face-touch: `deferred`
-- Runtime browser smoke: `not_attempted`
+- Runtime browser smoke: **pass**
 - Public UI/public avatar promotion: `not_attempted`
+
+## Pre-mega-run analysis update (2026-06-11)
+
+- Woody browser smoke: **pass** (`?generatedAvatar=woody&smoke=avatar-load-only`)
+- Darth Vader browser smoke: **pass** (`?generatedAvatar=darth-vader&smoke=avatar-load-only`)
+- Missing avatar fallback: **pass** (controlled warning, no crash)
+- Public UI isolation: **pass** (generated avatars not in cycling)
+- All 4 Playwright tests: **pass** (21.5s)
+- 18/18 remaining models: dry-run source resolution **pass** on Ubuntu
+- 5/18 next-batch models: Blender inspect **pass** (batman, iron-man, shrek, asm2, t-800)
