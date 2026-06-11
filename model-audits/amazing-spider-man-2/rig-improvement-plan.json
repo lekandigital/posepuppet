@@ -1,0 +1,31 @@
+{
+  "created_at": "2026-06-11T16:50:48+00:00",
+  "display_name": "The Amazing Spider-Man 2",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/amazing-spider-man-2/Amazing Spider Man 2 Rigged.fbx",
+  "gates": {
+    "dry_run_resolved": true,
+    "inspect_required_before_attempt": true,
+    "runtime_smoke_test": "not_attempted"
+  },
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/amazing-spider-man-2/suggested-bone-map.json",
+  "risk_notes": [
+    "face-touch remains deferred until runtime tests",
+    "orientation",
+    "runtime browser smoke is not attempted",
+    "scale",
+    "shoulders/wrists if humanoid",
+    "unsupported controls"
+  ],
+  "runtime_glb_companion": "OtherSpiderman/the_amazing_spider_man_2_rigged_model.glb",
+  "schema_version": "posepuppet-rig-prep-plan-v1",
+  "selected_source_format": ".fbx",
+  "selected_source_kind": "zip-entry",
+  "selected_source_path": "OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx",
+  "slug": "amazing-spider-man-2",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/amazing-spider-man-2",
+  "zip_nested_source_chain": [
+    "source/Amazing Spider Man 2 Rigged.fbx"
+  ]
+}

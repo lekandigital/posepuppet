@@ -1,0 +1,32 @@
+{
+  "created_at": "2026-06-11T16:51:24+00:00",
+  "display_name": "Terminator T-800",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/terminator-t-800.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/terminator-t-800/t-800_LP.blend",
+  "gates": {
+    "dry_run_resolved": true,
+    "inspect_required_before_attempt": true,
+    "runtime_smoke_test": "not_attempted"
+  },
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/terminator-t-800/suggested-bone-map.json",
+  "risk_notes": [
+    "face-touch remains deferred until runtime tests",
+    "orientation",
+    "runtime browser smoke is not attempted",
+    "scale",
+    "shoulders/wrists if humanoid",
+    "unsupported controls"
+  ],
+  "runtime_glb_companion": "terminator-t-800-endo-skeleton-damaged.glb",
+  "schema_version": "posepuppet-rig-prep-plan-v1",
+  "selected_source_format": ".blend",
+  "selected_source_kind": "nested-zip-entry",
+  "selected_source_path": "terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend",
+  "slug": "terminator-t-800",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/terminator-t-800",
+  "zip_nested_source_chain": [
+    "source/terminator-t-800-endo-skeleton-damaged.zip",
+    "source/t-800_LP.blend"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "candidate_vrm_exists": true,
+  "candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm",
+  "candidate_vrm_size_bytes": 15974984,
+  "command": [
+    "/home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/blender",
+    "-b",
+    "--python",
+    "/home/o/Dev/posepuppet/tools/export_source_to_vrm.py",
+    "--",
+    "/home/o/posepuppet-assets/ModelsForAnimation/OtherSpiderman/spider-man_no_way_home_rigged.glb",
+    "/home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm",
+    "--mapping",
+    "/home/o/Dev/posepuppet/model-audits/spider-man-no-way-home/suggested-bone-map.json"
+  ],
+  "created_at": "2026-06-11T16:51:55+00:00",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/spider-man-no-way-home/suggested-bone-map.json",
+  "materialized_source_path": "/home/o/posepuppet-assets/ModelsForAnimation/OtherSpiderman/spider-man_no_way_home_rigged.glb",
+  "public_avatar_written": false,
+  "runtime_browser_smoke": "not_attempted",
+  "schema_version": "posepuppet-vrm-conversion-run-v1",
+  "selected_source_path": "OtherSpiderman/spider-man_no_way_home_rigged.glb",
+  "slug": "spider-man-no-way-home",
+  "status": "pass",
+  "stderr": "",
+  "stdout": "12:51:54 | INFO: Data are loaded, start creating Blender stuff\n12:51:54 | INFO: Blender create Mesh node Object_17_24_eyelineup_0_0_0_0\n12:51:54 | INFO: Blender create Mesh node Object_9_Material.009_0\n12:51:54 | INFO: Blender create Mesh node Object_19_24_eyelinelow_0_0_0_0\n12:51:54 | INFO: Blender create Mesh node Object_11_Material.008_0\n12:51:54 | INFO: Blender create Mesh node Object_18_24_eye_0_0_0_0\n12:51:54 | INFO: Blender create Mesh node Object_13_Material.003_0\n12:51:54 | INFO: Blender create Mesh node Object_7_Material.010_0\n12:51:54 | INFO: Blender create Mesh node Object_15_Material.002_0\n12:51:54 | INFO: glTF import finished in 0.47s\nArmature: Object_8\nFinal mapped bones: 22\nINFO Draco mesh compression is available, use library at /home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/5.1/scripts/addons_core/io_scene_gltf2/libextern_draco.so\n12:51:54 | INFO: Starting glTF 2.0 export\n12:51:54 | INFO: Extracting primitive: Object_17_24_eyelineup_0_0_0_0\n12:51:54 | INFO: Primitives created: 1\n12:51:54 | INFO: Extracting primitive: Object_9_Material.009_0\n12:51:55 | INFO: Primitives created: 1\n12:51:55 | INFO: Extracting primitive: Object_19_24_eyelinelow_0_0_0_0\n12:51:55 | INFO: Primitives created: 1\n12:51:55 | INFO: Extracting primitive: Object_11_Material.008_0\n12:51:55 | INFO: Primitives created: 1\n12:51:55 | INFO: Extracting primitive: Object_18_24_eye_0_0_0_0\n12:51:55 | INFO: Primitives created: 1\n12:51:55 | INFO: Extracting primitive: Object_13_Material.003_0\n12:51:55 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.\n12:51:55 | INFO: Primitives created: 1\n12:51:55 | INFO: Extracting primitive: Object_7_Material.010_0\n12:51:55 | INFO: Primitives created: 1\n12:51:55 | INFO: Extracting primitive: Object_15_Material.002_0\n12:51:55 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.\n12:51:55 | INFO: Primitives created: 1\n12:51:55 | INFO: Finished glTF 2.0 export in 0.8303306102752686 s\n\nVRM written: /home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm\nBlender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 02:18:37)\n\nBlender quit\n"
+}

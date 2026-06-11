@@ -1,0 +1,15 @@
+{
+  "created_at": "2026-06-11T16:51:39+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/spider-man-no-way-home/spider-man_no_way_home_rigged.glb",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/spider-man-no-way-home/suggested-bone-map.json",
+  "nested_chain": [],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "OtherSpiderman/spider-man_no_way_home_rigged.glb",
+  "slug": "spider-man-no-way-home",
+  "source_from_zip": false,
+  "source_zip": "",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/spider-man-no-way-home"
+}

@@ -1,0 +1,57 @@
+{
+  "armature_count": 1,
+  "blender_log_path": "/home/o/Dev/posepuppet/model-audits/terminator-t-800/rig-prep-inspect/blender.log",
+  "created_at": "2026-06-11T16:51:29+00:00",
+  "deformation_risks": [
+    "face-touch remains deferred until runtime tests",
+    "runtime browser smoke is not attempted"
+  ],
+  "finger_support": "missing",
+  "foot_support": "good",
+  "hand_support": "good",
+  "humanoid_bone_count": 22,
+  "humanoid_mapping": {
+    "chest": "mixamorig:Spine1",
+    "head": "mixamorig:Head",
+    "hips": "mixamorig:Hips",
+    "jaw": null,
+    "leftEye": null,
+    "leftFoot": "mixamorig:LeftFoot",
+    "leftHand": "mixamorig:LeftHand",
+    "leftLowerArm": "mixamorig:LeftForeArm",
+    "leftLowerLeg": "mixamorig:LeftLeg",
+    "leftShoulder": "mixamorig:LeftShoulder",
+    "leftToes": "mixamorig:LeftToeBase",
+    "leftUpperArm": "mixamorig:LeftArm",
+    "leftUpperLeg": "mixamorig:LeftUpLeg",
+    "neck": "mixamorig:Neck",
+    "rightEye": null,
+    "rightFoot": "mixamorig:RightFoot",
+    "rightHand": "mixamorig:RightHand",
+    "rightLowerArm": "mixamorig:RightForeArm",
+    "rightLowerLeg": "mixamorig:RightLeg",
+    "rightShoulder": "mixamorig:RightShoulder",
+    "rightToes": "mixamorig:RightToeBase",
+    "rightUpperArm": "mixamorig:RightArm",
+    "rightUpperLeg": "mixamorig:RightUpLeg",
+    "spine": "mixamorig:Spine",
+    "upperChest": "mixamorig:Spine2"
+  },
+  "material_count": 10,
+  "mesh_count": 15,
+  "primary_armature": "Armature",
+  "scale_orientation": {
+    "estimated_height": 203.74201,
+    "rest_pose_guess": "unknown"
+  },
+  "schema_version": "posepuppet-source-rig-cleanup-v1",
+  "selected_source_path": "terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend",
+  "slug": "terminator-t-800",
+  "status": "pass",
+  "texture_count": 0,
+  "warnings": [
+    "License unknown; do not redistribute this model or generated converted files.",
+    "No finger bones detected; use palm-only hand control.",
+    "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+  ]
+}

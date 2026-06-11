@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T16:50:48+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/amazing-spider-man-2/Amazing Spider Man 2 Rigged.fbx",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/amazing-spider-man-2/suggested-bone-map.json",
+  "nested_chain": [
+    "source/Amazing Spider Man 2 Rigged.fbx"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx",
+  "slug": "amazing-spider-man-2",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/amazing-spider-man-2"
+}
