@@ -1,0 +1,59 @@
+{
+  "armature_count": 1,
+  "blender_log_path": "/home/o/Dev/posepuppet/model-audits/shrek/rig-prep-inspect/blender.log",
+  "created_at": "2026-06-11T16:18:48+00:00",
+  "deformation_risks": [
+    "face-touch remains deferred until runtime tests",
+    "runtime browser smoke is not attempted"
+  ],
+  "finger_support": "poor",
+  "foot_support": "good",
+  "hand_support": "good",
+  "humanoid_bone_count": 20,
+  "humanoid_mapping": {
+    "chest": "ValveBiped.Bip01_Spine1",
+    "head": "ValveBiped.Bip01_Head1",
+    "hips": "ValveBiped.Bip01_Pelvis",
+    "jaw": "Jaw_Bone",
+    "leftEye": null,
+    "leftFoot": "ValveBiped.Bip01_L_Foot",
+    "leftHand": "ValveBiped.Bip01_L_Hand",
+    "leftLowerArm": "ValveBiped.Bip01_L_Forearm",
+    "leftLowerLeg": "ValveBiped.Bip01_L_Calf",
+    "leftShoulder": "ValveBiped.Bip01_L_Clavicle",
+    "leftToes": null,
+    "leftUpperArm": "ValveBiped.Bip01_L_UpperArm",
+    "leftUpperLeg": "ValveBiped.Bip01_L_Thigh",
+    "neck": null,
+    "rightEye": null,
+    "rightFoot": "ValveBiped.Bip01_R_Foot",
+    "rightHand": "ValveBiped.Bip01_R_Hand",
+    "rightLowerArm": "ValveBiped.Bip01_R_Forearm",
+    "rightLowerLeg": "ValveBiped.Bip01_R_Calf",
+    "rightShoulder": "ValveBiped.Bip01_R_Clavicle",
+    "rightToes": null,
+    "rightUpperArm": "ValveBiped.Bip01_R_UpperArm",
+    "rightUpperLeg": "ValveBiped.Bip01_R_Thigh",
+    "spine": "ValveBiped.Bip01_Spine",
+    "upperChest": "ValveBiped.Bip01_Spine2"
+  },
+  "material_count": 6,
+  "mesh_count": 2,
+  "primary_armature": "shrek_forever_face.qc_skeleton",
+  "scale_orientation": {
+    "estimated_height": 83.51363,
+    "rest_pose_guess": "unknown"
+  },
+  "schema_version": "posepuppet-source-rig-cleanup-v1",
+  "selected_source_path": "shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx",
+  "slug": "shrek",
+  "status": "pass",
+  "texture_count": 0,
+  "warnings": [
+    "Feet exist but toes are missing; disable toe articulation.",
+    "Finger support is incomplete; use conservative MediaPipe hand retargeting.",
+    "Ignored Blender FBX importer light cast_shadow compatibility error.",
+    "License unknown; do not redistribute this model or generated converted files.",
+    "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+  ]
+}

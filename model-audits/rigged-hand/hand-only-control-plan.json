@@ -1,0 +1,17 @@
+{
+  "classification": "hand_only",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "deferred_controls": [
+    "full_finger_retargeting",
+    "normal_avatar_registry"
+  ],
+  "first_controls": [
+    "wrist",
+    "palm",
+    "curl_presets"
+  ],
+  "not_full_avatar": true,
+  "runtime_requirement": "requires_hand_landmarker_mode",
+  "schema_version": "posepuppet-hand-only-control-plan-v1",
+  "slug": "rigged-hand"
+}

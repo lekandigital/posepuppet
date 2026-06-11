@@ -1,0 +1,86 @@
+{
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "models": [
+    {
+      "classification": "ik_required",
+      "slug": "amazing-spider-man-2"
+    },
+    {
+      "classification": "disabled",
+      "slug": "baby-yoda"
+    },
+    {
+      "classification": "disabled",
+      "slug": "buzz-lightyear"
+    },
+    {
+      "classification": "ik_required",
+      "slug": "darth-vader"
+    },
+    {
+      "classification": "ik_required",
+      "slug": "elsa"
+    },
+    {
+      "classification": "ik_required",
+      "slug": "fortnite-batman"
+    },
+    {
+      "classification": "disabled",
+      "slug": "godzilla"
+    },
+    {
+      "classification": "disabled",
+      "slug": "grogu"
+    },
+    {
+      "classification": "ik_required",
+      "slug": "iron-man"
+    },
+    {
+      "classification": "ik_required",
+      "slug": "jack-sparrow"
+    },
+    {
+      "classification": "disabled",
+      "slug": "king-kong"
+    },
+    {
+      "classification": "disabled",
+      "slug": "olaf"
+    },
+    {
+      "classification": "disabled",
+      "slug": "rigged-hand"
+    },
+    {
+      "classification": "estimated_targets_only",
+      "slug": "shrek"
+    },
+    {
+      "classification": "ik_required",
+      "slug": "spider-man-no-way-home"
+    },
+    {
+      "classification": "ik_required",
+      "slug": "spider-man-playstation"
+    },
+    {
+      "classification": "disabled",
+      "slug": "teal-v2"
+    },
+    {
+      "classification": "ik_required",
+      "slug": "terminator-t-800"
+    },
+    {
+      "classification": "ik_required",
+      "slug": "woody"
+    },
+    {
+      "classification": "disabled",
+      "slug": "xenomorph"
+    }
+  ],
+  "schema_version": "posepuppet-face-touch-readiness-summary-v1"
+}

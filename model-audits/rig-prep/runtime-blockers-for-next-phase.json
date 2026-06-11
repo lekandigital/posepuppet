@@ -1,0 +1,885 @@
+{
+  "blockers": [
+    "browser_smoke_fail",
+    "cleanup_needed",
+    "creature_profile_needed",
+    "feet_not_ready",
+    "hand_control_not_ready",
+    "manual_mapping_needed",
+    "no_accepted_generated_vrm_candidate",
+    "not_full_avatar",
+    "requires_hand_landmarker_mode",
+    "static_preview_only",
+    "visual_review_needed"
+  ],
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "models": [
+    {
+      "active_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm",
+      "attempt_classification": "accepted_active_candidate",
+      "blockers": [
+        "visual_review_needed"
+      ],
+      "browser_smoke": "pass",
+      "category": "standard_humanoid",
+      "display_name": "The Amazing Spider-Man 2",
+      "face_touch": "ik_required",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "optional",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_for_face_touch_experiment",
+          "best_for_flying",
+          "best_for_hand_control",
+          "best_for_rowing",
+          "best_for_walking",
+          "best_for_website_now"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "amazing-spider-man-2",
+        "walking": "partial"
+      },
+      "generated": true,
+      "hand_mode": "palm_only",
+      "quality_label": "experimental",
+      "rank_tags": [
+        "best_for_face_touch_experiment",
+        "best_for_flying",
+        "best_for_hand_control",
+        "best_for_rowing",
+        "best_for_walking",
+        "best_for_website_now"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "humanoid",
+      "slug": "amazing-spider-man-2",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "feet_not_ready",
+        "hand_control_not_ready",
+        "no_accepted_generated_vrm_candidate",
+        "static_preview_only",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "Baby Yoda",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "defer",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "defer",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "baby-yoda",
+        "walking": "defer"
+      },
+      "generated": false,
+      "hand_mode": "none",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "baby-yoda",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "saved_for_later",
+      "blockers": [
+        "cleanup_needed",
+        "feet_not_ready",
+        "hand_control_not_ready",
+        "manual_mapping_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "cleanup_manual_mapping",
+      "display_name": "Buzz Lightyear",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "defer",
+        "gesture_to_intent": "not_recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [],
+        "rowing": "defer",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "buzz-lightyear",
+        "walking": "defer"
+      },
+      "generated": false,
+      "hand_mode": "none",
+      "quality_label": "manual_mapping_needed",
+      "rank_tags": [],
+      "reference_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm",
+      "runtime_profile": "humanoid_with_offsets",
+      "slug": "buzz-lightyear",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/darth-vader.vrm",
+      "attempt_classification": "accepted_active_candidate",
+      "blockers": [
+        "visual_review_needed"
+      ],
+      "browser_smoke": "pass",
+      "category": "standard_humanoid",
+      "display_name": "Darth Vader",
+      "face_touch": "ik_required",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "optional",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_for_face_touch_experiment",
+          "best_for_finger_experimentation",
+          "best_for_flying",
+          "best_for_hand_control",
+          "best_for_rowing",
+          "best_for_walking",
+          "best_for_website_now"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "darth-vader",
+        "walking": "partial"
+      },
+      "generated": true,
+      "hand_mode": "curl_presets",
+      "quality_label": "experimental",
+      "rank_tags": [
+        "best_for_face_touch_experiment",
+        "best_for_finger_experimentation",
+        "best_for_flying",
+        "best_for_hand_control",
+        "best_for_rowing",
+        "best_for_walking",
+        "best_for_website_now"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "humanoid",
+      "slug": "darth-vader",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "rejected_validation",
+      "blockers": [
+        "browser_smoke_fail",
+        "feet_not_ready",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "fail",
+      "category": "humanoid_with_offsets",
+      "display_name": "Elsa",
+      "face_touch": "ik_required",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "defer",
+        "gesture_to_intent": "not_recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [],
+        "rowing": "defer",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "elsa",
+        "walking": "defer"
+      },
+      "generated": false,
+      "hand_mode": "palm_only",
+      "quality_label": "defer",
+      "rank_tags": [],
+      "reference_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/elsa.vrm",
+      "runtime_profile": "humanoid_with_offsets",
+      "slug": "elsa",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/fortnite-batman.vrm",
+      "attempt_classification": "accepted_active_candidate",
+      "blockers": [
+        "visual_review_needed"
+      ],
+      "browser_smoke": "pass",
+      "category": "standard_humanoid",
+      "display_name": "Fortnite Batman",
+      "face_touch": "ik_required",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "optional",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_for_face_touch_experiment",
+          "best_for_finger_experimentation",
+          "best_for_flying",
+          "best_for_hand_control",
+          "best_for_rowing",
+          "best_for_walking",
+          "best_for_website_now"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "fortnite-batman",
+        "walking": "partial"
+      },
+      "generated": true,
+      "hand_mode": "curl_presets",
+      "quality_label": "experimental",
+      "rank_tags": [
+        "best_for_face_touch_experiment",
+        "best_for_finger_experimentation",
+        "best_for_flying",
+        "best_for_hand_control",
+        "best_for_rowing",
+        "best_for_walking",
+        "best_for_website_now"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "humanoid",
+      "slug": "fortnite-batman",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "Godzilla",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "godzilla",
+        "walking": "partial"
+      },
+      "generated": false,
+      "hand_mode": "palm_only",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "godzilla",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "Grogu",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "grogu",
+        "walking": "partial"
+      },
+      "generated": false,
+      "hand_mode": "palm_only",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "grogu",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/iron-man.vrm",
+      "attempt_classification": "accepted_active_candidate",
+      "blockers": [
+        "visual_review_needed"
+      ],
+      "browser_smoke": "pass",
+      "category": "standard_humanoid",
+      "display_name": "Iron Man",
+      "face_touch": "ik_required",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "optional",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_for_face_touch_experiment",
+          "best_for_finger_experimentation",
+          "best_for_flying",
+          "best_for_hand_control",
+          "best_for_rowing",
+          "best_for_walking",
+          "best_for_website_now"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "iron-man",
+        "walking": "partial"
+      },
+      "generated": true,
+      "hand_mode": "curl_presets",
+      "quality_label": "experimental",
+      "rank_tags": [
+        "best_for_face_touch_experiment",
+        "best_for_finger_experimentation",
+        "best_for_flying",
+        "best_for_hand_control",
+        "best_for_rowing",
+        "best_for_walking",
+        "best_for_website_now"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "humanoid",
+      "slug": "iron-man",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/jack-sparrow.vrm",
+      "attempt_classification": "accepted_active_candidate",
+      "blockers": [
+        "visual_review_needed"
+      ],
+      "browser_smoke": "pass",
+      "category": "humanoid_with_offsets",
+      "display_name": "Jack Sparrow",
+      "face_touch": "ik_required",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "optional",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_for_face_touch_experiment",
+          "best_for_flying",
+          "best_for_hand_control",
+          "best_for_rowing",
+          "best_for_walking",
+          "best_for_website_now"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "jack-sparrow",
+        "walking": "partial"
+      },
+      "generated": true,
+      "hand_mode": "palm_only",
+      "quality_label": "experimental",
+      "rank_tags": [
+        "best_for_face_touch_experiment",
+        "best_for_flying",
+        "best_for_hand_control",
+        "best_for_rowing",
+        "best_for_walking",
+        "best_for_website_now"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "humanoid",
+      "slug": "jack-sparrow",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "King Kong",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "king-kong",
+        "walking": "partial"
+      },
+      "generated": false,
+      "hand_mode": "palm_only",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "king-kong",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "Olaf",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "olaf",
+        "walking": "partial"
+      },
+      "generated": false,
+      "hand_mode": "palm_only",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "olaf",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "feet_not_ready",
+        "no_accepted_generated_vrm_candidate",
+        "not_full_avatar",
+        "requires_hand_landmarker_mode",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "hand_only",
+      "display_name": "Rigged Hand",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "not_ready",
+        "gesture_to_intent": "not_recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_for_hand_control"
+        ],
+        "rowing": "not_ready",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "rigged-hand",
+        "walking": "not_ready"
+      },
+      "generated": false,
+      "hand_mode": "hand_only",
+      "quality_label": "hand_only",
+      "rank_tags": [
+        "best_for_hand_control"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "hand_only",
+      "slug": "rigged-hand",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/shrek.vrm",
+      "attempt_classification": "accepted_active_candidate",
+      "blockers": [
+        "visual_review_needed"
+      ],
+      "browser_smoke": "pass",
+      "category": "standard_humanoid",
+      "display_name": "Shrek",
+      "face_touch": "estimated_targets_only",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "optional",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_for_face_touch_experiment",
+          "best_for_flying",
+          "best_for_hand_control",
+          "best_for_rowing",
+          "best_for_walking",
+          "best_for_website_now"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "shrek",
+        "walking": "partial"
+      },
+      "generated": true,
+      "hand_mode": "palm_only",
+      "quality_label": "experimental",
+      "rank_tags": [
+        "best_for_face_touch_experiment",
+        "best_for_flying",
+        "best_for_hand_control",
+        "best_for_rowing",
+        "best_for_walking",
+        "best_for_website_now"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "humanoid",
+      "slug": "shrek",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm",
+      "attempt_classification": "accepted_active_candidate",
+      "blockers": [
+        "visual_review_needed"
+      ],
+      "browser_smoke": "pass",
+      "category": "standard_humanoid",
+      "display_name": "Spider-Man No Way Home",
+      "face_touch": "ik_required",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "optional",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_for_face_touch_experiment",
+          "best_for_flying",
+          "best_for_hand_control",
+          "best_for_rowing",
+          "best_for_walking",
+          "best_for_website_now"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "spider-man-no-way-home",
+        "walking": "partial"
+      },
+      "generated": true,
+      "hand_mode": "palm_only",
+      "quality_label": "experimental",
+      "rank_tags": [
+        "best_for_face_touch_experiment",
+        "best_for_flying",
+        "best_for_hand_control",
+        "best_for_rowing",
+        "best_for_walking",
+        "best_for_website_now"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "humanoid",
+      "slug": "spider-man-no-way-home",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/spider-man-playstation.vrm",
+      "attempt_classification": "accepted_active_candidate",
+      "blockers": [
+        "visual_review_needed"
+      ],
+      "browser_smoke": "pass",
+      "category": "standard_humanoid",
+      "display_name": "Spider-Man PlayStation",
+      "face_touch": "ik_required",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "optional",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_for_face_touch_experiment",
+          "best_for_flying",
+          "best_for_hand_control",
+          "best_for_rowing",
+          "best_for_walking",
+          "best_for_website_now"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "spider-man-playstation",
+        "walking": "partial"
+      },
+      "generated": true,
+      "hand_mode": "palm_only",
+      "quality_label": "experimental",
+      "rank_tags": [
+        "best_for_face_touch_experiment",
+        "best_for_flying",
+        "best_for_hand_control",
+        "best_for_rowing",
+        "best_for_walking",
+        "best_for_website_now"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "humanoid",
+      "slug": "spider-man-playstation",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "saved_for_later",
+      "blockers": [
+        "cleanup_needed",
+        "hand_control_not_ready",
+        "manual_mapping_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "cleanup_manual_mapping",
+      "display_name": "Teal v2",
+      "face_touch": "disabled",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "defer",
+        "gesture_to_intent": "not_recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [],
+        "rowing": "defer",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "teal-v2",
+        "walking": "defer"
+      },
+      "generated": false,
+      "hand_mode": "none",
+      "quality_label": "manual_mapping_needed",
+      "rank_tags": [],
+      "reference_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/teal-v2.vrm",
+      "runtime_profile": "humanoid_with_offsets",
+      "slug": "teal-v2",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/terminator-t-800.vrm",
+      "attempt_classification": "accepted_active_candidate",
+      "blockers": [
+        "visual_review_needed"
+      ],
+      "browser_smoke": "pass",
+      "category": "standard_humanoid",
+      "display_name": "Terminator T-800",
+      "face_touch": "ik_required",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "optional",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_for_face_touch_experiment",
+          "best_for_flying",
+          "best_for_hand_control",
+          "best_for_rowing",
+          "best_for_walking",
+          "best_for_website_now"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "terminator-t-800",
+        "walking": "partial"
+      },
+      "generated": true,
+      "hand_mode": "palm_only",
+      "quality_label": "experimental",
+      "rank_tags": [
+        "best_for_face_touch_experiment",
+        "best_for_flying",
+        "best_for_hand_control",
+        "best_for_rowing",
+        "best_for_walking",
+        "best_for_website_now"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "humanoid",
+      "slug": "terminator-t-800",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/woody.vrm",
+      "attempt_classification": "accepted_active_candidate",
+      "blockers": [
+        "visual_review_needed"
+      ],
+      "browser_smoke": "pass",
+      "category": "standard_humanoid",
+      "display_name": "Woody",
+      "face_touch": "ik_required",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "optional",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_for_face_touch_experiment",
+          "best_for_flying",
+          "best_for_hand_control",
+          "best_for_rowing",
+          "best_for_walking",
+          "best_for_website_now"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "woody",
+        "walking": "partial"
+      },
+      "generated": true,
+      "hand_mode": "palm_only",
+      "quality_label": "experimental",
+      "rank_tags": [
+        "best_for_face_touch_experiment",
+        "best_for_flying",
+        "best_for_hand_control",
+        "best_for_rowing",
+        "best_for_walking",
+        "best_for_website_now"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "humanoid",
+      "slug": "woody",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "hand_control_not_ready",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "Xenomorph",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "xenomorph",
+        "walking": "partial"
+      },
+      "generated": false,
+      "hand_mode": "none",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "xenomorph",
+      "visual_review": "not_available"
+    }
+  ],
+  "schema_version": "posepuppet-runtime-blockers-for-next-phase-v1"
+}

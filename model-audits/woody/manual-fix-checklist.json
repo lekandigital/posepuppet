@@ -1,0 +1,9 @@
+{
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "items": [
+    "Generate screenshots/contact sheet and perform visual review."
+  ],
+  "schema_version": "posepuppet-manual-fix-checklist-v2",
+  "slug": "woody",
+  "status": "open"
+}

@@ -1,0 +1,30 @@
+{
+  "goal": "Make Ubuntu canonical for PosePuppet rig prep and conversion",
+  "sync_date": "2026-06-11T11:05-04:00",
+  "backup_timestamp": "20260611-110515",
+  "mac_repo": "/Users/lekan/Dev/posepuppet",
+  "ubuntu_repo": "/home/o/Dev/posepuppet",
+  "ubuntu_working": "/home/o/posepuppet-working",
+  "repo_sync_status": "pass",
+  "generated_vrm_sync_status": "pass",
+  "woody_candidate_on_ubuntu": true,
+  "darth_vader_candidate_on_ubuntu": true,
+  "ubuntu_build_status": "pass",
+  "ubuntu_audit_self_test": "not_attempted",
+  "ubuntu_rigprep_dry_run": "pass",
+  "ubuntu_conversion_dry_run": "pass",
+  "ubuntu_woody_validation": "pass",
+  "ubuntu_darth_vader_validation": "pass",
+  "large_files_staged": false,
+  "generated_vrms_staged": false,
+  "notes": [
+    "audit_models.py has no --self-test flag; requires source_dir and output_dir positional args",
+    "Rig prep and conversion dry-runs ran in enumeration_only scope (no --only slug specified)",
+    "Both validate_vrm_candidate.py calls exited 0 (pass) with no error output",
+    "darth-vader.vrm (16M) synced from Mac; woody.vrm (5.0M) was already on Ubuntu",
+    "Backup created at /home/o/posepuppet-working/sync-backups/20260611-110515",
+    "rsync used --backup to preserve any overwritten Ubuntu-side files",
+    "No --delete flag was used; no files removed from either machine",
+    "406 files transferred in repo sync; 1 file (darth-vader.vrm) transferred in VRM sync"
+  ]
+}

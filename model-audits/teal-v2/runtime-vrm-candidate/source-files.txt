@@ -1,0 +1,8 @@
+# Source files for teal-v2 candidate VRM
+
+Selected source: /home/o/posepuppet-working/generated-vrms/teal-v2.vrm
+Selected format: vrm
+Selected from ZIP: False
+
+All known source paths:
+- /home/o/posepuppet-working/generated-vrms/teal-v2.vrm

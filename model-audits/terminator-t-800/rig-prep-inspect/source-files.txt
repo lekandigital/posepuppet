@@ -1,0 +1,13 @@
+# Source files for Terminator T-800
+
+Selected source: terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend
+Selected format: blend
+Selected from ZIP: True
+Source ZIP: /home/o/posepuppet-assets/ModelsForAnimation/terminator-t-800-endo-skeleton-damaged.zip
+Nested ZIP: terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip
+
+All known source paths:
+- terminator-t-800-endo-skeleton-damaged (1).glb
+- terminator-t-800-endo-skeleton-damaged.glb
+- terminator-t-800-endo-skeleton-damaged.zip
+- terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend

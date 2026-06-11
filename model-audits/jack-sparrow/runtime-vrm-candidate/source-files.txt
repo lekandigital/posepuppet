@@ -1,0 +1,8 @@
+# Source files for jack-sparrow candidate VRM
+
+Selected source: /home/o/posepuppet-working/generated-vrms/jack-sparrow.vrm
+Selected format: vrm
+Selected from ZIP: False
+
+All known source paths:
+- /home/o/posepuppet-working/generated-vrms/jack-sparrow.vrm

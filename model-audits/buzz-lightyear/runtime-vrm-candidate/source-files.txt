@@ -1,0 +1,8 @@
+# Source files for buzz-lightyear candidate VRM
+
+Selected source: /home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm
+Selected format: vrm
+Selected from ZIP: False
+
+All known source paths:
+- /home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm

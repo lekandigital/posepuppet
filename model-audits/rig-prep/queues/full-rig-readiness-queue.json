@@ -1,0 +1,853 @@
+{
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "models": [
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "baseline_status": "generated_smoke_pass",
+      "category": "standard_humanoid",
+      "current_browser_smoke": "pass",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm",
+      "defer_reasons": [
+        "visual_review_needed"
+      ],
+      "display_name": "The Amazing Spider-Man 2",
+      "expected_attempts": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "No finger bones detected; use palm-only hand control.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "amazing-spider-man-2"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "finger-chain-preservation",
+        "finger-curl-preset-test"
+      ],
+      "baseline_status": "generated_smoke_pass",
+      "category": "standard_humanoid",
+      "current_browser_smoke": "pass",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/darth-vader.vrm",
+      "defer_reasons": [
+        "visual_review_needed"
+      ],
+      "display_name": "Darth Vader",
+      "expected_attempts": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "finger-chain-preservation",
+        "finger-curl-preset-test"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "darth-vader"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "finger-chain-preservation",
+        "finger-curl-preset-test"
+      ],
+      "baseline_status": "generated_smoke_pass",
+      "category": "standard_humanoid",
+      "current_browser_smoke": "pass",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/fortnite-batman.vrm",
+      "defer_reasons": [
+        "visual_review_needed"
+      ],
+      "display_name": "Fortnite Batman",
+      "expected_attempts": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "finger-chain-preservation",
+        "finger-curl-preset-test"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "fortnite-batman"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "finger-chain-preservation",
+        "finger-curl-preset-test"
+      ],
+      "baseline_status": "generated_smoke_pass",
+      "category": "standard_humanoid",
+      "current_browser_smoke": "pass",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/iron-man.vrm",
+      "defer_reasons": [
+        "visual_review_needed"
+      ],
+      "display_name": "Iron Man",
+      "expected_attempts": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "finger-chain-preservation",
+        "finger-curl-preset-test"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "iron-man"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "finger-chain-preservation",
+        "finger-curl-preset-test"
+      ],
+      "baseline_status": "generated_smoke_pass",
+      "category": "standard_humanoid",
+      "current_browser_smoke": "pass",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/shrek.vrm",
+      "defer_reasons": [
+        "visual_review_needed"
+      ],
+      "display_name": "Shrek",
+      "expected_attempts": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "finger-chain-preservation",
+        "finger-curl-preset-test"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Feet exist but toes are missing; disable toe articulation.",
+        "Finger support is incomplete; use conservative MediaPipe hand retargeting.",
+        "Ignored Blender FBX importer light cast_shadow compatibility error.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "shrek"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "baseline_status": "generated_smoke_pass",
+      "category": "standard_humanoid",
+      "current_browser_smoke": "pass",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm",
+      "defer_reasons": [
+        "visual_review_needed"
+      ],
+      "display_name": "Spider-Man No Way Home",
+      "expected_attempts": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "No finger bones detected; use palm-only hand control.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "spider-man-no-way-home"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "baseline_status": "audit_only",
+      "category": "standard_humanoid",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/spider-man-playstation.vrm",
+      "defer_reasons": [
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "display_name": "Spider-Man PlayStation",
+      "expected_attempts": [
+        "baseline-conversion",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "No finger bones detected; use palm-only hand control.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "spider-man-playstation"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "baseline_status": "generated_smoke_pass",
+      "category": "standard_humanoid",
+      "current_browser_smoke": "pass",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/terminator-t-800.vrm",
+      "defer_reasons": [
+        "visual_review_needed"
+      ],
+      "display_name": "Terminator T-800",
+      "expected_attempts": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "No finger bones detected; use palm-only hand control.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "terminator-t-800"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "baseline_status": "generated_smoke_pass",
+      "category": "standard_humanoid",
+      "current_browser_smoke": "pass",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/woody.vrm",
+      "defer_reasons": [
+        "visual_review_needed"
+      ],
+      "display_name": "Woody",
+      "expected_attempts": [
+        "baseline-generated-vrm-regression",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "No finger bones detected; use palm-only hand control.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "woody"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "finger-chain-preservation",
+        "finger-curl-preset-test"
+      ],
+      "baseline_status": "audit_only",
+      "category": "humanoid_with_offsets",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/elsa.vrm",
+      "defer_reasons": [
+        "feet_not_ready",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "display_name": "Elsa",
+      "expected_attempts": [
+        "baseline-conversion",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "finger-chain-preservation",
+        "finger-curl-preset-test"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Feet are missing or asymmetric; disable foot orientation control.",
+        "Finger support is incomplete; use conservative MediaPipe hand retargeting.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed.",
+        "character:jnt_L_palm mapped as hand candidate from wrist/palm",
+        "character:jnt_R_palm mapped as hand candidate from wrist/palm"
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "elsa"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "baseline_status": "audit_only",
+      "category": "humanoid_with_offsets",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/jack-sparrow.vrm",
+      "defer_reasons": [
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "display_name": "Jack Sparrow",
+      "expected_attempts": [
+        "baseline-conversion",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "No finger bones detected; use palm-only hand control.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "jack-sparrow"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "manual-bone-map-recovery"
+      ],
+      "baseline_status": "audit_only",
+      "category": "cleanup_manual_mapping",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm",
+      "defer_reasons": [
+        "cleanup_needed",
+        "feet_not_ready",
+        "hand_control_not_ready",
+        "manual_mapping_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "display_name": "Buzz Lightyear",
+      "expected_attempts": [
+        "baseline-conversion",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "manual-bone-map-recovery"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Feet are missing or asymmetric; disable foot orientation control.",
+        "No usable hand bones detected; face-touch and hand control are not supported.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "buzz-lightyear"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "manual-bone-map-recovery"
+      ],
+      "baseline_status": "audit_only",
+      "category": "cleanup_manual_mapping",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "/home/o/posepuppet-working/generated-vrms/teal-v2.vrm",
+      "defer_reasons": [
+        "cleanup_needed",
+        "hand_control_not_ready",
+        "manual_mapping_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "display_name": "Teal v2",
+      "expected_attempts": [
+        "baseline-conversion",
+        "scale-orientation-root-fix",
+        "wrist-palm-axis-fix",
+        "foot-ankle-axis-fix",
+        "face-touch-anchor-estimation",
+        "manual-bone-map-recovery"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Feet exist but toes are missing; disable toe articulation.",
+        "No usable hand bones detected; face-touch and hand control are not supported.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not public-promote generated candidates.",
+        "Do not commit generated VRMs or screenshots."
+      ],
+      "slug": "teal-v2"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "hand-only-vrm-container",
+        "hand-only-finger-test"
+      ],
+      "baseline_status": "audit_only",
+      "category": "hand_only",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "",
+      "defer_reasons": [
+        "feet_not_ready",
+        "no_accepted_generated_vrm_candidate",
+        "not_full_avatar",
+        "requires_hand_landmarker_mode",
+        "visual_review_needed"
+      ],
+      "display_name": "Rigged Hand",
+      "expected_attempts": [
+        "baseline-conversion",
+        "hand-only-vrm-container",
+        "hand-only-finger-test"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Feet are missing or asymmetric; disable foot orientation control.",
+        "Finger support is incomplete; use conservative MediaPipe hand retargeting.",
+        "Ignored Blender FBX importer light cast_shadow compatibility error.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not add to normal full-body avatar registry.",
+        "Do not run face-touch full-body attempts."
+      ],
+      "slug": "rigged-hand"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "baseline_status": "audit_only",
+      "category": "creature",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "",
+      "defer_reasons": [
+        "creature_profile_needed",
+        "feet_not_ready",
+        "hand_control_not_ready",
+        "no_accepted_generated_vrm_candidate",
+        "static_preview_only",
+        "visual_review_needed"
+      ],
+      "display_name": "Baby Yoda",
+      "expected_attempts": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Blender reported a recoverable .blend load warning: Error: ShapeKey KEKey.001 has an invalid 'from' pointer (0x0), it will be deleted\n",
+        "Feet are missing or asymmetric; disable foot orientation control.",
+        "Model appears to be creature/non-human anatomy; do not force standard humanoid retargeting.",
+        "No usable hand bones detected; face-touch and hand control are not supported.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not force standard humanoid retargeting.",
+        "Do not mark as works_well without creature runtime support."
+      ],
+      "slug": "baby-yoda"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "baseline_status": "audit_only",
+      "category": "creature",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "",
+      "defer_reasons": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "display_name": "Godzilla",
+      "expected_attempts": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Finger support is incomplete; use conservative MediaPipe hand retargeting.",
+        "Model appears to be creature/non-human anatomy; do not force standard humanoid retargeting.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not force standard humanoid retargeting.",
+        "Do not mark as works_well without creature runtime support."
+      ],
+      "slug": "godzilla"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "baseline_status": "audit_only",
+      "category": "creature",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "",
+      "defer_reasons": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "display_name": "Grogu",
+      "expected_attempts": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Finger support is incomplete; use conservative MediaPipe hand retargeting.",
+        "Model appears to be creature/non-human anatomy; do not force standard humanoid retargeting.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not force standard humanoid retargeting.",
+        "Do not mark as works_well without creature runtime support."
+      ],
+      "slug": "grogu"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "baseline_status": "audit_only",
+      "category": "creature",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "",
+      "defer_reasons": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "display_name": "King Kong",
+      "expected_attempts": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Feet exist but toes are missing; disable toe articulation.",
+        "Finger support is incomplete; use conservative MediaPipe hand retargeting.",
+        "Model appears to be creature/non-human anatomy; do not force standard humanoid retargeting.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not force standard humanoid retargeting.",
+        "Do not mark as works_well without creature runtime support."
+      ],
+      "slug": "king-kong"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "baseline_status": "audit_only",
+      "category": "creature",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "",
+      "defer_reasons": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "display_name": "Olaf",
+      "expected_attempts": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Feet exist but toes are missing; disable toe articulation.",
+        "Finger support is incomplete; use conservative MediaPipe hand retargeting.",
+        "Model appears to be creature/non-human anatomy; do not force standard humanoid retargeting.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+      ],
+      "must_not_do": [
+        "Do not force standard humanoid retargeting.",
+        "Do not mark as works_well without creature runtime support."
+      ],
+      "slug": "olaf"
+    },
+    {
+      "acceptance_tests": [
+        "post_vrm_validation",
+        "pose_suite",
+        "visual_review_marker",
+        "browser_smoke_if_generated"
+      ],
+      "ambitious_goals": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "baseline_status": "audit_only",
+      "category": "creature",
+      "current_browser_smoke": "not_attempted",
+      "current_vrm_candidate": "",
+      "defer_reasons": [
+        "creature_profile_needed",
+        "hand_control_not_ready",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "display_name": "Xenomorph",
+      "expected_attempts": [
+        "baseline-conversion",
+        "creature-profile-static-preview",
+        "creature-profile-vrm-container"
+      ],
+      "first_goal": "Validate or classify without public promotion.",
+      "known_risks": [
+        "Feet exist but toes are missing; disable toe articulation.",
+        "Model appears to be creature/non-human anatomy; do not force standard humanoid retargeting.",
+        "No usable hand bones detected; face-touch and hand control are not supported.",
+        "Screenshots were not generated; rerun with --screenshots if visual evidence is needed.",
+        "ankle mapped as foot candidate"
+      ],
+      "must_not_do": [
+        "Do not force standard humanoid retargeting.",
+        "Do not mark as works_well without creature runtime support."
+      ],
+      "slug": "xenomorph"
+    }
+  ],
+  "schema_version": "posepuppet-full-rig-readiness-queue-v1"
+}

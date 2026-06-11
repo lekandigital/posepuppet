@@ -1,0 +1,7 @@
+{
+  "blockers": [],
+  "disabled_controls": [],
+  "enabled_controls": [],
+  "quality_label": "experimental | partial | manual_mapping_needed | cleanup_needed | creature_profile_needed | hand_only | static_preview | visual_reject | defer",
+  "runtime_profile": "humanoid | humanoid_with_offsets | creature | hand_only | static_preview | deferred"
+}

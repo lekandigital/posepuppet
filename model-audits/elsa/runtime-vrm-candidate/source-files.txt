@@ -1,0 +1,8 @@
+# Source files for elsa candidate VRM
+
+Selected source: /home/o/posepuppet-working/generated-vrms/elsa.vrm
+Selected format: vrm
+Selected from ZIP: False
+
+All known source paths:
+- /home/o/posepuppet-working/generated-vrms/elsa.vrm

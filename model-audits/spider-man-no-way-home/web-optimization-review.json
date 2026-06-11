@@ -1,0 +1,16 @@
+{
+  "active_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm",
+  "browser_load_risk": "low",
+  "candidate_vrm_exists": true,
+  "candidate_vrm_size_bytes": 15974984,
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "material_count": 8,
+  "mesh_count": 9,
+  "optimization_actions": [
+    "report_only"
+  ],
+  "reference_candidate_vrm_path": "",
+  "schema_version": "posepuppet-web-optimization-review-v1",
+  "slug": "spider-man-no-way-home",
+  "texture_count": 0
+}

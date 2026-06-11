@@ -1,0 +1,86 @@
+{
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "models": [
+    {
+      "classification": "feet_ready_for_future_runtime",
+      "slug": "amazing-spider-man-2"
+    },
+    {
+      "classification": "feet_disabled",
+      "slug": "baby-yoda"
+    },
+    {
+      "classification": "feet_disabled",
+      "slug": "buzz-lightyear"
+    },
+    {
+      "classification": "feet_ready_for_future_runtime",
+      "slug": "darth-vader"
+    },
+    {
+      "classification": "feet_disabled",
+      "slug": "elsa"
+    },
+    {
+      "classification": "feet_ready_for_future_runtime",
+      "slug": "fortnite-batman"
+    },
+    {
+      "classification": "feet_disabled",
+      "slug": "godzilla"
+    },
+    {
+      "classification": "feet_disabled",
+      "slug": "grogu"
+    },
+    {
+      "classification": "feet_ready_for_future_runtime",
+      "slug": "iron-man"
+    },
+    {
+      "classification": "feet_ready_for_future_runtime",
+      "slug": "jack-sparrow"
+    },
+    {
+      "classification": "feet_disabled",
+      "slug": "king-kong"
+    },
+    {
+      "classification": "feet_disabled",
+      "slug": "olaf"
+    },
+    {
+      "classification": "feet_disabled",
+      "slug": "rigged-hand"
+    },
+    {
+      "classification": "feet_ready_for_future_runtime",
+      "slug": "shrek"
+    },
+    {
+      "classification": "feet_ready_for_future_runtime",
+      "slug": "spider-man-no-way-home"
+    },
+    {
+      "classification": "feet_ready_for_future_runtime",
+      "slug": "spider-man-playstation"
+    },
+    {
+      "classification": "feet_ready_for_future_runtime",
+      "slug": "teal-v2"
+    },
+    {
+      "classification": "feet_ready_for_future_runtime",
+      "slug": "terminator-t-800"
+    },
+    {
+      "classification": "feet_ready_for_future_runtime",
+      "slug": "woody"
+    },
+    {
+      "classification": "feet_disabled",
+      "slug": "xenomorph"
+    }
+  ],
+  "schema_version": "posepuppet-feet-and-leg-readiness-summary-v1"
+}

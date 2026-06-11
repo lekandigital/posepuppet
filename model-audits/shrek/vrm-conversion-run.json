@@ -1,0 +1,27 @@
+{
+  "candidate_vrm_exists": true,
+  "candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/shrek.vrm",
+  "candidate_vrm_size_bytes": 4202796,
+  "command": [
+    "/home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/blender",
+    "-b",
+    "--python",
+    "/home/o/Dev/posepuppet/tools/export_source_to_vrm.py",
+    "--",
+    "/home/o/posepuppet-working/model-working/shrek/conversion-input/shrek/Dying.fbx",
+    "/home/o/posepuppet-working/generated-vrms/shrek.vrm",
+    "--mapping",
+    "/home/o/Dev/posepuppet/model-audits/shrek/suggested-bone-map.json"
+  ],
+  "created_at": "2026-06-11T16:19:06+00:00",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/shrek/suggested-bone-map.json",
+  "materialized_source_path": "/home/o/posepuppet-working/model-working/shrek/conversion-input/shrek/Dying.fbx",
+  "public_avatar_written": false,
+  "runtime_browser_smoke": "not_attempted",
+  "schema_version": "posepuppet-vrm-conversion-run-v1",
+  "selected_source_path": "shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx",
+  "slug": "shrek",
+  "status": "pass",
+  "stderr": "",
+  "stdout": "FBX version: 7700\nWARNING: Ignored Blender FBX importer light cast_shadow compatibility error.\nWARNING: Ignored Blender FBX importer light cast_shadow compatibility error.\nArmature: shrek_forever_face.qc_skeleton\nFinal mapped bones: 20\nMissing required bones: neck\nWARNING: could not pack alpha_texture: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/shrek/conversion-input/shrek/skins_e0fab8fc-a822-4be4-a43b-2270537e51b0.fbm/shrekbody.png' not found\n\nWARNING: could not pack base_color_texture: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/shrek/conversion-input/shrek/skins_e0fab8fc-a822-4be4-a43b-2270537e51b0.fbm/shrekball.jpg' not found\n\nWARNING: could not pack normalmap_texture: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/shrek/conversion-input/shrek/skins_e0fab8fc-a822-4be4-a43b-2270537e51b0.fbm/shrekbodyN.png' not found\n\nINFO Draco mesh compression is available, use library at /home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/5.1/scripts/addons_core/io_scene_gltf2/libextern_draco.so\n12:19:06 | INFO: Starting glTF 2.0 export\n12:19:06 | INFO: Extracting primitive: Body\n12:19:06 | WARNING: Image '<bpy_struct, Image(\"alpha_texture\") at 0x7a17b943f908>' has no size and cannot be exported.\n12:19:06 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.\n12:19:06 | INFO: Primitives created: 2\n12:19:06 | INFO: Extracting primitive: head\n12:19:06 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.\n12:19:06 | INFO: Primitives created: 4\n12:19:06 | INFO: Finished glTF 2.0 export in 0.2520928382873535 s\n\nVRM written: /home/o/posepuppet-working/generated-vrms/shrek.vrm\nBlender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 02:18:37)\n\nBlender quit\n"
+}

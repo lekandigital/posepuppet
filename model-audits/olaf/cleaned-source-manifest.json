@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T15:31:11+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/olaf.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/olaf/OlafRig.blend",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/olaf/suggested-bone-map.json",
+  "nested_chain": [
+    "source/OlafRig.blend"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "olaf-3d-rigged.zip!/source/OlafRig.blend",
+  "slug": "olaf",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/olaf-3d-rigged.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/olaf"
+}

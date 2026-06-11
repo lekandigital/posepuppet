@@ -1,0 +1,17 @@
+{
+  "classification": "ik_required",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "notes": [
+    "Do not mark supported until a visual hand-to-face pose test passes."
+  ],
+  "safe_first_gesture": "hand_to_cheek",
+  "schema_version": "posepuppet-face-touch-rig-plan-v1",
+  "slug": "darth-vader",
+  "targets": {
+    "head_center": "estimated",
+    "left_cheek": "estimated",
+    "mouth": "estimated",
+    "right_cheek": "estimated"
+  },
+  "visual_result": "not_available"
+}

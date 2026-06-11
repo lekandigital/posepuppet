@@ -1,0 +1,8 @@
+# Source files for woody candidate VRM
+
+Selected source: /home/o/posepuppet-working/generated-vrms/woody.vrm
+Selected format: vrm
+Selected from ZIP: False
+
+All known source paths:
+- /home/o/posepuppet-working/generated-vrms/woody.vrm

@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T15:31:19+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/godzilla.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/godzilla/Godzilla (New Glow).blend",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/godzilla/suggested-bone-map.json",
+  "nested_chain": [
+    "source/Godzilla (New Glow).blend"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "godzilla-rigged-animated.zip!/source/Godzilla (New Glow).blend",
+  "slug": "godzilla",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/godzilla-rigged-animated.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/godzilla"
+}

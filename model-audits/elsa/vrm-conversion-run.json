@@ -1,0 +1,27 @@
+{
+  "candidate_vrm_exists": true,
+  "candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/elsa.vrm",
+  "candidate_vrm_size_bytes": 470168,
+  "command": [
+    "/home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/blender",
+    "-b",
+    "--python",
+    "/home/o/Dev/posepuppet/tools/export_source_to_vrm.py",
+    "--",
+    "/home/o/posepuppet-working/model-working/elsa/conversion-input/elsa/Elsa_merge_.glb",
+    "/home/o/posepuppet-working/generated-vrms/elsa.vrm",
+    "--mapping",
+    "/home/o/Dev/posepuppet/model-audits/elsa/suggested-bone-map.json"
+  ],
+  "created_at": "2026-06-11T18:03:22+00:00",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/elsa/suggested-bone-map.json",
+  "materialized_source_path": "/home/o/posepuppet-working/model-working/elsa/conversion-input/elsa/Elsa_merge_.glb",
+  "public_avatar_written": false,
+  "runtime_browser_smoke": "not_attempted",
+  "schema_version": "posepuppet-vrm-conversion-run-v1",
+  "selected_source_path": "elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb",
+  "slug": "elsa",
+  "status": "pass",
+  "stderr": "",
+  "stdout": "14:03:21 | INFO: Data are loaded, start creating Blender stuff\n14:03:21 | INFO: Blender create Mesh node elsa_geo\n14:03:21 | INFO: Blender create Mesh node elsa_geo.001\n14:03:21 | INFO: glTF import finished in 0.07s\nArmature: Armature\nFinal mapped bones: 15\nMissing required bones: spine, leftUpperLeg, leftLowerLeg, leftFoot, rightUpperLeg, rightLowerLeg, rightFoot\nINFO Draco mesh compression is available, use library at /home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/5.1/scripts/addons_core/io_scene_gltf2/libextern_draco.so\n14:03:21 | INFO: Starting glTF 2.0 export\n14:03:21 | INFO: Extracting primitive: elsa_geo\n14:03:21 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.\n14:03:21 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.\n14:03:21 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.\n14:03:21 | INFO: Primitives created: 3\n14:03:21 | INFO: Extracting primitive: elsa_geo.001\n14:03:21 | INFO: Primitives created: 3\n14:03:21 | INFO: Finished glTF 2.0 export in 0.1052544116973877 s\n\nVRM written: /home/o/posepuppet-working/generated-vrms/elsa.vrm\nBlender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 02:18:37)\n\nBlender quit\n"
+}

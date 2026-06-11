@@ -1,0 +1,13 @@
+# Source files for Iron Man
+
+Selected source: iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend
+Selected format: blend
+Selected from ZIP: True
+Source ZIP: /home/o/posepuppet-assets/ModelsForAnimation/iron-man-rig.zip
+Nested ZIP: iron-man-rig.zip!/source/iron man.zip
+
+All known source paths:
+- iron-man-rig.zip
+- iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend
+- iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.fbx
+- iron_man_rig.glb

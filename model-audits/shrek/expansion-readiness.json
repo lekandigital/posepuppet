@@ -1,0 +1,16 @@
+{
+  "schema_version": "posepuppet-expansion-readiness-v1",
+  "created_at": "2026-06-11T16:21:00+00:00",
+  "slug": "shrek",
+  "conversion_status": "pass",
+  "validation_status": "pass",
+  "browser_smoke_status": "pass",
+  "humanoid_bone_count": 20,
+  "vrm_size_bytes": 4202796,
+  "public_ui_ready": false,
+  "works_well": false,
+  "batch": "A",
+  "next_step": "runtime_quality_review",
+  "blockers": [],
+  "notes": "Browser smoke passed. Not yet promoted to public UI. Requires manual quality review of pose tracking fidelity."
+}

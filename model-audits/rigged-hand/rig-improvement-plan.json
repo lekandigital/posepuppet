@@ -1,0 +1,52 @@
+{
+  "acceptance_tests": [
+    "post_vrm_validation",
+    "pose_suite_manifest",
+    "browser_smoke_for_generated_candidates",
+    "visual_review_or_not_available_marker",
+    "generated_assets_not_tracked"
+  ],
+  "ambition_level": "medium",
+  "attempts_planned": [
+    "baseline-conversion",
+    "hand-only-vrm-container",
+    "hand-only-finger-test"
+  ],
+  "baseline_candidate": "",
+  "category": "hand_only",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "deferred_controls": [
+    "full_body_tracking",
+    "normal_avatar_cycling",
+    "face_touch"
+  ],
+  "display_name": "Rigged Hand",
+  "do_not_attempt": [
+    "Do not add to normal full-body avatar registry.",
+    "Do not run face-touch full-body attempts."
+  ],
+  "first_pass_controls": [],
+  "goal": "Preserve a truthful test-only avatar candidate or document blockers for future runtime work.",
+  "notes": [
+    "Current runtime does not drive feet, toes, fingers, shoulders, face anchors, or creature profiles."
+  ],
+  "risky_or_manual_fixes": [
+    "Build a dedicated hand-only runtime path.",
+    "Generate contact sheets and perform vision review."
+  ],
+  "safe_automated_fixes": [
+    "report-only metadata refresh",
+    "non-destructive source inspection",
+    "finger-chain manifest"
+  ],
+  "schema_version": "posepuppet-rig-improvement-plan-v2",
+  "slug": "rigged-hand",
+  "target_runtime_profile": "hand_only",
+  "visual_acceptance_criteria": [
+    "scale reasonable",
+    "facing expected direction",
+    "materials intact",
+    "limbs attached",
+    "no exploding deformation"
+  ]
+}

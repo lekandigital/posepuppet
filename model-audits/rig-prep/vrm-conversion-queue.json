@@ -1,0 +1,155 @@
+{
+  "attempt_refused": false,
+  "dry_run": true,
+  "entries": [
+    {
+      "display_name": "Woody",
+      "dry_run": true,
+      "group": "humanoid",
+      "notes": [
+        "Generated VRMs go under /home/o/posepuppet-working/generated-vrms.",
+        "Runtime paths under public/avatars are not written by this batch command."
+      ],
+      "output_vrm": "/home/o/posepuppet-working/generated-vrms/woody.vrm",
+      "priority": 1,
+      "queue_status": "dry_run_only",
+      "report_path": "/home/o/Dev/posepuppet/model-audits/woody/vrm-conversion-run.json",
+      "slug": "woody",
+      "source": {
+        "errors": [],
+        "extracted": false,
+        "resolved": true,
+        "source_exists": true,
+        "source_kind": "file",
+        "source_path": "/home/o/posepuppet-assets/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx",
+        "source_spec": "/home/o/posepuppet-assets/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx",
+        "warnings": []
+      }
+    },
+    {
+      "display_name": "Darth Vader",
+      "dry_run": true,
+      "group": "humanoid",
+      "notes": [
+        "Generated VRMs go under /home/o/posepuppet-working/generated-vrms.",
+        "Runtime paths under public/avatars are not written by this batch command."
+      ],
+      "output_vrm": "/home/o/posepuppet-working/generated-vrms/darth-vader.vrm",
+      "priority": 2,
+      "queue_status": "dry_run_only",
+      "report_path": "/home/o/Dev/posepuppet/model-audits/darth-vader/vrm-conversion-run.json",
+      "slug": "darth-vader",
+      "source": {
+        "archive_entries": [
+          "source/darthvaderrig.blend"
+        ],
+        "archive_path": "/home/o/posepuppet-assets/ModelsForAnimation/fortnite-darth-vader-advanced-rig.zip",
+        "errors": [],
+        "extracted": false,
+        "resolved": true,
+        "source_exists": true,
+        "source_kind": "archive-entry",
+        "source_path": "fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend",
+        "source_spec": "fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend",
+        "warnings": [
+          "Archive source was resolved for planning only; extraction was not requested."
+        ]
+      }
+    },
+    {
+      "display_name": "Fortnite Batman",
+      "dry_run": true,
+      "group": "humanoid",
+      "notes": [
+        "Generated VRMs go under /home/o/posepuppet-working/generated-vrms.",
+        "Runtime paths under public/avatars are not written by this batch command."
+      ],
+      "output_vrm": "/home/o/posepuppet-working/generated-vrms/fortnite-batman.vrm",
+      "priority": 3,
+      "queue_status": "dry_run_only",
+      "report_path": "/home/o/Dev/posepuppet/model-audits/fortnite-batman/vrm-conversion-run.json",
+      "slug": "fortnite-batman",
+      "source": {
+        "archive_entries": [
+          "source/BATMANRIG.blend"
+        ],
+        "archive_path": "/home/o/posepuppet-assets/ModelsForAnimation/fortnite-batman-advanced-rig.zip",
+        "errors": [],
+        "extracted": false,
+        "resolved": true,
+        "source_exists": true,
+        "source_kind": "archive-entry",
+        "source_path": "fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend",
+        "source_spec": "fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend",
+        "warnings": [
+          "Archive source was resolved for planning only; extraction was not requested."
+        ]
+      }
+    },
+    {
+      "display_name": "Iron Man",
+      "dry_run": true,
+      "group": "humanoid",
+      "notes": [
+        "Generated VRMs go under /home/o/posepuppet-working/generated-vrms.",
+        "Runtime paths under public/avatars are not written by this batch command."
+      ],
+      "output_vrm": "/home/o/posepuppet-working/generated-vrms/iron-man.vrm",
+      "priority": 4,
+      "queue_status": "dry_run_only",
+      "report_path": "/home/o/Dev/posepuppet/model-audits/iron-man/vrm-conversion-run.json",
+      "slug": "iron-man",
+      "source": {
+        "archive_entries": [
+          "source/iron man.zip",
+          "iron-man-rig/source/iron man.blend"
+        ],
+        "archive_path": "/home/o/posepuppet-assets/ModelsForAnimation/iron-man-rig.zip",
+        "errors": [],
+        "extracted": false,
+        "resolved": true,
+        "source_exists": true,
+        "source_kind": "archive-entry",
+        "source_path": "iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend",
+        "source_spec": "iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend",
+        "warnings": [
+          "Archive source was resolved for planning only; extraction was not requested."
+        ]
+      }
+    },
+    {
+      "display_name": "Shrek",
+      "dry_run": true,
+      "group": "humanoid",
+      "notes": [
+        "Generated VRMs go under /home/o/posepuppet-working/generated-vrms.",
+        "Runtime paths under public/avatars are not written by this batch command."
+      ],
+      "output_vrm": "/home/o/posepuppet-working/generated-vrms/shrek.vrm",
+      "priority": 5,
+      "queue_status": "dry_run_only",
+      "report_path": "/home/o/Dev/posepuppet/model-audits/shrek/vrm-conversion-run.json",
+      "slug": "shrek",
+      "source": {
+        "archive_entries": [
+          "source/shrek 4.zip",
+          "source/Dying.fbx"
+        ],
+        "archive_path": "/home/o/posepuppet-assets/ModelsForAnimation/shrek-rig.zip",
+        "errors": [],
+        "extracted": false,
+        "resolved": true,
+        "source_exists": true,
+        "source_kind": "archive-entry",
+        "source_path": "shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx",
+        "source_spec": "shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx",
+        "warnings": [
+          "Archive source was resolved for planning only; extraction was not requested."
+        ]
+      }
+    }
+  ],
+  "entry_count": 5,
+  "status": "not_attempted",
+  "updated_at": "2026-06-11T14:36:31+00:00"
+}

@@ -1,0 +1,77 @@
+{
+  "action": "cleanup_then_convert",
+  "avatar_id": "buzz-lightyear",
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "feet",
+    "fingers",
+    "toes"
+  ],
+  "display_name": "Buzz Lightyear",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet.",
+    "Do not enable feet for this model yet."
+  ],
+  "enabled_controls": [
+    "arms",
+    "hands",
+    "head",
+    "upper_body"
+  ],
+  "face_touch_mode": "none",
+  "finger_mode": "none",
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=buzz-lightyear after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "load_vrm_upper_body_only",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera",
+      "head tracks",
+      "arms track"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "performance": "light",
+  "priority": 19,
+  "profile": "humanoid_with_offsets",
+  "read_first": "model-audits/buzz-lightyear/avatar-adapter-spec.json",
+  "reason": "Automatic mapping is too weak; inspect hierarchy and create a manual map first.",
+  "rig_readiness": {
+    "blockers": [
+      "cleanup_needed",
+      "feet_not_ready",
+      "hand_control_not_ready",
+      "manual_mapping_needed",
+      "no_accepted_generated_vrm_candidate",
+      "visual_review_needed"
+    ],
+    "browser_smoke": "not_attempted",
+    "category": "cleanup_manual_mapping",
+    "quality_label": "manual_mapping_needed",
+    "runtime_profile": "humanoid_with_offsets",
+    "updated_at": "2026-06-11T18:11:49+00:00",
+    "visual_review": "not_available"
+  },
+  "risk": "high",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "40e213a8c6a40358750d829a238bbbf39849be1adef33304a988091903195b7d",
+    "selected_source_sha256": "5ad3edb738f16f318b521769623ca6e39839000cbb2c0e935173c50f0bb5bd8e",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend",
+  "target_vrm": "public/avatars/buzz-lightyear.vrm"
+}

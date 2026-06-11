@@ -1,0 +1,27 @@
+{
+  "candidate_vrm_exists": true,
+  "candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm",
+  "candidate_vrm_size_bytes": 129800,
+  "command": [
+    "/home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/blender",
+    "-b",
+    "--python",
+    "/home/o/Dev/posepuppet/tools/export_source_to_vrm.py",
+    "--",
+    "/home/o/posepuppet-working/model-working/buzz-lightyear/conversion-input/buzz-lightyear/Buzz_Lightyear.blend",
+    "/home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm",
+    "--mapping",
+    "/home/o/Dev/posepuppet/model-audits/buzz-lightyear/suggested-bone-map.json"
+  ],
+  "created_at": "2026-06-11T18:03:27+00:00",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/buzz-lightyear/suggested-bone-map.json",
+  "materialized_source_path": "/home/o/posepuppet-working/model-working/buzz-lightyear/conversion-input/buzz-lightyear/Buzz_Lightyear.blend",
+  "public_avatar_written": false,
+  "runtime_browser_smoke": "not_attempted",
+  "schema_version": "posepuppet-vrm-conversion-run-v1",
+  "selected_source_path": "adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend",
+  "slug": "buzz-lightyear",
+  "status": "pass",
+  "stderr": "",
+  "stdout": "00:00.445  blend            | Read blend: \"/home/o/posepuppet-working/model-working/buzz-lightyear/conversion-input/buzz-lightyear/Buzz_Lightyear.blend\"\n00:00.450  blend.doversion  | WARNING Region type 4 missing in space type \"Info\" (id: 7) - removing region\nArmature: Armature\nFinal mapped bones: 0\nMissing required bones: hips, spine, chest, neck, head, leftUpperArm, leftLowerArm, leftHand, rightUpperArm, rightLowerArm, rightHand, leftUpperLeg, leftLowerLeg, leftFoot, rightUpperLeg, rightLowerLeg, rightFoot\nWARNING: could not pack Tex_0050_2.png: Error: Unable to pack file, source path '/c/Users/munoz/Downloads/rigged_models_and_showtime_mickey_by_hola1231_dasi6gm/buzz lightyear/Tex_0050_2.png' not found\n\nWARNING: could not pack Tex_0056_2.png: Error: Unable to pack file, source path '/c/Users/munoz/Downloads/rigged_models_and_showtime_mickey_by_hola1231_dasi6gm/buzz lightyear/Tex_0056_2.png' not found\n\nINFO Draco mesh compression is available, use library at /home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/5.1/scripts/addons_core/io_scene_gltf2/libextern_draco.so\n14:03:27 | INFO: Starting glTF 2.0 export\n14:03:27 | INFO: Extracting primitive: Mesh_0043.rip\n14:03:27 | INFO: Primitives created: 2\n14:03:27 | INFO: Finished glTF 2.0 export in 0.021413087844848633 s\n\nVRM written: /home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm\nBlender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 02:18:37)\n\nBlender quit\n"
+}

@@ -1,0 +1,149 @@
+{
+  "active_accepted_generated_candidates": [
+    "amazing-spider-man-2",
+    "darth-vader",
+    "fortnite-batman",
+    "iron-man",
+    "jack-sparrow",
+    "shrek",
+    "spider-man-no-way-home",
+    "spider-man-playstation",
+    "terminator-t-800",
+    "woody"
+  ],
+  "best_for_face_touch_experimentation": [
+    "amazing-spider-man-2",
+    "darth-vader",
+    "fortnite-batman",
+    "iron-man",
+    "jack-sparrow"
+  ],
+  "best_for_finger_experimentation": [
+    "darth-vader",
+    "fortnite-batman",
+    "iron-man"
+  ],
+  "best_for_flying": [
+    "amazing-spider-man-2",
+    "darth-vader",
+    "fortnite-batman",
+    "iron-man",
+    "jack-sparrow"
+  ],
+  "best_for_hand_control": [
+    "amazing-spider-man-2",
+    "darth-vader",
+    "fortnite-batman",
+    "iron-man",
+    "jack-sparrow"
+  ],
+  "best_for_rowing": [
+    "amazing-spider-man-2",
+    "darth-vader",
+    "fortnite-batman",
+    "iron-man",
+    "jack-sparrow"
+  ],
+  "best_for_walking": [
+    "amazing-spider-man-2",
+    "darth-vader",
+    "fortnite-batman",
+    "iron-man",
+    "jack-sparrow"
+  ],
+  "browser_smoke_passed": [
+    "amazing-spider-man-2",
+    "darth-vader",
+    "fortnite-batman",
+    "iron-man",
+    "jack-sparrow",
+    "shrek",
+    "spider-man-no-way-home",
+    "spider-man-playstation",
+    "terminator-t-800",
+    "woody"
+  ],
+  "cleanup_needed": [
+    "buzz-lightyear",
+    "teal-v2"
+  ],
+  "converted_to_vrm": [
+    "amazing-spider-man-2",
+    "buzz-lightyear",
+    "darth-vader",
+    "elsa",
+    "fortnite-batman",
+    "iron-man",
+    "jack-sparrow",
+    "shrek",
+    "spider-man-no-way-home",
+    "spider-man-playstation",
+    "teal-v2",
+    "terminator-t-800",
+    "woody"
+  ],
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "creature_model_recommendations": [
+    "baby-yoda",
+    "godzilla",
+    "grogu",
+    "king-kong",
+    "olaf",
+    "xenomorph"
+  ],
+  "creature_profile_needed": [
+    "baby-yoda",
+    "godzilla",
+    "grogu",
+    "king-kong",
+    "olaf",
+    "xenomorph"
+  ],
+  "deferred": [
+    "baby-yoda",
+    "buzz-lightyear",
+    "elsa",
+    "godzilla",
+    "grogu",
+    "king-kong",
+    "olaf",
+    "rigged-hand",
+    "teal-v2",
+    "xenomorph"
+  ],
+  "hand_only": [
+    "rigged-hand"
+  ],
+  "manual_mapping_needed": [
+    "buzz-lightyear",
+    "teal-v2"
+  ],
+  "model_count": 20,
+  "runtime_blockers": [
+    "browser_smoke_fail",
+    "cleanup_needed",
+    "creature_profile_needed",
+    "feet_not_ready",
+    "hand_control_not_ready",
+    "manual_mapping_needed",
+    "no_accepted_generated_vrm_candidate",
+    "not_full_avatar",
+    "requires_hand_landmarker_mode",
+    "static_preview_only",
+    "visual_review_needed"
+  ],
+  "saved_reference_attempts": [],
+  "schema_version": "posepuppet-full-rig-readiness-summary-v1",
+  "static_preview_only": [
+    "baby-yoda"
+  ],
+  "top_5_closest_to_website_use": [
+    "amazing-spider-man-2",
+    "darth-vader",
+    "fortnite-batman",
+    "iron-man",
+    "jack-sparrow"
+  ],
+  "visually_accepted": [],
+  "visually_rejected": []
+}

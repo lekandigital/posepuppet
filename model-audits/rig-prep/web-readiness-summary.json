@@ -1,0 +1,126 @@
+{
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "models": [
+    {
+      "browser_smoke": "pass",
+      "generated": true,
+      "slug": "amazing-spider-man-2",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "not_attempted",
+      "generated": false,
+      "slug": "baby-yoda",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "not_attempted",
+      "generated": false,
+      "slug": "buzz-lightyear",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "pass",
+      "generated": true,
+      "slug": "darth-vader",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "fail",
+      "generated": false,
+      "slug": "elsa",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "pass",
+      "generated": true,
+      "slug": "fortnite-batman",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "not_attempted",
+      "generated": false,
+      "slug": "godzilla",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "not_attempted",
+      "generated": false,
+      "slug": "grogu",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "pass",
+      "generated": true,
+      "slug": "iron-man",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "pass",
+      "generated": true,
+      "slug": "jack-sparrow",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "not_attempted",
+      "generated": false,
+      "slug": "king-kong",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "not_attempted",
+      "generated": false,
+      "slug": "olaf",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "not_attempted",
+      "generated": false,
+      "slug": "rigged-hand",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "pass",
+      "generated": true,
+      "slug": "shrek",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "pass",
+      "generated": true,
+      "slug": "spider-man-no-way-home",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "pass",
+      "generated": true,
+      "slug": "spider-man-playstation",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "not_attempted",
+      "generated": false,
+      "slug": "teal-v2",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "pass",
+      "generated": true,
+      "slug": "terminator-t-800",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "pass",
+      "generated": true,
+      "slug": "woody",
+      "visual_review": "not_available"
+    },
+    {
+      "browser_smoke": "not_attempted",
+      "generated": false,
+      "slug": "xenomorph",
+      "visual_review": "not_available"
+    }
+  ],
+  "schema_version": "posepuppet-web-readiness-summary-v1"
+}

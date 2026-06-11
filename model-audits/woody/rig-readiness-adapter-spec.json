@@ -1,0 +1,73 @@
+{
+  "action": "convert_to_vrm",
+  "avatar_id": "woody",
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "fingers"
+  ],
+  "display_name": "Woody",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet."
+  ],
+  "enabled_controls": [
+    "arms",
+    "feet",
+    "hands",
+    "head",
+    "legs",
+    "root_motion",
+    "toes",
+    "upper_body"
+  ],
+  "face_touch_mode": "ik_required",
+  "finger_mode": "palm_only",
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=woody after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "load_vrm_full_body",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera",
+      "head tracks",
+      "arms track"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "performance": "medium",
+  "priority": 1,
+  "profile": "humanoid",
+  "read_first": "model-audits/woody/avatar-adapter-spec.json",
+  "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+  "rig_readiness": {
+    "blockers": [
+      "visual_review_needed"
+    ],
+    "browser_smoke": "pass",
+    "category": "standard_humanoid",
+    "quality_label": "experimental",
+    "runtime_profile": "humanoid",
+    "updated_at": "2026-06-11T18:11:49+00:00",
+    "visual_review": "not_available"
+  },
+  "risk": "medium",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "d599209431cb344cb414fe7606218325cd6b123ecf54b4943009e022d55d542d",
+    "selected_source_sha256": "eea452c046550ec4be68f8bcae25eb0eebf28a650ad7d28ddc05ad6f6cdc91b3",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx",
+  "target_vrm": "public/avatars/woody.vrm"
+}

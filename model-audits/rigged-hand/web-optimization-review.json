@@ -1,0 +1,16 @@
+{
+  "active_candidate_vrm_path": "",
+  "browser_load_risk": "unknown",
+  "candidate_vrm_exists": false,
+  "candidate_vrm_size_bytes": 0,
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "material_count": 1,
+  "mesh_count": 1,
+  "optimization_actions": [
+    "report_only"
+  ],
+  "reference_candidate_vrm_path": "",
+  "schema_version": "posepuppet-web-optimization-review-v1",
+  "slug": "rigged-hand",
+  "texture_count": 0
+}

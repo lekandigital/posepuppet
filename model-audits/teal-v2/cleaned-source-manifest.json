@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T15:31:45+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/teal-v2.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/teal-v2/Tealv2.fbx",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/teal-v2/suggested-bone-map.json",
+  "nested_chain": [
+    "source/Tealv2.fbx"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "teal-v2.zip!/source/Tealv2.fbx",
+  "slug": "teal-v2",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/teal-v2.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/teal-v2"
+}

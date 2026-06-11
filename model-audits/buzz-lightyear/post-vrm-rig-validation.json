@@ -1,0 +1,25 @@
+{
+  "candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm",
+  "candidate_vrm_size_bytes": 129800,
+  "created_at": "2026-06-11T18:03:52+00:00",
+  "direct_bpy_import_scene_vrm": "not_attempted",
+  "face_touch": "deferred",
+  "fallback_gltf_vrmc_inspection": "pass",
+  "feet_preserved": "missing",
+  "fingers_preserved": "missing",
+  "hands_preserved": "missing",
+  "humanoid_bone_count": 0,
+  "humanoid_bones": [],
+  "material_count": 2,
+  "mesh_count": 2,
+  "runtime_browser_smoke": "not_attempted",
+  "runtime_suitability": "partial",
+  "scale_orientation": {
+    "estimated_height": 5.18656,
+    "rest_pose_guess": "unknown"
+  },
+  "schema_version": "posepuppet-vrm-validation-v1",
+  "slug": "buzz-lightyear",
+  "status": "pass",
+  "vrmc_vrm_present": true
+}

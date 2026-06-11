@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T15:30:54+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/grogu.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/grogu/Grogurig.blend",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/grogu/suggested-bone-map.json",
+  "nested_chain": [
+    "source/Grogurig.blend"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "the-mandalorian-grogu-advanced-rig.zip!/source/Grogurig.blend",
+  "slug": "grogu",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/the-mandalorian-grogu-advanced-rig.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/grogu"
+}

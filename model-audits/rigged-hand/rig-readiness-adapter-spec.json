@@ -1,0 +1,78 @@
+{
+  "action": "hand_only_test",
+  "avatar_id": "rigged-hand",
+  "disabled_controls": [
+    "arms",
+    "face_touch",
+    "facial_expressions",
+    "feet",
+    "head",
+    "legs",
+    "root_motion",
+    "toes",
+    "torso",
+    "upper_body"
+  ],
+  "display_name": "Rigged Hand",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet.",
+    "Do not enable feet for this model yet.",
+    "Do not treat this as a full avatar; use it only for hand/finger tests."
+  ],
+  "enabled_controls": [
+    "fingers",
+    "hands"
+  ],
+  "face_touch_mode": "none",
+  "finger_mode": "curl_presets",
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=rigged-hand after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "hand_test_only",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "performance": "medium",
+  "priority": 17,
+  "profile": "hand_only",
+  "read_first": "model-audits/rigged-hand/avatar-adapter-spec.json",
+  "reason": "Use only for hand/finger experiments; it is not a full avatar.",
+  "rig_readiness": {
+    "blockers": [
+      "feet_not_ready",
+      "no_accepted_generated_vrm_candidate",
+      "not_full_avatar",
+      "requires_hand_landmarker_mode",
+      "visual_review_needed"
+    ],
+    "browser_smoke": "not_attempted",
+    "category": "hand_only",
+    "quality_label": "hand_only",
+    "runtime_profile": "hand_only",
+    "updated_at": "2026-06-11T18:11:49+00:00",
+    "visual_review": "not_available"
+  },
+  "risk": "high",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "19c5e80132138c94c3ae886ce6c30038369df1dab17f7475bcd7cfbad43a9cea",
+    "selected_source_sha256": "55b5c5ba6eaa9d81109a0e54b325b6ecb673665539fe2c5ead2bb93e73a5a1a1",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "rigged-hand.zip!/source/handRig_02.fbx",
+  "target_vrm": "public/avatars/rigged-hand.vrm"
+}
