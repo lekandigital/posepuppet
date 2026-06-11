@@ -54,6 +54,132 @@ test.describe('generated avatar smoke tests', () => {
     expect(errors).toEqual([]);
   });
 
+  test('generated fortnite-batman candidate loads without crash', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+
+    await page.goto('/?generatedAvatar=fortnite-batman&smoke=avatar-load-only');
+
+    await page.waitForFunction(
+      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
+      undefined,
+      { timeout: 30_000 },
+    );
+
+    const status = await page.evaluate(() => window.__PP.avatarStatus);
+    expect(status).toBe('loaded');
+
+    const stage = page.locator('#stage');
+    await expect(stage).toBeVisible();
+
+    expect(errors).toEqual([]);
+  });
+
+  test('generated iron-man candidate loads without crash', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+
+    await page.goto('/?generatedAvatar=iron-man&smoke=avatar-load-only');
+
+    await page.waitForFunction(
+      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
+      undefined,
+      { timeout: 30_000 },
+    );
+
+    const status = await page.evaluate(() => window.__PP.avatarStatus);
+    expect(status).toBe('loaded');
+
+    const stage = page.locator('#stage');
+    await expect(stage).toBeVisible();
+
+    expect(errors).toEqual([]);
+  });
+
+  test('generated shrek candidate loads without crash', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+
+    await page.goto('/?generatedAvatar=shrek&smoke=avatar-load-only');
+
+    await page.waitForFunction(
+      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
+      undefined,
+      { timeout: 30_000 },
+    );
+
+    const status = await page.evaluate(() => window.__PP.avatarStatus);
+    expect(status).toBe('loaded');
+
+    const stage = page.locator('#stage');
+    await expect(stage).toBeVisible();
+
+    expect(errors).toEqual([]);
+  });
+
+  test('generated amazing-spider-man-2 candidate loads without crash', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+
+    await page.goto('/?generatedAvatar=amazing-spider-man-2&smoke=avatar-load-only');
+
+    await page.waitForFunction(
+      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
+      undefined,
+      { timeout: 30_000 },
+    );
+
+    const status = await page.evaluate(() => window.__PP.avatarStatus);
+    expect(status).toBe('loaded');
+
+    const stage = page.locator('#stage');
+    await expect(stage).toBeVisible();
+
+    expect(errors).toEqual([]);
+  });
+
+  test('generated terminator-t-800 candidate loads without crash', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+
+    await page.goto('/?generatedAvatar=terminator-t-800&smoke=avatar-load-only');
+
+    await page.waitForFunction(
+      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
+      undefined,
+      { timeout: 30_000 },
+    );
+
+    const status = await page.evaluate(() => window.__PP.avatarStatus);
+    expect(status).toBe('loaded');
+
+    const stage = page.locator('#stage');
+    await expect(stage).toBeVisible();
+
+    expect(errors).toEqual([]);
+  });
+
+  test('generated spider-man-no-way-home candidate loads without crash', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+
+    await page.goto('/?generatedAvatar=spider-man-no-way-home&smoke=avatar-load-only');
+
+    await page.waitForFunction(
+      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
+      undefined,
+      { timeout: 30_000 },
+    );
+
+    const status = await page.evaluate(() => window.__PP.avatarStatus);
+    expect(status).toBe('loaded');
+
+    const stage = page.locator('#stage');
+    await expect(stage).toBeVisible();
+
+    expect(errors).toEqual([]);
+  });
+
   test('missing generated avatar falls back without crash', async ({ page }) => {
     const warnings: string[] = [];
     page.on('console', (m) => {
