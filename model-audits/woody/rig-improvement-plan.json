@@ -1,0 +1,72 @@
+{
+  "acceptance_tests": [
+    "post_vrm_validation",
+    "pose_suite_manifest",
+    "browser_smoke_for_generated_candidates",
+    "visual_review_or_not_available_marker",
+    "generated_assets_not_tracked"
+  ],
+  "ambition_level": "high",
+  "attempts_planned": [
+    "baseline-generated-vrm-regression",
+    "scale-orientation-root-fix",
+    "wrist-palm-axis-fix",
+    "foot-ankle-axis-fix",
+    "face-touch-anchor-estimation"
+  ],
+  "baseline_candidate": "/home/o/posepuppet-working/generated-vrms/woody.vrm",
+  "category": "standard_humanoid",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "deferred_controls": [
+    "feet",
+    "toes",
+    "shoulders",
+    "fingers",
+    "face_anchors",
+    "root_motion"
+  ],
+  "display_name": "Woody",
+  "do_not_attempt": [
+    "Do not public-promote generated candidates.",
+    "Do not commit generated VRMs or screenshots."
+  ],
+  "first_pass_controls": [
+    "chest",
+    "head",
+    "hips",
+    "leftHand",
+    "leftLowerArm",
+    "leftLowerLeg",
+    "leftUpperArm",
+    "leftUpperLeg",
+    "neck",
+    "rightHand",
+    "rightLowerArm",
+    "rightLowerLeg",
+    "rightUpperArm",
+    "rightUpperLeg"
+  ],
+  "goal": "Preserve a truthful test-only avatar candidate or document blockers for future runtime work.",
+  "notes": [
+    "Current runtime does not drive feet, toes, fingers, shoulders, face anchors, or creature profiles."
+  ],
+  "risky_or_manual_fixes": [
+    "Generate contact sheets and perform vision review."
+  ],
+  "safe_automated_fixes": [
+    "report-only metadata refresh",
+    "non-destructive source inspection",
+    "offset profile generation",
+    "manual bone-map proposal"
+  ],
+  "schema_version": "posepuppet-rig-improvement-plan-v2",
+  "slug": "woody",
+  "target_runtime_profile": "humanoid",
+  "visual_acceptance_criteria": [
+    "scale reasonable",
+    "facing expected direction",
+    "materials intact",
+    "limbs attached",
+    "no exploding deformation"
+  ]
+}

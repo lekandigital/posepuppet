@@ -1,0 +1,18 @@
+{
+  "created_at": "2026-06-11T16:18:42+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/shrek.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/shrek/Dying.fbx",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/shrek/suggested-bone-map.json",
+  "nested_chain": [
+    "source/shrek 4.zip",
+    "source/Dying.fbx"
+  ],
+  "nested_zip": "shrek-rig.zip!/source/shrek 4.zip",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx",
+  "slug": "shrek",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/shrek-rig.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/shrek"
+}

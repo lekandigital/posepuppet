@@ -1,0 +1,75 @@
+{
+  "action": "cleanup_then_convert",
+  "avatar_id": "elsa",
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "feet",
+    "fingers",
+    "toes"
+  ],
+  "display_name": "Elsa",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet.",
+    "Do not enable feet for this model yet."
+  ],
+  "enabled_controls": [
+    "arms",
+    "hands",
+    "head",
+    "upper_body"
+  ],
+  "face_touch_mode": "ik_required",
+  "finger_mode": "curl_presets",
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=elsa after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "load_vrm_upper_body_only",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera",
+      "head tracks",
+      "arms track"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "performance": "light",
+  "priority": 11,
+  "profile": "humanoid_with_offsets",
+  "read_first": "model-audits/elsa/avatar-adapter-spec.json",
+  "reason": "Partial structure exists, but cleanup or custom mapping is needed first.",
+  "rig_readiness": {
+    "blockers": [
+      "browser_smoke_fail",
+      "feet_not_ready",
+      "no_accepted_generated_vrm_candidate",
+      "visual_review_needed"
+    ],
+    "browser_smoke": "fail",
+    "category": "humanoid_with_offsets",
+    "quality_label": "defer",
+    "runtime_profile": "humanoid_with_offsets",
+    "updated_at": "2026-06-11T18:11:49+00:00",
+    "visual_review": "not_available"
+  },
+  "risk": "high",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "9e8c846062c77191cd78a530b81e667b05468477468ef7f8f2559f4308d4fd89",
+    "selected_source_sha256": "d29387993ff09d71f69935e7098525c10a3fbc8704c9a0035e32771608c5763a",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb",
+  "target_vrm": "public/avatars/elsa.vrm"
+}

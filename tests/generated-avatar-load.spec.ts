@@ -180,6 +180,48 @@ test.describe('generated avatar smoke tests', () => {
     expect(errors).toEqual([]);
   });
 
+  test('generated spider-man-playstation candidate loads without crash', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+
+    await page.goto('/?generatedAvatar=spider-man-playstation&smoke=avatar-load-only');
+
+    await page.waitForFunction(
+      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
+      undefined,
+      { timeout: 30_000 },
+    );
+
+    const status = await page.evaluate(() => window.__PP.avatarStatus);
+    expect(status).toBe('loaded');
+
+    const stage = page.locator('#stage');
+    await expect(stage).toBeVisible();
+
+    expect(errors).toEqual([]);
+  });
+
+  test('generated jack-sparrow candidate loads without crash', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+
+    await page.goto('/?generatedAvatar=jack-sparrow&smoke=avatar-load-only');
+
+    await page.waitForFunction(
+      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
+      undefined,
+      { timeout: 30_000 },
+    );
+
+    const status = await page.evaluate(() => window.__PP.avatarStatus);
+    expect(status).toBe('loaded');
+
+    const stage = page.locator('#stage');
+    await expect(stage).toBeVisible();
+
+    expect(errors).toEqual([]);
+  });
+
   test('missing generated avatar falls back without crash', async ({ page }) => {
     const warnings: string[] = [];
     page.on('console', (m) => {

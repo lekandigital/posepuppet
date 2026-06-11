@@ -1,0 +1,13 @@
+{
+  "common_pipeline_utilities": "created",
+  "last_cleanup_report": "/home/o/Dev/posepuppet/model-audits/woody/source-rig-cleanup-report.json",
+  "last_plan": "/home/o/Dev/posepuppet/model-audits/woody/rig-improvement-plan.json",
+  "last_processed_slug": "woody",
+  "safe_defaults": {
+    "dry_run_does_not_open_blender": true,
+    "generated_binaries_written_to_repo": false,
+    "original_assets_overwritten": false
+  },
+  "status": "pass",
+  "updated_at": "2026-06-11T14:36:32+00:00"
+}

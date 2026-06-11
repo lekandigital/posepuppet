@@ -1,0 +1,10 @@
+# Source files for Spider-Man No Way Home
+
+Selected source: OtherSpiderman/spider-man_no_way_home_rigged.glb
+Selected format: glb
+Selected from ZIP: False
+
+All known source paths:
+- OtherSpiderman/spider-man-no-way-home-rigged.zip
+- OtherSpiderman/spider-man_no_way_home_rigged (1).glb
+- OtherSpiderman/spider-man_no_way_home_rigged.glb

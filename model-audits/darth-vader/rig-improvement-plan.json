@@ -1,30 +1,75 @@
 {
-  "created_at": "2026-06-11T14:54:02+00:00",
-  "display_name": "Darth Vader",
-  "expected_candidate_vrm_path": "/Users/lekan/posepuppet-working/generated-vrms/darth-vader.vrm",
-  "expected_clean_blend_path": "/Users/lekan/posepuppet-working/model-working/darth-vader/darthvaderrig.blend",
-  "gates": {
-    "dry_run_resolved": true,
-    "inspect_required_before_attempt": true,
-    "runtime_smoke_test": "not_attempted"
-  },
-  "manual_bone_map_path": "/Users/lekan/Dev/posepuppet/model-audits/darth-vader/suggested-bone-map.json",
-  "risk_notes": [
-    "cape/robe deformation",
-    "finger mapping",
-    "runtime browser smoke is not attempted",
-    "shoulders",
-    "wrist orientation"
+  "acceptance_tests": [
+    "post_vrm_validation",
+    "pose_suite_manifest",
+    "browser_smoke_for_generated_candidates",
+    "visual_review_or_not_available_marker",
+    "generated_assets_not_tracked"
   ],
-  "runtime_glb_companion": "fortnite_darth_vader_advanced_rig (2).glb",
-  "schema_version": "posepuppet-rig-prep-plan-v1",
-  "selected_source_format": ".blend",
-  "selected_source_kind": "zip-entry",
-  "selected_source_path": "fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend",
+  "ambition_level": "high",
+  "attempts_planned": [
+    "baseline-generated-vrm-regression",
+    "scale-orientation-root-fix",
+    "wrist-palm-axis-fix",
+    "foot-ankle-axis-fix",
+    "face-touch-anchor-estimation",
+    "finger-chain-preservation",
+    "finger-curl-preset-test"
+  ],
+  "baseline_candidate": "/home/o/posepuppet-working/generated-vrms/darth-vader.vrm",
+  "category": "standard_humanoid",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "deferred_controls": [
+    "feet",
+    "toes",
+    "shoulders",
+    "fingers",
+    "face_anchors",
+    "root_motion"
+  ],
+  "display_name": "Darth Vader",
+  "do_not_attempt": [
+    "Do not public-promote generated candidates.",
+    "Do not commit generated VRMs or screenshots."
+  ],
+  "first_pass_controls": [
+    "chest",
+    "head",
+    "hips",
+    "leftHand",
+    "leftLowerArm",
+    "leftLowerLeg",
+    "leftUpperArm",
+    "leftUpperLeg",
+    "neck",
+    "rightHand",
+    "rightLowerArm",
+    "rightLowerLeg",
+    "rightUpperArm",
+    "rightUpperLeg"
+  ],
+  "goal": "Preserve a truthful test-only avatar candidate or document blockers for future runtime work.",
+  "notes": [
+    "Current runtime does not drive feet, toes, fingers, shoulders, face anchors, or creature profiles."
+  ],
+  "risky_or_manual_fixes": [
+    "Generate contact sheets and perform vision review."
+  ],
+  "safe_automated_fixes": [
+    "report-only metadata refresh",
+    "non-destructive source inspection",
+    "offset profile generation",
+    "manual bone-map proposal",
+    "finger-chain manifest"
+  ],
+  "schema_version": "posepuppet-rig-improvement-plan-v2",
   "slug": "darth-vader",
-  "status": "partial",
-  "working_directory": "/Users/lekan/posepuppet-working/model-working/darth-vader",
-  "zip_nested_source_chain": [
-    "source/darthvaderrig.blend"
+  "target_runtime_profile": "humanoid",
+  "visual_acceptance_criteria": [
+    "scale reasonable",
+    "facing expected direction",
+    "materials intact",
+    "limbs attached",
+    "no exploding deformation"
   ]
 }

@@ -1,29 +1,72 @@
 {
-  "created_at": "2026-06-11T16:51:39+00:00",
-  "display_name": "Spider-Man No Way Home",
-  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm",
-  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/spider-man-no-way-home/spider-man_no_way_home_rigged.glb",
-  "gates": {
-    "dry_run_resolved": true,
-    "inspect_required_before_attempt": true,
-    "runtime_smoke_test": "not_attempted"
-  },
-  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/spider-man-no-way-home/suggested-bone-map.json",
-  "risk_notes": [
-    "face-touch remains deferred until runtime tests",
-    "orientation",
-    "runtime browser smoke is not attempted",
-    "scale",
-    "shoulders/wrists if humanoid",
-    "unsupported controls"
+  "acceptance_tests": [
+    "post_vrm_validation",
+    "pose_suite_manifest",
+    "browser_smoke_for_generated_candidates",
+    "visual_review_or_not_available_marker",
+    "generated_assets_not_tracked"
   ],
-  "runtime_glb_companion": "",
-  "schema_version": "posepuppet-rig-prep-plan-v1",
-  "selected_source_format": ".glb",
-  "selected_source_kind": "file",
-  "selected_source_path": "OtherSpiderman/spider-man_no_way_home_rigged.glb",
+  "ambition_level": "high",
+  "attempts_planned": [
+    "baseline-generated-vrm-regression",
+    "scale-orientation-root-fix",
+    "wrist-palm-axis-fix",
+    "foot-ankle-axis-fix",
+    "face-touch-anchor-estimation"
+  ],
+  "baseline_candidate": "/home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm",
+  "category": "standard_humanoid",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "deferred_controls": [
+    "feet",
+    "toes",
+    "shoulders",
+    "fingers",
+    "face_anchors",
+    "root_motion"
+  ],
+  "display_name": "Spider-Man No Way Home",
+  "do_not_attempt": [
+    "Do not public-promote generated candidates.",
+    "Do not commit generated VRMs or screenshots."
+  ],
+  "first_pass_controls": [
+    "chest",
+    "head",
+    "hips",
+    "leftHand",
+    "leftLowerArm",
+    "leftLowerLeg",
+    "leftUpperArm",
+    "leftUpperLeg",
+    "neck",
+    "rightHand",
+    "rightLowerArm",
+    "rightLowerLeg",
+    "rightUpperArm",
+    "rightUpperLeg"
+  ],
+  "goal": "Preserve a truthful test-only avatar candidate or document blockers for future runtime work.",
+  "notes": [
+    "Current runtime does not drive feet, toes, fingers, shoulders, face anchors, or creature profiles."
+  ],
+  "risky_or_manual_fixes": [
+    "Generate contact sheets and perform vision review."
+  ],
+  "safe_automated_fixes": [
+    "report-only metadata refresh",
+    "non-destructive source inspection",
+    "offset profile generation",
+    "manual bone-map proposal"
+  ],
+  "schema_version": "posepuppet-rig-improvement-plan-v2",
   "slug": "spider-man-no-way-home",
-  "status": "partial",
-  "working_directory": "/home/o/posepuppet-working/model-working/spider-man-no-way-home",
-  "zip_nested_source_chain": []
+  "target_runtime_profile": "humanoid",
+  "visual_acceptance_criteria": [
+    "scale reasonable",
+    "facing expected direction",
+    "materials intact",
+    "limbs attached",
+    "no exploding deformation"
+  ]
 }

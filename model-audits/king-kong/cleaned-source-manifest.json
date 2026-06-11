@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T15:31:02+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/king-kong.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/king-kong/king kong.glb",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/king-kong/suggested-bone-map.json",
+  "nested_chain": [
+    "source/king kong.glb"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "king-kong-animated.zip!/source/king kong.glb",
+  "slug": "king-kong",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/king-kong-animated.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/king-kong"
+}

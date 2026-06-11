@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T16:17:16+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/fortnite-batman.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/fortnite-batman/BATMANRIG.blend",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/fortnite-batman/suggested-bone-map.json",
+  "nested_chain": [
+    "source/BATMANRIG.blend"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend",
+  "slug": "fortnite-batman",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/fortnite-batman-advanced-rig.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/fortnite-batman"
+}

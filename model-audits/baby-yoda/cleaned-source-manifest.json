@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T15:32:02+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/baby-yoda.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/baby-yoda/BABY YODA SHARE.blend",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/baby-yoda/suggested-bone-map.json",
+  "nested_chain": [
+    "source/BABY YODA SHARE.blend"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend",
+  "slug": "baby-yoda",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/baby-yoda-mandalorian-low-poly-basic-rig.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/baby-yoda"
+}

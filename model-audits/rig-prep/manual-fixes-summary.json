@@ -1,0 +1,156 @@
+{
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "models": [
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "saved_for_later",
+      "blockers": [
+        "cleanup_needed",
+        "feet_not_ready",
+        "hand_control_not_ready",
+        "manual_mapping_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "cleanup_manual_mapping",
+      "display_name": "Buzz Lightyear",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "defer",
+        "gesture_to_intent": "not_recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [],
+        "rowing": "defer",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "buzz-lightyear",
+        "walking": "defer"
+      },
+      "generated": false,
+      "hand_mode": "none",
+      "quality_label": "manual_mapping_needed",
+      "rank_tags": [],
+      "reference_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm",
+      "runtime_profile": "humanoid_with_offsets",
+      "slug": "buzz-lightyear",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "saved_for_later",
+      "blockers": [
+        "cleanup_needed",
+        "hand_control_not_ready",
+        "manual_mapping_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "cleanup_manual_mapping",
+      "display_name": "Teal v2",
+      "face_touch": "disabled",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "defer",
+        "gesture_to_intent": "not_recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [],
+        "rowing": "defer",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "teal-v2",
+        "walking": "defer"
+      },
+      "generated": false,
+      "hand_mode": "none",
+      "quality_label": "manual_mapping_needed",
+      "rank_tags": [],
+      "reference_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/teal-v2.vrm",
+      "runtime_profile": "humanoid_with_offsets",
+      "slug": "teal-v2",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "saved_for_later",
+      "blockers": [
+        "cleanup_needed",
+        "feet_not_ready",
+        "hand_control_not_ready",
+        "manual_mapping_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "cleanup_manual_mapping",
+      "display_name": "Buzz Lightyear",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "defer",
+        "gesture_to_intent": "not_recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [],
+        "rowing": "defer",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "buzz-lightyear",
+        "walking": "defer"
+      },
+      "generated": false,
+      "hand_mode": "none",
+      "quality_label": "manual_mapping_needed",
+      "rank_tags": [],
+      "reference_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm",
+      "runtime_profile": "humanoid_with_offsets",
+      "slug": "buzz-lightyear",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "saved_for_later",
+      "blockers": [
+        "cleanup_needed",
+        "hand_control_not_ready",
+        "manual_mapping_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "cleanup_manual_mapping",
+      "display_name": "Teal v2",
+      "face_touch": "disabled",
+      "feet_mode": "feet_ready_for_future_runtime",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "defer",
+        "gesture_to_intent": "not_recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [],
+        "rowing": "defer",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "teal-v2",
+        "walking": "defer"
+      },
+      "generated": false,
+      "hand_mode": "none",
+      "quality_label": "manual_mapping_needed",
+      "rank_tags": [],
+      "reference_candidate_vrm": "/home/o/posepuppet-working/generated-vrms/teal-v2.vrm",
+      "runtime_profile": "humanoid_with_offsets",
+      "slug": "teal-v2",
+      "visual_review": "not_available"
+    }
+  ],
+  "schema_version": "posepuppet-manual-fixes-summary-v1"
+}

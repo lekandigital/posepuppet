@@ -55,6 +55,7 @@ public/avatars/textures/
 # Generated candidate VRMs — test-only, never committed
 public/avatars/generated/
 public/avatars/generated/*.vrm
+model-working/
 
 # Test/eval transients (eval/results.json IS committed)
 test-results/

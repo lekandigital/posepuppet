@@ -1,0 +1,19 @@
+{
+  "blockers": [
+    "visual_review_needed"
+  ],
+  "category": "standard_humanoid",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "display_name": "Woody",
+  "evidence_files": [
+    "model-audits/woody/audit.json",
+    "model-audits/woody/runtime-capability-profile.json",
+    "model-audits/woody/attempts-summary.json"
+  ],
+  "next_steps": [
+    "Generate screenshots/contact sheet and perform visual review."
+  ],
+  "schema_version": "posepuppet-llm-dossier-v2",
+  "slug": "woody",
+  "summary": "Experimental query-param-only generated candidate; visual quality not yet claimed."
+}

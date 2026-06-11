@@ -1,0 +1,12 @@
+# Source files for Fortnite Batman
+
+Selected source: fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend
+Selected format: blend
+Selected from ZIP: True
+Source ZIP: /home/o/posepuppet-assets/ModelsForAnimation/fortnite-batman-advanced-rig.zip
+
+All known source paths:
+- fortnite-batman-advanced-rig.zip
+- fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend
+- fortnite_batman_advanced_rig (1).glb
+- fortnite_batman_advanced_rig.glb

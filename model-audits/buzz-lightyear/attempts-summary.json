@@ -1,0 +1,30 @@
+{
+  "attempts": [
+    {
+      "attempt_id": "attempt-001-baseline",
+      "blockers": [
+        "cleanup_needed",
+        "feet_not_ready",
+        "hand_control_not_ready",
+        "manual_mapping_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "classification": "saved_for_later",
+      "label": "reference-generated-vrm",
+      "post_vrm_validation": "available",
+      "source": "generated VRM reference",
+      "visual_review": "not_available",
+      "vrm_exists": true,
+      "vrm_path": "/home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm"
+    }
+  ],
+  "best_attempt_id": "",
+  "category": "cleanup_manual_mapping",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "display_name": "Buzz Lightyear",
+  "final_classification": "manual_mapping_needed",
+  "schema_version": "posepuppet-attempts-summary-v1",
+  "slug": "buzz-lightyear"
+}

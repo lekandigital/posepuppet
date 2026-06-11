@@ -1,0 +1,37 @@
+{
+  "attempted": true,
+  "blender_command": [
+    "/home/o/.local/bin/blender",
+    "-b",
+    "--python",
+    "/home/o/Dev/posepuppet/tools/blender_export_vrm_worker.py",
+    "--",
+    "--slug",
+    "woody",
+    "--source",
+    "/home/o/posepuppet-assets/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx",
+    "--output",
+    "/home/o/posepuppet-working/generated-vrms/woody.vrm",
+    "--mapping-json",
+    "/home/o/posepuppet-working/model-working/woody/woody.bone-map.json",
+    "--summary-json",
+    "/home/o/posepuppet-working/model-working/woody/vrm-export-summary.json",
+    "--texture-dir",
+    "/home/o/posepuppet-assets/woody/woody-toy-story-rig-free-download/textures"
+  ],
+  "errors": [],
+  "last_dry_run_at": "2026-06-11T14:36:32+00:00",
+  "notes": [
+    "Blender worker status: pass",
+    "A later dry-run preserved this attempted conversion report."
+  ],
+  "output_vrm": "/home/o/posepuppet-working/generated-vrms/woody.vrm",
+  "slug": "woody",
+  "source": "/home/o/posepuppet-assets/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx",
+  "status": "pass",
+  "stderr_log": "/home/o/posepuppet-working/logs/woody/20260611T143230Z-vrm-export.stderr.log",
+  "stdout_log": "/home/o/posepuppet-working/logs/woody/20260611T143230Z-vrm-export.stdout.log",
+  "vrm_file_exists": true,
+  "vrm_file_size_bytes": 5188676,
+  "warnings": []
+}

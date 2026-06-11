@@ -1,0 +1,55 @@
+{
+  "armature_count": 2,
+  "blender_log_path": "/home/o/Dev/posepuppet/model-audits/iron-man/rig-prep-inspect/blender.log",
+  "created_at": "2026-06-11T16:18:04+00:00",
+  "deformation_risks": [
+    "runtime browser smoke is not attempted"
+  ],
+  "finger_support": "good",
+  "foot_support": "good",
+  "hand_support": "good",
+  "humanoid_bone_count": 21,
+  "humanoid_mapping": {
+    "chest": "chest",
+    "head": "head",
+    "hips": "hips",
+    "jaw": null,
+    "leftEye": null,
+    "leftFoot": "DEF-foot.L",
+    "leftHand": "DEF-hand.L",
+    "leftLowerArm": "DEF-forearm.L",
+    "leftLowerLeg": "DEF-shin.L",
+    "leftShoulder": "DEF-shoulder.L",
+    "leftToes": "DEF-toe.L",
+    "leftUpperArm": "DEF-upper_arm.L",
+    "leftUpperLeg": "DEF-thigh.L",
+    "neck": "MCH-ROT-neck",
+    "rightEye": null,
+    "rightFoot": "DEF-foot.R",
+    "rightHand": "DEF-hand.R",
+    "rightLowerArm": "DEF-forearm.R",
+    "rightLowerLeg": "DEF-shin.R",
+    "rightShoulder": "DEF-shoulder.R",
+    "rightToes": "DEF-toe.R",
+    "rightUpperArm": "DEF-upper_arm.R",
+    "rightUpperLeg": "DEF-thigh.R",
+    "spine": "DEF-spine",
+    "upperChest": null
+  },
+  "material_count": 3,
+  "mesh_count": 143,
+  "primary_armature": "rig",
+  "scale_orientation": {
+    "estimated_height": 6.48714,
+    "rest_pose_guess": "unknown"
+  },
+  "schema_version": "posepuppet-source-rig-cleanup-v1",
+  "selected_source_path": "iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend",
+  "slug": "iron-man",
+  "status": "pass",
+  "texture_count": 0,
+  "warnings": [
+    "License unknown; do not redistribute this model or generated converted files.",
+    "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+  ]
+}

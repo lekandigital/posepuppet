@@ -1,0 +1,15 @@
+{
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "flying": "partial",
+  "gesture_to_intent": "recommended",
+  "notes": [
+    "Game-control readiness is based on readable intent, not full anatomical runtime support."
+  ],
+  "rank_tags": [
+    "best_creature_experiment"
+  ],
+  "rowing": "partial",
+  "schema_version": "posepuppet-game-control-readiness-v1",
+  "slug": "olaf",
+  "walking": "partial"
+}

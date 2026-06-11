@@ -1,12 +1,9 @@
 {
-  "schema_version": "posepuppet-manual-fix-checklist-v1",
-  "slug": "amazing-spider-man-2",
-  "status": "partial",
+  "created_at": "2026-06-11T18:11:49+00:00",
   "items": [
-    "Verify web/suit texture rendering under three.js materials",
-    "Confirm finger bones are truly absent (not just unmapped)",
-    "Verify scale correction (estimated height 55.74)",
-    "Keep face-touch deferred until runtime IK/pose validation exists",
-    "Do not promote to public UI before runtime quality review"
-  ]
+    "Generate screenshots/contact sheet and perform visual review."
+  ],
+  "schema_version": "posepuppet-manual-fix-checklist-v2",
+  "slug": "amazing-spider-man-2",
+  "status": "open"
 }

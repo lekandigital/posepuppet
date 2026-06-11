@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T15:30:11+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/spider-man-playstation.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/spider-man-playstation/spider man playstation realistic.blend",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/spider-man-playstation/suggested-bone-map.json",
+  "nested_chain": [
+    "source/spider man playstation realistic.blend"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "spider-man-playstation-rigged.zip!/source/spider man playstation realistic.blend",
+  "slug": "spider-man-playstation",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/spider-man-playstation-rigged.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/spider-man-playstation"
+}

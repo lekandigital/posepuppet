@@ -1,0 +1,71 @@
+{
+  "action": "custom_profile",
+  "avatar_id": "xenomorph",
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "fingers",
+    "standard_humanoid_full_body"
+  ],
+  "display_name": "Xenomorph",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet.",
+    "Do not force standard full-body humanoid mode; use a creature profile."
+  ],
+  "enabled_controls": [
+    "creature_head",
+    "creature_jaw",
+    "legs"
+  ],
+  "face_touch_mode": "none",
+  "finger_mode": "curl_presets",
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=xenomorph after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "custom_creature_preview",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "performance": "heavy",
+  "priority": 16,
+  "profile": "creature",
+  "read_first": "model-audits/xenomorph/avatar-adapter-spec.json",
+  "reason": "Nonstandard anatomy should not be forced into standard humanoid full-body mode.",
+  "rig_readiness": {
+    "blockers": [
+      "creature_profile_needed",
+      "hand_control_not_ready",
+      "no_accepted_generated_vrm_candidate",
+      "visual_review_needed"
+    ],
+    "browser_smoke": "not_attempted",
+    "category": "creature",
+    "quality_label": "creature_profile_needed",
+    "runtime_profile": "creature",
+    "updated_at": "2026-06-11T18:11:49+00:00",
+    "visual_review": "not_available"
+  },
+  "risk": "high",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "d39e9fb9902a3926825c95940adf4621c1ffcb164d48a1da8a5011e3b09d0e9b",
+    "selected_source_sha256": "4dbf2cded569bcb08a0f66a7ce481d6942441c254e14c5291b116b522e796800",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx",
+  "target_vrm": "public/avatars/xenomorph.vrm"
+}

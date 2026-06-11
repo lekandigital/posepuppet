@@ -1,0 +1,55 @@
+{
+  "armature_count": 2,
+  "blender_log_path": "/home/o/Dev/posepuppet/model-audits/fortnite-batman/rig-prep-inspect/blender.log",
+  "created_at": "2026-06-11T16:17:25+00:00",
+  "deformation_risks": [
+    "runtime browser smoke is not attempted"
+  ],
+  "finger_support": "good",
+  "foot_support": "good",
+  "hand_support": "good",
+  "humanoid_bone_count": 24,
+  "humanoid_mapping": {
+    "chest": "chest",
+    "head": "head",
+    "hips": "DEF-pelvis.L",
+    "jaw": "DEF-jaw",
+    "leftEye": "eye.L",
+    "leftFoot": "DEF-foot.L",
+    "leftHand": "DEF-hand.L",
+    "leftLowerArm": "DEF-forearm.L",
+    "leftLowerLeg": "DEF-shin.L",
+    "leftShoulder": "DEF-shoulder.L",
+    "leftToes": "DEF-toe.L",
+    "leftUpperArm": "DEF-upper_arm.L",
+    "leftUpperLeg": "DEF-thigh.L",
+    "neck": "MCH-ROT-neck",
+    "rightEye": "eye.R",
+    "rightFoot": "DEF-foot.R",
+    "rightHand": "DEF-hand.R",
+    "rightLowerArm": "DEF-forearm.R",
+    "rightLowerLeg": "DEF-shin.R",
+    "rightShoulder": "DEF-shoulder.R",
+    "rightToes": "DEF-toe.R",
+    "rightUpperArm": "DEF-upper_arm.R",
+    "rightUpperLeg": "DEF-thigh.R",
+    "spine": "DEF-spine",
+    "upperChest": null
+  },
+  "material_count": 8,
+  "mesh_count": 226,
+  "primary_armature": "rig",
+  "scale_orientation": {
+    "estimated_height": 1.69234,
+    "rest_pose_guess": "unknown"
+  },
+  "schema_version": "posepuppet-source-rig-cleanup-v1",
+  "selected_source_path": "fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend",
+  "slug": "fortnite-batman",
+  "status": "pass",
+  "texture_count": 0,
+  "warnings": [
+    "License unknown; do not redistribute this model or generated converted files.",
+    "Screenshots were not generated; rerun with --screenshots if visual evidence is needed."
+  ]
+}

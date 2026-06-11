@@ -1,0 +1,57 @@
+{
+  "acceptance_tests": [
+    "post_vrm_validation",
+    "pose_suite_manifest",
+    "browser_smoke_for_generated_candidates",
+    "visual_review_or_not_available_marker",
+    "generated_assets_not_tracked"
+  ],
+  "ambition_level": "very_high",
+  "attempts_planned": [
+    "baseline-conversion",
+    "creature-profile-static-preview",
+    "creature-profile-vrm-container"
+  ],
+  "baseline_candidate": "",
+  "category": "creature",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "deferred_controls": [
+    "feet",
+    "toes",
+    "shoulders",
+    "fingers",
+    "face_anchors",
+    "root_motion",
+    "creature_jaw",
+    "tail",
+    "custom_profile_runtime"
+  ],
+  "display_name": "Baby Yoda",
+  "do_not_attempt": [
+    "Do not force standard humanoid retargeting.",
+    "Do not mark as works_well without creature runtime support."
+  ],
+  "first_pass_controls": [],
+  "goal": "Preserve a truthful test-only avatar candidate or document blockers for future runtime work.",
+  "notes": [
+    "Current runtime does not drive feet, toes, fingers, shoulders, face anchors, or creature profiles."
+  ],
+  "risky_or_manual_fixes": [
+    "Create a creature profile before runtime use.",
+    "Generate contact sheets and perform vision review."
+  ],
+  "safe_automated_fixes": [
+    "report-only metadata refresh",
+    "non-destructive source inspection"
+  ],
+  "schema_version": "posepuppet-rig-improvement-plan-v2",
+  "slug": "baby-yoda",
+  "target_runtime_profile": "creature",
+  "visual_acceptance_criteria": [
+    "scale reasonable",
+    "facing expected direction",
+    "materials intact",
+    "limbs attached",
+    "no exploding deformation"
+  ]
+}

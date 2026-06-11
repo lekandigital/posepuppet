@@ -91,6 +91,24 @@ export const GENERATED_AVATARS: Record<string, GeneratedAvatarDef> = {
     profile: 'humanoid',
     source: 'generated-vrm-smoke-test',
   },
+  'spider-man-playstation': {
+    id: 'spider-man-playstation',
+    label: 'Spider-Man PlayStation Candidate VRM',
+    url: '/avatars/generated/spider-man-playstation.vrm',
+    enabledInUi: false,
+    warningLabel: 'experimental',
+    profile: 'humanoid',
+    source: 'generated-vrm-smoke-test',
+  },
+  'jack-sparrow': {
+    id: 'jack-sparrow',
+    label: 'Jack Sparrow Candidate VRM',
+    url: '/avatars/generated/jack-sparrow.vrm',
+    enabledInUi: false,
+    warningLabel: 'experimental',
+    profile: 'humanoid',
+    source: 'generated-vrm-smoke-test',
+  },
 };
 
 /** Look up a generated avatar by slug. Returns undefined for unknown slugs. */

@@ -1,0 +1,17 @@
+{
+  "attempt_refused": false,
+  "dry_run_works": true,
+  "entry_count": 5,
+  "pipeline_readiness": "partial",
+  "runtime_load_status": "not_attempted",
+  "safe_defaults": {
+    "default_invocation_attempts_conversion": false,
+    "requires_attempt_flag_for_conversion": true,
+    "requires_filter_for_attempt": true,
+    "runtime_vrms_overwritten": false
+  },
+  "status": "partial",
+  "updated_at": "2026-06-11T14:36:31+00:00",
+  "woody_conversion_status": "pass",
+  "woody_post_vrm_validation_status": "pass"
+}

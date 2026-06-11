@@ -1,0 +1,73 @@
+{
+  "active_candidate": {
+    "attempt_id": "",
+    "browser_smoke": "not_attempted",
+    "visual_review": "not_available",
+    "vrm_path": ""
+  },
+  "blockers": [
+    "feet_not_ready",
+    "no_accepted_generated_vrm_candidate",
+    "not_full_avatar",
+    "requires_hand_landmarker_mode",
+    "visual_review_needed"
+  ],
+  "body_tracking": {
+    "arms": "disabled",
+    "feet": "disabled",
+    "head": "disabled",
+    "legs": "disabled",
+    "root_motion": "disabled",
+    "torso": "disabled"
+  },
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "disabled_controls": [
+    "chest",
+    "face_touch",
+    "full_body_tracking",
+    "head",
+    "hips",
+    "leftHand",
+    "leftLowerArm",
+    "leftLowerLeg",
+    "leftUpperArm",
+    "leftUpperLeg",
+    "neck",
+    "normal_avatar_cycling",
+    "rightLowerArm",
+    "rightLowerLeg",
+    "rightUpperArm",
+    "rightUpperLeg"
+  ],
+  "display_name": "Rigged Hand",
+  "enabled_controls": [],
+  "face_touch": {
+    "mode": "disabled",
+    "notes": [
+      "IK and visual validation required before support claim."
+    ],
+    "safe_first_gesture": "none",
+    "visual_result": "not_available"
+  },
+  "game_modes": {
+    "flying": "not_ready",
+    "gesture_to_intent": "not_recommended",
+    "rowing": "not_ready",
+    "walking": "not_ready"
+  },
+  "hand_tracking": {
+    "finger_chains": "partial",
+    "left_hand": "partial",
+    "mode": "hand_only",
+    "right_hand": "partial"
+  },
+  "notes": [
+    "Generated candidates remain query-param-only and excluded from public avatar cycling."
+  ],
+  "quality_label": "hand_only",
+  "runtime_profile": "hand_only",
+  "schema_version": "posepuppet-runtime-capability-profile-v2",
+  "slug": "rigged-hand",
+  "warning_label": "hand_only",
+  "warning_text": "Hand-only asset; requires a dedicated hand tracking mode and is not a full avatar."
+}

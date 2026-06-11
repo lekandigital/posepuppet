@@ -1,0 +1,111 @@
+Bone
+  Spine
+    Leg.L
+      Leg.L.001
+        Leg.L.002
+          Leg Jet.L
+            Foot.L
+              Foot.L.001
+            Leg Jet.L.001
+            Leg Jet.L.002
+    Leg.R
+      Leg.R.001
+        Leg.R.002
+          Leg Jet.R
+            Foot.R
+              Foot.R.001
+            Leg Jet.R.001
+            Leg Jet.R.002
+    Spine.001
+      Spine.002
+        Spine.003
+          Arm.L
+            Arm.L.001
+              Arm.L.002
+                Arm Cannon.L
+                  Arm Cannon.L.001
+                    Arm Cannon.L.004
+                    Arm Gun Shield.L
+                    Arm Gun Shield.L.001
+                    Arm Hand.L
+                      Arm Hand.L.001
+                        Arm Hand.L.002
+                          Arm Hand.L.003
+                            Arm Hand.L.004
+                      Arm Hand.L.005
+                        Arm Hand.L.006
+                          Arm Hand.L.007
+                            Arm Hand.L.008
+                      Arm Hand.L.009
+                        Arm Hand.L.010
+                          Arm Hand.L.011
+                            Arm Hand.L.012
+                      Arm Hand.L.013
+                        Arm Hand.L.014
+                          Arm Hand.L.015
+                            Arm Hand.L.016
+                              Arm Hand.L.017
+          Arm.R
+            Arm.R.001
+              Arm.R.002
+                Arm Cannon.R
+                  Arm Cannon.R.001
+                    Arm Cannon.R.004
+                    Arm Gun Shield.R
+                    Arm Gun Shield.R.001
+                    Arm Hand.R
+                      Arm Hand.R.001
+                        Arm Hand.R.002
+                          Arm Hand.R.003
+                            Arm Hand.R.004
+                      Arm Hand.R.005
+                        Arm Hand.R.006
+                          Arm Hand.R.007
+                            Arm Hand.R.008
+                      Arm Hand.R.009
+                        Arm Hand.R.010
+                          Arm Hand.R.011
+                            Arm Hand.R.012
+                      Arm Hand.R.013
+                        Arm Hand.R.014
+                          Arm Hand.R.015
+                            Arm Hand.R.016
+                              Arm Hand.R.017
+          Head
+            Head.001
+              Head.002
+                Eye Control.L
+                  Eyes.L
+                  Eyes.L.001
+                  Eyes.L.002
+                  Eyes.L.003
+                  Eyes.L.004
+                  Eyes.L.005
+                  Eyes.L.006
+                  Eyes.L.007
+                Eye Control.R
+                  Eyes.R
+                  Eyes.R.001
+                  Eyes.R.002
+                  Eyes.R.003
+                  Eyes.R.004
+                  Eyes.R.005
+                  Eyes.R.006
+                  Eyes.R.007
+                Head Piston.L
+                Head Piston.R
+                Mouth Control
+                  Mouth
+                  Mouth.006
+                  Mouth.L
+                  Mouth.L.001
+                  Mouth.L.002
+                  Mouth.L.003
+                  Mouth.L.004
+                  Mouth.R
+                  Mouth.R.001
+                  Mouth.R.002
+                  Mouth.R.003
+                  Mouth.R.004
+          Head Piston.L.001
+          Head Piston.R.001

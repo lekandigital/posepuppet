@@ -1,0 +1,24 @@
+{
+  "cleaned_source": "",
+  "cleaned_source_exists": false,
+  "cleaned_source_sha256": "",
+  "cleaned_source_size_bytes": 0,
+  "manifest_scope": "working-copy-only",
+  "notes": [
+    "Cleaned sources are intentionally written outside the repo.",
+    "Original source models are not overwritten."
+  ],
+  "slug": "woody",
+  "source": {
+    "errors": [],
+    "extracted": false,
+    "resolved": true,
+    "source_exists": true,
+    "source_kind": "file",
+    "source_path": "/home/o/posepuppet-assets/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx",
+    "source_spec": "/home/o/posepuppet-assets/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx",
+    "warnings": []
+  },
+  "status": "not_attempted",
+  "updated_at": "2026-06-11T14:36:32+00:00"
+}

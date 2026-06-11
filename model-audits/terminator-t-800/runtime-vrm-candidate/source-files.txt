@@ -1,0 +1,8 @@
+# Source files for terminator-t-800 candidate VRM
+
+Selected source: /home/o/posepuppet-working/generated-vrms/terminator-t-800.vrm
+Selected format: vrm
+Selected from ZIP: False
+
+All known source paths:
+- /home/o/posepuppet-working/generated-vrms/terminator-t-800.vrm

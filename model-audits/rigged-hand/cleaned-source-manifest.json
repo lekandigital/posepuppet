@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T15:31:36+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/rigged-hand.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/rigged-hand/handRig_02.fbx",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/rigged-hand/suggested-bone-map.json",
+  "nested_chain": [
+    "source/handRig_02.fbx"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "rigged-hand.zip!/source/handRig_02.fbx",
+  "slug": "rigged-hand",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/rigged-hand.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/rigged-hand"
+}

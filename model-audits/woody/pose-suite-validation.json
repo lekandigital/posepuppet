@@ -1,0 +1,374 @@
+{
+  "attempt_id": "attempt-001-baseline",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "pose_tests": [
+    {
+      "applied": true,
+      "bones_driven": [
+        "chest",
+        "head",
+        "hips"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "neutral",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "leftUpperArm",
+        "rightUpperArm"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "arms_out",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "leftUpperArm",
+        "rightUpperArm"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "arms_up",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "leftUpperArm",
+        "rightUpperArm"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "arms_forward",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "leftLowerArm",
+        "rightLowerArm"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "elbow_bend",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "leftHand",
+        "rightHand"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "wrist_rotate",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "leftHand",
+        "rightHand"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "palm_forward",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "chest",
+        "hips"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "lean_left",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "chest",
+        "hips"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "lean_right",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "chest",
+        "hips"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "torso_turn",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "leftLowerLeg",
+        "leftUpperLeg",
+        "rightLowerLeg",
+        "rightUpperLeg"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "walking_stride_proxy",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "leftFoot",
+        "rightFoot"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "foot_lift",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "leftFoot",
+        "rightFoot"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "foot_rotate",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "leftLowerArm",
+        "leftUpperArm",
+        "rightLowerArm",
+        "rightUpperArm"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "rowing_stroke",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "leftUpperArm",
+        "rightUpperArm"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "flying_arms_out",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "head",
+        "leftHand",
+        "rightHand"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "hand_to_mouth_proxy",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    },
+    {
+      "applied": true,
+      "bones_driven": [
+        "head",
+        "leftHand",
+        "rightHand"
+      ],
+      "expected_visual": "pose proxy should be readable without detached geometry",
+      "measured": {
+        "bounds_changed": true,
+        "detached_meshes_detected": [],
+        "extreme_scale_or_explosion_detected": false,
+        "missing_bones": [],
+        "warnings": [
+          "visual screenshot review not available"
+        ]
+      },
+      "pose_name": "hand_to_cheek_proxy",
+      "reason": "structural mapping supports this proxy; visual review still required",
+      "result": "pass",
+      "visual_review": "not_available"
+    }
+  ],
+  "schema_version": "posepuppet-pose-suite-validation-v1",
+  "slug": "woody",
+  "source": "generated-vrm",
+  "status": "partial"
+}

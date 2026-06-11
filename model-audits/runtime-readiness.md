@@ -1,62 +1,26 @@
 # Runtime readiness
 
-| Model | Slug | Recommended action | Runtime profile | Best conversion source | Target VRM path | Conversion status | PosePuppet load status | Upper body | Hand/finger | Leg | Face/expression | Risk | Disabled controls | Performance | Adapter spec | Priority | Reason |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---:|---|
-| Woody | woody | convert_then_test | humanoid | `/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx` | `public/avatars/woody.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / missing | not_tested | missing / missing | medium | face_touch, facial_expressions, fingers | medium | `model-audits/woody/avatar-adapter-spec.json` | 1 | VRM browser-loads via query param. Runtime tracking accuracy not yet tested. |
-| Darth Vader | darth-vader | convert_then_test | humanoid | `fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend` | `public/avatars/darth-vader.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / not_tested | not_tested | not_tested / not_tested | medium | face_touch, facial_expressions | heavy | `model-audits/darth-vader/avatar-adapter-spec.json` | 2 | VRM browser-loads via query param. 16MB — performance check needed. |
-| Fortnite Batman | fortnite-batman | convert_then_test | humanoid | `fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend` | `public/avatars/fortnite-batman.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | not_tested | not_tested / not_tested | medium | face_touch, facial_expressions | heavy | `model-audits/fortnite-batman/avatar-adapter-spec.json` | 3 | Good structural candidate, but runtime load and deformation tests are still required. |
-| Iron Man | iron-man | convert_then_test | humanoid | `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend` | `public/avatars/iron-man.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | not_tested | missing / missing | medium | face_touch, facial_expressions | heavy | `model-audits/iron-man/avatar-adapter-spec.json` | 4 | Good structural candidate, but runtime load and deformation tests are still required. |
-| Shrek | shrek | convert_then_test | humanoid | `shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx` | `public/avatars/shrek.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | not_tested | not_tested / not_tested | medium | face_touch, facial_expressions, fingers, toes | medium | `model-audits/shrek/avatar-adapter-spec.json` | 5 | Good structural candidate, but runtime load and deformation tests are still required. |
-| Spider-Man No Way Home | spider-man-no-way-home | convert_then_test | humanoid | `OtherSpiderman/spider-man_no_way_home_rigged.glb` | `public/avatars/spider-man-no-way-home.vrm` | not_attempted | not_attempted | not_tested | not_tested / missing | not_tested | missing / missing | medium | face_touch, facial_expressions, fingers | heavy | `model-audits/spider-man-no-way-home/avatar-adapter-spec.json` | 6 | Good structural candidate, but runtime load and deformation tests are still required. |
-| Spider-Man PlayStation | spider-man-playstation | convert_then_test | humanoid | `spider-man-playstation-rigged.zip!/source/spider man playstation realistic.blend` | `public/avatars/spider-man-playstation.vrm` | not_attempted | not_attempted | not_tested | not_tested / missing | not_tested | missing / missing | medium | face_touch, facial_expressions, fingers | very_heavy | `model-audits/spider-man-playstation/avatar-adapter-spec.json` | 7 | Good structural candidate, but runtime load and deformation tests are still required. |
-| The Amazing Spider-Man 2 | amazing-spider-man-2 | convert_then_test | humanoid | `OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx` | `public/avatars/amazing-spider-man-2.vrm` | not_attempted | not_attempted | not_tested | not_tested / missing | not_tested | missing / missing | medium | face_touch, facial_expressions, fingers | medium | `model-audits/amazing-spider-man-2/avatar-adapter-spec.json` | 8 | Good structural candidate, but runtime load and deformation tests are still required. |
-| Terminator T-800 | terminator-t-800 | convert_then_test | humanoid | `terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend` | `public/avatars/terminator-t-800.vrm` | not_attempted | not_attempted | not_tested | not_tested / missing | not_tested | missing / missing | medium | face_touch, facial_expressions, fingers | medium | `model-audits/terminator-t-800/avatar-adapter-spec.json` | 9 | Good structural candidate, but runtime load and deformation tests are still required. |
-| Jack Sparrow | jack-sparrow | convert_then_test | humanoid_with_offsets | `jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend` | `public/avatars/jack-sparrow.vrm` | not_attempted | not_attempted | not_tested | not_tested / missing | not_tested | missing / missing | medium | face_touch, facial_expressions, fingers | very_heavy | `model-audits/jack-sparrow/avatar-adapter-spec.json` | 10 | Good structural candidate, but runtime load and deformation tests are still required. |
-| Elsa | elsa | cleanup_then_convert | humanoid_with_offsets | `elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb` | `public/avatars/elsa.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | disabled | not_tested / not_tested | high | face_touch, facial_expressions, feet, fingers, toes | light | `model-audits/elsa/avatar-adapter-spec.json` | 11 | Partial structure exists, but cleanup or custom mapping is needed first. |
-| Grogu | grogu | custom_profile | creature | `the-mandalorian-grogu-advanced-rig.zip!/source/Grogurig.blend` | `public/avatars/grogu.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | not_tested | not_tested / not_tested | high | face_touch, facial_expressions, fingers, standard_humanoid_full_body | medium | `model-audits/grogu/avatar-adapter-spec.json` | 12 | Nonstandard anatomy should not be forced into standard humanoid full-body mode. |
-| King Kong | king-kong | custom_profile | creature | `king-kong-animated.zip!/source/king kong.glb` | `public/avatars/king-kong.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | not_tested | not_tested / not_tested | high | face_touch, facial_expressions, fingers, standard_humanoid_full_body | very_heavy | `model-audits/king-kong/avatar-adapter-spec.json` | 13 | Nonstandard anatomy should not be forced into standard humanoid full-body mode. |
-| Olaf | olaf | custom_profile | creature | `olaf-3d-rigged.zip!/source/OlafRig.blend` | `public/avatars/olaf.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | not_tested | missing / missing | high | face_touch, facial_expressions, fingers, standard_humanoid_full_body | medium | `model-audits/olaf/avatar-adapter-spec.json` | 14 | Nonstandard anatomy should not be forced into standard humanoid full-body mode. |
-| Godzilla | godzilla | custom_profile | creature | `godzilla-rigged-animated.zip!/source/Godzilla (New Glow).blend` | `public/avatars/godzilla.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | not_tested | missing / missing | high | face_touch, facial_expressions, fingers, standard_humanoid_full_body | heavy | `model-audits/godzilla/avatar-adapter-spec.json` | 15 | Nonstandard anatomy should not be forced into standard humanoid full-body mode. |
-| Xenomorph | xenomorph | custom_profile | creature | `realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx` | `public/avatars/xenomorph.vrm` | not_attempted | not_attempted | not_tested | disabled / not_tested | not_tested | not_tested / not_tested | high | face_touch, facial_expressions, fingers, standard_humanoid_full_body | heavy | `model-audits/xenomorph/avatar-adapter-spec.json` | 16 | Nonstandard anatomy should not be forced into standard humanoid full-body mode. |
-| Rigged Hand | rigged-hand | hand_test_only | hand_only | `rigged-hand.zip!/source/handRig_02.fbx` | `public/avatars/rigged-hand.vrm` | not_attempted | not_attempted | not_tested | not_tested / not_tested | disabled | missing / missing | high | arms, face_touch, facial_expressions, feet, head, legs, root_motion, toes, torso, upper_body | medium | `model-audits/rigged-hand/avatar-adapter-spec.json` | 17 | Use only for hand/finger experiments; it is not a full avatar. |
-| Teal v2 | teal-v2 | cleanup_then_convert | humanoid_with_offsets | `teal-v2.zip!/source/Tealv2.fbx` | `public/avatars/teal-v2.vrm` | not_attempted | not_attempted | not_tested | disabled / missing | not_tested | not_tested / not_tested | high | face_touch, facial_expressions, fingers, toes | medium | `model-audits/teal-v2/avatar-adapter-spec.json` | 18 | Automatic mapping is too weak; inspect hierarchy and create a manual map first. |
-| Buzz Lightyear | buzz-lightyear | cleanup_then_convert | humanoid_with_offsets | `adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend` | `public/avatars/buzz-lightyear.vrm` | not_attempted | not_attempted | not_tested | disabled / missing | disabled | missing / missing | high | face_touch, facial_expressions, feet, fingers, toes | light | `model-audits/buzz-lightyear/avatar-adapter-spec.json` | 19 | Automatic mapping is too weak; inspect hierarchy and create a manual map first. |
-| Baby Yoda | baby-yoda | custom_profile | creature | `baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend` | `public/avatars/baby-yoda.vrm` | not_attempted | not_attempted | not_tested | disabled / missing | disabled | not_tested / not_tested | high | face_touch, facial_expressions, fingers, standard_humanoid_full_body | medium | `model-audits/baby-yoda/avatar-adapter-spec.json` | 20 | Nonstandard anatomy should not be forced into standard humanoid full-body mode. |
+Generated candidates remain test-only. Current runtime driven bones are limited; feet, fingers, face anchors, and creature profiles are future work.
 
-## Ubuntu rig-prep update: Darth Vader
-
-- Dry-run status: `pass`
-- Blender inspect status: `pass`
-- Candidate conversion status: `pass`
-- Candidate VRM path: `/home/o/posepuppet-working/generated-vrms/darth-vader.vrm`
-- Candidate validation status: `pass`
-- Hands/fingers/feet after fallback glTF/VRMC validation: `good` / `good` / `good`
-- Face-touch: `deferred`
-- Runtime browser smoke: **pass**
-- Public UI/public avatar promotion: `not_attempted`
-
-## Pre-mega-run analysis update (2026-06-11)
-
-- Woody browser smoke: **pass** (`?generatedAvatar=woody&smoke=avatar-load-only`)
-- Darth Vader browser smoke: **pass** (`?generatedAvatar=darth-vader&smoke=avatar-load-only`)
-- Missing avatar fallback: **pass** (controlled warning, no crash)
-- Public UI isolation: **pass** (generated avatars not in cycling)
-- All 4 Playwright tests: **pass** (21.5s)
-- 18/18 remaining models: dry-run source resolution **pass** on Ubuntu
-- 5/18 next-batch models: Blender inspect **pass** (batman, iron-man, shrek, asm2, t-800)
-| Fortnite Batman | fortnite-batman | convert_then_test | humanoid | `fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend` | `public/avatars/fortnite-batman.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | medium | `model-audits/fortnite-batman/expansion-readiness.json` | 2 | VRM browser-loads via query param. Runtime tracking accuracy not yet tested. |
-| Iron Man | iron-man | convert_then_test | humanoid | `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend` | `public/avatars/iron-man.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | medium | `model-audits/iron-man/expansion-readiness.json` | 3 | VRM browser-loads via query param. Runtime tracking accuracy not yet tested. |
-| Shrek | shrek | convert_then_test | humanoid | `shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx` | `public/avatars/shrek.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | medium | `model-audits/shrek/expansion-readiness.json` | 4 | VRM browser-loads via query param. Runtime tracking accuracy not yet tested. |
-
-## Batch B browser smoke update (2026-06-11)
-
-- Amazing Spider-Man 2 browser smoke: **pass** (`?generatedAvatar=amazing-spider-man-2&smoke=avatar-load-only`)
-- Terminator T-800 browser smoke: **pass** (`?generatedAvatar=terminator-t-800&smoke=avatar-load-only`)
-- Spider-Man No Way Home browser smoke: **pass** (`?generatedAvatar=spider-man-no-way-home&smoke=avatar-load-only`)
-- All 10 Playwright tests: **pass** (28.5s)
-- Public UI promotion: **none**
-- Generated VRMs staged: **no**
-
-| Amazing Spider-Man 2 | amazing-spider-man-2 | convert_then_test | humanoid | FBX source | `/avatars/generated/amazing-spider-man-2.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | medium | `model-audits/amazing-spider-man-2/expansion-readiness.json` | B-1 | VRM browser-loads via query param. Fingers missing. Scale 55.74. |
-| Terminator T-800 | terminator-t-800 | convert_then_test | humanoid | Blend source | `/avatars/generated/terminator-t-800.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | light | `model-audits/terminator-t-800/expansion-readiness.json` | B-2 | VRM browser-loads via query param. Endo-skeleton. Fingers missing. Scale 213.55. |
-| Spider-Man No Way Home | spider-man-no-way-home | convert_then_test | humanoid | GLB source | `/avatars/generated/spider-man-no-way-home.vrm` | pass | **browser_smoke_pass** | not_tested | not_tested / good | not_tested | missing / missing | medium | face_touch, facial_expressions | heavy | `model-audits/spider-man-no-way-home/expansion-readiness.json` | B-3 | VRM browser-loads via query param. Fingers missing. 15.2 MB VRM. |
+| Slug | Profile | Quality | Browser smoke | Visual |
+| --- | --- | --- | --- | --- |
+| `amazing-spider-man-2` | `humanoid` | `experimental` | `pass` | `not_available` |
+| `baby-yoda` | `creature` | `creature_profile_needed` | `not_attempted` | `not_available` |
+| `buzz-lightyear` | `humanoid_with_offsets` | `manual_mapping_needed` | `not_attempted` | `not_available` |
+| `darth-vader` | `humanoid` | `experimental` | `pass` | `not_available` |
+| `elsa` | `humanoid_with_offsets` | `defer` | `fail` | `not_available` |
+| `fortnite-batman` | `humanoid` | `experimental` | `pass` | `not_available` |
+| `godzilla` | `creature` | `creature_profile_needed` | `not_attempted` | `not_available` |
+| `grogu` | `creature` | `creature_profile_needed` | `not_attempted` | `not_available` |
+| `iron-man` | `humanoid` | `experimental` | `pass` | `not_available` |
+| `jack-sparrow` | `humanoid` | `experimental` | `pass` | `not_available` |
+| `king-kong` | `creature` | `creature_profile_needed` | `not_attempted` | `not_available` |
+| `olaf` | `creature` | `creature_profile_needed` | `not_attempted` | `not_available` |
+| `rigged-hand` | `hand_only` | `hand_only` | `not_attempted` | `not_available` |
+| `shrek` | `humanoid` | `experimental` | `pass` | `not_available` |
+| `spider-man-no-way-home` | `humanoid` | `experimental` | `pass` | `not_available` |
+| `spider-man-playstation` | `humanoid` | `experimental` | `pass` | `not_available` |
+| `teal-v2` | `humanoid_with_offsets` | `manual_mapping_needed` | `not_attempted` | `not_available` |
+| `terminator-t-800` | `humanoid` | `experimental` | `pass` | `not_available` |
+| `woody` | `humanoid` | `experimental` | `pass` | `not_available` |
+| `xenomorph` | `creature` | `creature_profile_needed` | `not_attempted` | `not_available` |

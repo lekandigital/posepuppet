@@ -1,0 +1,24 @@
+{
+  "blockers": [
+    "feet_not_ready",
+    "no_accepted_generated_vrm_candidate",
+    "not_full_avatar",
+    "requires_hand_landmarker_mode",
+    "visual_review_needed"
+  ],
+  "category": "hand_only",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "display_name": "Rigged Hand",
+  "evidence_files": [
+    "model-audits/rigged-hand/audit.json",
+    "model-audits/rigged-hand/runtime-capability-profile.json",
+    "model-audits/rigged-hand/attempts-summary.json"
+  ],
+  "next_steps": [
+    "Generate screenshots/contact sheet and perform visual review.",
+    "Implement a hand-only preview/control route before browser smoke."
+  ],
+  "schema_version": "posepuppet-llm-dossier-v2",
+  "slug": "rigged-hand",
+  "summary": "Hand-only asset; requires a dedicated hand tracking mode and is not a full avatar."
+}

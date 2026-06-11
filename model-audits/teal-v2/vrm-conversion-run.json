@@ -1,0 +1,27 @@
+{
+  "candidate_vrm_exists": true,
+  "candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/teal-v2.vrm",
+  "candidate_vrm_size_bytes": 1197472,
+  "command": [
+    "/home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/blender",
+    "-b",
+    "--python",
+    "/home/o/Dev/posepuppet/tools/export_source_to_vrm.py",
+    "--",
+    "/home/o/posepuppet-working/model-working/teal-v2/conversion-input/teal-v2/Tealv2.fbx",
+    "/home/o/posepuppet-working/generated-vrms/teal-v2.vrm",
+    "--mapping",
+    "/home/o/Dev/posepuppet/model-audits/teal-v2/suggested-bone-map.json"
+  ],
+  "created_at": "2026-06-11T18:03:33+00:00",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/teal-v2/suggested-bone-map.json",
+  "materialized_source_path": "/home/o/posepuppet-working/model-working/teal-v2/conversion-input/teal-v2/Tealv2.fbx",
+  "public_avatar_written": false,
+  "runtime_browser_smoke": "not_attempted",
+  "schema_version": "posepuppet-vrm-conversion-run-v1",
+  "selected_source_path": "teal-v2.zip!/source/Tealv2.fbx",
+  "slug": "teal-v2",
+  "status": "pass",
+  "stderr": "",
+  "stdout": "FBX version: 7400\nArmature: Armature.006\nFinal mapped bones: 10\nMissing required bones: hips, chest, neck, leftLowerArm, leftHand, rightLowerArm, rightHand, leftUpperLeg, rightUpperLeg\nWARNING: could not pack Atlas_t: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/teal-v2/conversion-input/teal-v2/Screen Alpha.png' not found\n\nWARNING: could not pack Metal_n.png: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/teal-v2/conversion-input/teal-v2/Textures/Metal_n.png' not found\n\nWARNING: could not pack Metal_r.png: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/teal-v2/conversion-input/teal-v2/Textures/Metal_r.png' not found\n\nWARNING: could not pack Metal_t.png: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/teal-v2/conversion-input/teal-v2/Textures/Metal_t.png' not found\n\nWARNING: could not pack Plastic A_n.png: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/teal-v2/conversion-input/teal-v2/Textures/Plastic A_n.png' not found\n\nWARNING: could not pack Plastic A_t.png: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/teal-v2/conversion-input/teal-v2/Textures/Plastic A_t.png' not found\n\nWARNING: could not pack Plastic B_n.png: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/teal-v2/conversion-input/teal-v2/Textures/Plastic B_n.png' not found\n\nWARNING: could not pack Plastic B_t.png: Error: Unable to pack file, source path '/home/o/posepuppet-working/model-working/teal-v2/conversion-input/teal-v2/Textures/Plastic B_t.png' not found\n\nINFO Draco mesh compression is available, use library at /home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/5.1/scripts/addons_core/io_scene_gltf2/libextern_draco.so\n14:03:33 | INFO: Starting glTF 2.0 export\n14:03:33 | INFO: Extracting primitive: Cube.312\n14:03:33 | WARNING: Image '<bpy_struct, Image(\"Atlas_t\") at 0x79eb606c8f08>' has no size and cannot be exported.\n14:03:33 | INFO: Primitives created: 1\n14:03:33 | INFO: Extracting primitive: Circle.010\n14:03:33 | INFO: Primitives created: 1\n14:03:33 | INFO: Extracting primitive: Cube.309\n14:03:33 | WARNING: Image '<bpy_struct, Image(\"Metal_r.png\") at 0x79eb606b2408>' has no size and cannot be exported.\n14:03:33 | INFO: Primitives created: 1\n14:03:33 | INFO: Extracting primitive: Cube.311\n14:03:33 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material\n14:03:33 | INFO: Primitives created: 1\n14:03:33 | INFO: Extracting primitive: Cube.310\n14:03:33 | INFO: Primitives created: 1\n14:03:33 | INFO: Finished glTF 2.0 export in 0.13574910163879395 s\n\nVRM written: /home/o/posepuppet-working/generated-vrms/teal-v2.vrm\nBlender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 02:18:37)\n\nBlender quit\n"
+}

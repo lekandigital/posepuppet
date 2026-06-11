@@ -1,0 +1,73 @@
+{
+  "action": "convert_to_vrm",
+  "avatar_id": "spider-man-playstation",
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "fingers"
+  ],
+  "display_name": "Spider-Man PlayStation",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet."
+  ],
+  "enabled_controls": [
+    "arms",
+    "feet",
+    "hands",
+    "head",
+    "legs",
+    "root_motion",
+    "toes",
+    "upper_body"
+  ],
+  "face_touch_mode": "ik_required",
+  "finger_mode": "palm_only",
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=spider-man-playstation after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "load_vrm_full_body",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera",
+      "head tracks",
+      "arms track"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "performance": "very_heavy",
+  "priority": 7,
+  "profile": "humanoid",
+  "read_first": "model-audits/spider-man-playstation/avatar-adapter-spec.json",
+  "reason": "Good structural candidate, but runtime load and deformation tests are still required.",
+  "rig_readiness": {
+    "blockers": [
+      "visual_review_needed"
+    ],
+    "browser_smoke": "pass",
+    "category": "standard_humanoid",
+    "quality_label": "experimental",
+    "runtime_profile": "humanoid",
+    "updated_at": "2026-06-11T18:11:49+00:00",
+    "visual_review": "not_available"
+  },
+  "risk": "medium",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "a252976a1c78a812170018cca9c32381e63046e8f0c53b70e028d9d372eb912d",
+    "selected_source_sha256": "888f58f282d122d810f40f1ba8556dc6ca4b120c981ab951546488b7d8c1a2f2",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "spider-man-playstation-rigged.zip!/source/spider man playstation realistic.blend",
+  "target_vrm": "public/avatars/spider-man-playstation.vrm"
+}

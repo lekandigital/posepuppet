@@ -1,0 +1,70 @@
+{
+  "action": "custom_profile",
+  "avatar_id": "king-kong",
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "fingers",
+    "standard_humanoid_full_body"
+  ],
+  "display_name": "King Kong",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable facial expressions for this model yet.",
+    "Do not force standard full-body humanoid mode; use a creature profile."
+  ],
+  "enabled_controls": [
+    "arms",
+    "creature_head",
+    "creature_jaw",
+    "legs"
+  ],
+  "face_touch_mode": "none",
+  "finger_mode": "curl_presets",
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=king-kong after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "custom_creature_preview",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "performance": "very_heavy",
+  "priority": 13,
+  "profile": "creature",
+  "read_first": "model-audits/king-kong/avatar-adapter-spec.json",
+  "reason": "Nonstandard anatomy should not be forced into standard humanoid full-body mode.",
+  "rig_readiness": {
+    "blockers": [
+      "creature_profile_needed",
+      "no_accepted_generated_vrm_candidate",
+      "visual_review_needed"
+    ],
+    "browser_smoke": "not_attempted",
+    "category": "creature",
+    "quality_label": "creature_profile_needed",
+    "runtime_profile": "creature",
+    "updated_at": "2026-06-11T18:11:49+00:00",
+    "visual_review": "not_available"
+  },
+  "risk": "high",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "29ca9dcb05a2197a8339afe25059791e180058075d95a76cb83083f9b2d56dcd",
+    "selected_source_sha256": "a5025a16affaa9d98becd203f3f73b7ef95ef19d3618958c837716f217574f2c",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "king-kong-animated.zip!/source/king kong.glb",
+  "target_vrm": "public/avatars/king-kong.vrm"
+}

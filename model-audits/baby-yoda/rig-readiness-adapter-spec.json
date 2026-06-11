@@ -1,0 +1,72 @@
+{
+  "action": "custom_profile",
+  "avatar_id": "baby-yoda",
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "fingers",
+    "standard_humanoid_full_body"
+  ],
+  "display_name": "Baby Yoda",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet.",
+    "Do not enable feet for this model yet.",
+    "Do not force standard full-body humanoid mode; use a creature profile."
+  ],
+  "enabled_controls": [
+    "creature_head"
+  ],
+  "face_touch_mode": "none",
+  "finger_mode": "none",
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=baby-yoda after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "custom_creature_preview",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "performance": "medium",
+  "priority": 20,
+  "profile": "creature",
+  "read_first": "model-audits/baby-yoda/avatar-adapter-spec.json",
+  "reason": "Nonstandard anatomy should not be forced into standard humanoid full-body mode.",
+  "rig_readiness": {
+    "blockers": [
+      "creature_profile_needed",
+      "feet_not_ready",
+      "hand_control_not_ready",
+      "no_accepted_generated_vrm_candidate",
+      "static_preview_only",
+      "visual_review_needed"
+    ],
+    "browser_smoke": "not_attempted",
+    "category": "creature",
+    "quality_label": "creature_profile_needed",
+    "runtime_profile": "creature",
+    "updated_at": "2026-06-11T18:11:49+00:00",
+    "visual_review": "not_available"
+  },
+  "risk": "high",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "13c3d9540d37f5d5cd89afd8218a48029627ff181c0da66729616504342d2d62",
+    "selected_source_sha256": "19c08b45b061c72c5af61c418a87640b577bc525704501a61d24d8e258f4c0a9",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend",
+  "target_vrm": "public/avatars/baby-yoda.vrm"
+}

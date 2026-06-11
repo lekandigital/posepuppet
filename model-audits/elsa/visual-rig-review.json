@@ -1,0 +1,19 @@
+{
+  "attempt_id": "attempt-001-baseline",
+  "contact_sheet_path": "",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "decision": "do_not_claim_visual_quality",
+  "questions": {
+    "acceptable_for_query_param_experimental_use": "not_available",
+    "limbs_attached": "not_available",
+    "model_loaded": "not_available",
+    "scale_reasonable": "not_available",
+    "textures_intact": "not_available"
+  },
+  "requires_future_vision_review": true,
+  "schema_version": "posepuppet-visual-rig-review-v1",
+  "screenshots": [],
+  "slug": "elsa",
+  "visual_label": "visual_not_available",
+  "visual_review": "not_available"
+}

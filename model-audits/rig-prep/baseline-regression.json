@@ -1,0 +1,22 @@
+{
+  "commands": [
+    "npm run build",
+    "npx playwright test tests/generated-avatar-load.spec.ts --reporter=line",
+    "python3 tools/audit_model.py --self-test",
+    "python3 tools/rig_prep_all_models.py --dry-run",
+    "python3 tools/convert_all_avatars_to_vrm.py --dry-run"
+  ],
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "notes": [
+    "Generated VRMs remained in ignored working paths.",
+    "Generated avatars remained query-param-only."
+  ],
+  "results": {
+    "audit_self_test": "pass",
+    "convert_all_avatars_to_vrm_dry_run": "pass",
+    "generated_avatar_smoke": "pass",
+    "npm_run_build": "pass",
+    "rig_prep_all_models_dry_run": "pass"
+  },
+  "schema_version": "posepuppet-rig-prep-baseline-regression-v1"
+}

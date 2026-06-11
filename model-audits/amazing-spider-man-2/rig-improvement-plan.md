@@ -1,18 +1,19 @@
 # The Amazing Spider-Man 2 rig improvement plan
 
-- Status: `partial`
-- Selected source path: `OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx`
-- Zip/nested zip source chain: `["source/Amazing Spider Man 2 Rigged.fbx"]`
-- Working directory: `/home/o/posepuppet-working/model-working/amazing-spider-man-2`
-- Expected clean blend path: `/home/o/posepuppet-working/model-working/amazing-spider-man-2/Amazing Spider Man 2 Rigged.fbx`
-- Expected candidate VRM path: `/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm`
-- Manual bone map path: `/home/o/Dev/posepuppet/model-audits/amazing-spider-man-2/suggested-bone-map.json`
+- Category: `standard_humanoid`
+- Target runtime profile: `humanoid`
+- Ambition level: `high`
+- Baseline candidate: `/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm`
 
-## Risk Notes
+## Planned Attempts
 
-- face-touch remains deferred until runtime tests
-- orientation
-- runtime browser smoke is not attempted
-- scale
-- shoulders/wrists if humanoid
-- unsupported controls
+- `baseline-generated-vrm-regression`
+- `scale-orientation-root-fix`
+- `wrist-palm-axis-fix`
+- `foot-ankle-axis-fix`
+- `face-touch-anchor-estimation`
+
+## Do Not Attempt
+
+- Do not public-promote generated candidates.
+- Do not commit generated VRMs or screenshots.

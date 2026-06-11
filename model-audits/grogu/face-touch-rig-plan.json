@@ -1,0 +1,17 @@
+{
+  "classification": "disabled",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "notes": [
+    "Do not mark supported until a visual hand-to-face pose test passes."
+  ],
+  "safe_first_gesture": "none",
+  "schema_version": "posepuppet-face-touch-rig-plan-v1",
+  "slug": "grogu",
+  "targets": {
+    "head_center": "missing",
+    "left_cheek": "missing",
+    "mouth": "missing",
+    "right_cheek": "missing"
+  },
+  "visual_result": "not_available"
+}

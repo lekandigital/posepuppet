@@ -1,0 +1,8 @@
+# Source files for iron-man candidate VRM
+
+Selected source: /home/o/posepuppet-working/generated-vrms/iron-man.vrm
+Selected format: vrm
+Selected from ZIP: False
+
+All known source paths:
+- /home/o/posepuppet-working/generated-vrms/iron-man.vrm

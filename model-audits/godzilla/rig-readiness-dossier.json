@@ -1,0 +1,22 @@
+{
+  "blockers": [
+    "creature_profile_needed",
+    "no_accepted_generated_vrm_candidate",
+    "visual_review_needed"
+  ],
+  "category": "creature",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "display_name": "Godzilla",
+  "evidence_files": [
+    "model-audits/godzilla/audit.json",
+    "model-audits/godzilla/runtime-capability-profile.json",
+    "model-audits/godzilla/attempts-summary.json"
+  ],
+  "next_steps": [
+    "Generate screenshots/contact sheet and perform visual review.",
+    "Define custom creature controls before enabling runtime puppeteering."
+  ],
+  "schema_version": "posepuppet-llm-dossier-v2",
+  "slug": "godzilla",
+  "summary": "Creature asset needs a custom profile or static preview path before runtime use."
+}

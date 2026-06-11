@@ -1,0 +1,18 @@
+{
+  "created_at": "2026-06-11T16:17:59+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/iron-man.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/iron-man/iron man.blend",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/iron-man/suggested-bone-map.json",
+  "nested_chain": [
+    "source/iron man.zip",
+    "iron-man-rig/source/iron man.blend"
+  ],
+  "nested_zip": "iron-man-rig.zip!/source/iron man.zip",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend",
+  "slug": "iron-man",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/iron-man-rig.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/iron-man"
+}

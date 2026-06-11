@@ -1,0 +1,12 @@
+# Source files for Shrek
+
+Selected source: shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx
+Selected format: fbx
+Selected from ZIP: True
+Source ZIP: /home/o/posepuppet-assets/ModelsForAnimation/shrek-rig.zip
+Nested ZIP: shrek-rig.zip!/source/shrek 4.zip
+
+All known source paths:
+- shrek-rig.zip
+- shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx
+- shrek_rig.glb

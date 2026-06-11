@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T15:31:53+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/buzz-lightyear.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/buzz-lightyear/Buzz Lightyear.blend",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/buzz-lightyear/suggested-bone-map.json",
+  "nested_chain": [
+    "source/Buzz Lightyear.blend"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend",
+  "slug": "buzz-lightyear",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/adi-20-buzz-lightyear-fully-rigged.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/buzz-lightyear"
+}

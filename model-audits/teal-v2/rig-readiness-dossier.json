@@ -1,0 +1,25 @@
+{
+  "blockers": [
+    "cleanup_needed",
+    "hand_control_not_ready",
+    "manual_mapping_needed",
+    "no_accepted_generated_vrm_candidate",
+    "visual_review_needed"
+  ],
+  "category": "cleanup_manual_mapping",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "display_name": "Teal v2",
+  "evidence_files": [
+    "model-audits/teal-v2/audit.json",
+    "model-audits/teal-v2/runtime-capability-profile.json",
+    "model-audits/teal-v2/attempts-summary.json"
+  ],
+  "next_steps": [
+    "Recover bone mapping from hierarchy, symmetry, bone positions, mesh names, and vertex groups.",
+    "Create a non-destructive cleaned source copy before another conversion attempt.",
+    "Generate screenshots/contact sheet and perform visual review."
+  ],
+  "schema_version": "posepuppet-llm-dossier-v2",
+  "slug": "teal-v2",
+  "summary": "Manual mapping and cleanup are needed before a generated candidate can be accepted."
+}

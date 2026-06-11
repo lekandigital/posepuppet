@@ -1,0 +1,8 @@
+# Source files for spider-man-playstation candidate VRM
+
+Selected source: /home/o/posepuppet-working/generated-vrms/spider-man-playstation.vrm
+Selected format: vrm
+Selected from ZIP: False
+
+All known source paths:
+- /home/o/posepuppet-working/generated-vrms/spider-man-playstation.vrm

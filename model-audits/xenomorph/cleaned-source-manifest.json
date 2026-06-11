@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T15:31:28+00:00",
+  "expected_candidate_vrm_path": "/home/o/posepuppet-working/generated-vrms/xenomorph.vrm",
+  "expected_clean_blend_path": "/home/o/posepuppet-working/model-working/xenomorph/Xenomorph Default.fbx",
+  "manual_bone_map_path": "/home/o/Dev/posepuppet/model-audits/xenomorph/suggested-bone-map.json",
+  "nested_chain": [
+    "source/Xenomorph Default.fbx"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx",
+  "slug": "xenomorph",
+  "source_from_zip": true,
+  "source_zip": "/home/o/posepuppet-assets/ModelsForAnimation/realistic-xenomorph-rig.zip",
+  "status": "partial",
+  "working_directory": "/home/o/posepuppet-working/model-working/xenomorph"
+}

@@ -1,0 +1,27 @@
+{
+  "attempts": [
+    {
+      "attempt_id": "attempt-001-baseline",
+      "blockers": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "classification": "deferred",
+      "label": "baseline-source-audit",
+      "post_vrm_validation": "not_applicable",
+      "source": "audit/spec source",
+      "visual_review": "not_available",
+      "vrm_exists": false,
+      "vrm_path": ""
+    }
+  ],
+  "best_attempt_id": "",
+  "category": "creature",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "display_name": "Grogu",
+  "final_classification": "creature_profile_needed",
+  "schema_version": "posepuppet-attempts-summary-v1",
+  "slug": "grogu"
+}

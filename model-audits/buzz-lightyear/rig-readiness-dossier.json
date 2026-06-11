@@ -1,0 +1,26 @@
+{
+  "blockers": [
+    "cleanup_needed",
+    "feet_not_ready",
+    "hand_control_not_ready",
+    "manual_mapping_needed",
+    "no_accepted_generated_vrm_candidate",
+    "visual_review_needed"
+  ],
+  "category": "cleanup_manual_mapping",
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "display_name": "Buzz Lightyear",
+  "evidence_files": [
+    "model-audits/buzz-lightyear/audit.json",
+    "model-audits/buzz-lightyear/runtime-capability-profile.json",
+    "model-audits/buzz-lightyear/attempts-summary.json"
+  ],
+  "next_steps": [
+    "Recover bone mapping from hierarchy, symmetry, bone positions, mesh names, and vertex groups.",
+    "Create a non-destructive cleaned source copy before another conversion attempt.",
+    "Generate screenshots/contact sheet and perform visual review."
+  ],
+  "schema_version": "posepuppet-llm-dossier-v2",
+  "slug": "buzz-lightyear",
+  "summary": "Manual mapping and cleanup are needed before a generated candidate can be accepted."
+}

@@ -1,0 +1,244 @@
+{
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "models": [
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "feet_not_ready",
+        "hand_control_not_ready",
+        "no_accepted_generated_vrm_candidate",
+        "static_preview_only",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "Baby Yoda",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "defer",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "defer",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "baby-yoda",
+        "walking": "defer"
+      },
+      "generated": false,
+      "hand_mode": "none",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "baby-yoda",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "Godzilla",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "godzilla",
+        "walking": "partial"
+      },
+      "generated": false,
+      "hand_mode": "palm_only",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "godzilla",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "Grogu",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "grogu",
+        "walking": "partial"
+      },
+      "generated": false,
+      "hand_mode": "palm_only",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "grogu",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "King Kong",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "king-kong",
+        "walking": "partial"
+      },
+      "generated": false,
+      "hand_mode": "palm_only",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "king-kong",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "Olaf",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "olaf",
+        "walking": "partial"
+      },
+      "generated": false,
+      "hand_mode": "palm_only",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "olaf",
+      "visual_review": "not_available"
+    },
+    {
+      "active_candidate_vrm": "",
+      "attempt_classification": "deferred",
+      "blockers": [
+        "creature_profile_needed",
+        "hand_control_not_ready",
+        "no_accepted_generated_vrm_candidate",
+        "visual_review_needed"
+      ],
+      "browser_smoke": "not_attempted",
+      "category": "creature",
+      "display_name": "Xenomorph",
+      "face_touch": "disabled",
+      "feet_mode": "feet_disabled",
+      "game": {
+        "created_at": "2026-06-11T18:11:49+00:00",
+        "flying": "partial",
+        "gesture_to_intent": "recommended",
+        "notes": [
+          "Game-control readiness is based on readable intent, not full anatomical runtime support."
+        ],
+        "rank_tags": [
+          "best_creature_experiment"
+        ],
+        "rowing": "partial",
+        "schema_version": "posepuppet-game-control-readiness-v1",
+        "slug": "xenomorph",
+        "walking": "partial"
+      },
+      "generated": false,
+      "hand_mode": "none",
+      "quality_label": "creature_profile_needed",
+      "rank_tags": [
+        "best_creature_experiment"
+      ],
+      "reference_candidate_vrm": "",
+      "runtime_profile": "creature",
+      "slug": "xenomorph",
+      "visual_review": "not_available"
+    }
+  ],
+  "schema_version": "posepuppet-creature-profile-summary-v1"
+}

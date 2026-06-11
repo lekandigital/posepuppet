@@ -1,0 +1,86 @@
+{
+  "created_at": "2026-06-11T18:11:49+00:00",
+  "models": [
+    {
+      "classification": "palm_only",
+      "slug": "amazing-spider-man-2"
+    },
+    {
+      "classification": "none",
+      "slug": "baby-yoda"
+    },
+    {
+      "classification": "none",
+      "slug": "buzz-lightyear"
+    },
+    {
+      "classification": "curl_presets",
+      "slug": "darth-vader"
+    },
+    {
+      "classification": "palm_only",
+      "slug": "elsa"
+    },
+    {
+      "classification": "curl_presets",
+      "slug": "fortnite-batman"
+    },
+    {
+      "classification": "palm_only",
+      "slug": "godzilla"
+    },
+    {
+      "classification": "palm_only",
+      "slug": "grogu"
+    },
+    {
+      "classification": "curl_presets",
+      "slug": "iron-man"
+    },
+    {
+      "classification": "palm_only",
+      "slug": "jack-sparrow"
+    },
+    {
+      "classification": "palm_only",
+      "slug": "king-kong"
+    },
+    {
+      "classification": "palm_only",
+      "slug": "olaf"
+    },
+    {
+      "classification": "hand_only",
+      "slug": "rigged-hand"
+    },
+    {
+      "classification": "palm_only",
+      "slug": "shrek"
+    },
+    {
+      "classification": "palm_only",
+      "slug": "spider-man-no-way-home"
+    },
+    {
+      "classification": "palm_only",
+      "slug": "spider-man-playstation"
+    },
+    {
+      "classification": "none",
+      "slug": "teal-v2"
+    },
+    {
+      "classification": "palm_only",
+      "slug": "terminator-t-800"
+    },
+    {
+      "classification": "palm_only",
+      "slug": "woody"
+    },
+    {
+      "classification": "none",
+      "slug": "xenomorph"
+    }
+  ],
+  "schema_version": "posepuppet-hand-and-finger-readiness-summary-v1"
+}
