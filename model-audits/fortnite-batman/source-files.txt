@@ -1,16 +1,18 @@
 # Source files for Fortnite Batman
 
 Selected source: fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend
+Best conversion source: fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend
 Runtime GLB companion: fortnite_batman_advanced_rig.glb
+Target VRM path: public/avatars/fortnite-batman.vrm
 
 ## All known variants
 
-- `fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend` (zip-entry, .blend, 46.03 MB)
-- `fortnite_batman_advanced_rig (1).glb` (file, .glb, 6.42 MB, sha256=8c7e3307d52e)
-- `fortnite_batman_advanced_rig.glb` (file, .glb, 15.71 MB, sha256=da0fe87b030d)
-- `fortnite-batman-advanced-rig.zip` (file, .zip, 59.91 MB, sha256=510b4028e633)
+- `fortnite-batman-advanced-rig.zip`
+- `fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend`
+- `fortnite_batman_advanced_rig (1).glb`
+- `fortnite_batman_advanced_rig.glb`
 
 ## Notes
 
-- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
-- License remains unknown until manually verified from the original download source.
+- Original binaries, textures, ZIPs, screenshots, contact sheets, and converted VRMs are not included in handoff files.
+- Use source-lock hashes before trusting this audit after model files change.

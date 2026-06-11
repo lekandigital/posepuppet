@@ -1,0 +1,175 @@
+{
+  "acceptance_tests": [
+    "VRM loads in @pixiv/three-vrm",
+    "avatar appears upright and facing camera",
+    "head follows webcam rotation",
+    "arms follow shoulders/elbows/wrists",
+    "hands do not detach",
+    "full body mode does not explode when legs are visible"
+  ],
+  "avatar_id": "iron-man",
+  "bone_map": {
+    "chest": "chest",
+    "head": "head",
+    "hips": "hips",
+    "jaw": "",
+    "leftEye": "",
+    "leftFoot": "DEF-foot.L",
+    "leftHand": "DEF-hand.L",
+    "leftLowerArm": "DEF-forearm.L",
+    "leftLowerLeg": "DEF-shin.L",
+    "leftShoulder": "DEF-shoulder.L",
+    "leftToes": "DEF-toe.L",
+    "leftUpperArm": "DEF-upper_arm.L",
+    "leftUpperLeg": "DEF-thigh.L",
+    "neck": "MCH-ROT-neck",
+    "rightEye": "",
+    "rightFoot": "DEF-foot.R",
+    "rightHand": "DEF-hand.R",
+    "rightLowerArm": "DEF-forearm.R",
+    "rightLowerLeg": "DEF-shin.R",
+    "rightShoulder": "DEF-shoulder.R",
+    "rightToes": "DEF-toe.R",
+    "rightUpperArm": "DEF-upper_arm.R",
+    "rightUpperLeg": "DEF-thigh.R",
+    "spine": "DEF-spine",
+    "upperChest": ""
+  },
+  "bone_map_confidence": {
+    "arms": "exact",
+    "chest": "exact",
+    "confidence_notes": [
+      "Confidence is based on scripted bone-name and hierarchy mapping, not a visual retargeting run."
+    ],
+    "face": "missing",
+    "feet": "exact",
+    "fingers": "exact",
+    "hands": "exact",
+    "head": "exact",
+    "hips": "exact",
+    "legs": "exact",
+    "neck": "exact",
+    "overall": "high",
+    "spine": "exact",
+    "toes": "exact"
+  },
+  "conversion": {
+    "command": "# Extract/open the selected source in Blender, verify humanoid mapping, then export VRM.\n# Selected source: iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend\n# Target path: public/avatars/iron-man.vrm",
+    "expected_blockers": [
+      "conversion not attempted in this V2 run",
+      "manual mapping and runtime load test still required"
+    ],
+    "manual_mapping_needed": true,
+    "target_format": "vrm",
+    "target_path": "public/avatars/iron-man.vrm"
+  },
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions"
+  ],
+  "display_name": "Iron Man",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable facial expressions for this model yet."
+  ],
+  "do_not_inspect": [
+    "duplicate GLBs",
+    "source ZIP internals",
+    "textures",
+    "full source binaries",
+    "screenshots/contact sheets unless visual review is needed"
+  ],
+  "enabled_controls": [
+    "arms",
+    "feet",
+    "fingers",
+    "hands",
+    "head",
+    "legs",
+    "root_motion",
+    "toes",
+    "upper_body"
+  ],
+  "face_touch_config": {
+    "mode": "ik_required",
+    "notes": [
+      "Face-touch is not runtime-proven; implement only after IK/target tests."
+    ],
+    "supported": true,
+    "targets": [
+      "head_center",
+      "mouth",
+      "left_cheek",
+      "right_cheek"
+    ]
+  },
+  "implementation_status": "convert_then_enable",
+  "inspect_only_if": [
+    "open bone-tree.txt if automatic mapping fails",
+    "open source binary only if VRM conversion fails"
+  ],
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=iron-man after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "load_vrm_full_body",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera",
+      "head tracks",
+      "arms track"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "one_paragraph_implementation_summary": "Iron Man should use profile `humanoid` with action `convert_then_test`. Convert or test `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend` to `public/avatars/iron-man.vrm`, enable arms, feet, fingers, hands, head, legs, root_motion, toes, upper_body, and disable face_touch, facial_expressions until runtime tests pass.",
+  "performance": {
+    "desktop_safe": true,
+    "mobile_safe": false,
+    "optimization_required": true,
+    "runtime_weight": "heavy"
+  },
+  "priority": 4,
+  "profile": "humanoid",
+  "reference_glb": "iron_man_rig.glb",
+  "retargeting_config": {
+    "arm_correction": "test_required",
+    "body_mode": "full",
+    "finger_mode": "full_finger_retargeting",
+    "foot_orientation": "enabled_after_test",
+    "leg_correction": "test_required",
+    "offset_profile": "",
+    "requires_model_offsets": false,
+    "root_motion": true,
+    "wrist_correction": "test_required"
+  },
+  "runtime": {
+    "expected_loader": "@pixiv/three-vrm",
+    "fallback_if_missing": "current_default",
+    "registry_entry_needed": true,
+    "runtime_test_status": "not_attempted"
+  },
+  "runtime_fallback_policy": {
+    "if_tracking_profile_unsupported": "disable_unsupported_controls",
+    "if_vrm_load_fails": "show_warning_and_fallback",
+    "if_vrm_missing": "show_warning",
+    "recommended_warning_text": "This avatar is experimental. Some controls are disabled because the model does not yet have a verified full PosePuppet rig."
+  },
+  "runtime_vrm_path": "public/avatars/iron-man.vrm",
+  "schema_version": "posepuppet-avatar-adapter-spec-v1",
+  "selected_source_reasoning": "Selected by source-priority audit discovery: prefer editable .blend, then .fbx, then source/runtime .glb.",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "7cd0d123f77a3f4940b03a7c64e8074a2fa5055500ab2ec4960c4ee78be58dc2",
+    "selected_source_sha256": "688d8ecbc0cbc9a07adc021f97ef33798a2a4fdc2c1411a78b657701e6338d30",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend"
+}

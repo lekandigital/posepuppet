@@ -1,0 +1,176 @@
+{
+  "acceptance_tests": [
+    "VRM loads in @pixiv/three-vrm",
+    "avatar appears upright and facing camera",
+    "head follows webcam rotation",
+    "arms follow shoulders/elbows/wrists",
+    "hands do not detach",
+    "full body mode does not explode when legs are visible"
+  ],
+  "avatar_id": "spider-man-no-way-home",
+  "bone_map": {
+    "chest": "mixamorig:Spine1_83_07",
+    "head": "mixamorig:Head_2_010",
+    "hips": "mixamorig:Hips_95_05",
+    "jaw": "",
+    "leftEye": "",
+    "leftFoot": "mixamorig:LeftFoot_87_00",
+    "leftHand": "mixamorig:LeftHand_39_017",
+    "leftLowerArm": "mixamorig:LeftForeArm_40_016",
+    "leftLowerLeg": "mixamorig:LeftLeg_88_0133",
+    "leftShoulder": "mixamorig:LeftShoulder_42_014",
+    "leftToes": "mixamorig:LeftToeBase_86_0134",
+    "leftUpperArm": "mixamorig:LeftArm_41_015",
+    "leftUpperLeg": "mixamorig:LeftUpLeg_89_0132",
+    "neck": "mixamorig:Neck_3_09",
+    "rightEye": "",
+    "rightFoot": "mixamorig:RightFoot_92_0140",
+    "rightHand": "mixamorig:RightHand_78_076",
+    "rightLowerArm": "mixamorig:RightForeArm_79_075",
+    "rightLowerLeg": "mixamorig:RightLeg_93_0139",
+    "rightShoulder": "mixamorig:RightShoulder_81_073",
+    "rightToes": "mixamorig:RightToeBase_91_0141",
+    "rightUpperArm": "mixamorig:RightArm_80_074",
+    "rightUpperLeg": "mixamorig:RightUpLeg_94_0138",
+    "spine": "mixamorig:Spine_84_06",
+    "upperChest": "mixamorig:Spine2_82_08"
+  },
+  "bone_map_confidence": {
+    "arms": "exact",
+    "chest": "exact",
+    "confidence_notes": [
+      "Confidence is based on scripted bone-name and hierarchy mapping, not a visual retargeting run."
+    ],
+    "face": "missing",
+    "feet": "exact",
+    "fingers": "missing",
+    "hands": "exact",
+    "head": "exact",
+    "hips": "exact",
+    "legs": "exact",
+    "neck": "exact",
+    "overall": "high",
+    "spine": "exact",
+    "toes": "exact"
+  },
+  "conversion": {
+    "command": "# Extract/open the selected source in Blender, verify humanoid mapping, then export VRM.\n# Selected source: OtherSpiderman/spider-man_no_way_home_rigged.glb\n# Target path: public/avatars/spider-man-no-way-home.vrm",
+    "expected_blockers": [
+      "conversion not attempted in this V2 run",
+      "manual mapping and runtime load test still required"
+    ],
+    "manual_mapping_needed": true,
+    "target_format": "vrm",
+    "target_path": "public/avatars/spider-man-no-way-home.vrm"
+  },
+  "disabled_controls": [
+    "face_touch",
+    "facial_expressions",
+    "fingers"
+  ],
+  "display_name": "Spider-Man No Way Home",
+  "do_not_implement": [
+    "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+    "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+    "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+    "Do not enable fingers; use palm-only or curl presets.",
+    "Do not enable facial expressions for this model yet."
+  ],
+  "do_not_inspect": [
+    "duplicate GLBs",
+    "source ZIP internals",
+    "textures",
+    "full source binaries",
+    "screenshots/contact sheets unless visual review is needed"
+  ],
+  "enabled_controls": [
+    "arms",
+    "feet",
+    "hands",
+    "head",
+    "legs",
+    "root_motion",
+    "toes",
+    "upper_body"
+  ],
+  "face_touch_config": {
+    "mode": "ik_required",
+    "notes": [
+      "Face-touch is not runtime-proven; implement only after IK/target tests."
+    ],
+    "supported": true,
+    "targets": [
+      "head_center",
+      "mouth",
+      "left_cheek",
+      "right_cheek"
+    ]
+  },
+  "implementation_status": "convert_then_enable",
+  "inspect_only_if": [
+    "open bone-tree.txt if automatic mapping fails",
+    "open source binary only if VRM conversion fails"
+  ],
+  "minimum_viable_avatar_support": {
+    "acceptance_test": "Run PosePuppet with ?avatar=spider-man-no-way-home after adding a gated registry entry and verify basic tracking without runtime errors.",
+    "first_pass_goal": "load_vrm_full_body",
+    "may_defer": [
+      "fingers",
+      "face-touch",
+      "facial expressions",
+      "toes"
+    ],
+    "must_work": [
+      "VRM loads",
+      "avatar upright/facing camera",
+      "head tracks",
+      "arms track"
+    ],
+    "notes": [
+      "Do not attempt every control in the first pass."
+    ]
+  },
+  "one_paragraph_implementation_summary": "Spider-Man No Way Home should use profile `humanoid` with action `convert_then_test`. Convert or test `OtherSpiderman/spider-man_no_way_home_rigged.glb` to `public/avatars/spider-man-no-way-home.vrm`, enable arms, feet, hands, head, legs, root_motion, toes, upper_body, and disable face_touch, facial_expressions, fingers until runtime tests pass.",
+  "performance": {
+    "desktop_safe": true,
+    "mobile_safe": false,
+    "optimization_required": true,
+    "runtime_weight": "heavy"
+  },
+  "priority": 6,
+  "profile": "humanoid",
+  "reference_glb": "",
+  "retargeting_config": {
+    "arm_correction": "test_required",
+    "body_mode": "full",
+    "finger_mode": "palm_only",
+    "foot_orientation": "enabled_after_test",
+    "leg_correction": "test_required",
+    "offset_profile": "",
+    "requires_model_offsets": false,
+    "root_motion": true,
+    "wrist_correction": "test_required"
+  },
+  "runtime": {
+    "expected_loader": "@pixiv/three-vrm",
+    "fallback_if_missing": "current_default",
+    "registry_entry_needed": true,
+    "runtime_test_status": "not_attempted"
+  },
+  "runtime_fallback_policy": {
+    "if_tracking_profile_unsupported": "disable_unsupported_controls",
+    "if_vrm_load_fails": "show_warning_and_fallback",
+    "if_vrm_missing": "show_warning",
+    "recommended_warning_text": "This avatar is experimental. Some controls are disabled because the model does not yet have a verified full PosePuppet rig."
+  },
+  "runtime_vrm_path": "public/avatars/spider-man-no-way-home.vrm",
+  "schema_version": "posepuppet-avatar-adapter-spec-v1",
+  "selected_source_reasoning": "Selected by source-priority audit discovery: prefer editable .blend, then .fbx, then source/runtime .glb.",
+  "source_lock": {
+    "audit_status": "fresh",
+    "runtime_reference_sha256": "",
+    "selected_source_sha256": "06350131aa3745490c70ceecab9da83d69cfcd400a85a971f0e978b537ef5c6e",
+    "source_lock_path": "model-audits/source-lock.json"
+  },
+  "source_to_convert": "OtherSpiderman/spider-man_no_way_home_rigged.glb"
+}

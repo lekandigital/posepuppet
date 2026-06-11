@@ -1,0 +1,8 @@
+# Source files for darth-vader candidate VRM
+
+Selected source: /Users/lekan/posepuppet-working/generated-vrms/darth-vader.vrm
+Selected format: vrm
+Selected from ZIP: False
+
+All known source paths:
+- /Users/lekan/posepuppet-working/generated-vrms/darth-vader.vrm

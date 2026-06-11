@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-06-11T14:54:02+00:00",
+  "expected_candidate_vrm_path": "/Users/lekan/posepuppet-working/generated-vrms/darth-vader.vrm",
+  "expected_clean_blend_path": "/Users/lekan/posepuppet-working/model-working/darth-vader/darthvaderrig.blend",
+  "manual_bone_map_path": "/Users/lekan/Dev/posepuppet/model-audits/darth-vader/suggested-bone-map.json",
+  "nested_chain": [
+    "source/darthvaderrig.blend"
+  ],
+  "nested_zip": "",
+  "schema_version": "posepuppet-cleaned-source-manifest-v1",
+  "selected_source_path": "fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend",
+  "slug": "darth-vader",
+  "source_from_zip": true,
+  "source_zip": "/Users/lekan/Dev/posepuppet/models_for_animation/fortnite-darth-vader-advanced-rig.zip",
+  "status": "partial",
+  "working_directory": "/Users/lekan/posepuppet-working/model-working/darth-vader"
+}

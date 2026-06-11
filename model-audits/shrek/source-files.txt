@@ -1,15 +1,17 @@
 # Source files for Shrek
 
 Selected source: shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx
+Best conversion source: shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx
 Runtime GLB companion: shrek_rig.glb
+Target VRM path: public/avatars/shrek.vrm
 
 ## All known variants
 
-- `shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx` (nested-zip-entry, .fbx, 6.35 MB)
-- `shrek_rig.glb` (file, .glb, 3.25 MB, sha256=6880ac489414)
-- `shrek-rig.zip` (file, .zip, 10.47 MB, sha256=f02d50d0dcb7)
+- `shrek-rig.zip`
+- `shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx`
+- `shrek_rig.glb`
 
 ## Notes
 
-- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
-- License remains unknown until manually verified from the original download source.
+- Original binaries, textures, ZIPs, screenshots, contact sheets, and converted VRMs are not included in handoff files.
+- Use source-lock hashes before trusting this audit after model files change.

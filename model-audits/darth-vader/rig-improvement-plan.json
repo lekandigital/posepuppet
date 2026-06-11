@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-06-11T14:54:02+00:00",
+  "display_name": "Darth Vader",
+  "expected_candidate_vrm_path": "/Users/lekan/posepuppet-working/generated-vrms/darth-vader.vrm",
+  "expected_clean_blend_path": "/Users/lekan/posepuppet-working/model-working/darth-vader/darthvaderrig.blend",
+  "gates": {
+    "dry_run_resolved": true,
+    "inspect_required_before_attempt": true,
+    "runtime_smoke_test": "not_attempted"
+  },
+  "manual_bone_map_path": "/Users/lekan/Dev/posepuppet/model-audits/darth-vader/suggested-bone-map.json",
+  "risk_notes": [
+    "cape/robe deformation",
+    "finger mapping",
+    "runtime browser smoke is not attempted",
+    "shoulders",
+    "wrist orientation"
+  ],
+  "runtime_glb_companion": "fortnite_darth_vader_advanced_rig (2).glb",
+  "schema_version": "posepuppet-rig-prep-plan-v1",
+  "selected_source_format": ".blend",
+  "selected_source_kind": "zip-entry",
+  "selected_source_path": "fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend",
+  "slug": "darth-vader",
+  "status": "partial",
+  "working_directory": "/Users/lekan/posepuppet-working/model-working/darth-vader",
+  "zip_nested_source_chain": [
+    "source/darthvaderrig.blend"
+  ]
+}

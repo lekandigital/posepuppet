@@ -1,0 +1,76 @@
+{
+  "server": {
+    "host": "192.168.86.152",
+    "user": "o",
+    "os": "Ubuntu 22.04.5 LTS",
+    "kernel": "6.8.0-124-generic",
+    "cpu": "Intel(R) Xeon(R) W-3245 CPU @ 3.20GHz",
+    "gpu": "NVIDIA GeForce RTX 3090 Ti",
+    "vram": "24564 MiB",
+    "nvidia_driver": "580.159.03",
+    "cuda_visible": true,
+    "cuda_runtime_from_nvidia_smi": "13.0"
+  },
+  "tools": {
+    "python": "Python 3.10.12",
+    "node": "v22.22.3",
+    "npm": "10.9.8",
+    "blender": "Blender 5.1.2",
+    "vrm_addon": "available",
+    "git": "git version 2.34.1",
+    "git_lfs": "git-lfs/3.0.2 (GitHub; linux amd64; go 1.18.1)",
+    "ffmpeg": "ffmpeg version 4.4.2-0ubuntu0.22.04.1 Copyright (c) 2000-2021 the FFmpeg developers",
+    "jq": "jq-1.6",
+    "seven_zip": "7-Zip [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21"
+  },
+  "paths": {
+    "repo": "/home/o/Dev/posepuppet",
+    "models": "/home/o/posepuppet-assets/ModelsForAnimation",
+    "woody": "/home/o/posepuppet-assets/woody",
+    "working": "/home/o/posepuppet-working",
+    "generated_vrms": "/home/o/posepuppet-working/generated-vrms",
+    "tools": "/home/o/posepuppet-tools"
+  },
+  "assets": {
+    "models_size": "1.1G\t/home/o/posepuppet-assets/ModelsForAnimation",
+    "woody_size": "16M\t/home/o/posepuppet-assets/woody",
+    "models_symlink": "/home/o/posepuppet-assets/ModelsForAnimation",
+    "models_lowercase_symlink": "/home/o/posepuppet-assets/ModelsForAnimation"
+  },
+  "checks": {
+    "base_packages": "pass",
+    "npm_install": "pass",
+    "npm_build": "pass",
+    "npm_test": "fail",
+    "audit_self_test": "pass",
+    "generate_model_audit_v2": "pass",
+    "audit_validation": "pass",
+    "audit_staleness": "pass",
+    "blender_headless": "pass",
+    "blender_model_inspection": "pass",
+    "vrm_export_possible": "pass",
+    "rig_prep_dry_run": "missing",
+    "convert_dry_run": "missing"
+  },
+  "blockers": [
+    "npm test has 6 Playwright timeouts around fake camera/video readiness; 19 unit/browser tests passed.",
+    "tools/rig_prep_all_models.py is missing; rig-prep dry run was not attempted.",
+    "tools/convert_all_avatars_to_vrm.py is missing; conversion dry run was not attempted."
+  ],
+  "next_commands": [
+    "source ~/posepuppet-working/posepuppet-env.sh",
+    "python3 tools/audit_model.py --self-test",
+    "python3 tools/validate_model_audits.py model-audits",
+    "python3 tools/check_audit_staleness.py ModelsForAnimation model-audits --warn-only",
+    "python3 tools/audit_models.py ModelsForAnimation model-audits --blender /home/o/.local/bin/blender --woody-dir /home/o/posepuppet-assets/woody --limit 1 --timeout 300"
+  ],
+  "logs": {
+    "environment_initial": "/home/o/posepuppet-working/logs/environment-initial.txt",
+    "apt_base_install": "/home/o/posepuppet-working/logs/apt-base-install.txt",
+    "npm_install": "/home/o/posepuppet-working/logs/npm-install.txt",
+    "npm_build": "/home/o/posepuppet-working/logs/npm-build.txt",
+    "npm_test": "/home/o/posepuppet-working/logs/npm-test.txt",
+    "vrm_addon": "/home/o/posepuppet-working/logs/blender-vrm-addon-check.txt",
+    "pipeline_status": "/home/o/posepuppet-working/logs/pipeline-status.tsv"
+  }
+}

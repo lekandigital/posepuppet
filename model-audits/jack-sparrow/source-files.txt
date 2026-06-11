@@ -1,16 +1,18 @@
 # Source files for Jack Sparrow
 
 Selected source: jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend
+Best conversion source: jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend
 Runtime GLB companion: jack_sparrow_ready_for_animation.glb
+Target VRM path: public/avatars/jack-sparrow.vrm
 
 ## All known variants
 
-- `jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend` (zip-entry, .blend, 98.27 MB)
-- `jack_sparrow_ready_for_animation (1).glb` (file, .glb, 29.01 MB, sha256=a3eecdd84215)
-- `jack_sparrow_ready_for_animation.glb` (file, .glb, 63.60 MB, sha256=3fae0223afcd)
-- `jack-sparrow-ready-for-animation.zip` (file, .zip, 150.92 MB, sha256=e2e1cd777166)
+- `jack-sparrow-ready-for-animation.zip`
+- `jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend`
+- `jack_sparrow_ready_for_animation (1).glb`
+- `jack_sparrow_ready_for_animation.glb`
 
 ## Notes
 
-- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
-- License remains unknown until manually verified from the original download source.
+- Original binaries, textures, ZIPs, screenshots, contact sheets, and converted VRMs are not included in handoff files.
+- Use source-lock hashes before trusting this audit after model files change.

@@ -1,16 +1,18 @@
 # Source files for Terminator T-800
 
 Selected source: terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend
+Best conversion source: terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend
 Runtime GLB companion: terminator-t-800-endo-skeleton-damaged.glb
+Target VRM path: public/avatars/terminator-t-800.vrm
 
 ## All known variants
 
-- `terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend` (nested-zip-entry, .blend, 3.40 MB)
-- `terminator-t-800-endo-skeleton-damaged (1).glb` (file, .glb, 14.97 MB, sha256=137a57beef8b)
-- `terminator-t-800-endo-skeleton-damaged.glb` (file, .glb, 43.76 MB, sha256=5a4b5ebd95c5)
-- `terminator-t-800-endo-skeleton-damaged.zip` (file, .zip, 93.37 MB, sha256=2474a17e3e3a)
+- `terminator-t-800-endo-skeleton-damaged (1).glb`
+- `terminator-t-800-endo-skeleton-damaged.glb`
+- `terminator-t-800-endo-skeleton-damaged.zip`
+- `terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend`
 
 ## Notes
 
-- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
-- License remains unknown until manually verified from the original download source.
+- Original binaries, textures, ZIPs, screenshots, contact sheets, and converted VRMs are not included in handoff files.
+- Use source-lock hashes before trusting this audit after model files change.

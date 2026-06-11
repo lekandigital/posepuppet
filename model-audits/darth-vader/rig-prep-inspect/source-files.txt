@@ -1,0 +1,14 @@
+# Source files for Darth Vader
+
+Selected source: fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend
+Selected format: blend
+Selected from ZIP: True
+Source ZIP: /Users/lekan/Dev/posepuppet/models_for_animation/fortnite-darth-vader-advanced-rig.zip
+
+All known source paths:
+- fortnite-darth-vader-advanced-rig.zip
+- fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend
+- fortnite_darth_vader_advanced_rig (1).glb
+- fortnite_darth_vader_advanced_rig (2).glb
+- fortnite_darth_vader_advanced_rig (3).glb
+- fortnite_darth_vader_advanced_rig.glb

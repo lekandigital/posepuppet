@@ -1,196 +1,24 @@
 # Source archive report
 
-## `adi-20-buzz-lightyear-fully-rigged.zip`
+Archives were inspected by the earlier Blender audit system; V2 keeps source binaries out of generated handoffs.
 
-- Entries: 3
-- Texture files: 2
-- Model/source files:
-  - `adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend` (.blend, 794448 bytes)
-
-## `baby-yoda-mandalorian-low-poly-basic-rig.zip`
-
-- Entries: 1
-- Texture files: 0
-- Model/source files:
-  - `baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend` (.blend, 4346908 bytes)
-
-## `elsa-free-fall-frozen-with-rig-included (1).zip`
-
-- Entries: 4
-- Texture files: 3
-- Model/source files: none detected
-- Nested ZIPs:
-  - `elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip`
-
-## `elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip`
-
-- Entries: 5
-- Texture files: 3
-- Model/source files:
-  - `elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb` (.glb, 444896 bytes)
-
-## `elsa-free-fall-frozen-with-rig-included (2).zip`
-
-- Entries: 4
-- Texture files: 3
-- Model/source files: none detected
-- Nested ZIPs:
-  - `elsa-free-fall-frozen-with-rig-included (2).zip!/source/elsa free fall.zip`
-
-## `elsa-free-fall-frozen-with-rig-included (2).zip!/source/elsa free fall.zip`
-
-- Entries: 5
-- Texture files: 3
-- Model/source files:
-  - `elsa-free-fall-frozen-with-rig-included (2).zip!/source/elsa free fall.zip!/Elsa (merge).glb` (.glb, 444896 bytes)
-
-## `elsa-free-fall-frozen-with-rig-included.zip`
-
-- Entries: 4
-- Texture files: 3
-- Model/source files: none detected
-- Nested ZIPs:
-  - `elsa-free-fall-frozen-with-rig-included.zip!/source/elsa free fall.zip`
-
-## `elsa-free-fall-frozen-with-rig-included.zip!/source/elsa free fall.zip`
-
-- Entries: 5
-- Texture files: 3
-- Model/source files:
-  - `elsa-free-fall-frozen-with-rig-included.zip!/source/elsa free fall.zip!/Elsa (merge).glb` (.glb, 444896 bytes)
-
-## `fortnite-batman-advanced-rig.zip`
-
-- Entries: 9
-- Texture files: 8
-- Model/source files:
-  - `fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend` (.blend, 48265916 bytes)
-
-## `fortnite-darth-vader-advanced-rig.zip`
-
-- Entries: 11
-- Texture files: 10
-- Model/source files:
-  - `fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend` (.blend, 34198534 bytes)
-
-## `godzilla-rigged-animated.zip`
-
-- Entries: 4
-- Texture files: 3
-- Model/source files:
-  - `godzilla-rigged-animated.zip!/source/Godzilla (New Glow).blend` (.blend, 46826357 bytes)
-
-## `iron-man-rig.zip`
-
-- Entries: 5
-- Texture files: 4
-- Model/source files: none detected
-- Nested ZIPs:
-  - `iron-man-rig.zip!/source/iron man.zip`
-
-## `iron-man-rig.zip!/source/iron man.zip`
-
-- Entries: 8
-- Texture files: 5
-- Model/source files:
-  - `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend` (.blend, 4187712 bytes)
-  - `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.fbx` (.fbx, 1933196 bytes)
-
-## `jack-sparrow-ready-for-animation.zip`
-
-- Entries: 18
-- Texture files: 17
-- Model/source files:
-  - `jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend` (.blend, 103047210 bytes)
-
-## `king-kong-animated.zip`
-
-- Entries: 3
-- Texture files: 2
-- Model/source files:
-  - `king-kong-animated.zip!/source/king kong.glb` (.glb, 14300180 bytes)
-
-## `olaf-3d-rigged.zip`
-
-- Entries: 4
-- Texture files: 3
-- Model/source files:
-  - `olaf-3d-rigged.zip!/source/OlafRig.blend` (.blend, 11416106 bytes)
-
-## `OtherSpiderman/spider-man-no-way-home-rigged.zip`
-
-- Entries: 9
-- Texture files: 8
-- Model/source files: none detected
-
-## `OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip`
-
-- Entries: 5
-- Texture files: 4
-- Model/source files:
-  - `OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx` (.fbx, 11728080 bytes)
-
-## `realistic-xenomorph-rig.zip`
-
-- Entries: 5
-- Texture files: 4
-- Model/source files:
-  - `realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx` (.fbx, 7812988 bytes)
-
-## `rigged-hand.zip`
-
-- Entries: 5
-- Texture files: 4
-- Model/source files:
-  - `rigged-hand.zip!/source/handRig_02.fbx` (.fbx, 1559820 bytes)
-
-## `shrek-rig.zip`
-
-- Entries: 5
-- Texture files: 4
-- Model/source files: none detected
-- Nested ZIPs:
-  - `shrek-rig.zip!/source/shrek 4.zip`
-
-## `shrek-rig.zip!/source/shrek 4.zip`
-
-- Entries: 4
-- Texture files: 3
-- Model/source files:
-  - `shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx` (.fbx, 6659872 bytes)
-
-## `spider-man-playstation-rigged.zip`
-
-- Entries: 8
-- Texture files: 7
-- Model/source files:
-  - `spider-man-playstation-rigged.zip!/source/spider man playstation realistic.blend` (.blend, 37083344 bytes)
-
-## `teal-v2.zip`
-
-- Entries: 9
-- Texture files: 8
-- Model/source files:
-  - `teal-v2.zip!/source/Tealv2.fbx` (.fbx, 5745532 bytes)
-
-## `terminator-t-800-endo-skeleton-damaged.zip`
-
-- Entries: 18
-- Texture files: 17
-- Model/source files: none detected
-- Nested ZIPs:
-  - `terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip`
-
-## `terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip`
-
-- Entries: 22
-- Texture files: 21
-- Model/source files:
-  - `terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend` (.blend, 3565888 bytes)
-
-## `the-mandalorian-grogu-advanced-rig.zip`
-
-- Entries: 5
-- Texture files: 4
-- Model/source files:
-  - `the-mandalorian-grogu-advanced-rig.zip!/source/Grogurig.blend` (.blend, 10749961 bytes)
+- **Woody**: selected `/Users/lekan/Downloads/woody/woody-toy-story-rig-free-download/source/T-Pose (9).fbx`; runtime/reference `/Users/lekan/Downloads/woody/woody_toy_story_rig_free_download.glb`.
+- **Darth Vader**: selected `fortnite-darth-vader-advanced-rig.zip!/source/darthvaderrig.blend`; runtime/reference `fortnite_darth_vader_advanced_rig (2).glb`.
+- **Fortnite Batman**: selected `fortnite-batman-advanced-rig.zip!/source/BATMANRIG.blend`; runtime/reference `fortnite_batman_advanced_rig.glb`.
+- **Iron Man**: selected `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend`; runtime/reference `iron_man_rig.glb`.
+- **Shrek**: selected `shrek-rig.zip!/source/shrek 4.zip!/source/Dying.fbx`; runtime/reference `shrek_rig.glb`.
+- **Spider-Man No Way Home**: selected `OtherSpiderman/spider-man_no_way_home_rigged.glb`; runtime/reference `none`.
+- **Spider-Man PlayStation**: selected `spider-man-playstation-rigged.zip!/source/spider man playstation realistic.blend`; runtime/reference `spider_man_playstation_rigged.glb`.
+- **The Amazing Spider-Man 2**: selected `OtherSpiderman/the-amazing-spider-man-2-rigged-model.zip!/source/Amazing Spider Man 2 Rigged.fbx`; runtime/reference `OtherSpiderman/the_amazing_spider_man_2_rigged_model.glb`.
+- **Terminator T-800**: selected `terminator-t-800-endo-skeleton-damaged.zip!/source/terminator-t-800-endo-skeleton-damaged.zip!/source/t-800_LP.blend`; runtime/reference `terminator-t-800-endo-skeleton-damaged.glb`.
+- **Jack Sparrow**: selected `jack-sparrow-ready-for-animation.zip!/source/Jack Sparrow.blend`; runtime/reference `jack_sparrow_ready_for_animation.glb`.
+- **Elsa**: selected `elsa-free-fall-frozen-with-rig-included (1).zip!/source/elsa free fall.zip!/Elsa (merge).glb`; runtime/reference `elsa_free_fall_frozen_with_rig_included (2).glb`.
+- **Grogu**: selected `the-mandalorian-grogu-advanced-rig.zip!/source/Grogurig.blend`; runtime/reference `the_mandalorian_grogu_advanced_rig.glb`.
+- **King Kong**: selected `king-kong-animated.zip!/source/king kong.glb`; runtime/reference `king_kong_animated.glb`.
+- **Olaf**: selected `olaf-3d-rigged.zip!/source/OlafRig.blend`; runtime/reference `olaf_3d_rigged.glb`.
+- **Godzilla**: selected `godzilla-rigged-animated.zip!/source/Godzilla (New Glow).blend`; runtime/reference `godzilla_rigged_animated.glb`.
+- **Xenomorph**: selected `realistic-xenomorph-rig.zip!/source/Xenomorph Default.fbx`; runtime/reference `realistic_xenomorph_rig.glb`.
+- **Rigged Hand**: selected `rigged-hand.zip!/source/handRig_02.fbx`; runtime/reference `rigged_hand.glb`.
+- **Teal v2**: selected `teal-v2.zip!/source/Tealv2.fbx`; runtime/reference `teal_v.2.glb`.
+- **Buzz Lightyear**: selected `adi-20-buzz-lightyear-fully-rigged.zip!/source/Buzz Lightyear.blend`; runtime/reference `adi_2.0_buzz_lightyear_fully_rigged.glb`.
+- **Baby Yoda**: selected `baby-yoda-mandalorian-low-poly-basic-rig.zip!/source/BABY YODA SHARE.blend`; runtime/reference `baby_yoda_mandalorian_-_low_poly_-_basic_rig.glb`.

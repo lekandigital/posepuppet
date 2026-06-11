@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-06-11T14:51:42+00:00",
+  "items": [
+    "Verify cape/robe deformation during arm and torso motion.",
+    "Verify armor and helmet rigid parts do not shear during export.",
+    "Confirm wrist, hand, and finger behavior after VRM conversion.",
+    "Keep face-touch deferred until runtime IK/pose validation exists.",
+    "Do not promote to public UI before browser smoke passes."
+  ],
+  "schema_version": "posepuppet-manual-fix-checklist-v1",
+  "slug": "darth-vader",
+  "status": "partial"
+}

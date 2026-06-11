@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.venv/
 __pycache__/
 *.pyc
 
@@ -9,7 +10,9 @@ fixtures/
 # Downloaded/local character source material for audit only.
 # Keep generated reports under model-audits/ trackable.
 ModelsForAnimation/
+ModelsForAnimation
 models_for_animation/
+models_for_animation
 *.blend
 *.fbx
 *.glb
@@ -41,7 +44,8 @@ model-audits/**/*.log
 public/mediapipe-wasm/
 public/models/
 
-# Unconverted avatar sources stay out of git (runtime .vrm files are committed)
+# Avatar binaries stay local/private during audits unless the user explicitly
+# approves a specific runtime VRM for commit.
 public/avatars/*.glb
 public/avatars/*.fbx
 public/avatars/*.gltf

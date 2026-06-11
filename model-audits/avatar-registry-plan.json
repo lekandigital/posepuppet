@@ -1,0 +1,723 @@
+{
+  "avatars": [
+    {
+      "adapter_spec_path": "model-audits/woody/avatar-adapter-spec.json",
+      "avatar_id": "woody",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "display_name": "Woody",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "profile": "humanoid",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/woody.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "experimental"
+    },
+    {
+      "adapter_spec_path": "model-audits/darth-vader/avatar-adapter-spec.json",
+      "avatar_id": "darth-vader",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "feet",
+        "fingers",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "display_name": "Darth Vader",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "profile": "humanoid",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/darth-vader.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "conversion-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/fortnite-batman/avatar-adapter-spec.json",
+      "avatar_id": "fortnite-batman",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "feet",
+        "fingers",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "display_name": "Fortnite Batman",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "profile": "humanoid",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/fortnite-batman.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "conversion-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/iron-man/avatar-adapter-spec.json",
+      "avatar_id": "iron-man",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "feet",
+        "fingers",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "display_name": "Iron Man",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "profile": "humanoid",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/iron-man.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "conversion-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/shrek/avatar-adapter-spec.json",
+      "avatar_id": "shrek",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "toes"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "upper_body"
+      ],
+      "display_name": "Shrek",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "profile": "humanoid",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/shrek.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "conversion-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/spider-man-no-way-home/avatar-adapter-spec.json",
+      "avatar_id": "spider-man-no-way-home",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "display_name": "Spider-Man No Way Home",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "profile": "humanoid",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/spider-man-no-way-home.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "conversion-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/spider-man-playstation/avatar-adapter-spec.json",
+      "avatar_id": "spider-man-playstation",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "display_name": "Spider-Man PlayStation",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "profile": "humanoid",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/spider-man-playstation.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "conversion-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/amazing-spider-man-2/avatar-adapter-spec.json",
+      "avatar_id": "amazing-spider-man-2",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "display_name": "The Amazing Spider-Man 2",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "profile": "humanoid",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/amazing-spider-man-2.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "conversion-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/terminator-t-800/avatar-adapter-spec.json",
+      "avatar_id": "terminator-t-800",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "upper_body"
+      ],
+      "display_name": "Terminator T-800",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "profile": "humanoid",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/terminator-t-800.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "conversion-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/jack-sparrow/avatar-adapter-spec.json",
+      "avatar_id": "jack-sparrow",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "toes",
+        "upper_body"
+      ],
+      "display_name": "Jack Sparrow",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "profile": "humanoid_with_offsets",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/jack-sparrow.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "conversion-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/elsa/avatar-adapter-spec.json",
+      "avatar_id": "elsa",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "feet",
+        "fingers",
+        "toes"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "hands",
+        "head",
+        "upper_body"
+      ],
+      "display_name": "Elsa",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not enable feet for this model yet."
+      ],
+      "profile": "humanoid_with_offsets",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/elsa.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "cleanup-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/grogu/avatar-adapter-spec.json",
+      "avatar_id": "grogu",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "creature_head",
+        "creature_jaw",
+        "legs"
+      ],
+      "display_name": "Grogu",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "profile": "creature",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/grogu.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "creature-profile-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/king-kong/avatar-adapter-spec.json",
+      "avatar_id": "king-kong",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "creature_head",
+        "creature_jaw",
+        "legs"
+      ],
+      "display_name": "King Kong",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "profile": "creature",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/king-kong.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "creature-profile-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/olaf/avatar-adapter-spec.json",
+      "avatar_id": "olaf",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "creature_head",
+        "legs"
+      ],
+      "display_name": "Olaf",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "profile": "creature",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/olaf.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "creature-profile-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/godzilla/avatar-adapter-spec.json",
+      "avatar_id": "godzilla",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "creature_head",
+        "creature_jaw",
+        "legs"
+      ],
+      "display_name": "Godzilla",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "profile": "creature",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/godzilla.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "creature-profile-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/xenomorph/avatar-adapter-spec.json",
+      "avatar_id": "xenomorph",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "default_enabled_controls": [
+        "creature_head",
+        "creature_jaw",
+        "legs"
+      ],
+      "display_name": "Xenomorph",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "profile": "creature",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/xenomorph.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "creature-profile-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/rigged-hand/avatar-adapter-spec.json",
+      "avatar_id": "rigged-hand",
+      "default_disabled_controls": [
+        "arms",
+        "face_touch",
+        "facial_expressions",
+        "feet",
+        "head",
+        "legs",
+        "root_motion",
+        "toes",
+        "torso",
+        "upper_body"
+      ],
+      "default_enabled_controls": [
+        "fingers",
+        "hands"
+      ],
+      "display_name": "Rigged Hand",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not enable feet for this model yet.",
+        "Do not treat this as a full avatar; use it only for hand/finger tests."
+      ],
+      "profile": "hand_only",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/rigged-hand.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "hand-only"
+    },
+    {
+      "adapter_spec_path": "model-audits/teal-v2/avatar-adapter-spec.json",
+      "avatar_id": "teal-v2",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "toes"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "feet",
+        "hands",
+        "head",
+        "legs",
+        "upper_body"
+      ],
+      "display_name": "Teal v2",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet."
+      ],
+      "profile": "humanoid_with_offsets",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/teal-v2.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "cleanup-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/buzz-lightyear/avatar-adapter-spec.json",
+      "avatar_id": "buzz-lightyear",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "feet",
+        "fingers",
+        "toes"
+      ],
+      "default_enabled_controls": [
+        "arms",
+        "hands",
+        "head",
+        "upper_body"
+      ],
+      "display_name": "Buzz Lightyear",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not enable feet for this model yet."
+      ],
+      "profile": "humanoid_with_offsets",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/buzz-lightyear.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "cleanup-needed"
+    },
+    {
+      "adapter_spec_path": "model-audits/baby-yoda/avatar-adapter-spec.json",
+      "avatar_id": "baby-yoda",
+      "default_disabled_controls": [
+        "face_touch",
+        "facial_expressions",
+        "fingers",
+        "standard_humanoid_full_body"
+      ],
+      "default_enabled_controls": [
+        "creature_head"
+      ],
+      "display_name": "Baby Yoda",
+      "fallback_if_missing": "current_default",
+      "notes": [
+        "Do not implement FBX, BLEND, ZIP, or texture loading in the browser runtime.",
+        "Do not add this avatar to public UI cycling until VRM conversion and runtime load tests pass.",
+        "Do not inspect duplicate GLBs or source textures unless conversion/debugging fails.",
+        "Do not enable fingers; use palm-only or curl presets.",
+        "Do not enable facial expressions for this model yet.",
+        "Do not enable feet for this model yet.",
+        "Do not force standard full-body humanoid mode; use a creature profile."
+      ],
+      "profile": "creature",
+      "required_before_enable": [
+        "convert_to_vrm",
+        "load_test",
+        "orientation_test"
+      ],
+      "runtime_vrm_path": "/avatars/baby-yoda.vrm",
+      "should_add_to_registry_now": false,
+      "warning_label": "creature-profile-needed"
+    }
+  ],
+  "created_at": "2026-06-11T13:21:41+00:00",
+  "schema_version": "posepuppet-avatar-registry-plan-v1"
+}

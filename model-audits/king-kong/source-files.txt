@@ -1,16 +1,18 @@
 # Source files for King Kong
 
 Selected source: king-kong-animated.zip!/source/king kong.glb
+Best conversion source: king-kong-animated.zip!/source/king kong.glb
 Runtime GLB companion: king_kong_animated.glb
+Target VRM path: public/avatars/king-kong.vrm
 
 ## All known variants
 
-- `king-kong-animated.zip!/source/king kong.glb` (zip-entry, .glb, 13.64 MB)
-- `king_kong_animated (1).glb` (file, .glb, 19.36 MB, sha256=e049b771bbdf)
-- `king_kong_animated.glb` (file, .glb, 21.60 MB, sha256=29ca9dcb05a2)
-- `king-kong-animated.zip` (file, .zip, 18.83 MB, sha256=bf763c9a2680)
+- `king-kong-animated.zip`
+- `king-kong-animated.zip!/source/king kong.glb`
+- `king_kong_animated (1).glb`
+- `king_kong_animated.glb`
 
 ## Notes
 
-- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
-- License remains unknown until manually verified from the original download source.
+- Original binaries, textures, ZIPs, screenshots, contact sheets, and converted VRMs are not included in handoff files.
+- Use source-lock hashes before trusting this audit after model files change.

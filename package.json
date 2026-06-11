@@ -10,7 +10,13 @@
     "postinstall": "node scripts/copy-mediapipe-wasm.mjs && node scripts/fetch-pose-model.mjs",
     "eval": "node eval/run.mjs",
     "test": "playwright test",
-    "prepare-fixtures": "node scripts/prepare-fixtures.mjs"
+    "prepare-fixtures": "node scripts/prepare-fixtures.mjs",
+    "audit:self-test": "python3 tools/audit_model.py --self-test",
+    "audit:models": "python3 tools/audit_models.py models_for_animation model-audits --woody-dir /Users/lekan/Downloads/woody && python3 tools/generate_model_audit_v2.py model-audits",
+    "audit:quick": "python3 tools/audit_model.py --self-test && python3 tools/validate_model_audits.py model-audits",
+    "audit:validate": "python3 tools/validate_model_audits.py model-audits",
+    "audit:staleness": "python3 tools/check_audit_staleness.py models_for_animation model-audits",
+    "audit:all": "npm run audit:self-test && npm run audit:models && npm run audit:validate && npm run audit:staleness"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.35",

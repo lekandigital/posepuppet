@@ -1,15 +1,17 @@
 # Source files for Spider-Man No Way Home
 
 Selected source: OtherSpiderman/spider-man_no_way_home_rigged.glb
+Best conversion source: OtherSpiderman/spider-man_no_way_home_rigged.glb
 Runtime GLB companion: none
+Target VRM path: public/avatars/spider-man-no-way-home.vrm
 
 ## All known variants
 
-- `OtherSpiderman/spider-man_no_way_home_rigged (1).glb` (file, .glb, 8.43 MB, sha256=4939c0b94c9f)
-- `OtherSpiderman/spider-man_no_way_home_rigged.glb` (file, .glb, 16.16 MB, sha256=06350131aa37)
-- `OtherSpiderman/spider-man-no-way-home-rigged.zip` (file, .zip, 25.94 MB, sha256=5d734686c27e)
+- `OtherSpiderman/spider-man-no-way-home-rigged.zip`
+- `OtherSpiderman/spider-man_no_way_home_rigged (1).glb`
+- `OtherSpiderman/spider-man_no_way_home_rigged.glb`
 
 ## Notes
 
-- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
-- License remains unknown until manually verified from the original download source.
+- Original binaries, textures, ZIPs, screenshots, contact sheets, and converted VRMs are not included in handoff files.
+- Use source-lock hashes before trusting this audit after model files change.

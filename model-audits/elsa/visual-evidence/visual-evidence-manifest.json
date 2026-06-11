@@ -1,0 +1,12 @@
+{
+  "generated": false,
+  "images": [],
+  "included_in_handoff": false,
+  "summarized_into": [
+    "visual_reasoning_review",
+    "appearance_descriptor",
+    "mobility_visual_review",
+    "retargeting_risk",
+    "deformation_risks"
+  ]
+}

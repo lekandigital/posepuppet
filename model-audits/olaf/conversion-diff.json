@@ -1,0 +1,27 @@
+{
+  "conversion_diff": {
+    "blockers": [
+      "VRM conversion and re-audit were not completed for this model."
+    ],
+    "converted_vrm_path": "public/avatars/olaf.vrm",
+    "feet_preserved": "unknown",
+    "fingers_preserved": "unknown",
+    "humanoid_mapping_preserved": "unknown",
+    "material_count_after": 0,
+    "material_count_before": 3,
+    "mesh_count_after": 0,
+    "mesh_count_before": 28,
+    "notes": [
+      "# Extract/open the selected source in Blender, verify humanoid mapping, then export VRM.\n# Selected source: olaf-3d-rigged.zip!/source/OlafRig.blend\n# Target path: public/avatars/olaf.vrm"
+    ],
+    "orientation_changed": "unknown",
+    "posepuppet_runtime_candidate": false,
+    "scale_changed": "unknown",
+    "shape_keys_preserved": "unknown",
+    "skeleton_preserved": "unknown",
+    "source_path": "olaf-3d-rigged.zip!/source/OlafRig.blend",
+    "status": "not_attempted",
+    "texture_result": "not_attempted"
+  },
+  "schema_version": "posepuppet-conversion-diff-v1"
+}

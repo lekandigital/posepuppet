@@ -1,16 +1,18 @@
 # Source files for Iron Man
 
 Selected source: iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend
+Best conversion source: iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend
 Runtime GLB companion: iron_man_rig.glb
+Target VRM path: public/avatars/iron-man.vrm
 
 ## All known variants
 
-- `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend` (nested-zip-entry, .blend, 3.99 MB)
-- `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.fbx` (nested-zip-entry, .fbx, 1.84 MB)
-- `iron_man_rig.glb` (file, .glb, 2.95 MB, sha256=7cd0d123f77a)
-- `iron-man-rig.zip` (file, .zip, 5.51 MB, sha256=f8af4595c231)
+- `iron-man-rig.zip`
+- `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.blend`
+- `iron-man-rig.zip!/source/iron man.zip!/iron-man-rig/source/iron man.fbx`
+- `iron_man_rig.glb`
 
 ## Notes
 
-- Original binaries, textures, ZIPs, and extracted sources are not copied into this audit folder.
-- License remains unknown until manually verified from the original download source.
+- Original binaries, textures, ZIPs, screenshots, contact sheets, and converted VRMs are not included in handoff files.
+- Use source-lock hashes before trusting this audit after model files change.
