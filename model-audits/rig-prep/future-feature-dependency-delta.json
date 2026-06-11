@@ -1,0 +1,78 @@
+{
+  "schema_version": "posepuppet-future-feature-dependency-delta-v1",
+  "created_at": "2026-06-11T15:48:00+00:00",
+  "features": [
+    {
+      "feature": "creature_profile_system",
+      "blocks": ["grogu", "olaf", "baby-yoda", "godzilla", "xenomorph", "king-kong"],
+      "blocked_count": 6,
+      "description": "Non-humanoid avatars need a separate retargeting profile that maps MediaPipe landmarks to creature-specific bone sets",
+      "estimated_effort": "1-2 days",
+      "priority": "medium",
+      "depends_on": []
+    },
+    {
+      "feature": "finger_retargeting",
+      "blocks": [],
+      "enhances": ["darth-vader", "fortnite-batman", "iron-man"],
+      "enhanced_count": 3,
+      "description": "Hand tracking → finger bone rotation mapping. Many models have finger bones but retargeting is not yet implemented",
+      "estimated_effort": "1-2 days",
+      "priority": "high",
+      "depends_on": ["hand_tracking"]
+    },
+    {
+      "feature": "face_touch_ik",
+      "blocks": [],
+      "enhances_all_humanoids": true,
+      "description": "When face landmarks detect a hand near the face, IK solver moves avatar hand to face. Currently deferred for all models",
+      "estimated_effort": "2-3 days",
+      "priority": "medium",
+      "depends_on": ["hand_tracking"]
+    },
+    {
+      "feature": "facial_expressions",
+      "blocks": [],
+      "enhances_all_humanoids": true,
+      "description": "MediaPipe face mesh → VRM blend shapes. Currently deferred. Requires models with blend shape support",
+      "estimated_effort": "2-3 days",
+      "priority": "low",
+      "depends_on": []
+    },
+    {
+      "feature": "hand_only_mode",
+      "blocks": ["rigged-hand"],
+      "blocked_count": 1,
+      "description": "Specialized rendering mode that shows only the hand model. For finger tracking experiments",
+      "estimated_effort": "4h",
+      "priority": "low",
+      "depends_on": ["finger_retargeting"]
+    },
+    {
+      "feature": "manual_bone_map_cleanup",
+      "blocks": ["elsa", "teal-v2", "buzz-lightyear"],
+      "blocked_count": 3,
+      "description": "Models with low automatic humanoid mapping need manual Blender bone map editing before conversion",
+      "estimated_effort": "2-4h per model",
+      "priority": "medium",
+      "depends_on": []
+    },
+    {
+      "feature": "lod_or_decimation",
+      "blocks": [],
+      "enhances": ["darth-vader", "fortnite-batman", "iron-man", "spider-man-playstation", "jack-sparrow", "king-kong"],
+      "enhanced_count": 6,
+      "description": "Heavy models (>10MB VRM) need LOD levels or mesh decimation for mobile performance",
+      "estimated_effort": "1 day",
+      "priority": "low",
+      "depends_on": []
+    }
+  ],
+  "critical_path_for_next_batch": [
+    "Batch 1 (batman, iron-man, shrek): No feature dependencies — convert_then_test ready NOW",
+    "Batch 2 (asm2, t-800, spidermen): Inspect first, then convert_then_test — no feature deps",
+    "Batch 3 (jack-sparrow, elsa, teal-v2, buzz): manual_bone_map_cleanup needed first",
+    "Batch 4 (rigged-hand): hand_only_mode + finger_retargeting needed",
+    "Batch 5 (creatures): creature_profile_system needed — largest code investment"
+  ]
+}

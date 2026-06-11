@@ -1,0 +1,27 @@
+{
+  "task_type": "pre-mega-run-analysis",
+  "canonical_machine": "ubuntu",
+  "repo": "/home/o/Dev/posepuppet",
+  "models_dir": "/home/o/posepuppet-assets/ModelsForAnimation",
+  "generated_vrm_dir": "/home/o/posepuppet-working/generated-vrms",
+  "known_converted": ["woody", "darth-vader"],
+  "known_browser_smoke_status": {
+    "woody": "pass",
+    "darth-vader": "pass"
+  },
+  "browser_smoke_test_count": 4,
+  "browser_smoke_pass_count": 4,
+  "browser_smoke_duration_seconds": 21.5,
+  "generated_avatar_query_param_format": "/?generatedAvatar=<slug>&smoke=avatar-load-only",
+  "public_ui_cycling_unchanged": true,
+  "generated_avatars_in_public_ui": false,
+  "missing_avatar_fallback_works": true,
+  "unsupported_controls_disabled": true,
+  "do_not_trust_mac_paths_for_operations": true,
+  "future_prompt_written": false,
+  "mac_path_references_total": 347,
+  "npm_build_status": "pass",
+  "typescript_compile_status": "pass",
+  "node_version": "v22.22.3",
+  "python_version": "3.10.12"
+}

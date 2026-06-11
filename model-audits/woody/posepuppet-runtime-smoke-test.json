@@ -1,0 +1,23 @@
+{
+  "slug": "woody",
+  "candidate_vrm": "/home/o/posepuppet-working/generated-vrms/woody.vrm",
+  "candidate_vrm_size_bytes": 5242880,
+  "served_url": "/avatars/generated/woody.vrm",
+  "browser_load_attempted": true,
+  "browser_load_status": "pass",
+  "runtime_mode": "generated-avatar-query-param",
+  "test_url": "/?generatedAvatar=woody&smoke=avatar-load-only",
+  "added_to_public_ui": false,
+  "unsupported_controls_disabled": true,
+  "warnings_visible_or_recorded": true,
+  "warning_label": "experimental",
+  "fallback_test_status": "not_applicable",
+  "console_errors": [],
+  "window_pp_avatar_status": "loaded",
+  "notes": [
+    "VRM loaded in 21.5s combined Playwright run (4 tests)",
+    "Fingers disabled per adapter spec — palm_only",
+    "Face-touch deferred — ik_required not yet implemented",
+    "Ready for query-param load; not site_ready until public UI smoke + unsupported controls confirmed"
+  ]
+}

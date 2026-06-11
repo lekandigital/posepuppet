@@ -1,0 +1,23 @@
+{
+  "generated_public_dir": "public/avatars/generated",
+  "ignored_by_git": true,
+  "gitignore_rules": [
+    "public/avatars/generated/",
+    "public/avatars/generated/*.vrm"
+  ],
+  "method": "symlink",
+  "woody_served_path": "/avatars/generated/woody.vrm",
+  "woody_symlink_target": "/home/o/posepuppet-working/generated-vrms/woody.vrm",
+  "woody_vrm_size_bytes": 5242880,
+  "darth_vader_served_path": "/avatars/generated/darth-vader.vrm",
+  "darth_vader_symlink_target": "/home/o/posepuppet-working/generated-vrms/darth-vader.vrm",
+  "darth_vader_vrm_size_bytes": 16777216,
+  "vite_serves_symlinks": true,
+  "browser_load_verified": true,
+  "notes": [
+    "Vite dev server resolves symlinks correctly for local files",
+    "public/avatars/generated/ directory is tracked by .gitignore — contents never staged",
+    "Symlinks created with: ln -sfn /home/o/posepuppet-working/generated-vrms/<slug>.vrm public/avatars/generated/<slug>.vrm",
+    "If Vite stops resolving symlinks, use: cp <vrm-path> public/avatars/generated/<slug>.vrm"
+  ]
+}
