@@ -2,24 +2,31 @@
   "attempts": [
     {
       "attempt_id": "attempt-001-baseline",
+      "browser_smoke": "pass",
+      "classification": "smoke_pass_visual_unproven",
+      "label": "prior generated VRM browser smoke",
+      "post_vrm_validation": "available",
+      "visual_review": "not_available"
+    },
+    {
+      "attempt_id": "attempt-visual-qa-final",
+      "attempt_manifest": "model-working/iron-man/attempts/attempt-visual-qa-final/attempt-manifest.json",
       "blockers": [
-        "visual_review_needed"
+        "future_runtime_limits_only"
       ],
       "browser_smoke": "pass",
       "classification": "accepted_active_candidate",
-      "label": "baseline-generated-vrm",
-      "post_vrm_validation": "available",
-      "source": "existing generated VRM",
-      "visual_review": "not_available",
-      "vrm_exists": true,
-      "vrm_path": "/home/o/posepuppet-working/generated-vrms/iron-man.vrm"
+      "contact_sheet": "model-working/iron-man/visual-review/contact-sheet.png",
+      "label": "final browser visual QA",
+      "pose_suite": "pass_with_limitations",
+      "visual_review": "pass"
     }
   ],
-  "best_attempt_id": "attempt-001-baseline",
+  "best_attempt_id": "attempt-visual-qa-final",
   "category": "standard_humanoid",
-  "created_at": "2026-06-11T18:11:49+00:00",
+  "created_at": "2026-06-11T23:21:07+00:00",
   "display_name": "Iron Man",
-  "final_classification": "experimental",
-  "schema_version": "posepuppet-attempts-summary-v1",
+  "final_classification": "active_visual_accepted",
+  "schema_version": "posepuppet-attempts-summary-v2",
   "slug": "iron-man"
 }

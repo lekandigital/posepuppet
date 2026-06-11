@@ -1,17 +1,14 @@
 {
   "active_candidate": {
-    "attempt_id": "",
-    "browser_smoke": "not_attempted",
-    "visual_review": "not_available",
-    "vrm_path": ""
+    "browser_smoke": "fail",
+    "contact_sheet": "model-working/buzz-lightyear/visual-review/contact-sheet.png",
+    "registry_decision": "not_registered",
+    "visual_review": "fail"
   },
   "blockers": [
-    "cleanup_needed",
-    "feet_not_ready",
-    "hand_control_not_ready",
-    "manual_mapping_needed",
-    "no_accepted_generated_vrm_candidate",
-    "visual_review_needed"
+    "missing_humanoid_required_bones",
+    "generic_bone_tree",
+    "manual_mapping_needed"
   ],
   "body_tracking": {
     "arms": "disabled",
@@ -21,7 +18,7 @@
     "root_motion": "disabled",
     "torso": "disabled"
   },
-  "created_at": "2026-06-11T18:11:49+00:00",
+  "created_at": "2026-06-11T23:21:07+00:00",
   "disabled_controls": [
     "chest",
     "face_anchors",
@@ -69,9 +66,9 @@
   "notes": [
     "Generated candidates remain query-param-only and excluded from public avatar cycling."
   ],
-  "quality_label": "manual_mapping_needed",
-  "runtime_profile": "humanoid_with_offsets",
-  "schema_version": "posepuppet-runtime-capability-profile-v2",
+  "quality_label": "deferred_manual_rig_repair",
+  "runtime_profile": "deferred",
+  "schema_version": "posepuppet-runtime-capability-profile-v3",
   "slug": "buzz-lightyear",
   "warning_label": "manual_mapping_needed",
   "warning_text": "Manual mapping and cleanup are needed before a generated candidate can be accepted."

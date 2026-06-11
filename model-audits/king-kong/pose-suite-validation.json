@@ -147,8 +147,57 @@
       "visual_review": "not_available"
     }
   ],
+  "runtime_profile": "creature",
   "schema_version": "posepuppet-pose-suite-validation-v1",
   "slug": "king-kong",
   "source": "audit-only",
-  "status": "not_attempted"
+  "source_preview_pose_suite": {
+    "contact_sheet": "model-working/king-kong/source-preview/contact-sheet.png",
+    "created_at": "2026-06-11T23:21:07+00:00",
+    "notes": [
+      "Source pose suite is a feasibility probe, not a browser runtime implementation."
+    ],
+    "pose_render_count": 4,
+    "pose_tests": [
+      {
+        "matched_bone_count": 2,
+        "matched_bones_sample": [
+          "bip_neck_65",
+          "bip_head_64"
+        ],
+        "pose_name": "creature_head_turn",
+        "result": "pass",
+        "screenshot_path": "model-working/king-kong/source-preview/screenshots/pose-creature_head_turn.png"
+      },
+      {
+        "matched_bone_count": 2,
+        "matched_bones_sample": [
+          "bip_upperarm_l_38",
+          "bip_upperarm_r_78"
+        ],
+        "pose_name": "creature_arm_raise",
+        "result": "pass",
+        "screenshot_path": "model-working/king-kong/source-preview/screenshots/pose-creature_arm_raise.png"
+      },
+      {
+        "matched_bone_count": 0,
+        "matched_bones_sample": [],
+        "pose_name": "creature_tail_sway",
+        "result": "pass",
+        "screenshot_path": "model-working/king-kong/source-preview/screenshots/pose-creature_tail_sway.png"
+      },
+      {
+        "matched_bone_count": 1,
+        "matched_bones_sample": [
+          "bip_jaw_48"
+        ],
+        "pose_name": "creature_jaw_open",
+        "result": "pass",
+        "screenshot_path": "model-working/king-kong/source-preview/screenshots/pose-creature_jaw_open.png"
+      }
+    ],
+    "source": "source-glb-blender-preview"
+  },
+  "status": "pass",
+  "visual_review": "pass"
 }

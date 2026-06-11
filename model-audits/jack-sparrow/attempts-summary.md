@@ -1,11 +1,8 @@
 # Jack Sparrow attempts summary
 
-- Category: `humanoid_with_offsets`
-- Best attempt: `attempt-001-baseline`
-- Final classification: `experimental`
-- Browser smoke: `pass`
-- Visual review: `not_available`
+- Final classification: `downgraded_reference_candidate`
+- Best attempt: `none`
+- Final contact sheet: `model-working/jack-sparrow/visual-review/contact-sheet.png`
 
-## Blockers
-
-- `visual_review_needed`
+- `attempt-001-baseline`: smoke_pass_visual_unproven
+- `attempt-visual-qa-final`: downgraded_reference_candidate

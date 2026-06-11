@@ -1,7 +1,9 @@
 # Woody runtime capability profile
 
 - Runtime profile: `humanoid`
-- Quality label: `experimental`
+- Quality label: `experimental_visual_accepted`
+- Registry decision: `kept_active`
 - Browser smoke: `pass`
-- Visual review: `not_available`
-- Public UI enabled: `false`
+- Visual review: `pass`
+
+Generated candidates remain query-param-only, experimental, and excluded from public UI cycling.

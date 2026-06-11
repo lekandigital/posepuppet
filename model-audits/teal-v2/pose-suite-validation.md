@@ -23,3 +23,11 @@
 | `flying_arms_out` | `pass` | structural mapping supports this proxy; visual review still required |
 | `hand_to_mouth_proxy` | `partial` | missing mapped bones: leftHand, rightHand |
 | `hand_to_cheek_proxy` | `partial` | missing mapped bones: leftHand, rightHand |
+
+## Visual QA Continuation
+
+- Status: `blocked`
+- Pose count: `0`
+- Contact sheet: `model-working/teal-v2/visual-review/contact-sheet.png`
+
+Browser visual pose capture could not run because Three-VRM rejected the required humanoid bones before the candidate loaded. Earlier structural pose-suite details above are preserved.

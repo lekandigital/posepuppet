@@ -1,0 +1,165 @@
+{
+  "created_at": "2026-06-11T23:21:07+00:00",
+  "global_attempts": [
+    "Generated active browser capture for 10 smoke-passing candidates.",
+    "Added scale-down-only generated-stage normalization for oversized VRM bounds.",
+    "Removed a failed auto-orientation heuristic after it damaged valid models.",
+    "Added tiny-bounds camera fallback to restore small/odd skinned bounds.",
+    "Created ignored serving symlinks for elsa, buzz-lightyear, and teal-v2 before retry.",
+    "Inspected hard-model audit JSON and bone trees for Elsa, Buzz, and Teal.",
+    "Rendered source previews and proxy pose suites for hand-only and creature candidates.",
+    "Downgraded or rejected candidates that did not pass visual review."
+  ],
+  "models": {
+    "amazing-spider-man-2": {
+      "blockers": [
+        "browser_visual_blank",
+        "needs_skinned_mesh_or_transform_repair"
+      ],
+      "display": "The Amazing Spider-Man 2",
+      "final_classification": "rejected_visual_candidate",
+      "next_steps": [
+        "Inspect exported VRM mesh/material visibility in Blender.",
+        "Repair source or export transform before another browser candidate attempt."
+      ],
+      "registry_decision": "removed_from_active_registry",
+      "summary": "Browser smoke reports loaded, but the visual contact sheet shows only the stage/floor; the avatar is not visually readable.",
+      "visual_review": "fail"
+    },
+    "buzz-lightyear": {
+      "blockers": [
+        "missing_humanoid_required_bones",
+        "generic_bone_tree",
+        "manual_mapping_needed"
+      ],
+      "display": "Buzz Lightyear",
+      "next_steps": [
+        "Inspect bone positions, vertex groups, and mesh names in Blender to build a manual map.",
+        "Do not rely on bone names for this source."
+      ],
+      "required_bones": [
+        "hips",
+        "spine",
+        "head",
+        "leftUpperLeg",
+        "leftLowerLeg",
+        "leftFoot",
+        "rightUpperLeg",
+        "rightLowerLeg",
+        "rightFoot",
+        "leftUpperArm",
+        "leftLowerArm",
+        "leftHand",
+        "rightUpperArm",
+        "rightLowerArm",
+        "rightHand"
+      ],
+      "summary": "Serving was repaired, but the candidate VRM has no usable Three-VRM humanoid mapping; source audit shows generic Bone.* hierarchy without semantic recovery from names alone."
+    },
+    "elsa": {
+      "blockers": [
+        "missing_spine",
+        "missing_left_leg_chain",
+        "missing_right_leg_chain",
+        "missing_feet"
+      ],
+      "display": "Elsa",
+      "next_steps": [
+        "Manual source re-rig or bone-map repair is required before another VRM export.",
+        "Do not defer as a serving bug; serving was fixed, rig structure remains the blocker."
+      ],
+      "required_bones": [
+        "spine",
+        "leftUpperLeg",
+        "leftLowerLeg",
+        "leftFoot",
+        "rightUpperLeg",
+        "rightLowerLeg",
+        "rightFoot"
+      ],
+      "summary": "The initial browser failure was fixed from an HTML fallback to serving the VRM, then Three-VRM rejected the file because required humanoid bones are missing."
+    },
+    "jack-sparrow": {
+      "blockers": [
+        "duplicate_character_mesh_or_hierarchy",
+        "not_single_avatar_candidate"
+      ],
+      "display": "Jack Sparrow",
+      "final_classification": "downgraded_reference_candidate",
+      "next_steps": [
+        "Clean duplicate mesh/armature hierarchy in source.",
+        "Re-export and rerun browser visual QA before active use."
+      ],
+      "registry_decision": "removed_from_active_registry",
+      "summary": "Scale repair made the model visible, but every browser pose renders two Jack figures side by side.",
+      "visual_review": "partial"
+    },
+    "spider-man-no-way-home": {
+      "blockers": [
+        "browser_visual_blank",
+        "orientation_or_skin_transform_repair_needed"
+      ],
+      "display": "Spider-Man No Way Home",
+      "final_classification": "rejected_visual_candidate",
+      "next_steps": [
+        "Repair source orientation and skinned mesh transform manually.",
+        "Avoid automatic orientation heuristics that damage other valid models."
+      ],
+      "registry_decision": "removed_from_active_registry",
+      "summary": "Earlier attempts exposed orientation/transform trouble; the final browser contact sheet is blank, so the candidate is not acceptable.",
+      "visual_review": "fail"
+    },
+    "spider-man-playstation": {
+      "blockers": [
+        "lower_body_not_readable_in_browser",
+        "not_full_humanoid_candidate"
+      ],
+      "display": "Spider-Man PlayStation",
+      "final_classification": "downgraded_reference_candidate",
+      "next_steps": [
+        "Inspect hierarchy, bounds, and skin weights around hips/legs.",
+        "Keep as reference only until full-body contact sheet passes."
+      ],
+      "registry_decision": "removed_from_active_registry",
+      "summary": "Browser visual evidence shows only the upper body; lower body is missing, submerged, or outside the readable frame.",
+      "visual_review": "partial"
+    },
+    "teal-v2": {
+      "blockers": [
+        "missing_humanoid_assignments",
+        "manual_bone_map_recovery_needed"
+      ],
+      "display": "Teal v2",
+      "next_steps": [
+        "Use the source hierarchy to recover Leg.*, Foot.*, Arm Cannon.*, and Arm Hand.* assignments.",
+        "Re-export only after verifying vertex groups and bone positions."
+      ],
+      "required_bones": [
+        "hips",
+        "leftUpperLeg",
+        "rightUpperLeg",
+        "leftLowerArm",
+        "leftHand",
+        "rightLowerArm",
+        "rightHand"
+      ],
+      "summary": "Serving was repaired and the source hierarchy contains recoverable semantic bones, but the exported VRM still misses required humanoid assignments."
+    },
+    "terminator-t-800": {
+      "blockers": [
+        "browser_visual_blank",
+        "needs_material_or_transform_repair"
+      ],
+      "display": "Terminator T-800",
+      "final_classification": "rejected_visual_candidate",
+      "next_steps": [
+        "Open converted VRM in Blender and inspect mesh visibility/material alpha.",
+        "Do not reactivate until browser contact sheet is readable."
+      ],
+      "registry_decision": "removed_from_active_registry",
+      "summary": "Browser smoke reports loaded, but the contact sheet remains visually blank; no usable avatar silhouette is visible.",
+      "visual_review": "fail"
+    }
+  },
+  "schema_version": "posepuppet-hard-model-repair-log-v1"
+}

@@ -1,30 +1,22 @@
 {
   "attempts": [
     {
-      "attempt_id": "attempt-001-baseline",
+      "attempt_id": "attempt-source-preview-pose-suite",
+      "attempt_manifest": "model-working/baby-yoda/attempts/attempt-source-preview-pose-suite/attempt-manifest.json",
       "blockers": [
-        "creature_profile_needed",
-        "feet_not_ready",
-        "hand_control_not_ready",
-        "no_accepted_generated_vrm_candidate",
-        "static_preview_only",
-        "visual_review_needed"
+        "source_preview_scale_or_framing_bad"
       ],
-      "browser_smoke": "not_attempted",
-      "classification": "deferred",
-      "label": "baseline-source-audit",
-      "post_vrm_validation": "not_applicable",
-      "source": "audit/spec source",
-      "visual_review": "not_available",
-      "vrm_exists": false,
-      "vrm_path": ""
+      "classification": "creature_preview_fail",
+      "contact_sheet": "model-working/baby-yoda/source-preview/contact-sheet.png",
+      "pose_suite": "partial",
+      "visual_review": "fail"
     }
   ],
   "best_attempt_id": "",
   "category": "creature",
-  "created_at": "2026-06-11T18:11:49+00:00",
+  "created_at": "2026-06-11T23:21:07+00:00",
   "display_name": "Baby Yoda",
-  "final_classification": "creature_profile_needed",
-  "schema_version": "posepuppet-attempts-summary-v1",
+  "final_classification": "creature_preview_fail",
+  "schema_version": "posepuppet-attempts-summary-v2",
   "slug": "baby-yoda"
 }

@@ -370,5 +370,17 @@
   "schema_version": "posepuppet-pose-suite-validation-v1",
   "slug": "terminator-t-800",
   "source": "generated-vrm",
-  "status": "partial"
+  "status": "fail",
+  "visual_qa": {
+    "browser_capture_status": "loaded",
+    "classification": "rejected_visual_candidate",
+    "contact_sheet": "model-working/terminator-t-800/visual-review/contact-sheet.png",
+    "created_at": "2026-06-11T23:21:07+00:00",
+    "notes": [
+      "QA pose hooks are for visual validation only; normal runtime retargeting still avoids foot/finger overclaims."
+    ],
+    "pose_frame_count": 25,
+    "source": "generated-vrm-browser-visual-qa"
+  },
+  "visual_review": "fail"
 }

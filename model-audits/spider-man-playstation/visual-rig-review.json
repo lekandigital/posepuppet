@@ -1,19 +1,35 @@
 {
-  "attempt_id": "attempt-001-baseline",
-  "contact_sheet_path": "",
-  "created_at": "2026-06-11T18:11:49+00:00",
-  "decision": "do_not_claim_visual_quality",
-  "questions": {
-    "acceptable_for_query_param_experimental_use": "not_available",
-    "limbs_attached": "not_available",
-    "model_loaded": "not_available",
-    "scale_reasonable": "not_available",
-    "textures_intact": "not_available"
+  "accepted_for_active_registry": false,
+  "attempt_id": "attempt-visual-qa-final",
+  "blockers": [
+    "lower_body_not_readable_in_browser",
+    "not_full_humanoid_candidate"
+  ],
+  "browser_capture_status": "loaded",
+  "created_at": "2026-06-11T23:21:07+00:00",
+  "display_name": "Spider-Man PlayStation",
+  "evidence": {
+    "browser_smoke": "pass",
+    "capture_manifest": "model-working/spider-man-playstation/visual-review/capture-results.json",
+    "contact_sheet": "model-working/spider-man-playstation/visual-review/contact-sheet.png",
+    "contact_sheet_committed": false,
+    "pose_frame_count": 25
   },
-  "requires_future_vision_review": true,
-  "schema_version": "posepuppet-visual-rig-review-v1",
-  "screenshots": [],
+  "final_classification": "downgraded_reference_candidate",
+  "limitations": [],
+  "next_steps": [
+    "Inspect hierarchy, bounds, and skin weights around hips/legs.",
+    "Keep as reference only until full-body contact sheet passes."
+  ],
+  "registry_decision": "removed_from_active_registry",
+  "safety": {
+    "enabled_in_ui": false,
+    "generated_assets_committed": false,
+    "query_param_only": true
+  },
+  "schema_version": "posepuppet-visual-rig-review-v3",
   "slug": "spider-man-playstation",
-  "visual_label": "visual_not_available",
-  "visual_review": "not_available"
+  "source": "generated-vrm-browser-capture",
+  "summary": "Browser visual evidence shows only the upper body; lower body is missing, submerged, or outside the readable frame.",
+  "visual_review": "partial"
 }

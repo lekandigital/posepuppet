@@ -1,12 +1,15 @@
 {
   "active_candidate": {
-    "attempt_id": "attempt-001-baseline",
-    "browser_smoke": "pass",
-    "visual_review": "not_available",
-    "vrm_path": "/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm"
+    "attempt_id": "attempt-visual-qa-final",
+    "browser_smoke": "downgraded",
+    "contact_sheet": "model-working/amazing-spider-man-2/visual-review/contact-sheet.png",
+    "pose_suite": "fail",
+    "registry_decision": "removed_from_active_registry",
+    "visual_review": "fail"
   },
   "blockers": [
-    "visual_review_needed"
+    "browser_visual_blank",
+    "needs_skinned_mesh_or_transform_repair"
   ],
   "body_tracking": {
     "arms": "enabled",
@@ -16,7 +19,7 @@
     "root_motion": "disabled",
     "torso": "enabled"
   },
-  "created_at": "2026-06-11T18:11:49+00:00",
+  "created_at": "2026-06-11T23:21:07+00:00",
   "disabled_controls": [
     "face_anchors",
     "feet",
@@ -65,10 +68,10 @@
   "notes": [
     "Generated candidates remain query-param-only and excluded from public avatar cycling."
   ],
-  "quality_label": "experimental",
+  "quality_label": "rejected_visual_candidate",
   "runtime_profile": "humanoid",
-  "schema_version": "posepuppet-runtime-capability-profile-v2",
+  "schema_version": "posepuppet-runtime-capability-profile-v3",
   "slug": "amazing-spider-man-2",
   "warning_label": "experimental",
-  "warning_text": "Experimental query-param-only generated candidate; visual quality not yet claimed."
+  "warning_text": "Experimental query-param-only generated candidate; not public UI promoted."
 }

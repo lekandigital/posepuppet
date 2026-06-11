@@ -1,11 +1,8 @@
 # Spider-Man No Way Home attempts summary
 
-- Category: `standard_humanoid`
-- Best attempt: `attempt-001-baseline`
-- Final classification: `experimental`
-- Browser smoke: `pass`
-- Visual review: `not_available`
+- Final classification: `rejected_visual_candidate`
+- Best attempt: `none`
+- Final contact sheet: `model-working/spider-man-no-way-home/visual-review/contact-sheet.png`
 
-## Blockers
-
-- `visual_review_needed`
+- `attempt-001-baseline`: smoke_pass_visual_unproven
+- `attempt-visual-qa-final`: rejected_visual_candidate

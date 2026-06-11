@@ -1,5 +1,8 @@
 # Olaf visual rig review
 
-- Visual label: `visual_not_available`
-- Requires future vision review: `true`
-- Decision: `do_not_claim_visual_quality`
+- Visual review: `pass`
+- Runtime profile: `creature`
+- Forced to humanoid: `false`
+- Contact sheet: `model-working/olaf/source-preview/contact-sheet.png`
+
+Source preview is readable and static/creature pose proxies render; anatomy is non-human and should stay creature/static-preview only.

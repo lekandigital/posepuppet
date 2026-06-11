@@ -13,3 +13,12 @@
 | `wrist_rotate` | `partial` | hand-only control path is future work |
 | `palm_forward` | `partial` | hand-only control path is future work |
 | `palm_down` | `partial` | hand-only control path is future work |
+
+## Visual QA Continuation
+
+- Status: `partial`
+- Runtime profile: `hand_only`
+- Pose renders: `4`
+- Contact sheet: `model-working/rigged-hand/source-preview/contact-sheet.png`
+
+Proxy poses were rendered from the source rig only; no humanoid runtime support is implied. Earlier structural pose-suite details above are preserved.

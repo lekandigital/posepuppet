@@ -24,3 +24,12 @@
 | `hand_to_mouth_proxy` | `pass` | structural mapping supports this proxy; visual review still required |
 | `hand_to_cheek_proxy` | `pass` | structural mapping supports this proxy; visual review still required |
 | `finger_curl` | `partial` | curl preset only; full finger runtime is not claimed |
+
+## Visual QA Continuation
+
+- Status: `pass_with_limitations`
+- Pose images reviewed: `25`
+- Contact sheet: `model-working/shrek/visual-review/contact-sheet.png`
+- Visual review: `pass`
+
+Browser visual QA drove neutral, arm, elbow, wrist, torso, walking, foot, rowing, flying, and face-touch proxy poses. The earlier structural pose-suite details above are preserved.

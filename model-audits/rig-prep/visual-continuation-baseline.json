@@ -1,0 +1,12 @@
+{
+  "base_commit": "5f3286c0d00e5be189b94e2149c1fb640916810c",
+  "baseline_checks": {
+    "audit_model_self_test": "pass",
+    "generated_avatar_registry_validate_only": "pass",
+    "generated_avatar_smoke": "pass",
+    "npm_run_build": "pass",
+    "validate_rig_readiness": "pass_without_visual_required"
+  },
+  "created_at": "2026-06-11T23:21:07+00:00",
+  "schema_version": "posepuppet-visual-continuation-baseline-v1"
+}

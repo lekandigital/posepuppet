@@ -312,5 +312,36 @@
   "schema_version": "posepuppet-pose-suite-validation-v1",
   "slug": "buzz-lightyear",
   "source": "generated-vrm-reference",
-  "status": "partial"
+  "status": "blocked",
+  "visual_qa": {
+    "blockers": [
+      "missing_humanoid_required_bones",
+      "generic_bone_tree",
+      "manual_mapping_needed"
+    ],
+    "browser_capture_status": "error",
+    "classification": "deferred_manual_rig_repair",
+    "contact_sheet": "model-working/buzz-lightyear/visual-review/contact-sheet.png",
+    "created_at": "2026-06-11T23:21:07+00:00",
+    "pose_frame_count": 0,
+    "required_bones": [
+      "hips",
+      "spine",
+      "head",
+      "leftUpperLeg",
+      "leftLowerLeg",
+      "leftFoot",
+      "rightUpperLeg",
+      "rightLowerLeg",
+      "rightFoot",
+      "leftUpperArm",
+      "leftLowerArm",
+      "leftHand",
+      "rightUpperArm",
+      "rightLowerArm",
+      "rightHand"
+    ],
+    "source": "generated-vrm-browser-visual-qa"
+  },
+  "visual_review": "fail"
 }

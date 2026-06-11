@@ -1,5 +1,13 @@
 {
+  "active_generated_slugs": [
+    "darth-vader",
+    "fortnite-batman",
+    "iron-man",
+    "shrek",
+    "woody"
+  ],
   "errors": [],
   "model_count": 20,
+  "require_visual_for_active": true,
   "status": "pass"
 }

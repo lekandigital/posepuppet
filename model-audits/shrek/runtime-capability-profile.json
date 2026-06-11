@@ -1,12 +1,14 @@
 {
   "active_candidate": {
-    "attempt_id": "attempt-001-baseline",
+    "attempt_id": "attempt-visual-qa-final",
     "browser_smoke": "pass",
-    "visual_review": "not_available",
-    "vrm_path": "/home/o/posepuppet-working/generated-vrms/shrek.vrm"
+    "contact_sheet": "model-working/shrek/visual-review/contact-sheet.png",
+    "pose_suite": "pass_with_limitations",
+    "registry_decision": "kept_active",
+    "visual_review": "pass"
   },
   "blockers": [
-    "visual_review_needed"
+    "future_runtime_limits_only"
   ],
   "body_tracking": {
     "arms": "enabled",
@@ -16,7 +18,7 @@
     "root_motion": "disabled",
     "torso": "enabled"
   },
-  "created_at": "2026-06-11T18:11:49+00:00",
+  "created_at": "2026-06-11T23:21:07+00:00",
   "disabled_controls": [
     "face_anchors",
     "feet",
@@ -65,10 +67,10 @@
   "notes": [
     "Generated candidates remain query-param-only and excluded from public avatar cycling."
   ],
-  "quality_label": "experimental",
+  "quality_label": "experimental_visual_accepted",
   "runtime_profile": "humanoid",
-  "schema_version": "posepuppet-runtime-capability-profile-v2",
+  "schema_version": "posepuppet-runtime-capability-profile-v3",
   "slug": "shrek",
   "warning_label": "experimental",
-  "warning_text": "Experimental query-param-only generated candidate; visual quality not yet claimed."
+  "warning_text": "Experimental query-param-only generated candidate; not public UI promoted."
 }

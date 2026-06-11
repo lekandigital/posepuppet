@@ -143,8 +143,72 @@
       "visual_review": "not_available"
     }
   ],
+  "runtime_profile": "hand_only",
   "schema_version": "posepuppet-pose-suite-validation-v1",
   "slug": "rigged-hand",
   "source": "audit-only",
-  "status": "partial"
+  "source_preview_pose_suite": {
+    "contact_sheet": "model-working/rigged-hand/source-preview/contact-sheet.png",
+    "created_at": "2026-06-11T23:21:07+00:00",
+    "notes": [
+      "Source pose suite is a feasibility probe, not a browser runtime implementation."
+    ],
+    "pose_render_count": 4,
+    "pose_tests": [
+      {
+        "matched_bone_count": 3,
+        "matched_bones_sample": [
+          "pulse.R_01",
+          "hand.R_02",
+          "hand.R.001_011"
+        ],
+        "pose_name": "hand_wrist_pitch",
+        "result": "partial",
+        "screenshot_path": "model-working/rigged-hand/source-preview/screenshots/pose-hand_wrist_pitch.png"
+      },
+      {
+        "matched_bone_count": 8,
+        "matched_bones_sample": [
+          "index_01.R_017",
+          "index_02.R_018",
+          "middle_01.R_025",
+          "middle_02.R_026",
+          "ring_01.R_033",
+          "ring_02.R_034",
+          "pinky_01.R_041",
+          "pinky_02.R_042"
+        ],
+        "pose_name": "hand_finger_curl",
+        "result": "partial",
+        "screenshot_path": "model-working/rigged-hand/source-preview/screenshots/pose-hand_finger_curl.png"
+      },
+      {
+        "matched_bone_count": 4,
+        "matched_bones_sample": [
+          "thumb_01.R_08",
+          "thumb_02.R_09",
+          "thumb_03.R_010",
+          "thumb_03.R_end_051"
+        ],
+        "pose_name": "hand_thumb_curl",
+        "result": "partial",
+        "screenshot_path": "model-working/rigged-hand/source-preview/screenshots/pose-hand_thumb_curl.png"
+      },
+      {
+        "matched_bone_count": 4,
+        "matched_bones_sample": [
+          "index_base.R_012",
+          "middle_base.R_020",
+          "ring_base.R_028",
+          "pinky_base.R_036"
+        ],
+        "pose_name": "hand_finger_spread",
+        "result": "partial",
+        "screenshot_path": "model-working/rigged-hand/source-preview/screenshots/pose-hand_finger_spread.png"
+      }
+    ],
+    "source": "source-glb-blender-preview"
+  },
+  "status": "partial",
+  "visual_review": "partial"
 }

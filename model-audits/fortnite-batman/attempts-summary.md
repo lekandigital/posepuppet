@@ -1,11 +1,8 @@
 # Fortnite Batman attempts summary
 
-- Category: `standard_humanoid`
-- Best attempt: `attempt-001-baseline`
-- Final classification: `experimental`
-- Browser smoke: `pass`
-- Visual review: `not_available`
+- Final classification: `active_visual_accepted`
+- Best attempt: `attempt-visual-qa-final`
+- Final contact sheet: `model-working/fortnite-batman/visual-review/contact-sheet.png`
 
-## Blockers
-
-- `visual_review_needed`
+- `attempt-001-baseline`: smoke_pass_visual_unproven
+- `attempt-visual-qa-final`: accepted_active_candidate

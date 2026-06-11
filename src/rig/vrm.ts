@@ -14,7 +14,8 @@ const VRM_BONES: BoneName[] = [
   'hips', 'chest', 'neck', 'head',
   'leftUpperArm', 'leftLowerArm', 'leftHand',
   'rightUpperArm', 'rightLowerArm', 'rightHand',
-  'leftUpperLeg', 'leftLowerLeg', 'rightUpperLeg', 'rightLowerLeg',
+  'leftUpperLeg', 'leftLowerLeg', 'leftFoot',
+  'rightUpperLeg', 'rightLowerLeg', 'rightFoot',
 ];
 
 /** joint anchors from humanoid bones (wrist/ankle = hand/foot nodes) */
@@ -112,8 +113,10 @@ export const BONE_NAME_PATTERNS: Record<BoneName, RegExp> = {
   rightHand: /^(J_Bip_R_Hand|mixamorig:?RightHand|.*\b(right|r)[._ ]?hand\b.*)$/i,
   leftUpperLeg: /^(J_Bip_L_UpperLeg|mixamorig:?LeftUpLeg|.*\b(left|l)[._ ]?(upper_?leg|up_?leg|thigh)\b.*)$/i,
   leftLowerLeg: /^(J_Bip_L_LowerLeg|mixamorig:?LeftLeg|.*\b(left|l)[._ ]?(lower_?leg|leg|shin|calf)\b.*)$/i,
+  leftFoot: /^(J_Bip_L_Foot|mixamorig:?LeftFoot|.*\b(left|l)[._ ]?(foot|ankle)\b.*)$/i,
   rightUpperLeg: /^(J_Bip_R_UpperLeg|mixamorig:?RightUpLeg|.*\b(right|r)[._ ]?(upper_?leg|up_?leg|thigh)\b.*)$/i,
   rightLowerLeg: /^(J_Bip_R_LowerLeg|mixamorig:?RightLeg|.*\b(right|r)[._ ]?(lower_?leg|leg|shin|calf)\b.*)$/i,
+  rightFoot: /^(J_Bip_R_Foot|mixamorig:?RightFoot|.*\b(right|r)[._ ]?(foot|ankle)\b.*)$/i,
 };
 
 /** Scans a hierarchy and maps bones by name. First match per bone wins,
