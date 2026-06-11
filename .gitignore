@@ -52,6 +52,10 @@ public/avatars/*.gltf
 public/avatars/*.blend
 public/avatars/textures/
 
+# Generated candidate VRMs — test-only, never committed
+public/avatars/generated/
+public/avatars/generated/*.vrm
+
 # Test/eval transients (eval/results.json IS committed)
 test-results/
 playwright-report/
