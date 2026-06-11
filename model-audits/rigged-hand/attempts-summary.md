@@ -1,15 +1,5 @@
 # Rigged Hand attempts summary
 
-- Category: `hand_only`
-- Best attempt: `none`
-- Final classification: `hand_only`
-- Browser smoke: `not_attempted`
-- Visual review: `not_available`
-
-## Blockers
-
-- `feet_not_ready`
-- `no_accepted_generated_vrm_candidate`
-- `not_full_avatar`
-- `requires_hand_landmarker_mode`
-- `visual_review_needed`
+- Final classification: `hand_only_preview_partial`
+- Attempt manifest: `model-working/rigged-hand/attempts/attempt-source-preview-pose-suite/attempt-manifest.json`
+- Contact sheet: `model-working/rigged-hand/source-preview/contact-sheet.png`

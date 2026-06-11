@@ -1,5 +1,8 @@
 # King Kong visual rig review
 
-- Visual label: `visual_not_available`
-- Requires future vision review: `true`
-- Decision: `do_not_claim_visual_quality`
+- Visual review: `pass`
+- Runtime profile: `creature`
+- Forced to humanoid: `false`
+- Contact sheet: `model-working/king-kong/source-preview/contact-sheet.png`
+
+Source preview is readable with bipedal creature proportions; proxy creature poses render, but custom creature logic is required.

@@ -1,16 +1,8 @@
 # Buzz Lightyear attempts summary
 
-- Category: `cleanup_manual_mapping`
-- Best attempt: `none`
-- Final classification: `manual_mapping_needed`
-- Browser smoke: `not_attempted`
-- Visual review: `not_available`
+- Final classification: `deferred_manual_rig_repair`
+- Serving blocker was fixed before deferral.
+- Final attempt manifest: `model-working/buzz-lightyear/attempts/attempt-visual-qa-serving-fixed-vrm-required-bones/attempt-manifest.json`
 
-## Blockers
-
-- `cleanup_needed`
-- `feet_not_ready`
-- `hand_control_not_ready`
-- `manual_mapping_needed`
-- `no_accepted_generated_vrm_candidate`
-- `visual_review_needed`
+- `attempt-serving-repair`: serving_fixed
+- `attempt-visual-qa-serving-fixed-vrm-required-bones`: blocked_required_bones

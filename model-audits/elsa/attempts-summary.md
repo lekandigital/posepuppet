@@ -1,14 +1,8 @@
 # Elsa attempts summary
 
-- Category: `humanoid_with_offsets`
-- Best attempt: `none`
-- Final classification: `defer`
-- Browser smoke: `fail`
-- Visual review: `not_available`
+- Final classification: `deferred_manual_rig_repair`
+- Serving blocker was fixed before deferral.
+- Final attempt manifest: `model-working/elsa/attempts/attempt-visual-qa-serving-fixed-vrm-required-bones/attempt-manifest.json`
 
-## Blockers
-
-- `browser_smoke_fail`
-- `feet_not_ready`
-- `no_accepted_generated_vrm_candidate`
-- `visual_review_needed`
+- `attempt-serving-repair`: serving_fixed
+- `attempt-visual-qa-serving-fixed-vrm-required-bones`: blocked_required_bones
