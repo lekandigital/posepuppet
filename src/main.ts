@@ -15,6 +15,7 @@ import { createRobot } from './rig/robot';
 import { Retargeter } from './rig/retarget';
 import type { Avatar } from './rig/types';
 import { type AvatarId, isAvatarId, getAvatarDef, nextAvatarId, loadAvatarById } from './rig/avatarRegistry';
+import { getGeneratedAvatarDef } from './rig/generatedAvatarRegistry';
 import { EvalCollector } from './eval/runner';
 import { createRecorder, createRecordButton, updateRecordButton } from './record/recorder';
 
@@ -28,6 +29,9 @@ declare global {
       lastDetectionAt: number;
       detectionCount: number;
       lastRecording: { size: number; type: string } | null;
+      /** Set by generated-avatar / smoke-mode loading. */
+      avatarStatus?: 'loading' | 'loaded' | 'fallback' | 'error';
+      avatarWarning?: string;
     };
   }
 }
@@ -40,10 +44,17 @@ async function boot() {
   const stageCanvas = document.getElementById('stage') as HTMLCanvasElement;
   const overlayCtx = overlay.getContext('2d')!;
 
+  // Add test markers for Playwright
+  document.body.setAttribute('data-testid', 'posepuppet-app');
+  statusEl.setAttribute('data-testid', 'camera-status');
+
   const params = new URLSearchParams(location.search);
   const evalFixture = params.get('eval');
   const evalDuration = Number(params.get('dur') ?? 60);
   const modelVariant = (params.get('model') ?? config.model) as ModelVariant;
+  const generatedAvatarSlug = params.get('generatedAvatar');
+  const smokeMode = params.get('smoke');
+  const isAvatarLoadOnly = smokeMode === 'avatar-load-only';
   if (params.has('mirror')) config.mirror = params.get('mirror') !== '0';
   if (params.has('avatar')) {
     const av = params.get('avatar')!;
@@ -156,7 +167,63 @@ async function boot() {
     lastDetectionAt: 0,
     detectionCount: 0,
     lastRecording: null,
+    avatarStatus: undefined,
+    avatarWarning: undefined,
   };
+
+  // --- Generated avatar smoke path (test-only) ---
+  if (generatedAvatarSlug) {
+    const genDef = getGeneratedAvatarDef(generatedAvatarSlug);
+    if (genDef) {
+      window.__PP.avatarStatus = 'loading';
+      window.__PP.avatarWarning = genDef.warningLabel;
+      statusEl.textContent = `loading generated avatar: ${genDef.label}…`;
+      statusEl.setAttribute('data-testid', 'avatar-status');
+      try {
+        const { loadVrmAvatar } = await import('./rig/vrm');
+        const next = await loadVrmAvatar(genDef.url);
+        stage.scene.add(next.object);
+        avatar.dispose();
+        avatar = next;
+        retargeter.bind(avatar);
+        window.__PP.avatarStatus = 'loaded';
+        statusEl.textContent = `generated avatar loaded: ${genDef.label} [${genDef.warningLabel}]`;
+        console.info(`[generated-avatar] loaded ${genDef.id} from ${genDef.url}`);
+      } catch (err) {
+        window.__PP.avatarStatus = 'error';
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn(`[generated-avatar] failed to load ${generatedAvatarSlug}: ${msg}`);
+        statusEl.textContent = `generated avatar failed: ${generatedAvatarSlug} — ${msg}`;
+      }
+    } else {
+      // Missing / unknown generated avatar: controlled fallback
+      window.__PP.avatarStatus = 'fallback';
+      window.__PP.avatarWarning = `unknown generated avatar: ${generatedAvatarSlug}`;
+      console.warn(`[generated-avatar] unknown slug: ${generatedAvatarSlug}, staying on default avatar`);
+      statusEl.textContent = `generated avatar not found: ${generatedAvatarSlug} — using default`;
+      statusEl.setAttribute('data-testid', 'avatar-status');
+    }
+    // Add warning indicator
+    const warningEl = document.createElement('div');
+    warningEl.setAttribute('data-testid', 'avatar-warning');
+    warningEl.textContent = window.__PP.avatarWarning ?? '';
+    warningEl.style.cssText = 'position:fixed;bottom:4px;right:4px;font-size:11px;color:#fa0;z-index:999;';
+    document.body.append(warningEl);
+  }
+
+  // --- avatar-load-only smoke mode: skip camera + detector entirely ---
+  if (isAvatarLoadOnly) {
+    statusEl.textContent = window.__PP.avatarStatus === 'loaded'
+      ? 'avatar-load-only smoke: OK'
+      : `avatar-load-only smoke: ${window.__PP.avatarStatus ?? 'idle'}`;
+    statusEl.classList.remove('hidden');
+    // Still run the render loop so the avatar is visible
+    stage.onTick((dt, time) => {
+      retargeter.tick(dt);
+      avatar.update(dt, time);
+    });
+    return; // skip camera, detector, eval, recording
+  }
 
   watchLayout(els);
   setMirrored(els, config.mirror);
