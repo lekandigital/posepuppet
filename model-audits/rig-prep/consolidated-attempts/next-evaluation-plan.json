@@ -1,0 +1,2529 @@
+{
+  "archive_path": "/Users/lekan/Downloads/PosePuppet_Consolidated_Attempts_20260611-204228",
+  "competing_attempts_by_model": {
+    "amazing-spider-man-2": [
+      "mac-hard-fix-evidence-amazing-spider-man-2",
+      "mac-parallel-hard-fix-amazing-spider-man-2",
+      "mac-working-hard-fix-amazing-spider-man-2",
+      "previous-downloads-amazing-spider-man-2",
+      "ubuntu-canonical-amazing-spider-man-2",
+      "ubuntu-hard-fix-evidence-amazing-spider-man-2",
+      "ubuntu-parallel-hard-fix-amazing-spider-man-2",
+      "ubuntu-working-canonical-amazing-spider-man-2",
+      "ubuntu-working-hard-fix-amazing-spider-man-2"
+    ],
+    "baby-yoda": [
+      "previous-downloads-baby-yoda",
+      "ubuntu-canonical-baby-yoda"
+    ],
+    "buzz-lightyear": [
+      "mac-parallel-hard-fix-buzz-lightyear",
+      "mac-working-hard-fix-buzz-lightyear",
+      "previous-downloads-buzz-lightyear",
+      "ubuntu-canonical-buzz-lightyear",
+      "ubuntu-working-canonical-buzz-lightyear",
+      "ubuntu-working-hard-fix-buzz-lightyear"
+    ],
+    "darth-vader": [
+      "mac-hard-fix-evidence-darth-vader",
+      "mac-parallel-hard-fix-darth-vader",
+      "mac-working-canonical-darth-vader",
+      "mac-working-hard-fix-darth-vader",
+      "previous-downloads-darth-vader",
+      "ubuntu-canonical-darth-vader",
+      "ubuntu-parallel-hard-fix-darth-vader",
+      "ubuntu-working-canonical-darth-vader",
+      "ubuntu-working-hard-fix-darth-vader"
+    ],
+    "elsa": [
+      "mac-parallel-hard-fix-elsa",
+      "mac-working-hard-fix-elsa",
+      "previous-downloads-elsa",
+      "ubuntu-canonical-elsa",
+      "ubuntu-working-canonical-elsa",
+      "ubuntu-working-hard-fix-elsa"
+    ],
+    "fortnite-batman": [
+      "mac-hard-fix-evidence-fortnite-batman",
+      "mac-parallel-hard-fix-fortnite-batman",
+      "mac-working-hard-fix-fortnite-batman",
+      "previous-downloads-fortnite-batman",
+      "ubuntu-canonical-fortnite-batman",
+      "ubuntu-parallel-hard-fix-fortnite-batman",
+      "ubuntu-working-canonical-fortnite-batman",
+      "ubuntu-working-hard-fix-fortnite-batman"
+    ],
+    "godzilla": [
+      "previous-downloads-godzilla",
+      "ubuntu-canonical-godzilla"
+    ],
+    "grogu": [
+      "previous-downloads-grogu",
+      "ubuntu-canonical-grogu"
+    ],
+    "iron-man": [
+      "mac-hard-fix-evidence-iron-man",
+      "mac-parallel-hard-fix-iron-man",
+      "mac-working-hard-fix-iron-man",
+      "previous-downloads-iron-man",
+      "ubuntu-canonical-iron-man",
+      "ubuntu-parallel-hard-fix-iron-man",
+      "ubuntu-working-canonical-iron-man",
+      "ubuntu-working-hard-fix-iron-man"
+    ],
+    "jack-sparrow": [
+      "mac-hard-fix-evidence-jack-sparrow",
+      "mac-parallel-hard-fix-jack-sparrow",
+      "mac-working-hard-fix-jack-sparrow",
+      "previous-downloads-jack-sparrow",
+      "ubuntu-canonical-jack-sparrow",
+      "ubuntu-hard-fix-evidence-jack-sparrow",
+      "ubuntu-parallel-hard-fix-jack-sparrow",
+      "ubuntu-working-canonical-jack-sparrow",
+      "ubuntu-working-hard-fix-jack-sparrow"
+    ],
+    "king-kong": [
+      "previous-downloads-king-kong",
+      "ubuntu-canonical-king-kong"
+    ],
+    "olaf": [
+      "previous-downloads-olaf",
+      "ubuntu-canonical-olaf"
+    ],
+    "rigged-hand": [
+      "previous-downloads-rigged-hand",
+      "ubuntu-canonical-rigged-hand"
+    ],
+    "shrek": [
+      "mac-hard-fix-evidence-shrek",
+      "mac-parallel-hard-fix-shrek",
+      "mac-working-hard-fix-shrek",
+      "previous-downloads-shrek",
+      "ubuntu-canonical-shrek",
+      "ubuntu-parallel-hard-fix-shrek",
+      "ubuntu-working-canonical-shrek",
+      "ubuntu-working-hard-fix-shrek"
+    ],
+    "spider-man-no-way-home": [
+      "mac-hard-fix-evidence-spider-man-no-way-home",
+      "mac-parallel-hard-fix-spider-man-no-way-home",
+      "mac-working-hard-fix-spider-man-no-way-home",
+      "previous-downloads-spider-man-no-way-home",
+      "ubuntu-canonical-spider-man-no-way-home",
+      "ubuntu-hard-fix-evidence-spider-man-no-way-home",
+      "ubuntu-parallel-hard-fix-spider-man-no-way-home",
+      "ubuntu-working-canonical-spider-man-no-way-home",
+      "ubuntu-working-hard-fix-spider-man-no-way-home"
+    ],
+    "spider-man-playstation": [
+      "mac-hard-fix-evidence-spider-man-playstation",
+      "mac-parallel-hard-fix-spider-man-playstation",
+      "mac-working-hard-fix-spider-man-playstation",
+      "previous-downloads-spider-man-playstation",
+      "ubuntu-canonical-spider-man-playstation",
+      "ubuntu-hard-fix-evidence-spider-man-playstation",
+      "ubuntu-parallel-hard-fix-spider-man-playstation",
+      "ubuntu-working-canonical-spider-man-playstation",
+      "ubuntu-working-hard-fix-spider-man-playstation"
+    ],
+    "teal-v2": [
+      "mac-parallel-hard-fix-teal-v2",
+      "mac-working-hard-fix-teal-v2",
+      "previous-downloads-teal-v2",
+      "ubuntu-canonical-teal-v2",
+      "ubuntu-working-canonical-teal-v2",
+      "ubuntu-working-hard-fix-teal-v2"
+    ],
+    "terminator-t-800": [
+      "mac-hard-fix-evidence-terminator-t-800",
+      "mac-parallel-hard-fix-terminator-t-800",
+      "mac-working-hard-fix-terminator-t-800",
+      "previous-downloads-terminator-t-800",
+      "ubuntu-canonical-terminator-t-800",
+      "ubuntu-hard-fix-evidence-terminator-t-800",
+      "ubuntu-parallel-hard-fix-terminator-t-800",
+      "ubuntu-working-canonical-terminator-t-800",
+      "ubuntu-working-hard-fix-terminator-t-800"
+    ],
+    "woody": [
+      "mac-hard-fix-evidence-woody",
+      "mac-parallel-hard-fix-woody",
+      "mac-working-hard-fix-woody",
+      "previous-downloads-woody",
+      "ubuntu-canonical-woody",
+      "ubuntu-parallel-hard-fix-woody",
+      "ubuntu-working-canonical-woody",
+      "ubuntu-working-hard-fix-woody"
+    ],
+    "xenomorph": [
+      "previous-downloads-xenomorph",
+      "ubuntu-canonical-xenomorph"
+    ]
+  },
+  "missing_evidence": [
+    {
+      "attempt_label": "mac-hard-fix-evidence-amazing-spider-man-2",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "amazing-spider-man-2"
+    },
+    {
+      "attempt_label": "mac-main-amazing-spider-man-2",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "amazing-spider-man-2"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-amazing-spider-man-2",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "amazing-spider-man-2"
+    },
+    {
+      "attempt_label": "ubuntu-hard-fix-evidence-amazing-spider-man-2",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "amazing-spider-man-2"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-amazing-spider-man-2",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "amazing-spider-man-2"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-amazing-spider-man-2",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "amazing-spider-man-2"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-amazing-spider-man-2",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "amazing-spider-man-2"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-terminator-t-800",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "terminator-t-800"
+    },
+    {
+      "attempt_label": "mac-main-terminator-t-800",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "terminator-t-800"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-terminator-t-800",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "terminator-t-800"
+    },
+    {
+      "attempt_label": "ubuntu-hard-fix-evidence-terminator-t-800",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "terminator-t-800"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-terminator-t-800",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "terminator-t-800"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-terminator-t-800",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "terminator-t-800"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-terminator-t-800",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "terminator-t-800"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-spider-man-no-way-home",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "spider-man-no-way-home"
+    },
+    {
+      "attempt_label": "mac-main-spider-man-no-way-home",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "spider-man-no-way-home"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-spider-man-no-way-home",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "spider-man-no-way-home"
+    },
+    {
+      "attempt_label": "ubuntu-hard-fix-evidence-spider-man-no-way-home",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "spider-man-no-way-home"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-spider-man-no-way-home",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "spider-man-no-way-home"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-spider-man-no-way-home",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "spider-man-no-way-home"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-spider-man-no-way-home",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "spider-man-no-way-home"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-spider-man-playstation",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "spider-man-playstation"
+    },
+    {
+      "attempt_label": "mac-main-spider-man-playstation",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "spider-man-playstation"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-spider-man-playstation",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "spider-man-playstation"
+    },
+    {
+      "attempt_label": "ubuntu-hard-fix-evidence-spider-man-playstation",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "spider-man-playstation"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-spider-man-playstation",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "spider-man-playstation"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-spider-man-playstation",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "spider-man-playstation"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-spider-man-playstation",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "spider-man-playstation"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-jack-sparrow",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "jack-sparrow"
+    },
+    {
+      "attempt_label": "mac-main-jack-sparrow",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "jack-sparrow"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-jack-sparrow",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "jack-sparrow"
+    },
+    {
+      "attempt_label": "ubuntu-hard-fix-evidence-jack-sparrow",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "jack-sparrow"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-jack-sparrow",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "jack-sparrow"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-jack-sparrow",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "jack-sparrow"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-jack-sparrow",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "jack-sparrow"
+    },
+    {
+      "attempt_label": "mac-main-elsa",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "elsa"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-elsa",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "elsa"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-elsa",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "elsa"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-elsa",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "elsa"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-elsa",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "elsa"
+    },
+    {
+      "attempt_label": "mac-main-buzz-lightyear",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "buzz-lightyear"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-buzz-lightyear",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "buzz-lightyear"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-buzz-lightyear",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "buzz-lightyear"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-buzz-lightyear",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "buzz-lightyear"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-buzz-lightyear",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "buzz-lightyear"
+    },
+    {
+      "attempt_label": "mac-main-teal-v2",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "teal-v2"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-teal-v2",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "teal-v2"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-teal-v2",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "teal-v2"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-teal-v2",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "teal-v2"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-teal-v2",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "teal-v2"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-shrek",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "shrek"
+    },
+    {
+      "attempt_label": "mac-main-shrek",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "shrek"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-shrek",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "shrek"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-shrek",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "shrek"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-shrek",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "shrek"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-shrek",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "shrek"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-shrek",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "shrek"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-iron-man",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "iron-man"
+    },
+    {
+      "attempt_label": "mac-main-iron-man",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "iron-man"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-iron-man",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "iron-man"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-iron-man",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "iron-man"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-iron-man",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "iron-man"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-iron-man",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "iron-man"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-iron-man",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "iron-man"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-woody",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "woody"
+    },
+    {
+      "attempt_label": "mac-main-woody",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "woody"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-woody",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "woody"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-woody",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "woody"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-woody",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "woody"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-woody",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "woody"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-woody",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "woody"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-darth-vader",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "darth-vader"
+    },
+    {
+      "attempt_label": "mac-main-darth-vader",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "darth-vader"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-darth-vader",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "darth-vader"
+    },
+    {
+      "attempt_label": "mac-working-canonical-darth-vader",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "darth-vader"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-darth-vader",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "darth-vader"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-darth-vader",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "darth-vader"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-darth-vader",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "darth-vader"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-darth-vader",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "darth-vader"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-fortnite-batman",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "fortnite-batman"
+    },
+    {
+      "attempt_label": "mac-main-fortnite-batman",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "fortnite-batman"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-fortnite-batman",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "fortnite-batman"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-fortnite-batman",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "fortnite-batman"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-fortnite-batman",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "fortnite-batman"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-fortnite-batman",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "fortnite-batman"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-fortnite-batman",
+      "blockers": [
+        "no screenshot/contact sheet located in this attempt source",
+        "no validation/report manifest located in this attempt source"
+      ],
+      "model_slug": "fortnite-batman"
+    },
+    {
+      "attempt_label": "mac-main-baby-yoda",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "baby-yoda"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-baby-yoda",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "baby-yoda"
+    },
+    {
+      "attempt_label": "previous-downloads-baby-yoda",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "baby-yoda"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-baby-yoda",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "baby-yoda"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-baby-yoda",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "baby-yoda"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-baby-yoda",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "baby-yoda"
+    },
+    {
+      "attempt_label": "mac-main-godzilla",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "godzilla"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-godzilla",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "godzilla"
+    },
+    {
+      "attempt_label": "previous-downloads-godzilla",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "godzilla"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-godzilla",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "godzilla"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-godzilla",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "godzilla"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-godzilla",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "godzilla"
+    },
+    {
+      "attempt_label": "mac-main-grogu",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "grogu"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-grogu",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "grogu"
+    },
+    {
+      "attempt_label": "previous-downloads-grogu",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "grogu"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-grogu",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "grogu"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-grogu",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "grogu"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-grogu",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "grogu"
+    },
+    {
+      "attempt_label": "mac-main-king-kong",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "king-kong"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-king-kong",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "king-kong"
+    },
+    {
+      "attempt_label": "previous-downloads-king-kong",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "king-kong"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-king-kong",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "king-kong"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-king-kong",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "king-kong"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-king-kong",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "king-kong"
+    },
+    {
+      "attempt_label": "mac-main-olaf",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "olaf"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-olaf",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "olaf"
+    },
+    {
+      "attempt_label": "previous-downloads-olaf",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "olaf"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-olaf",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "olaf"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-olaf",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "olaf"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-olaf",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "olaf"
+    },
+    {
+      "attempt_label": "mac-main-rigged-hand",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "rigged-hand"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-rigged-hand",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "rigged-hand"
+    },
+    {
+      "attempt_label": "previous-downloads-rigged-hand",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "rigged-hand"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-rigged-hand",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "rigged-hand"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-rigged-hand",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "rigged-hand"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-rigged-hand",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "rigged-hand"
+    },
+    {
+      "attempt_label": "mac-main-xenomorph",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "xenomorph"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-xenomorph",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "xenomorph"
+    },
+    {
+      "attempt_label": "previous-downloads-xenomorph",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "xenomorph"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-xenomorph",
+      "blockers": [
+        "no VRM located in this attempt source"
+      ],
+      "model_slug": "xenomorph"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-xenomorph",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "xenomorph"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-xenomorph",
+      "blockers": [
+        "no VRM located in this attempt source",
+        "no screenshot/contact sheet located in this attempt source"
+      ],
+      "model_slug": "xenomorph"
+    }
+  ],
+  "must_compare_visually": [
+    "mac-hard-fix-evidence-amazing-spider-man-2",
+    "mac-parallel-hard-fix-amazing-spider-man-2",
+    "mac-working-hard-fix-amazing-spider-man-2",
+    "previous-downloads-amazing-spider-man-2",
+    "ubuntu-canonical-amazing-spider-man-2",
+    "ubuntu-hard-fix-evidence-amazing-spider-man-2",
+    "ubuntu-parallel-hard-fix-amazing-spider-man-2",
+    "ubuntu-working-canonical-amazing-spider-man-2",
+    "ubuntu-working-hard-fix-amazing-spider-man-2",
+    "mac-hard-fix-evidence-terminator-t-800",
+    "mac-parallel-hard-fix-terminator-t-800",
+    "mac-working-hard-fix-terminator-t-800",
+    "previous-downloads-terminator-t-800",
+    "ubuntu-canonical-terminator-t-800",
+    "ubuntu-hard-fix-evidence-terminator-t-800",
+    "ubuntu-parallel-hard-fix-terminator-t-800",
+    "ubuntu-working-canonical-terminator-t-800",
+    "ubuntu-working-hard-fix-terminator-t-800",
+    "mac-hard-fix-evidence-spider-man-no-way-home",
+    "mac-parallel-hard-fix-spider-man-no-way-home",
+    "mac-working-hard-fix-spider-man-no-way-home",
+    "previous-downloads-spider-man-no-way-home",
+    "ubuntu-canonical-spider-man-no-way-home",
+    "ubuntu-hard-fix-evidence-spider-man-no-way-home",
+    "ubuntu-parallel-hard-fix-spider-man-no-way-home",
+    "ubuntu-working-canonical-spider-man-no-way-home",
+    "ubuntu-working-hard-fix-spider-man-no-way-home",
+    "mac-hard-fix-evidence-spider-man-playstation",
+    "mac-parallel-hard-fix-spider-man-playstation",
+    "mac-working-hard-fix-spider-man-playstation",
+    "previous-downloads-spider-man-playstation",
+    "ubuntu-canonical-spider-man-playstation",
+    "ubuntu-hard-fix-evidence-spider-man-playstation",
+    "ubuntu-parallel-hard-fix-spider-man-playstation",
+    "ubuntu-working-canonical-spider-man-playstation",
+    "ubuntu-working-hard-fix-spider-man-playstation",
+    "mac-hard-fix-evidence-jack-sparrow",
+    "mac-parallel-hard-fix-jack-sparrow",
+    "mac-working-hard-fix-jack-sparrow",
+    "previous-downloads-jack-sparrow",
+    "ubuntu-canonical-jack-sparrow",
+    "ubuntu-hard-fix-evidence-jack-sparrow",
+    "ubuntu-parallel-hard-fix-jack-sparrow",
+    "ubuntu-working-canonical-jack-sparrow",
+    "ubuntu-working-hard-fix-jack-sparrow",
+    "mac-parallel-hard-fix-elsa",
+    "mac-working-hard-fix-elsa",
+    "previous-downloads-elsa",
+    "ubuntu-canonical-elsa",
+    "ubuntu-working-canonical-elsa",
+    "ubuntu-working-hard-fix-elsa",
+    "mac-parallel-hard-fix-buzz-lightyear",
+    "mac-working-hard-fix-buzz-lightyear",
+    "previous-downloads-buzz-lightyear",
+    "ubuntu-canonical-buzz-lightyear",
+    "ubuntu-working-canonical-buzz-lightyear",
+    "ubuntu-working-hard-fix-buzz-lightyear",
+    "mac-parallel-hard-fix-teal-v2",
+    "mac-working-hard-fix-teal-v2",
+    "previous-downloads-teal-v2",
+    "ubuntu-canonical-teal-v2",
+    "ubuntu-working-canonical-teal-v2",
+    "ubuntu-working-hard-fix-teal-v2",
+    "mac-hard-fix-evidence-shrek",
+    "mac-parallel-hard-fix-shrek",
+    "mac-working-hard-fix-shrek",
+    "previous-downloads-shrek",
+    "ubuntu-canonical-shrek",
+    "ubuntu-parallel-hard-fix-shrek",
+    "ubuntu-working-canonical-shrek",
+    "ubuntu-working-hard-fix-shrek",
+    "mac-hard-fix-evidence-iron-man",
+    "mac-parallel-hard-fix-iron-man",
+    "mac-working-hard-fix-iron-man",
+    "previous-downloads-iron-man",
+    "ubuntu-canonical-iron-man",
+    "ubuntu-parallel-hard-fix-iron-man",
+    "ubuntu-working-canonical-iron-man",
+    "ubuntu-working-hard-fix-iron-man",
+    "mac-hard-fix-evidence-woody",
+    "mac-parallel-hard-fix-woody",
+    "mac-working-hard-fix-woody",
+    "previous-downloads-woody",
+    "ubuntu-canonical-woody",
+    "ubuntu-parallel-hard-fix-woody",
+    "ubuntu-working-canonical-woody",
+    "ubuntu-working-hard-fix-woody",
+    "mac-hard-fix-evidence-darth-vader",
+    "mac-parallel-hard-fix-darth-vader",
+    "mac-working-canonical-darth-vader",
+    "mac-working-hard-fix-darth-vader",
+    "previous-downloads-darth-vader",
+    "ubuntu-canonical-darth-vader",
+    "ubuntu-parallel-hard-fix-darth-vader",
+    "ubuntu-working-canonical-darth-vader",
+    "ubuntu-working-hard-fix-darth-vader",
+    "mac-hard-fix-evidence-fortnite-batman",
+    "mac-parallel-hard-fix-fortnite-batman",
+    "mac-working-hard-fix-fortnite-batman",
+    "previous-downloads-fortnite-batman",
+    "ubuntu-canonical-fortnite-batman",
+    "ubuntu-parallel-hard-fix-fortnite-batman",
+    "ubuntu-working-canonical-fortnite-batman",
+    "ubuntu-working-hard-fix-fortnite-batman",
+    "previous-downloads-baby-yoda",
+    "ubuntu-canonical-baby-yoda",
+    "previous-downloads-godzilla",
+    "ubuntu-canonical-godzilla",
+    "previous-downloads-grogu",
+    "ubuntu-canonical-grogu",
+    "previous-downloads-king-kong",
+    "ubuntu-canonical-king-kong",
+    "previous-downloads-olaf",
+    "ubuntu-canonical-olaf",
+    "previous-downloads-rigged-hand",
+    "ubuntu-canonical-rigged-hand",
+    "previous-downloads-xenomorph",
+    "ubuntu-canonical-xenomorph"
+  ],
+  "must_retest_on_ubuntu": [
+    "mac-parallel-hard-fix-amazing-spider-man-2",
+    "mac-working-hard-fix-amazing-spider-man-2",
+    "previous-downloads-amazing-spider-man-2",
+    "ubuntu-canonical-amazing-spider-man-2",
+    "ubuntu-parallel-hard-fix-amazing-spider-man-2",
+    "ubuntu-working-canonical-amazing-spider-man-2",
+    "ubuntu-working-hard-fix-amazing-spider-man-2",
+    "mac-parallel-hard-fix-terminator-t-800",
+    "mac-working-hard-fix-terminator-t-800",
+    "previous-downloads-terminator-t-800",
+    "ubuntu-canonical-terminator-t-800",
+    "ubuntu-parallel-hard-fix-terminator-t-800",
+    "ubuntu-working-canonical-terminator-t-800",
+    "ubuntu-working-hard-fix-terminator-t-800",
+    "mac-parallel-hard-fix-spider-man-no-way-home",
+    "mac-working-hard-fix-spider-man-no-way-home",
+    "previous-downloads-spider-man-no-way-home",
+    "ubuntu-canonical-spider-man-no-way-home",
+    "ubuntu-parallel-hard-fix-spider-man-no-way-home",
+    "ubuntu-working-canonical-spider-man-no-way-home",
+    "ubuntu-working-hard-fix-spider-man-no-way-home",
+    "mac-parallel-hard-fix-spider-man-playstation",
+    "mac-working-hard-fix-spider-man-playstation",
+    "previous-downloads-spider-man-playstation",
+    "ubuntu-canonical-spider-man-playstation",
+    "ubuntu-parallel-hard-fix-spider-man-playstation",
+    "ubuntu-working-canonical-spider-man-playstation",
+    "ubuntu-working-hard-fix-spider-man-playstation",
+    "mac-parallel-hard-fix-jack-sparrow",
+    "mac-working-hard-fix-jack-sparrow",
+    "previous-downloads-jack-sparrow",
+    "ubuntu-canonical-jack-sparrow",
+    "ubuntu-parallel-hard-fix-jack-sparrow",
+    "ubuntu-working-canonical-jack-sparrow",
+    "ubuntu-working-hard-fix-jack-sparrow",
+    "mac-parallel-hard-fix-elsa",
+    "mac-working-hard-fix-elsa",
+    "previous-downloads-elsa",
+    "ubuntu-canonical-elsa",
+    "ubuntu-working-canonical-elsa",
+    "ubuntu-working-hard-fix-elsa",
+    "mac-parallel-hard-fix-buzz-lightyear",
+    "mac-working-hard-fix-buzz-lightyear",
+    "previous-downloads-buzz-lightyear",
+    "ubuntu-canonical-buzz-lightyear",
+    "ubuntu-working-canonical-buzz-lightyear",
+    "ubuntu-working-hard-fix-buzz-lightyear",
+    "mac-parallel-hard-fix-teal-v2",
+    "mac-working-hard-fix-teal-v2",
+    "previous-downloads-teal-v2",
+    "ubuntu-canonical-teal-v2",
+    "ubuntu-working-canonical-teal-v2",
+    "ubuntu-working-hard-fix-teal-v2",
+    "mac-parallel-hard-fix-shrek",
+    "mac-working-hard-fix-shrek",
+    "previous-downloads-shrek",
+    "ubuntu-canonical-shrek",
+    "ubuntu-parallel-hard-fix-shrek",
+    "ubuntu-working-canonical-shrek",
+    "ubuntu-working-hard-fix-shrek",
+    "mac-parallel-hard-fix-iron-man",
+    "mac-working-hard-fix-iron-man",
+    "previous-downloads-iron-man",
+    "ubuntu-canonical-iron-man",
+    "ubuntu-parallel-hard-fix-iron-man",
+    "ubuntu-working-canonical-iron-man",
+    "ubuntu-working-hard-fix-iron-man",
+    "mac-parallel-hard-fix-woody",
+    "mac-working-hard-fix-woody",
+    "previous-downloads-woody",
+    "ubuntu-canonical-woody",
+    "ubuntu-parallel-hard-fix-woody",
+    "ubuntu-working-canonical-woody",
+    "ubuntu-working-hard-fix-woody",
+    "mac-parallel-hard-fix-darth-vader",
+    "mac-working-canonical-darth-vader",
+    "mac-working-hard-fix-darth-vader",
+    "previous-downloads-darth-vader",
+    "ubuntu-canonical-darth-vader",
+    "ubuntu-parallel-hard-fix-darth-vader",
+    "ubuntu-working-canonical-darth-vader",
+    "ubuntu-working-hard-fix-darth-vader",
+    "mac-parallel-hard-fix-fortnite-batman",
+    "mac-working-hard-fix-fortnite-batman",
+    "previous-downloads-fortnite-batman",
+    "ubuntu-canonical-fortnite-batman",
+    "ubuntu-parallel-hard-fix-fortnite-batman",
+    "ubuntu-working-canonical-fortnite-batman",
+    "ubuntu-working-hard-fix-fortnite-batman",
+    "mac-parallel-hard-fix-baby-yoda",
+    "previous-downloads-baby-yoda",
+    "mac-parallel-hard-fix-godzilla",
+    "previous-downloads-godzilla",
+    "mac-parallel-hard-fix-grogu",
+    "previous-downloads-grogu",
+    "mac-parallel-hard-fix-king-kong",
+    "previous-downloads-king-kong",
+    "mac-parallel-hard-fix-olaf",
+    "previous-downloads-olaf",
+    "mac-parallel-hard-fix-rigged-hand",
+    "previous-downloads-rigged-hand",
+    "mac-parallel-hard-fix-xenomorph",
+    "previous-downloads-xenomorph"
+  ],
+  "next_best_candidate_prompt": "Using the consolidated archive and branches, run Ubuntu visual/pose/browser smoke comparison for each model without merging. Load each competing VRM attempt, capture consistent contact sheets and pose-suite screenshots, compare against archived evidence, record pass/fail/blocker classes, then recommend candidates per model with explicit non-mergeable artifacts kept external to git.",
+  "runtime_only_fix_candidates": [
+    "mac-hard-fix-evidence-amazing-spider-man-2",
+    "mac-main-amazing-spider-man-2",
+    "mac-parallel-hard-fix-amazing-spider-man-2",
+    "mac-working-hard-fix-amazing-spider-man-2",
+    "previous-downloads-amazing-spider-man-2",
+    "ubuntu-canonical-amazing-spider-man-2",
+    "ubuntu-hard-fix-evidence-amazing-spider-man-2",
+    "ubuntu-parallel-hard-fix-amazing-spider-man-2",
+    "ubuntu-working-canonical-amazing-spider-man-2",
+    "ubuntu-working-hard-fix-amazing-spider-man-2",
+    "mac-hard-fix-evidence-terminator-t-800",
+    "mac-main-terminator-t-800",
+    "mac-parallel-hard-fix-terminator-t-800",
+    "mac-working-hard-fix-terminator-t-800",
+    "previous-downloads-terminator-t-800",
+    "ubuntu-canonical-terminator-t-800",
+    "ubuntu-hard-fix-evidence-terminator-t-800",
+    "ubuntu-parallel-hard-fix-terminator-t-800",
+    "ubuntu-working-canonical-terminator-t-800",
+    "ubuntu-working-hard-fix-terminator-t-800",
+    "mac-hard-fix-evidence-spider-man-no-way-home",
+    "mac-main-spider-man-no-way-home",
+    "mac-parallel-hard-fix-spider-man-no-way-home",
+    "mac-working-hard-fix-spider-man-no-way-home",
+    "previous-downloads-spider-man-no-way-home",
+    "ubuntu-canonical-spider-man-no-way-home",
+    "ubuntu-hard-fix-evidence-spider-man-no-way-home",
+    "ubuntu-parallel-hard-fix-spider-man-no-way-home",
+    "ubuntu-working-canonical-spider-man-no-way-home",
+    "ubuntu-working-hard-fix-spider-man-no-way-home",
+    "mac-hard-fix-evidence-spider-man-playstation",
+    "mac-main-spider-man-playstation",
+    "mac-parallel-hard-fix-spider-man-playstation",
+    "mac-working-hard-fix-spider-man-playstation",
+    "previous-downloads-spider-man-playstation",
+    "ubuntu-canonical-spider-man-playstation",
+    "ubuntu-hard-fix-evidence-spider-man-playstation",
+    "ubuntu-parallel-hard-fix-spider-man-playstation",
+    "ubuntu-working-canonical-spider-man-playstation",
+    "ubuntu-working-hard-fix-spider-man-playstation",
+    "mac-hard-fix-evidence-jack-sparrow",
+    "mac-main-jack-sparrow",
+    "mac-parallel-hard-fix-jack-sparrow",
+    "mac-working-hard-fix-jack-sparrow",
+    "previous-downloads-jack-sparrow",
+    "ubuntu-canonical-jack-sparrow",
+    "ubuntu-hard-fix-evidence-jack-sparrow",
+    "ubuntu-parallel-hard-fix-jack-sparrow",
+    "ubuntu-working-canonical-jack-sparrow",
+    "ubuntu-working-hard-fix-jack-sparrow",
+    "mac-main-elsa",
+    "mac-parallel-hard-fix-elsa",
+    "mac-working-hard-fix-elsa",
+    "previous-downloads-elsa",
+    "ubuntu-canonical-elsa",
+    "ubuntu-parallel-hard-fix-elsa",
+    "ubuntu-working-canonical-elsa",
+    "ubuntu-working-hard-fix-elsa",
+    "mac-main-buzz-lightyear",
+    "mac-parallel-hard-fix-buzz-lightyear",
+    "mac-working-hard-fix-buzz-lightyear",
+    "previous-downloads-buzz-lightyear",
+    "ubuntu-canonical-buzz-lightyear",
+    "ubuntu-parallel-hard-fix-buzz-lightyear",
+    "ubuntu-working-canonical-buzz-lightyear",
+    "ubuntu-working-hard-fix-buzz-lightyear",
+    "mac-main-teal-v2",
+    "mac-parallel-hard-fix-teal-v2",
+    "mac-working-hard-fix-teal-v2",
+    "previous-downloads-teal-v2",
+    "ubuntu-canonical-teal-v2",
+    "ubuntu-parallel-hard-fix-teal-v2",
+    "ubuntu-working-canonical-teal-v2",
+    "ubuntu-working-hard-fix-teal-v2",
+    "mac-hard-fix-evidence-shrek",
+    "mac-main-shrek",
+    "mac-parallel-hard-fix-shrek",
+    "mac-working-hard-fix-shrek",
+    "previous-downloads-shrek",
+    "ubuntu-canonical-shrek",
+    "ubuntu-parallel-hard-fix-shrek",
+    "ubuntu-working-canonical-shrek",
+    "ubuntu-working-hard-fix-shrek",
+    "mac-hard-fix-evidence-iron-man",
+    "mac-main-iron-man",
+    "mac-parallel-hard-fix-iron-man",
+    "mac-working-hard-fix-iron-man",
+    "previous-downloads-iron-man",
+    "ubuntu-canonical-iron-man",
+    "ubuntu-parallel-hard-fix-iron-man",
+    "ubuntu-working-canonical-iron-man",
+    "ubuntu-working-hard-fix-iron-man",
+    "mac-hard-fix-evidence-woody",
+    "mac-main-woody",
+    "mac-parallel-hard-fix-woody",
+    "mac-working-hard-fix-woody",
+    "previous-downloads-woody",
+    "ubuntu-canonical-woody",
+    "ubuntu-parallel-hard-fix-woody",
+    "ubuntu-working-canonical-woody",
+    "ubuntu-working-hard-fix-woody",
+    "mac-hard-fix-evidence-darth-vader",
+    "mac-main-darth-vader",
+    "mac-parallel-hard-fix-darth-vader",
+    "mac-working-hard-fix-darth-vader",
+    "previous-downloads-darth-vader",
+    "ubuntu-canonical-darth-vader",
+    "ubuntu-parallel-hard-fix-darth-vader",
+    "ubuntu-working-canonical-darth-vader",
+    "ubuntu-working-hard-fix-darth-vader",
+    "mac-hard-fix-evidence-fortnite-batman",
+    "mac-main-fortnite-batman",
+    "mac-parallel-hard-fix-fortnite-batman",
+    "mac-working-hard-fix-fortnite-batman",
+    "previous-downloads-fortnite-batman",
+    "ubuntu-canonical-fortnite-batman",
+    "ubuntu-parallel-hard-fix-fortnite-batman",
+    "ubuntu-working-canonical-fortnite-batman",
+    "ubuntu-working-hard-fix-fortnite-batman",
+    "mac-main-baby-yoda",
+    "mac-parallel-hard-fix-baby-yoda",
+    "previous-downloads-baby-yoda",
+    "ubuntu-canonical-baby-yoda",
+    "ubuntu-parallel-hard-fix-baby-yoda",
+    "ubuntu-working-canonical-baby-yoda",
+    "mac-main-godzilla",
+    "mac-parallel-hard-fix-godzilla",
+    "previous-downloads-godzilla",
+    "ubuntu-canonical-godzilla",
+    "ubuntu-parallel-hard-fix-godzilla",
+    "ubuntu-working-canonical-godzilla",
+    "mac-main-grogu",
+    "mac-parallel-hard-fix-grogu",
+    "previous-downloads-grogu",
+    "ubuntu-canonical-grogu",
+    "ubuntu-parallel-hard-fix-grogu",
+    "ubuntu-working-canonical-grogu",
+    "mac-main-king-kong",
+    "mac-parallel-hard-fix-king-kong",
+    "previous-downloads-king-kong",
+    "ubuntu-canonical-king-kong",
+    "ubuntu-parallel-hard-fix-king-kong",
+    "ubuntu-working-canonical-king-kong",
+    "mac-main-olaf",
+    "mac-parallel-hard-fix-olaf",
+    "previous-downloads-olaf",
+    "ubuntu-canonical-olaf",
+    "ubuntu-parallel-hard-fix-olaf",
+    "ubuntu-working-canonical-olaf",
+    "mac-main-rigged-hand",
+    "mac-parallel-hard-fix-rigged-hand",
+    "previous-downloads-rigged-hand",
+    "ubuntu-canonical-rigged-hand",
+    "ubuntu-parallel-hard-fix-rigged-hand",
+    "ubuntu-working-canonical-rigged-hand",
+    "mac-main-xenomorph",
+    "mac-parallel-hard-fix-xenomorph",
+    "previous-downloads-xenomorph",
+    "ubuntu-canonical-xenomorph",
+    "ubuntu-parallel-hard-fix-xenomorph",
+    "ubuntu-working-canonical-xenomorph"
+  ],
+  "source_level_repair_needed": [
+    "mac-parallel-hard-fix-amazing-spider-man-2",
+    "previous-downloads-amazing-spider-man-2",
+    "mac-parallel-hard-fix-terminator-t-800",
+    "previous-downloads-terminator-t-800",
+    "mac-parallel-hard-fix-spider-man-no-way-home",
+    "previous-downloads-spider-man-no-way-home",
+    "mac-parallel-hard-fix-spider-man-playstation",
+    "previous-downloads-spider-man-playstation",
+    "mac-parallel-hard-fix-jack-sparrow",
+    "previous-downloads-jack-sparrow",
+    "mac-parallel-hard-fix-elsa",
+    "previous-downloads-elsa",
+    "mac-parallel-hard-fix-buzz-lightyear",
+    "previous-downloads-buzz-lightyear",
+    "mac-parallel-hard-fix-teal-v2",
+    "previous-downloads-teal-v2"
+  ],
+  "timestamp": "20260611-204228",
+  "unsafe_to_merge": [
+    {
+      "attempt_label": "mac-hard-fix-evidence-amazing-spider-man-2",
+      "model_slug": "amazing-spider-man-2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-amazing-spider-man-2",
+      "model_slug": "amazing-spider-man-2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-amazing-spider-man-2",
+      "model_slug": "amazing-spider-man-2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-amazing-spider-man-2",
+      "model_slug": "amazing-spider-man-2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-amazing-spider-man-2",
+      "model_slug": "amazing-spider-man-2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-amazing-spider-man-2",
+      "model_slug": "amazing-spider-man-2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-hard-fix-evidence-amazing-spider-man-2",
+      "model_slug": "amazing-spider-man-2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-amazing-spider-man-2",
+      "model_slug": "amazing-spider-man-2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-amazing-spider-man-2",
+      "model_slug": "amazing-spider-man-2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-amazing-spider-man-2",
+      "model_slug": "amazing-spider-man-2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-terminator-t-800",
+      "model_slug": "terminator-t-800",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-terminator-t-800",
+      "model_slug": "terminator-t-800",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-terminator-t-800",
+      "model_slug": "terminator-t-800",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-terminator-t-800",
+      "model_slug": "terminator-t-800",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-terminator-t-800",
+      "model_slug": "terminator-t-800",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-terminator-t-800",
+      "model_slug": "terminator-t-800",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-hard-fix-evidence-terminator-t-800",
+      "model_slug": "terminator-t-800",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-terminator-t-800",
+      "model_slug": "terminator-t-800",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-terminator-t-800",
+      "model_slug": "terminator-t-800",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-terminator-t-800",
+      "model_slug": "terminator-t-800",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-spider-man-no-way-home",
+      "model_slug": "spider-man-no-way-home",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-spider-man-no-way-home",
+      "model_slug": "spider-man-no-way-home",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-spider-man-no-way-home",
+      "model_slug": "spider-man-no-way-home",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-spider-man-no-way-home",
+      "model_slug": "spider-man-no-way-home",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-spider-man-no-way-home",
+      "model_slug": "spider-man-no-way-home",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-spider-man-no-way-home",
+      "model_slug": "spider-man-no-way-home",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-hard-fix-evidence-spider-man-no-way-home",
+      "model_slug": "spider-man-no-way-home",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-spider-man-no-way-home",
+      "model_slug": "spider-man-no-way-home",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-spider-man-no-way-home",
+      "model_slug": "spider-man-no-way-home",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-spider-man-no-way-home",
+      "model_slug": "spider-man-no-way-home",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-spider-man-playstation",
+      "model_slug": "spider-man-playstation",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-spider-man-playstation",
+      "model_slug": "spider-man-playstation",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-spider-man-playstation",
+      "model_slug": "spider-man-playstation",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-spider-man-playstation",
+      "model_slug": "spider-man-playstation",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-spider-man-playstation",
+      "model_slug": "spider-man-playstation",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-spider-man-playstation",
+      "model_slug": "spider-man-playstation",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-hard-fix-evidence-spider-man-playstation",
+      "model_slug": "spider-man-playstation",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-spider-man-playstation",
+      "model_slug": "spider-man-playstation",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-spider-man-playstation",
+      "model_slug": "spider-man-playstation",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-spider-man-playstation",
+      "model_slug": "spider-man-playstation",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-jack-sparrow",
+      "model_slug": "jack-sparrow",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-jack-sparrow",
+      "model_slug": "jack-sparrow",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-jack-sparrow",
+      "model_slug": "jack-sparrow",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-jack-sparrow",
+      "model_slug": "jack-sparrow",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-jack-sparrow",
+      "model_slug": "jack-sparrow",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-jack-sparrow",
+      "model_slug": "jack-sparrow",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-hard-fix-evidence-jack-sparrow",
+      "model_slug": "jack-sparrow",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-jack-sparrow",
+      "model_slug": "jack-sparrow",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-jack-sparrow",
+      "model_slug": "jack-sparrow",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-jack-sparrow",
+      "model_slug": "jack-sparrow",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-elsa",
+      "model_slug": "elsa",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-elsa",
+      "model_slug": "elsa",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-elsa",
+      "model_slug": "elsa",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-elsa",
+      "model_slug": "elsa",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-elsa",
+      "model_slug": "elsa",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-elsa",
+      "model_slug": "elsa",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-elsa",
+      "model_slug": "elsa",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-elsa",
+      "model_slug": "elsa",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-buzz-lightyear",
+      "model_slug": "buzz-lightyear",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-buzz-lightyear",
+      "model_slug": "buzz-lightyear",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-buzz-lightyear",
+      "model_slug": "buzz-lightyear",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-buzz-lightyear",
+      "model_slug": "buzz-lightyear",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-buzz-lightyear",
+      "model_slug": "buzz-lightyear",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-buzz-lightyear",
+      "model_slug": "buzz-lightyear",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-buzz-lightyear",
+      "model_slug": "buzz-lightyear",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-buzz-lightyear",
+      "model_slug": "buzz-lightyear",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-teal-v2",
+      "model_slug": "teal-v2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-teal-v2",
+      "model_slug": "teal-v2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-teal-v2",
+      "model_slug": "teal-v2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-teal-v2",
+      "model_slug": "teal-v2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-teal-v2",
+      "model_slug": "teal-v2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-teal-v2",
+      "model_slug": "teal-v2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-teal-v2",
+      "model_slug": "teal-v2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-teal-v2",
+      "model_slug": "teal-v2",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-shrek",
+      "model_slug": "shrek",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-shrek",
+      "model_slug": "shrek",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-shrek",
+      "model_slug": "shrek",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-shrek",
+      "model_slug": "shrek",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-shrek",
+      "model_slug": "shrek",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-shrek",
+      "model_slug": "shrek",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-shrek",
+      "model_slug": "shrek",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-shrek",
+      "model_slug": "shrek",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-shrek",
+      "model_slug": "shrek",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-iron-man",
+      "model_slug": "iron-man",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-iron-man",
+      "model_slug": "iron-man",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-iron-man",
+      "model_slug": "iron-man",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-iron-man",
+      "model_slug": "iron-man",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-iron-man",
+      "model_slug": "iron-man",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-iron-man",
+      "model_slug": "iron-man",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-iron-man",
+      "model_slug": "iron-man",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-iron-man",
+      "model_slug": "iron-man",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-iron-man",
+      "model_slug": "iron-man",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-woody",
+      "model_slug": "woody",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-woody",
+      "model_slug": "woody",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-woody",
+      "model_slug": "woody",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-woody",
+      "model_slug": "woody",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-woody",
+      "model_slug": "woody",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-woody",
+      "model_slug": "woody",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-woody",
+      "model_slug": "woody",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-woody",
+      "model_slug": "woody",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-woody",
+      "model_slug": "woody",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-darth-vader",
+      "model_slug": "darth-vader",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-darth-vader",
+      "model_slug": "darth-vader",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-darth-vader",
+      "model_slug": "darth-vader",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-canonical-darth-vader",
+      "model_slug": "darth-vader",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-darth-vader",
+      "model_slug": "darth-vader",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-darth-vader",
+      "model_slug": "darth-vader",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-darth-vader",
+      "model_slug": "darth-vader",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-darth-vader",
+      "model_slug": "darth-vader",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-darth-vader",
+      "model_slug": "darth-vader",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-darth-vader",
+      "model_slug": "darth-vader",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-hard-fix-evidence-fortnite-batman",
+      "model_slug": "fortnite-batman",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-fortnite-batman",
+      "model_slug": "fortnite-batman",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-fortnite-batman",
+      "model_slug": "fortnite-batman",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-working-hard-fix-fortnite-batman",
+      "model_slug": "fortnite-batman",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-fortnite-batman",
+      "model_slug": "fortnite-batman",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-fortnite-batman",
+      "model_slug": "fortnite-batman",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-fortnite-batman",
+      "model_slug": "fortnite-batman",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-fortnite-batman",
+      "model_slug": "fortnite-batman",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-hard-fix-fortnite-batman",
+      "model_slug": "fortnite-batman",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-baby-yoda",
+      "model_slug": "baby-yoda",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-baby-yoda",
+      "model_slug": "baby-yoda",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-baby-yoda",
+      "model_slug": "baby-yoda",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-baby-yoda",
+      "model_slug": "baby-yoda",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-baby-yoda",
+      "model_slug": "baby-yoda",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-baby-yoda",
+      "model_slug": "baby-yoda",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-godzilla",
+      "model_slug": "godzilla",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-godzilla",
+      "model_slug": "godzilla",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-godzilla",
+      "model_slug": "godzilla",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-godzilla",
+      "model_slug": "godzilla",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-godzilla",
+      "model_slug": "godzilla",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-godzilla",
+      "model_slug": "godzilla",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-grogu",
+      "model_slug": "grogu",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-grogu",
+      "model_slug": "grogu",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-grogu",
+      "model_slug": "grogu",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-grogu",
+      "model_slug": "grogu",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-grogu",
+      "model_slug": "grogu",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-grogu",
+      "model_slug": "grogu",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-king-kong",
+      "model_slug": "king-kong",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-king-kong",
+      "model_slug": "king-kong",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-king-kong",
+      "model_slug": "king-kong",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-king-kong",
+      "model_slug": "king-kong",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-king-kong",
+      "model_slug": "king-kong",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-king-kong",
+      "model_slug": "king-kong",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-olaf",
+      "model_slug": "olaf",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-olaf",
+      "model_slug": "olaf",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-olaf",
+      "model_slug": "olaf",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-olaf",
+      "model_slug": "olaf",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-olaf",
+      "model_slug": "olaf",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-olaf",
+      "model_slug": "olaf",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-rigged-hand",
+      "model_slug": "rigged-hand",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-rigged-hand",
+      "model_slug": "rigged-hand",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-rigged-hand",
+      "model_slug": "rigged-hand",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-rigged-hand",
+      "model_slug": "rigged-hand",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-rigged-hand",
+      "model_slug": "rigged-hand",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-rigged-hand",
+      "model_slug": "rigged-hand",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-main-xenomorph",
+      "model_slug": "xenomorph",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "mac-parallel-hard-fix-xenomorph",
+      "model_slug": "xenomorph",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "previous-downloads-xenomorph",
+      "model_slug": "xenomorph",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-canonical-xenomorph",
+      "model_slug": "xenomorph",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-parallel-hard-fix-xenomorph",
+      "model_slug": "xenomorph",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    },
+    {
+      "attempt_label": "ubuntu-working-canonical-xenomorph",
+      "model_slug": "xenomorph",
+      "reason": "not evaluated in this consolidation pass",
+      "safe_to_merge_later": "unknown"
+    }
+  ]
+}

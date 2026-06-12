@@ -1,0 +1,55 @@
+{
+  "archive_path": "/Users/lekan/Downloads/PosePuppet_Consolidated_Attempts_20260611-204228",
+  "branches_requested": [
+    "archive/consolidated-attempt-index-20260611-204228",
+    "archive/mac-parallel-hard-fix-20260611-204228",
+    "archive/ubuntu-canonical-visual-qa-20260611-204228"
+  ],
+  "repo_infos_pre_branches": {
+    "mac-main": {
+      "branch": "main",
+      "dirty": true,
+      "dirty_entries": 173,
+      "exists": true,
+      "head": "5f3286c0d00e5be189b94e2149c1fb640916810c",
+      "head_short": "5f3286c",
+      "is_git": true,
+      "label": "mac-main",
+      "path": "/Users/lekan/Dev/posepuppet"
+    },
+    "mac-parallel-hard-fix": {
+      "branch": "hard-model-fix",
+      "dirty": false,
+      "dirty_entries": 0,
+      "exists": true,
+      "head": "08881ffe21606a3aaaa5fe86f77cb311d908fd64",
+      "head_short": "08881ff",
+      "is_git": true,
+      "label": "mac-parallel-hard-fix",
+      "path": "/Users/lekan/Dev/posepuppet-hard-model-fix"
+    },
+    "ubuntu-canonical": {
+      "branch": "main",
+      "dirty": false,
+      "dirty_entries": 0,
+      "exists": true,
+      "head": "89dea4f56fd69a96314c22489d1c204065c4dcde",
+      "head_short": "89dea4f",
+      "is_git": true,
+      "label": "ubuntu-canonical",
+      "path": "o@192.168.86.152:/home/o/Dev/posepuppet"
+    },
+    "ubuntu-parallel-hard-fix": {
+      "branch": "parallel-hard-model-fix-20260611-155951",
+      "dirty": false,
+      "dirty_entries": 0,
+      "exists": true,
+      "head": "5f3286c0d00e5be189b94e2149c1fb640916810c",
+      "head_short": "5f3286c",
+      "is_git": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "path": "o@192.168.86.152:/home/o/Dev/posepuppet-hard-model-fix"
+    }
+  },
+  "timestamp": "20260611-204228"
+}

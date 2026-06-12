@@ -1,0 +1,9 @@
+{
+  "notes": [
+    "Do not merge any archive branches until a separate Ubuntu visual/pose evaluation chooses candidates.",
+    "Mac main checkout had substantial pre-existing dirty work; consolidation commit should stage only model-audits/rig-prep/consolidated-attempts/.",
+    "Ubuntu parallel hard-fix path existed but was not a git checkout; preserved as source-copy/artifacts instead of a branch commit.",
+    "Previous preservation folders were copied into the master archive and also mined for per-model index evidence."
+  ],
+  "timestamp": "20260611-204228"
+}

@@ -1,0 +1,490 @@
+{
+  "archive_path": "/Users/lekan/Downloads/PosePuppet_Consolidated_Attempts_20260611-204228",
+  "category_counts": {
+    "capture-json": 478,
+    "contact-sheet": 485,
+    "diff": 24,
+    "log": 598,
+    "manifest": 1468,
+    "pose-suite": 1431,
+    "report": 21511,
+    "screenshot": 12669,
+    "source-copy": 208,
+    "unknown": 496,
+    "vrm": 303
+  },
+  "copied_records_manifest": "/Users/lekan/Downloads/PosePuppet_Consolidated_Attempts_20260611-204228/manifests/copied-artifacts.json",
+  "copy_jobs": [
+    {
+      "category_hint": "model-audits",
+      "dest_rel": "repositories/mac-main/artifacts/model-audits",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-main",
+      "remote": false,
+      "source": "/Users/lekan/Dev/posepuppet/model-audits",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "test-results",
+      "dest_rel": "repositories/mac-main/artifacts/test-results",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-main",
+      "remote": false,
+      "source": "/Users/lekan/Dev/posepuppet/test-results",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": ".codex-local",
+      "dest_rel": "repositories/mac-main/artifacts/.codex-local",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-main",
+      "remote": false,
+      "source": "/Users/lekan/Dev/posepuppet/.codex-local",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "public/avatars/generated",
+      "dest_rel": "repositories/mac-parallel-hard-fix/artifacts/public/avatars/generated",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-parallel-hard-fix",
+      "remote": false,
+      "source": "/Users/lekan/Dev/posepuppet-hard-model-fix/public/avatars/generated",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "dist/avatars/generated",
+      "dest_rel": "repositories/mac-parallel-hard-fix/artifacts/dist/avatars/generated",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-parallel-hard-fix",
+      "remote": false,
+      "source": "/Users/lekan/Dev/posepuppet-hard-model-fix/dist/avatars/generated",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "model-working-hard-fix",
+      "dest_rel": "repositories/mac-parallel-hard-fix/artifacts/model-working-hard-fix",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-parallel-hard-fix",
+      "remote": false,
+      "source": "/Users/lekan/Dev/posepuppet-hard-model-fix/model-working-hard-fix",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "model-audits",
+      "dest_rel": "repositories/mac-parallel-hard-fix/artifacts/model-audits",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-parallel-hard-fix",
+      "remote": false,
+      "source": "/Users/lekan/Dev/posepuppet-hard-model-fix/model-audits",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "test-results",
+      "dest_rel": "repositories/mac-parallel-hard-fix/artifacts/test-results",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-parallel-hard-fix",
+      "remote": false,
+      "source": "/Users/lekan/Dev/posepuppet-hard-model-fix/test-results",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": ".codex-local",
+      "dest_rel": "repositories/mac-parallel-hard-fix/artifacts/.codex-local",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-parallel-hard-fix",
+      "remote": false,
+      "source": "/Users/lekan/Dev/posepuppet-hard-model-fix/.codex-local",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "extra-working",
+      "dest_rel": "repositories/mac-working-canonical/artifacts/posepuppet-working",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-working-canonical",
+      "remote": false,
+      "source": "/Users/lekan/posepuppet-working",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "extra-working",
+      "dest_rel": "repositories/mac-working-hard-fix/artifacts/posepuppet-working-hard-fix",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-working-hard-fix",
+      "remote": false,
+      "source": "/Users/lekan/posepuppet-working-hard-fix",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "extra-working",
+      "dest_rel": "repositories/mac-hard-fix-evidence/artifacts/posepuppet-hard-fix-evidence",
+      "exists": true,
+      "is_dir": true,
+      "label": "mac-hard-fix-evidence",
+      "remote": false,
+      "source": "/Users/lekan/posepuppet-hard-fix-evidence",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "previous-downloads",
+      "dest_rel": "repositories/previous-downloads/PosePuppet_ALL_Attempts_Results_20260611-2023280",
+      "exists": true,
+      "is_dir": true,
+      "label": "previous-downloads",
+      "remote": false,
+      "source": "/Users/lekan/Downloads/PosePuppet_ALL_Attempts_Results_20260611-2023280",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "previous-downloads",
+      "dest_rel": "repositories/previous-downloads/PosePuppet_Attempt_Preservation_20260611-201805",
+      "exists": true,
+      "is_dir": true,
+      "label": "previous-downloads",
+      "remote": false,
+      "source": "/Users/lekan/Downloads/PosePuppet_Attempt_Preservation_20260611-201805",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "previous-downloads",
+      "dest_rel": "repositories/previous-downloads/PosePuppet_Filming_Brief.pdf",
+      "exists": true,
+      "is_dir": false,
+      "label": "previous-downloads",
+      "remote": false,
+      "source": "/Users/lekan/Downloads/PosePuppet_Filming_Brief.pdf",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "previous-downloads",
+      "dest_rel": "repositories/previous-downloads/PosePuppet_Model_Attempts_By_Model_20260611-203017",
+      "exists": true,
+      "is_dir": true,
+      "label": "previous-downloads",
+      "remote": false,
+      "source": "/Users/lekan/Downloads/PosePuppet_Model_Attempts_By_Model_20260611-203017",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "public/avatars/generated",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/public/avatars/generated",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/public/avatars/generated",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "dist/avatars/generated",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/dist/avatars/generated",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/dist/avatars/generated",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "model-working",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/model-working",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/model-working",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "model-working-hard-fix",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/model-working-hard-fix",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/model-working-hard-fix",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "model-audits",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/model-audits",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/model-audits",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "test-results",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/test-results",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/test-results",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "playwright-report",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/playwright-report",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/playwright-report",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "coverage",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/coverage",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/coverage",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "logs",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/logs",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/logs",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "reports",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/reports",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/reports",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "screenshots",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/screenshots",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/screenshots",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "contact-sheets",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/contact-sheets",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/contact-sheets",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": ".codex-local",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/.codex-local",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/.codex-local",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "public/avatars/generated",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/public/avatars/generated",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/public/avatars/generated",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "dist/avatars/generated",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/dist/avatars/generated",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/dist/avatars/generated",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "model-working",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/model-working",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/model-working",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "model-working-hard-fix",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/model-working-hard-fix",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/model-working-hard-fix",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "model-audits",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/model-audits",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/model-audits",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "test-results",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/test-results",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/test-results",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "playwright-report",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/playwright-report",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/playwright-report",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "coverage",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/coverage",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/coverage",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "logs",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/logs",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/logs",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "reports",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/reports",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/reports",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "screenshots",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/screenshots",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/screenshots",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "contact-sheets",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/contact-sheets",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/contact-sheets",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": ".codex-local",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/artifacts/.codex-local",
+      "exists": false,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix/.codex-local",
+      "source_is_dir": false
+    },
+    {
+      "category_hint": "source-copy",
+      "dest_rel": "repositories/ubuntu-parallel-hard-fix/source-copy/posepuppet-hard-model-fix",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-parallel-hard-fix",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet-hard-model-fix",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "extra-working",
+      "dest_rel": "repositories/ubuntu-working-canonical/artifacts/posepuppet-working",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-working-canonical",
+      "remote": true,
+      "source": "/home/o/posepuppet-working",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "extra-working",
+      "dest_rel": "repositories/ubuntu-working-hard-fix/artifacts/posepuppet-working-hard-fix",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-working-hard-fix",
+      "remote": true,
+      "source": "/home/o/posepuppet-working-hard-fix",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "extra-working",
+      "dest_rel": "repositories/ubuntu-hard-fix-evidence/artifacts/posepuppet-hard-fix-evidence",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-hard-fix-evidence",
+      "remote": true,
+      "source": "/home/o/posepuppet-hard-fix-evidence",
+      "source_is_dir": true
+    },
+    {
+      "category_hint": "extra-working",
+      "dest_rel": "repositories/ubuntu-canonical/artifacts/model-working",
+      "exists": true,
+      "is_dir": true,
+      "label": "ubuntu-canonical",
+      "remote": true,
+      "source": "/home/o/Dev/posepuppet/model-working",
+      "source_is_dir": true
+    }
+  ],
+  "sha256_manifest": "/Users/lekan/Downloads/PosePuppet_Consolidated_Attempts_20260611-204228/manifests/sha256-all-files.txt"
+}
