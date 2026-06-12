@@ -16,6 +16,7 @@ export interface Config {
   bodyMode: 'upper' | 'full';
   rootMotion: boolean;
   wristGain: number; // wrist rotation amplification, 1.0 = raw, default 1.25
+  exaggeration: number; // 1.0 = faithful … 2.0 = cartoon (amplitude scale)
 }
 
 // One Euro params are for METRIC world landmarks (meters): velocities are
@@ -34,6 +35,7 @@ const DEFAULTS: Config = {
   bodyMode: 'upper',
   rootMotion: true,
   wristGain: 1.25,
+  exaggeration: 1.0,
 };
 
 const KEY = 'posepuppet-config-v3';

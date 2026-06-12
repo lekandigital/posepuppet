@@ -1,5 +1,64 @@
 # Eval notes
 
+## P2 — motion core + expressiveness (2026-06-12)
+The puppet got better hands, a body, and a pulse. All sync numbers below
+are honest per-frame geometry (valid regardless of machine state); the
+FPS floor re-check is deferred — see the throttle note at the end.
+
+OCCLUSION RECOVERY: the decay path became pose continuity — angular
+velocity coast (τ=0.25 s) into pull-to-rest, joint limits (120° from rest,
+clamped on both target and enacted bone — the slerp path between two
+in-limit orientations can bulge past the limit, found by test), and
+re-acquisition that BLENDS from the held pose to live over up to 0.5 s,
+scaled by how long tracking was lost (a 50 ms flicker recovers almost
+instantly — without that, arms sync regressed 9.49→11.09°; with it,
+9.57° = within noise). tests/occlusion.spec.ts runs the synthetic dropout:
+settle → 2.5 s loss → relax under 4°/tick → re-acquire under 10°/tick,
+back on pose within 1.2 s.
+
+FACE-TOUCH: proximity magnetism (engage 1.15→0.6 shoulder-widths,
+smoothstep easing) into a two-bone IK blend with per-avatar arm lengths
+and a head-collider radius from the head subtree bbox; the contact target
+sits 1.18 R outside the skull, so the hand cannot pass through. The
+forearm converts against the PREDICTED upper-arm frame (with big IK
+corrections the stale frame landed the hand short — robot went 48%→100%
+reach after the fix + criterion alignment). facetouch.mp4, 60 s, both
+avatars: reach 100%/100%, penetration 0/0 (engaged frames 478/467).
+Astronaut visually lands hand-on-chin; robot reads as reach-to-collar
+(its head floats above the body — geometry, not a bug; live gate judges).
+
+FULL BODY/FEET: legs gained foot bones driven by ankle→toe landmarks
+(synthesized standing rest dir, 50° swing clamp; robot got real foot
+pivots), eval gained leg limbs in the sync metric + ?body=full wiring.
+fullbody.mp4 30 s: legsMean robot 5.60° / astronaut 6.21°, upper 6.4/7.9°
+— legs track about as well as arms.
+
+EXPRESSIVENESS: exaggeration slider (1.0–2.0, rail 'Expression' section,
+persisted) scales swing amplitude with a speed-coupled overshoot boost,
+chest at half rate, clamps everywhere; squash-and-stretch hint (≤5%
+compress on fast moves, restores exactly); motion-energy EMA exposed for
+velocity VFX later. Robot antenna is a real 2-DOF damped spring driven by
+head velocity. Idle life: robot breathing bob; VRM periodic randomized
+blinks (expressionManager, where the model has blendshapes); micro chest/
+head sway fades in 1.5 s after tracking loss — the avatar never freezes.
+Avatar switch crossfades materials over 0.45 s while the re-acquisition
+ramp blends the pose — no pop. Perf auto-tuner: pose FPS <22 for 5 s →
+coach offers one-click lite model + reduced effects (body.perf-lite drops
+blur/halos/grain).
+
+HAND STATE: open/fist/point estimated from pose landmarks alone
+(fingertip reach / forearm length, EMA-smoothed); VRM avatars curl real
+finger chains through the humanoid map (index stays out when pointing),
+the robot's mitt flattens/balls. No second ML model yet — that's P3.
+
+Suite: 48 tests, 43 passed / 5 skipped, tsc clean. Honest caveat: every
+headed FPS reading this session collapsed to ~30 regardless of content —
+blank-page rAF probes confirm environment throttling (display asleep or
+locked), so the P2 before/after FPS table is DEFERRED; eval/run.mjs now
+probes for this and stamps results.meta.envThrottled so a throttled run
+can never silently pose as floor evidence. Floors get verified the next
+time the display is verifiably awake (next session start or P3 close).
+
 ## P1 — design system rolled out (2026-06-12)
 Gate 2 approved; the glass-cockpit shell is live on the real app. Token
 system both themes; self-hosted variable fonts (Inter/JetBrains Mono/

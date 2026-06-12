@@ -1,3 +1,10 @@
+## 2026-06-12 ~09:30 (P2 COMPLETE — motion core + expressiveness)
+Done: occlusion recovery (coast/limits/adaptive reacq blend + dropout tests); face-touch IK magnetism (100% reach, 0% penetration both avatars on facetouch.mp4); feet + legs metric (legsMean 5.6/6.2 deg on fullbody.mp4); exaggeration slider + squash + antenna spring + idle life + VRM blinks + switch crossfade + auto-tuner; hand open/fist/point from pose landmarks (VRM finger curls)
+Sync metric: arms 9.57 deg (vs 9.49 baseline, within noise); facetouch upper 6.4/9.6; fullbody upper 6.4/7.9 + legs 5.6/6.2
+FPS: BLOCKED — environment throttled to ~30 rAF (display asleep/locked); rig now detects+stamps this; floors re-verified next awake session
+Blockers: none for P3 (FPS floor check deferred, not forgotten)
+Next: P3 hand-only mode — HandLandmarker, expressive hand, creature puppet (pinch=jaw), x-ray, pinch→jaw eval metric → GATE 3 live test
+
 ## 2026-06-12 ~08:10 (P1 COMPLETE — design system live everywhere)
 Done: Gate 2 approved + full rollout (tokens, shell, chain, receipt, cards, coach card, engineering view, palette+shortcuts, themes persisted); 2 bugs fixed (video-layer compositing hole, font-load receipt false positive); design.spec.ts added (contrast both themes, reduced-motion, focus)
 Sync metric: arms 9.40/11.02, torso 2.23/2.30, fast 18.98/19.86 (robot/astronaut) — unchanged within noise

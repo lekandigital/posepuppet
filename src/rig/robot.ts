@@ -98,6 +98,8 @@ export function createRobot(): Avatar {
   antennaTip.position.set(0, 0.31, 0);
   head.add(antennaTip);
 
+  const handMeshes: Record<'left' | 'right', THREE.Mesh | null> = { left: null, right: null };
+
   // arms: shoulder pivot → upper arm (down −y) → elbow pivot → forearm → wrist
   for (const [prefix, sx] of [
     ['left', 1],
@@ -123,7 +125,9 @@ export function createRobot(): Avatar {
     const hand = shadowed(new THREE.Mesh(new THREE.SphereGeometry(0.055, 12, 10), DARK));
     hand.position.y = -0.02;
     hand.scale.set(0.9, 1.1, 0.7);
+    hand.name = `${prefix}HandMesh`;
     wrist.add(hand);
+    handMeshes[prefix] = hand;
   }
 
   // legs: hip pivot → thigh → knee pivot → shin → foot
@@ -148,22 +152,64 @@ export function createRobot(): Avatar {
     lower.add(ankle);
     joints[`${prefix}Ankle`] = ankle;
 
+    // foot is a drivable pivot at the ankle (P2: foot orientation)
+    const footPivot = new THREE.Object3D();
+    footPivot.position.set(0, -0.38, 0);
+    lower.add(footPivot);
+    bones[`${prefix}Foot`] = footPivot;
     const foot = shadowed(new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.05, 0.19), DARK));
-    foot.position.set(0, -0.39, 0.04);
-    lower.add(foot);
+    foot.position.set(0, -0.01, 0.04);
+    footPivot.add(foot);
   }
 
   let baseY = root.position.y;
+
+  // antenna spring (secondary motion): the tip lags the head's movement —
+  // overlap and follow-through, the classic puppet-alive ingredient
+  const springPos = new THREE.Vector2(); // antenna deflection (x: fwd/back, y: side)
+  const springVel = new THREE.Vector2();
+  const headWorld = new THREE.Vector3();
+  const prevHeadWorld = new THREE.Vector3();
+  let headInit = false;
 
   return {
     name: 'robot',
     object: root,
     bones,
     joints,
-    update(_dt, time) {
-      // subtle idle: breathing bob + faint head sway
+    applyHandState(side, openness) {
+      // no fingers on the robot: an open hand reads as a flatter, wider
+      // mitt; a fist as a tight ball
+      const m = handMeshes[side];
+      if (!m) return;
+      const o = openness;
+      m.scale.set(0.75 + 0.3 * o, 0.85 + 0.35 * o, 0.65 + 0.15 * o);
+    },
+    update(dt, time) {
+      // subtle idle: breathing bob
       root.position.y = baseY + Math.sin(time * 0.0021) * 0.008;
-      antennaTip.position.x = Math.sin(time * 0.0035) * 0.01;
+
+      // drive the antenna spring from head velocity (world space)
+      head.getWorldPosition(headWorld);
+      if (!headInit) {
+        prevHeadWorld.copy(headWorld);
+        headInit = true;
+      }
+      const clampedDt = Math.min(Math.max(dt, 1e-3), 0.1);
+      const vx = (headWorld.x - prevHeadWorld.x) / clampedDt;
+      const vz = (headWorld.z - prevHeadWorld.z) / clampedDt;
+      prevHeadWorld.copy(headWorld);
+      const K = 70; // spring stiffness
+      const C = 7; // damping
+      springVel.x += (-K * springPos.x - C * springVel.x - vz * 9) * clampedDt;
+      springVel.y += (-K * springPos.y - C * springVel.y + vx * 9) * clampedDt;
+      springPos.x = THREE.MathUtils.clamp(springPos.x + springVel.x * clampedDt, -0.5, 0.5);
+      springPos.y = THREE.MathUtils.clamp(springPos.y + springVel.y * clampedDt, -0.5, 0.5);
+      antenna.rotation.x = springPos.x;
+      antenna.rotation.z = springPos.y;
+      antennaTip.position.x = Math.sin(springPos.y) * 0.09;
+      antennaTip.position.z = Math.sin(springPos.x) * 0.09;
+      antennaTip.position.y = 0.26 + Math.cos(Math.max(Math.abs(springPos.x), Math.abs(springPos.y))) * 0.05;
     },
     dispose() {
       root.removeFromParent();
