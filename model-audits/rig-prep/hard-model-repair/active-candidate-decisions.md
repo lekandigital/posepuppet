@@ -1,0 +1,10 @@
+# Active candidate decisions
+
+- `amazing-spider-man-2`: `deferred`; best `attempt-008-raw-gltf-normalize-ground`; sheet `model-working-hard-fix/amazing-spider-man-2/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/contact-sheet.png`; query `avatarLoader=raw-gltf&avatarNormalize=1`
+- `terminator-t-800`: `deferred`; best `attempt-008-raw-gltf-normalize-ground`; sheet `model-working-hard-fix/terminator-t-800/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/contact-sheet.png`; query `avatarLoader=raw-gltf&avatarNormalize=1`
+- `spider-man-no-way-home`: `deferred`; best `attempt-008-raw-gltf-normalize-ground`; sheet `model-working-hard-fix/spider-man-no-way-home/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/contact-sheet.png`; query `avatarLoader=raw-gltf&avatarNormalize=1`
+- `spider-man-playstation`: `active_candidate`; best `attempt-005-visual-pose-suite-fixed`; sheet `model-working-hard-fix/spider-man-playstation/attempts/attempt-005-visual-pose-suite-fixed/visual-review/contact-sheet.png`; query `none`
+- `jack-sparrow`: `reference_only`; best `attempt-011-visual-pose-suite-fixed-duplicate-cull`; sheet `model-working-hard-fix/jack-sparrow/attempts/attempt-011-visual-pose-suite-fixed-duplicate-cull/visual-review/contact-sheet.png`; query `avatarLoader=raw-gltf&avatarNormalize=1&avatarDuplicateCull=negative-x`
+- `elsa`: `deferred`; best `attempt-008-raw-gltf-normalize-ground`; sheet `model-working-hard-fix/elsa/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/contact-sheet.png`; query `avatarLoader=raw-gltf&avatarNormalize=1`
+- `buzz-lightyear`: `active_candidate_with_material_caveat`; best `attempt-008-manual-bone-map-vrm`; sheet `model-working-hard-fix/buzz-lightyear/attempts/attempt-008-manual-bone-map-vrm/visual-review/contact-sheet.png`; query `avatarNormalize=1`
+- `teal-v2`: `active_candidate`; best `attempt-009-visual-pose-suite-fixed-manual-map`; sheet `model-working-hard-fix/teal-v2/attempts/attempt-009-visual-pose-suite-fixed-manual-map/visual-review/contact-sheet.png`; query `avatarNormalize=1`

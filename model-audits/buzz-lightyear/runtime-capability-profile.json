@@ -1,78 +1,102 @@
 {
   "active_candidate": {
-    "attempt_id": "",
-    "browser_smoke": "not_attempted",
-    "visual_review": "not_available",
-    "vrm_path": ""
+    "accepted": true,
+    "best_attempt": "attempt-008-manual-bone-map-vrm",
+    "browser_smoke": "pass",
+    "candidate_vrm_path": "/Users/lekan/posepuppet-working-hard-fix/generated-vrms/buzz-lightyear.vrm",
+    "pose_suite": "pose_responsive_low_confidence_manual_map",
+    "visual_review": "visible_single_character_material_degraded"
   },
-  "blockers": [
-    "cleanup_needed",
-    "feet_not_ready",
-    "hand_control_not_ready",
-    "manual_mapping_needed",
-    "no_accepted_generated_vrm_candidate",
-    "visual_review_needed"
+  "attempt_count": 3,
+  "attempts": [
+    {
+      "attempt_id": "attempt-002-camera-framing-no-scale",
+      "browser_smoke": "failed",
+      "capture_results": "model-working-hard-fix/buzz-lightyear/attempts/attempt-002-camera-framing-no-scale/visual-review/capture-results.json",
+      "classification": "failed_browser_load",
+      "contact_sheet": "model-working-hard-fix/buzz-lightyear/attempts/attempt-002-camera-framing-no-scale/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/buzz-lightyear/attempts/attempt-002-camera-framing-no-scale/visual-review/pose-suite",
+      "query": "",
+      "slug": "buzz-lightyear",
+      "status": "error",
+      "targeted_change": "camera framing no scale",
+      "visual_label": "see_contact_sheet",
+      "warnings": [
+        "[warning] [.WebGL-0x13400534e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x13400534e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x13400534e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x13400534e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
+        "[warning] [generated-avatar] failed to load buzz-lightyear: VRMHumanoidLoaderPlugin: These humanoid bones are required but not exist: hips, spine, head, leftUpperLeg, leftLowerLeg, leftFoot, rightUpperLeg, rightLowerLeg, rightFoot, leftUpperArm, leftLowerArm, leftHand, rightUpperArm, rightLowerArm, rightHand"
+      ]
+    },
+    {
+      "attempt_id": "attempt-007-raw-gltf-loader",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/buzz-lightyear/attempts/attempt-007-raw-gltf-loader/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/buzz-lightyear/attempts/attempt-007-raw-gltf-loader/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/buzz-lightyear/attempts/attempt-007-raw-gltf-loader/visual-review/pose-suite",
+      "query": "&avatarLoader=raw-gltf",
+      "slug": "buzz-lightyear",
+      "status": "loaded",
+      "targeted_change": "raw GLTF loader",
+      "visual_label": "see_contact_sheet",
+      "warnings": []
+    },
+    {
+      "attempt_id": "attempt-008-manual-bone-map-vrm",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/buzz-lightyear/attempts/attempt-008-manual-bone-map-vrm/visual-review/capture-results.json",
+      "classification": "accepted_active_candidate",
+      "contact_sheet": "model-working-hard-fix/buzz-lightyear/attempts/attempt-008-manual-bone-map-vrm/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "pose_responsive_low_confidence_manual_map",
+      "pose_suite_dir": "model-working-hard-fix/buzz-lightyear/attempts/attempt-008-manual-bone-map-vrm/visual-review/pose-suite",
+      "query": "&avatarNormalize=1",
+      "slug": "buzz-lightyear",
+      "status": "loaded",
+      "targeted_change": "manual bone map VRM",
+      "visual_label": "visible_single_character_material_degraded",
+      "warnings": [
+        "[warning] [.WebGL-0x134004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x134004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x134004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x134004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ]
+    }
   ],
+  "best_attempt": "attempt-008-manual-bone-map-vrm",
+  "best_capture_results": "model-working-hard-fix/buzz-lightyear/attempts/attempt-008-manual-bone-map-vrm/visual-review/capture-results.json",
+  "best_contact_sheet": "model-working-hard-fix/buzz-lightyear/attempts/attempt-008-manual-bone-map-vrm/visual-review/contact-sheet.png",
+  "blocker": "No rig blocker after manual map, but source texture paths are missing so the VRM appears mostly white/material-degraded. Bone names are anonymous, so the mapping is position-derived and should be reviewed before public promotion.",
   "body_tracking": {
-    "arms": "disabled",
-    "feet": "disabled",
-    "head": "disabled",
-    "legs": "disabled",
-    "root_motion": "disabled",
-    "torso": "disabled"
+    "arms": "enabled",
+    "legs": "enabled",
+    "reason": "visual pose-suite evidence passed"
   },
-  "created_at": "2026-06-11T18:11:49+00:00",
-  "disabled_controls": [
-    "chest",
-    "face_anchors",
-    "feet",
-    "fingers",
-    "head",
-    "hips",
-    "leftHand",
-    "leftLowerArm",
-    "leftLowerLeg",
-    "leftUpperArm",
-    "leftUpperLeg",
-    "neck",
-    "rightHand",
-    "rightLowerArm",
-    "rightLowerLeg",
-    "rightUpperArm",
-    "rightUpperLeg",
-    "root_motion",
-    "shoulders",
-    "toes"
-  ],
-  "display_name": "Buzz Lightyear",
-  "enabled_controls": [],
-  "face_touch": {
-    "mode": "disabled",
-    "notes": [
-      "IK and visual validation required before support claim."
-    ],
-    "safe_first_gesture": "none",
-    "visual_result": "not_available"
+  "candidate_vrm_path": "/Users/lekan/posepuppet-working-hard-fix/generated-vrms/buzz-lightyear.vrm",
+  "created_at": "2026-06-11T23:53:28.709120+00:00",
+  "decision": "active_candidate_with_material_caveat",
+  "display": "Buzz Lightyear",
+  "pose_label": "pose_responsive_low_confidence_manual_map",
+  "public_ui": {
+    "enabledInUi": false,
+    "public_promotion": false,
+    "query_param_only": true
   },
-  "game_modes": {
-    "flying": "defer",
-    "gesture_to_intent": "not_recommended",
-    "rowing": "defer",
-    "walking": "defer"
-  },
-  "hand_tracking": {
-    "finger_chains": "missing",
-    "left_hand": "missing",
-    "mode": "none",
-    "right_hand": "missing"
-  },
-  "notes": [
-    "Generated candidates remain query-param-only and excluded from public avatar cycling."
-  ],
-  "quality_label": "manual_mapping_needed",
+  "quality_label": "works_with_material_caveat",
+  "query": "avatarNormalize=1",
+  "recommendation": "Accept as active generated-avatar candidate with material and mapping caveats; do not public-promote without texture recovery and manual rig review.",
+  "reference_only": false,
   "runtime_profile": "humanoid_with_offsets",
-  "schema_version": "posepuppet-runtime-capability-profile-v2",
+  "schema_version": "posepuppet-hard-model-repair-model-summary-v1",
   "slug": "buzz-lightyear",
-  "warning_label": "manual_mapping_needed",
-  "warning_text": "Manual mapping and cleanup are needed before a generated candidate can be accepted."
+  "visual_label": "visible_single_character_material_degraded"
 }

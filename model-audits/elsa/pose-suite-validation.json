@@ -1,384 +1,79 @@
 {
-  "attempt_id": "attempt-001-baseline",
-  "created_at": "2026-06-11T18:11:49+00:00",
-  "pose_tests": [
+  "active_candidate": false,
+  "attempt_count": 3,
+  "attempts": [
     {
-      "applied": true,
-      "bones_driven": [
-        "chest",
-        "head",
-        "hips"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "neutral",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-002-camera-framing-no-scale",
+      "browser_smoke": "failed",
+      "capture_results": "model-working-hard-fix/elsa/attempts/attempt-002-camera-framing-no-scale/visual-review/capture-results.json",
+      "classification": "failed_browser_load",
+      "contact_sheet": "model-working-hard-fix/elsa/attempts/attempt-002-camera-framing-no-scale/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/elsa/attempts/attempt-002-camera-framing-no-scale/visual-review/pose-suite",
+      "query": "",
+      "slug": "elsa",
+      "status": "error",
+      "targeted_change": "camera framing no scale",
+      "visual_label": "see_contact_sheet",
+      "warnings": [
+        "[warning] [generated-avatar] failed to load elsa: VRMHumanoidLoaderPlugin: These humanoid bones are required but not exist: spine, leftUpperLeg, leftLowerLeg, leftFoot, rightUpperLeg, rightLowerLeg, rightFoot"
+      ]
     },
     {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "arms_out",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-007-raw-gltf-loader",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/elsa/attempts/attempt-007-raw-gltf-loader/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/elsa/attempts/attempt-007-raw-gltf-loader/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/elsa/attempts/attempt-007-raw-gltf-loader/visual-review/pose-suite",
+      "query": "&avatarLoader=raw-gltf",
+      "slug": "elsa",
+      "status": "loaded",
+      "targeted_change": "raw GLTF loader",
+      "visual_label": "see_contact_sheet",
+      "warnings": []
     },
     {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "arms_up",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "arms_forward",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftLowerArm",
-        "rightLowerArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "elbow_bend",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftHand",
-        "rightHand"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "wrist_rotate",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftHand",
-        "rightHand"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "palm_forward",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "chest",
-        "hips"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "lean_left",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "chest",
-        "hips"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "lean_right",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "chest",
-        "hips"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "torso_turn",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "walking_stride_proxy",
-      "reason": "missing mapped bones: leftLowerLeg, leftUpperLeg, rightLowerLeg, rightUpperLeg",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "foot_lift",
-      "reason": "missing mapped bones: leftFoot, rightFoot",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "foot_rotate",
-      "reason": "missing mapped bones: leftFoot, rightFoot",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftLowerArm",
-        "leftUpperArm",
-        "rightLowerArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "rowing_stroke",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "flying_arms_out",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "head",
-        "leftHand",
-        "rightHand"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "hand_to_mouth_proxy",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "head",
-        "leftHand",
-        "rightHand"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "hand_to_cheek_proxy",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftHand",
-        "rightHand"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "finger_curl",
-      "reason": "curl preset only; full finger runtime is not claimed",
-      "result": "partial",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-008-raw-gltf-normalize-ground",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/elsa/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/capture-results.json",
+      "classification": "best_deferred_evidence",
+      "contact_sheet": "model-working-hard-fix/elsa/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "not_poseable_missing_required_lower_body_bones",
+      "pose_suite_dir": "model-working-hard-fix/elsa/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/pose-suite",
+      "query": "&avatarLoader=raw-gltf&avatarNormalize=1",
+      "slug": "elsa",
+      "status": "loaded",
+      "targeted_change": "raw GLTF normalize ground",
+      "visual_label": "blank_floor_only",
+      "warnings": []
     }
   ],
-  "schema_version": "posepuppet-pose-suite-validation-v1",
+  "best_attempt": "attempt-008-raw-gltf-normalize-ground",
+  "best_capture_results": "model-working-hard-fix/elsa/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/capture-results.json",
+  "best_contact_sheet": "model-working-hard-fix/elsa/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/contact-sheet.png",
+  "blocker": "VRM loader rejects the candidate because required humanoid lower-body bones are missing; raw GLTF load succeeds but remains visually blank after normalization. Source audit shows only upper-body useful mapping plus duplicate/reflection source content.",
+  "candidate_vrm_path": "/Users/lekan/posepuppet-working-hard-fix/generated-vrms/elsa.vrm",
+  "created_at": "2026-06-11T23:53:28.709120+00:00",
+  "decision": "deferred",
+  "display": "Elsa",
+  "pose_label": "not_poseable_missing_required_lower_body_bones",
+  "public_ui": {
+    "enabledInUi": false,
+    "public_promotion": false,
+    "query_param_only": true
+  },
+  "query": "avatarLoader=raw-gltf&avatarNormalize=1",
+  "recommendation": "Do not activate. Requires manual artist/source repair to add or recover lower-body bones before VRM humanoid conversion can be trusted.",
+  "reference_only": false,
+  "schema_version": "posepuppet-hard-model-repair-model-summary-v1",
   "slug": "elsa",
-  "source": "generated-vrm-reference",
-  "status": "partial"
+  "visual_label": "blank_floor_only"
 }

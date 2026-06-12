@@ -1,74 +1,208 @@
 {
   "active_candidate": {
-    "attempt_id": "attempt-001-baseline",
+    "accepted": false,
+    "best_attempt": "attempt-011-visual-pose-suite-fixed-duplicate-cull",
     "browser_smoke": "pass",
-    "visual_review": "not_available",
-    "vrm_path": "/home/o/posepuppet-working/generated-vrms/jack-sparrow.vrm"
+    "candidate_vrm_path": "/Users/lekan/posepuppet-working-hard-fix/generated-vrms/jack-sparrow.vrm",
+    "pose_suite": "static_mesh_not_deforming",
+    "visual_review": "visible_single_copy_after_duplicate_cull"
   },
-  "blockers": [
-    "visual_review_needed"
+  "attempt_count": 9,
+  "attempts": [
+    {
+      "attempt_id": "attempt-002-camera-framing-no-scale",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/jack-sparrow/attempts/attempt-002-camera-framing-no-scale/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/jack-sparrow/attempts/attempt-002-camera-framing-no-scale/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/jack-sparrow/attempts/attempt-002-camera-framing-no-scale/visual-review/pose-suite",
+      "query": "",
+      "slug": "jack-sparrow",
+      "status": "loaded",
+      "targeted_change": "camera framing no scale",
+      "visual_label": "see_contact_sheet",
+      "warnings": []
+    },
+    {
+      "attempt_id": "attempt-003-skinned-bounds-camera",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/jack-sparrow/attempts/attempt-003-skinned-bounds-camera/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/jack-sparrow/attempts/attempt-003-skinned-bounds-camera/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/jack-sparrow/attempts/attempt-003-skinned-bounds-camera/visual-review/pose-suite",
+      "query": "",
+      "slug": "jack-sparrow",
+      "status": "loaded",
+      "targeted_change": "skinned bounds camera",
+      "visual_label": "see_contact_sheet",
+      "warnings": []
+    },
+    {
+      "attempt_id": "attempt-004-material-debug-lit",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/jack-sparrow/attempts/attempt-004-material-debug-lit/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/jack-sparrow/attempts/attempt-004-material-debug-lit/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/jack-sparrow/attempts/attempt-004-material-debug-lit/visual-review/pose-suite",
+      "query": "&avatarMaterialMode=debug-lit",
+      "slug": "jack-sparrow",
+      "status": "loaded",
+      "targeted_change": "material debug lit",
+      "visual_label": "see_contact_sheet",
+      "warnings": []
+    },
+    {
+      "attempt_id": "attempt-005-disable-frustum-culling",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/jack-sparrow/attempts/attempt-005-disable-frustum-culling/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/jack-sparrow/attempts/attempt-005-disable-frustum-culling/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/jack-sparrow/attempts/attempt-005-disable-frustum-culling/visual-review/pose-suite",
+      "query": "",
+      "slug": "jack-sparrow",
+      "status": "loaded",
+      "targeted_change": "disable frustum culling",
+      "visual_label": "see_contact_sheet",
+      "warnings": []
+    },
+    {
+      "attempt_id": "attempt-007-raw-gltf-loader",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/jack-sparrow/attempts/attempt-007-raw-gltf-loader/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/jack-sparrow/attempts/attempt-007-raw-gltf-loader/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/jack-sparrow/attempts/attempt-007-raw-gltf-loader/visual-review/pose-suite",
+      "query": "&avatarLoader=raw-gltf",
+      "slug": "jack-sparrow",
+      "status": "loaded",
+      "targeted_change": "raw GLTF loader",
+      "visual_label": "see_contact_sheet",
+      "warnings": []
+    },
+    {
+      "attempt_id": "attempt-008-raw-gltf-normalize-ground",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/jack-sparrow/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/jack-sparrow/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/jack-sparrow/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/pose-suite",
+      "query": "&avatarLoader=raw-gltf&avatarNormalize=1",
+      "slug": "jack-sparrow",
+      "status": "loaded",
+      "targeted_change": "raw GLTF normalize ground",
+      "visual_label": "see_contact_sheet",
+      "warnings": []
+    },
+    {
+      "attempt_id": "attempt-009-raw-gltf-duplicate-cull",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/jack-sparrow/attempts/attempt-009-raw-gltf-duplicate-cull/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/jack-sparrow/attempts/attempt-009-raw-gltf-duplicate-cull/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/jack-sparrow/attempts/attempt-009-raw-gltf-duplicate-cull/visual-review/pose-suite",
+      "query": "&avatarLoader=raw-gltf&avatarNormalize=1&avatarDuplicateCull=positive-x",
+      "slug": "jack-sparrow",
+      "status": "loaded",
+      "targeted_change": "raw GLTF duplicate cull",
+      "visual_label": "see_contact_sheet",
+      "warnings": [
+        "[warning] [.WebGL-0x13400534800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x13400534800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x13400534800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x13400534800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ]
+    },
+    {
+      "attempt_id": "attempt-010-raw-gltf-duplicate-cull-negative",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/jack-sparrow/attempts/attempt-010-raw-gltf-duplicate-cull-negative/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/jack-sparrow/attempts/attempt-010-raw-gltf-duplicate-cull-negative/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/jack-sparrow/attempts/attempt-010-raw-gltf-duplicate-cull-negative/visual-review/pose-suite",
+      "query": "&avatarLoader=raw-gltf&avatarNormalize=1&avatarDuplicateCull=negative-x",
+      "slug": "jack-sparrow",
+      "status": "loaded",
+      "targeted_change": "raw GLTF duplicate cull negative",
+      "visual_label": "see_contact_sheet",
+      "warnings": [
+        "[warning] [.WebGL-0x12c004e5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x12c004e5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x12c004e5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x12c004e5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ]
+    },
+    {
+      "attempt_id": "attempt-011-visual-pose-suite-fixed-duplicate-cull",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/jack-sparrow/attempts/attempt-011-visual-pose-suite-fixed-duplicate-cull/visual-review/capture-results.json",
+      "classification": "accepted_reference_only",
+      "contact_sheet": "model-working-hard-fix/jack-sparrow/attempts/attempt-011-visual-pose-suite-fixed-duplicate-cull/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_mesh_not_deforming",
+      "pose_suite_dir": "model-working-hard-fix/jack-sparrow/attempts/attempt-011-visual-pose-suite-fixed-duplicate-cull/visual-review/pose-suite",
+      "query": "&avatarLoader=raw-gltf&avatarNormalize=1&avatarDuplicateCull=negative-x",
+      "slug": "jack-sparrow",
+      "status": "loaded",
+      "targeted_change": "visual pose suite fixed duplicate cull",
+      "visual_label": "visible_single_copy_after_duplicate_cull",
+      "warnings": [
+        "[warning] [.WebGL-0x11c004e5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11c004e5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11c004e5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11c004e5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ]
+    }
   ],
+  "best_attempt": "attempt-011-visual-pose-suite-fixed-duplicate-cull",
+  "best_capture_results": "model-working-hard-fix/jack-sparrow/attempts/attempt-011-visual-pose-suite-fixed-duplicate-cull/visual-review/capture-results.json",
+  "best_contact_sheet": "model-working-hard-fix/jack-sparrow/attempts/attempt-011-visual-pose-suite-fixed-duplicate-cull/visual-review/contact-sheet.png",
+  "blocker": "Duplicate copy can be hidden in the raw visual harness, but the visible copy does not deform when matched bones are posed. Source contains duplicated mesh/armature content that still needs proper cleanup or rebinding.",
   "body_tracking": {
-    "arms": "enabled",
-    "feet": "disabled",
-    "head": "enabled",
-    "legs": "enabled",
-    "root_motion": "disabled",
-    "torso": "enabled"
+    "arms": "disabled",
+    "legs": "disabled",
+    "reason": "reference-only static/deformation blocker"
   },
-  "created_at": "2026-06-11T18:11:49+00:00",
-  "disabled_controls": [
-    "face_anchors",
-    "feet",
-    "fingers",
-    "root_motion",
-    "shoulders",
-    "toes"
-  ],
-  "display_name": "Jack Sparrow",
-  "enabled_controls": [
-    "chest",
-    "head",
-    "hips",
-    "leftHand",
-    "leftLowerArm",
-    "leftLowerLeg",
-    "leftUpperArm",
-    "leftUpperLeg",
-    "neck",
-    "rightHand",
-    "rightLowerArm",
-    "rightLowerLeg",
-    "rightUpperArm",
-    "rightUpperLeg"
-  ],
-  "face_touch": {
-    "mode": "ik_required",
-    "notes": [
-      "IK and visual validation required before support claim."
-    ],
-    "safe_first_gesture": "hand_to_cheek",
-    "visual_result": "not_available"
+  "candidate_vrm_path": "/Users/lekan/posepuppet-working-hard-fix/generated-vrms/jack-sparrow.vrm",
+  "created_at": "2026-06-11T23:53:28.709120+00:00",
+  "decision": "reference_only",
+  "display": "Jack Sparrow",
+  "pose_label": "static_mesh_not_deforming",
+  "public_ui": {
+    "enabledInUi": false,
+    "public_promotion": false,
+    "query_param_only": true
   },
-  "game_modes": {
-    "flying": "partial",
-    "gesture_to_intent": "optional",
-    "rowing": "partial",
-    "walking": "partial"
-  },
-  "hand_tracking": {
-    "finger_chains": "missing",
-    "left_hand": "supported",
-    "mode": "palm_only",
-    "right_hand": "supported"
-  },
-  "notes": [
-    "Generated candidates remain query-param-only and excluded from public avatar cycling."
-  ],
-  "quality_label": "experimental",
-  "runtime_profile": "humanoid",
-  "schema_version": "posepuppet-runtime-capability-profile-v2",
+  "quality_label": "reference_only",
+  "query": "avatarLoader=raw-gltf&avatarNormalize=1&avatarDuplicateCull=negative-x",
+  "recommendation": "Preserve as reference evidence only. Do not activate until duplicate source cleanup and skin binding are repaired in Blender/export path.",
+  "reference_only": true,
+  "runtime_profile": "static_preview",
+  "schema_version": "posepuppet-hard-model-repair-model-summary-v1",
   "slug": "jack-sparrow",
-  "warning_label": "experimental",
-  "warning_text": "Experimental query-param-only generated candidate; visual quality not yet claimed."
+  "visual_label": "visible_single_copy_after_duplicate_cull"
 }

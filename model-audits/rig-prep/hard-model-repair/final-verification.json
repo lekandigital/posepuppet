@@ -1,0 +1,53 @@
+{
+  "schema_version": "posepuppet-hard-model-final-verification-v1",
+  "branch": "hard-model-fix",
+  "build": {
+    "command": "npm run build",
+    "status": "pass",
+    "notes": [
+      "Vite emitted existing chunk-size/dynamic-import warnings only."
+    ]
+  },
+  "browser_smoke": {
+    "command": "npx playwright test tests/generated-avatar-load.spec.ts --reporter=line",
+    "status": "pass",
+    "tests": "15 passed",
+    "covered_new_slugs": [
+      "elsa",
+      "buzz-lightyear",
+      "teal-v2"
+    ]
+  },
+  "audit_self_test": {
+    "command": "python3 tools/audit_model.py --self-test",
+    "status": "pass",
+    "notes": [
+      "27 bone mapping examples passed",
+      "Non-fatal warning: character:jnt_L_wrist_11 mapped as hand candidate from wrist/palm"
+    ]
+  },
+  "rig_readiness_validation": {
+    "command": "python3 tools/validate_rig_readiness.py model-audits",
+    "status": "pass",
+    "model_count": 20,
+    "errors": []
+  },
+  "diff_checks": {
+    "git_diff_check": "pass",
+    "git_diff_cached_check": "pass"
+  },
+  "forbidden_file_scans": {
+    "tracked_generated_assets": "pass_empty",
+    "staged_media_or_source_extensions": "pass_empty",
+    "staged_model_working_public_generated_prompt_paths": "pass_empty",
+    "ignored_local_evidence_paths": [
+      "model-working-hard-fix/",
+      "public/avatars/generated/"
+    ]
+  },
+  "public_ui_status": {
+    "generated_avatars_query_param_only": true,
+    "enabledInUi_all_generated": false,
+    "public_promotion": false
+  }
+}

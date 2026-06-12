@@ -2,16 +2,16 @@
 
 - Status: `pass`
 - Selected source path: `OtherSpiderman/spider-man_no_way_home_rigged.glb`
-- Materialized source path: `/home/o/posepuppet-assets/ModelsForAnimation/OtherSpiderman/spider-man_no_way_home_rigged.glb`
-- Candidate VRM path: `/home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm`
+- Materialized source path: `/Users/lekan/Dev/posepuppet/models_for_animation/OtherSpiderman/spider-man_no_way_home_rigged.glb`
+- Candidate VRM path: `/Users/lekan/posepuppet-working-hard-fix/generated-vrms/spider-man-no-way-home.vrm`
 - Candidate VRM exists: `true`
-- Candidate VRM size bytes: `15974984`
-- Manual bone map path: `/home/o/Dev/posepuppet/model-audits/spider-man-no-way-home/suggested-bone-map.json`
+- Candidate VRM size bytes: `15975196`
+- Manual bone map path: `/Users/lekan/Dev/posepuppet-hard-model-fix/model-audits/spider-man-no-way-home/suggested-bone-map.json`
 - Runtime browser smoke: `not_attempted`
 - Public avatar written: `false`
 
 ## Command
 
 ```sh
-/home/o/posepuppet-tools/blender-versions/blender-5.1.2-linux-x64/blender -b --python /home/o/Dev/posepuppet/tools/export_source_to_vrm.py -- /home/o/posepuppet-assets/ModelsForAnimation/OtherSpiderman/spider-man_no_way_home_rigged.glb /home/o/posepuppet-working/generated-vrms/spider-man-no-way-home.vrm --mapping /home/o/Dev/posepuppet/model-audits/spider-man-no-way-home/suggested-bone-map.json
+/Applications/Blender.app/Contents/MacOS/Blender -b --python /Users/lekan/Dev/posepuppet-hard-model-fix/tools/export_source_to_vrm.py -- /Users/lekan/Dev/posepuppet/models_for_animation/OtherSpiderman/spider-man_no_way_home_rigged.glb /Users/lekan/posepuppet-working-hard-fix/generated-vrms/spider-man-no-way-home.vrm --mapping /Users/lekan/Dev/posepuppet-hard-model-fix/model-audits/spider-man-no-way-home/suggested-bone-map.json
 ```

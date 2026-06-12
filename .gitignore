@@ -56,6 +56,7 @@ public/avatars/textures/
 public/avatars/generated/
 public/avatars/generated/*.vrm
 model-working/
+model-working-hard-fix/
 
 # Test/eval transients (eval/results.json IS committed)
 test-results/

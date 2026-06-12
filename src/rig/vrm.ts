@@ -96,6 +96,52 @@ export async function loadVrmAvatar(url: string): Promise<Avatar> {
   };
 }
 
+export async function loadRawGltfAvatar(url: string): Promise<Avatar> {
+  const loader = new GLTFLoader();
+  const gltf = await loader.loadAsync(url);
+  const root = new THREE.Group();
+  root.name = 'raw-gltf-avatar';
+  root.add(gltf.scene);
+  gltf.scene.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (mesh.isMesh) {
+      mesh.castShadow = true;
+      mesh.frustumCulled = false;
+    }
+  });
+
+  const bones = matchBonesByName(gltf.scene);
+  const joints: Partial<Record<JointName, THREE.Object3D>> = {
+    hipCenter: bones.hips,
+    shoulderCenter: bones.neck ?? bones.chest,
+    head: bones.head,
+    leftShoulder: bones.leftUpperArm,
+    leftElbow: bones.leftLowerArm,
+    leftWrist: bones.leftHand,
+    rightShoulder: bones.rightUpperArm,
+    rightElbow: bones.rightLowerArm,
+    rightWrist: bones.rightHand,
+    leftHip: bones.leftUpperLeg,
+    leftKnee: bones.leftLowerLeg,
+    rightHip: bones.rightUpperLeg,
+    rightKnee: bones.rightLowerLeg,
+  };
+
+  return {
+    name: 'raw-gltf',
+    object: root,
+    bones,
+    joints,
+    update() {
+      /* raw GLB candidates do not have VRM springbone update hooks */
+    },
+    dispose() {
+      root.removeFromParent();
+      VRMUtils.deepDispose(gltf.scene);
+    },
+  };
+}
+
 // --- name-matching layer for plain GLB humanoids ------------------------
 
 /** Regex table per BoneName: VRoid (J_Bip_*), Mixamo (mixamorig*), generic. */

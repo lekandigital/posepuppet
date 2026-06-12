@@ -1,346 +1,110 @@
 {
-  "attempt_id": "attempt-001-baseline",
-  "created_at": "2026-06-11T18:11:49+00:00",
-  "pose_tests": [
+  "active_candidate": true,
+  "attempt_count": 4,
+  "attempts": [
     {
-      "applied": true,
-      "bones_driven": [
-        "head"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "neutral",
-      "reason": "missing mapped bones: chest, hips",
-      "result": "partial",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-002-camera-framing-no-scale",
+      "browser_smoke": "failed",
+      "capture_results": "model-working-hard-fix/teal-v2/attempts/attempt-002-camera-framing-no-scale/visual-review/capture-results.json",
+      "classification": "failed_browser_load",
+      "contact_sheet": "model-working-hard-fix/teal-v2/attempts/attempt-002-camera-framing-no-scale/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/teal-v2/attempts/attempt-002-camera-framing-no-scale/visual-review/pose-suite",
+      "query": "",
+      "slug": "teal-v2",
+      "status": "error",
+      "targeted_change": "camera framing no scale",
+      "visual_label": "see_contact_sheet",
+      "warnings": [
+        "[warning] [.WebGL-0x10400534e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x10400534e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x10400534e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x10400534e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
+        "[warning] [generated-avatar] failed to load teal-v2: VRMHumanoidLoaderPlugin: These humanoid bones are required but not exist: hips, leftUpperLeg, rightUpperLeg, leftLowerArm, leftHand, rightLowerArm, rightHand"
+      ]
     },
     {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "arms_out",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-007-raw-gltf-loader",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/teal-v2/attempts/attempt-007-raw-gltf-loader/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/teal-v2/attempts/attempt-007-raw-gltf-loader/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/teal-v2/attempts/attempt-007-raw-gltf-loader/visual-review/pose-suite",
+      "query": "&avatarLoader=raw-gltf",
+      "slug": "teal-v2",
+      "status": "loaded",
+      "targeted_change": "raw GLTF loader",
+      "visual_label": "see_contact_sheet",
+      "warnings": []
     },
     {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "arms_up",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-008-manual-bone-map-vrm",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/teal-v2/attempts/attempt-008-manual-bone-map-vrm/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/teal-v2/attempts/attempt-008-manual-bone-map-vrm/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/teal-v2/attempts/attempt-008-manual-bone-map-vrm/visual-review/pose-suite",
+      "query": "&avatarNormalize=1",
+      "slug": "teal-v2",
+      "status": "loaded",
+      "targeted_change": "manual bone map VRM",
+      "visual_label": "see_contact_sheet",
+      "warnings": [
+        "[warning] [.WebGL-0x11c00564e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11c00564e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11c00564e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11c00564e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ]
     },
     {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "arms_forward",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "elbow_bend",
-      "reason": "missing mapped bones: leftLowerArm, rightLowerArm",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "wrist_rotate",
-      "reason": "missing mapped bones: leftHand, rightHand",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "palm_forward",
-      "reason": "missing mapped bones: leftHand, rightHand",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "lean_left",
-      "reason": "missing mapped bones: chest, hips",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "lean_right",
-      "reason": "missing mapped bones: chest, hips",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "torso_turn",
-      "reason": "missing mapped bones: chest, hips",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftLowerLeg",
-        "rightLowerLeg"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "walking_stride_proxy",
-      "reason": "missing mapped bones: leftUpperLeg, rightUpperLeg",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftFoot",
-        "rightFoot"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "foot_lift",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftFoot",
-        "rightFoot"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "foot_rotate",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "rowing_stroke",
-      "reason": "missing mapped bones: leftLowerArm, rightLowerArm",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "flying_arms_out",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "head"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "hand_to_mouth_proxy",
-      "reason": "missing mapped bones: leftHand, rightHand",
-      "result": "partial",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "head"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "hand_to_cheek_proxy",
-      "reason": "missing mapped bones: leftHand, rightHand",
-      "result": "partial",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-009-visual-pose-suite-fixed-manual-map",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/teal-v2/attempts/attempt-009-visual-pose-suite-fixed-manual-map/visual-review/capture-results.json",
+      "classification": "accepted_active_candidate",
+      "contact_sheet": "model-working-hard-fix/teal-v2/attempts/attempt-009-visual-pose-suite-fixed-manual-map/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "pose_responsive",
+      "pose_suite_dir": "model-working-hard-fix/teal-v2/attempts/attempt-009-visual-pose-suite-fixed-manual-map/visual-review/pose-suite",
+      "query": "&avatarNormalize=1",
+      "slug": "teal-v2",
+      "status": "loaded",
+      "targeted_change": "visual pose suite fixed manual map",
+      "visual_label": "visible_single_character",
+      "warnings": [
+        "[warning] [.WebGL-0x114004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x114004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x114004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x114004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ]
     }
   ],
-  "schema_version": "posepuppet-pose-suite-validation-v1",
+  "best_attempt": "attempt-009-visual-pose-suite-fixed-manual-map",
+  "best_capture_results": "model-working-hard-fix/teal-v2/attempts/attempt-009-visual-pose-suite-fixed-manual-map/visual-review/capture-results.json",
+  "best_contact_sheet": "model-working-hard-fix/teal-v2/attempts/attempt-009-visual-pose-suite-fixed-manual-map/visual-review/contact-sheet.png",
+  "blocker": "Minor texture pack warnings remain, but browser VRM load, visibility, and pose-suite evidence pass after manual bone-map recovery.",
+  "candidate_vrm_path": "/Users/lekan/posepuppet-working-hard-fix/generated-vrms/teal-v2.vrm",
+  "created_at": "2026-06-11T23:53:28.709120+00:00",
+  "decision": "active_candidate",
+  "display": "Teal v2",
+  "pose_label": "pose_responsive",
+  "public_ui": {
+    "enabledInUi": false,
+    "public_promotion": false,
+    "query_param_only": true
+  },
+  "query": "avatarNormalize=1",
+  "recommendation": "Safe to cherry-pick as a generated-avatar active candidate only; keep query-param-only and disabled in public UI until explicitly promoted.",
+  "reference_only": false,
+  "schema_version": "posepuppet-hard-model-repair-model-summary-v1",
   "slug": "teal-v2",
-  "source": "generated-vrm-reference",
-  "status": "partial"
+  "visual_label": "visible_single_character"
 }
