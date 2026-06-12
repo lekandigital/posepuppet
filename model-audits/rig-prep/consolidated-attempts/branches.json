@@ -1,55 +1,33 @@
 {
   "archive_path": "/Users/lekan/Downloads/PosePuppet_Consolidated_Attempts_20260611-204228",
-  "branches_requested": [
-    "archive/consolidated-attempt-index-20260611-204228",
-    "archive/mac-parallel-hard-fix-20260611-204228",
-    "archive/ubuntu-canonical-visual-qa-20260611-204228"
-  ],
-  "repo_infos_pre_branches": {
-    "mac-main": {
-      "branch": "main",
-      "dirty": true,
-      "dirty_entries": 173,
-      "exists": true,
-      "head": "5f3286c0d00e5be189b94e2149c1fb640916810c",
-      "head_short": "5f3286c",
-      "is_git": true,
-      "label": "mac-main",
-      "path": "/Users/lekan/Dev/posepuppet"
+  "branches_created": [
+    {
+      "branch": "archive/consolidated-attempt-index-20260611-204228",
+      "checkout": "/Users/lekan/Dev/posepuppet",
+      "commit": "cc5eeca66f73a278fb3609e970114c6814651ac9",
+      "current_branch": "archive/consolidated-attempt-index-20260611-204228",
+      "label": "consolidated-attempt-index",
+      "log_one_line": "cc5eeca Archive PosePuppet consolidated attempt reports",
+      "status_short_branch": "## archive/consolidated-attempt-index-20260611-204228\n M COMBINED_MODEL_AUDIT_LLM_HANDOFF_COMPACT_V2.md\n M model-audits/amazing-spider-man-2/attempts-summary.json\n M model-audits/amazing-spider-man-2/attempts-summary.md\n M model-audits/amazing-spider-man-2/pose-suite-validation.json\n M model-audits/amazing-spider-man-2/pose-suite-validation.md\n M model-audits/amazing-spider-man-2/runtime-capability-profile.json\n M model-audits/amazing-spider-man-2/runtime-capability-profile.md\n M model-audits/amazing-spider-man-2/visual-rig-review.json\n M model-audits/amazing-spider-man-2/visual-rig-review.md\n M model-audits/baby-yoda/attempts-summary.json\n M model-audits/baby-yoda/attempts-summary.md\n M model-audits/baby-yoda/pose-suite-validation.json\n M model-audits/baby-yoda/pose-suite-validation.md\n M model-audits/baby-yoda/runtime-capability-profile.json\n M model-audits/baby-yoda/visual-rig-review.json\n M model-audits/baby-yoda/visual-rig-review.md\n M model-audits/buzz-lightyear/attempts-summary.json\n M model-audits/buzz-lightyear/attempts-summary.md\n M model-audits/buzz-lightyear/pose-suite-validation.json\n M model-audits/buzz-lightyear/pose-suite-validation.md\n M model-audits/buzz-lightyear/runtime-capability-profile.json\n M model-audits/buzz-lightyear/visual-rig-review.json\n M model-audits/buzz-lightyear/visual-rig-review.md\n M model-audits/darth-vader/attempts-summary.json\n M model-audits/darth-vader/attempts-summary.md\n M model-audits/darth-vader/pose-suite-validation.json\n M model-audits/darth-vader/pose-suite-validation.md\n M model-audits/darth-vader/runtime-capability-profile.json\n M model-audits/darth-vader/runtime-capability-profile.md\n M model-audits/darth-vader/visual-rig-review.json\n M model-audits/darth-vader/visual-rig-review.md\n M model-audits/elsa/attempts-summary.json\n M model-audits/elsa/attempts-summary.md\n M model-audits/elsa/pose-suite-validation.json\n M model-audits/elsa/pose-suite-validation.md\n M model-audits/elsa/runtime-capability-profile.json\n M model-audits/elsa/visual-rig-review.json\n M model-audits/elsa/visual-rig-review.md\n M model-audits/fortnite-batman/attempts-summary.json\n M model-audits/fortnite-batman/attempts-summary.md\n M model-audits/fortnite-batman/pose-suite-validation.json\n M model-audits/fortnite-batman/pose-suite-validation.md\n M model-audits/fortnite-batman/runtime-capability-profile.json\n M model-audits/fortnite-batman/runtime-capability-profile.md\n M model-audits/fortnite-batman/visual-rig-review.json\n M model-audits/fortnite-batman/visual-rig-review.md\n M model-audits/godzilla/attempts-summary.json\n M model-audits/godzilla/attempts-summary.md\n M model-audits/godzilla/pose-suite-validation.json\n M model-audits/godzilla/pose-suite-validation.md\n M model-audits/godzilla/runtime-capability-profile.json\n M model-audits/godzilla/visual-rig-review.json\n M model-audits/godzilla/visual-rig-review.md\n M model-audits/grogu/attempts-summary.json\n M model-audits/grogu/attempts-summary.md\n M model-audits/grogu/pose-suite-validation.json\n M model-audits/grogu/pose-suite-validation.md\n M model-audits/grogu/runtime-capability-profile.json\n M model-audits/grogu/visual-rig-review.json\n M model-audits/grogu/visual-rig-review.md\n M model-audits/iron-man/attempts-summary.json\n M model-audits/iron-man/attempts-summary.md\n M model-audits/iron-man/pose-suite-validation.json\n M model-audits/iron-man/pose-suite-validation.md\n M model-audits/iron-man/runtime-capability-profile.json\n M model-audits/iron-man/runtime-capability-profile.md\n M model-audits/iron-man/visual-rig-review.json\n M model-audits/iron-man/visual-rig-review.md\n M model-audits/jack-sparrow/attempts-summary.json\n M model-audits/jack-sparrow/attempts-summary.md\n M model-audits/jack-sparrow/pose-suite-validation.json\n M model-audits/jack-sparrow/pose-suite-validation.md\n M model-audits/jack-sparrow/runtime-capability-profile.json\n M model-audits/jack-sparrow/runtime-capability-profile.md\n M model-audits/jack-sparrow/visual-rig-review.json\n M model-audits/jack-sparrow/visual-rig-review.md\n M model-audits/king-kong/attempts-summary.json\n M model-audits/king-kong/attempts-summary.md\n M model-audits/king-kong/pose-suite-validation.json\n M model-audits/king-kong/pose-suite-validation.md\n M model-audits/king-kong/runtime-capability-profile.json\n M model-audits/king-kong/visual-rig-review.json\n M model-audits/king-kong/visual-rig-review.md\n M model-audits/olaf/attempts-summary.json\n M model-audits/olaf/attempts-summary.md\n M model-audits/olaf/pose-suite-validation.json\n M model-audits/olaf/pose-suite-validation.md\n M model-audits/olaf/runtime-capability-profile.json\n M model-audits/olaf/visual-rig-review.json\n M model-audits/olaf/visual-rig-review.md\n M model-audits/rig-prep/validation/rig-readiness-validation.json\n M model-audits/rigged-hand/attempts-summary.json\n M model-audits/rigged-hand/attempts-summary.md\n M model-audits/rigged-hand/pose-suite-validation.json\n M model-audits/rigged-hand/pose-suite-validation.md\n M model-audits/rigged-hand/runtime-capability-profile.json\n M model-audits/rigged-hand/visual-rig-review.json\n M model-audits/rigged-hand/visual-rig-review.md\n M model-audits/shrek/attempts-summary.json\n M model-audits/shrek/attempts-summary.md\n M model-audits/shrek/pose-suite-validation.json\n M model-audits/shrek/pose-suite-validation.md\n M model-audits/shrek/runtime-capability-profile.json\n M model-audits/shrek/runtime-capability-profile.md\n M model-audits/shrek/visual-rig-review.json\n M model-audits/shrek/visual-rig-review.md\n M model-audits/spider-man-no-way-home/attempts-summary.json\n M model-audits/spider-man-no-way-home/attempts-summary.md\n M model-audits/spider-man-no-way-home/pose-suite-validation.json\n M model-audits/spider-man-no-way-home/pose-suite-validation.md\n M model-audits/spider-man-no-way-home/runtime-capability-profile.json\n M model-audits/spider-man-no-way-home/runtime-capability-profile.md\n M model-audits/spider-man-no-way-home/visual-rig-review.json\n M model-audits/spider-man-no-way-home/visual-rig-review.md\n M model-audits/spider-man-playstation/attempts-summary.json\n M model-audits/spider-man-playstation/attempts-summary.md\n M model-audits/spider-man-playstation/pose-suite-validation.json\n M model-audits/spider-man-playstation/pose-suite-validation.md\n M model-audits/spider-man-playstation/runtime-capability-profile.json\n M model-audits/spider-man-playstation/runtime-capability-profile.md\n M model-audits/spider-man-playstation/visual-rig-review.json\n M model-audits/spider-man-playstation/visual-rig-review.md\n M model-audits/teal-v2/attempts-summary.json\n M model-audits/teal-v2/attempts-summary.md\n M model-audits/teal-v2/pose-suite-validation.json\n M model-audits/teal-v2/pose-suite-validation.md\n M model-audits/teal-v2/runtime-capability-profile.json\n M model-audits/teal-v2/visual-rig-review.json\n M model-audits/teal-v2/visual-rig-review.md\n M model-audits/terminator-t-800/attempts-summary.json\n M model-audits/terminator-t-800/attempts-summary.md\n M model-audits/terminator-t-800/pose-suite-validation.json\n M model-audits/terminator-t-800/pose-suite-validation.md\n M model-audits/terminator-t-800/runtime-capability-profile.json\n M model-audits/terminator-t-800/runtime-capability-profile.md\n M model-audits/terminator-t-800/visual-rig-review.json\n M model-audits/terminator-t-800/visual-rig-review.md\n M model-audits/woody/attempts-summary.json\n M model-audits/woody/attempts-summary.md\n M model-audits/woody/pose-suite-validation.json\n M model-audits/woody/pose-suite-validation.md\n M model-audits/woody/runtime-capability-profile.json\n M model-audits/woody/runtime-capability-profile.md\n M model-audits/woody/visual-rig-review.json\n M model-audits/woody/visual-rig-review.md\n M model-audits/xenomorph/attempts-summary.json\n M model-audits/xenomorph/attempts-summary.md\n M model-audits/xenomorph/pose-suite-validation.json\n M model-audits/xenomorph/pose-suite-validation.md\n M model-audits/xenomorph/runtime-capability-profile.json\n M model-audits/xenomorph/visual-rig-review.json\n M model-audits/xenomorph/visual-rig-review.md\n M src/main.ts\n M src/rig/generatedAvatarRegistry.ts\n M src/rig/types.ts\n M src/rig/vrm.ts\n M tests/generated-avatar-load.spec.ts\n M tools/generate_avatar_contact_sheet.py\n M tools/validate_rig_readiness.py\n?? model-audits/rig-prep/hard-model-repair-log.json\n?? model-audits/rig-prep/hard-model-repair-log.md\n?? model-audits/rig-prep/special-preview-summary.json\n?? model-audits/rig-prep/special-preview-summary.md\n?? model-audits/rig-prep/visual-continuation-baseline.json\n?? model-audits/rig-prep/visual-continuation-baseline.md\n?? model-audits/rig-prep/visual-qa-continuation-summary.json\n?? model-audits/rig-prep/visual-qa-continuation-summary.md\n?? model-audits/rig-prep/visual-qa-work-queue.json\n?? model-audits/rig-prep/visual-qa-work-queue.md\n?? tests/generated-avatar-visual-capture.spec.ts\n?? tools/generate_source_preview_contact_sheet.py\n?? tools/generate_visual_qa_reports.py\n?? tools/render_source_previews.py\n"
     },
-    "mac-parallel-hard-fix": {
-      "branch": "hard-model-fix",
-      "dirty": false,
-      "dirty_entries": 0,
-      "exists": true,
-      "head": "08881ffe21606a3aaaa5fe86f77cb311d908fd64",
-      "head_short": "08881ff",
-      "is_git": true,
+    {
+      "branch": "archive/mac-parallel-hard-fix-20260611-204228",
+      "checkout": "/Users/lekan/Dev/posepuppet-hard-model-fix",
+      "commit": "08881ffe21606a3aaaa5fe86f77cb311d908fd64",
+      "current_branch": "hard-model-fix",
       "label": "mac-parallel-hard-fix",
-      "path": "/Users/lekan/Dev/posepuppet-hard-model-fix"
+      "log_one_line": "08881ff repair hard generated avatar candidates",
+      "status_short_branch": "## hard-model-fix\n"
     },
-    "ubuntu-canonical": {
-      "branch": "main",
-      "dirty": false,
-      "dirty_entries": 0,
-      "exists": true,
-      "head": "89dea4f56fd69a96314c22489d1c204065c4dcde",
-      "head_short": "89dea4f",
-      "is_git": true,
-      "label": "ubuntu-canonical",
-      "path": "o@192.168.86.152:/home/o/Dev/posepuppet"
-    },
-    "ubuntu-parallel-hard-fix": {
-      "branch": "parallel-hard-model-fix-20260611-155951",
-      "dirty": false,
-      "dirty_entries": 0,
-      "exists": true,
-      "head": "5f3286c0d00e5be189b94e2149c1fb640916810c",
-      "head_short": "5f3286c",
-      "is_git": true,
-      "label": "ubuntu-parallel-hard-fix",
-      "path": "o@192.168.86.152:/home/o/Dev/posepuppet-hard-model-fix"
+    {
+      "branch": "archive/ubuntu-canonical-visual-qa-20260611-204228",
+      "checkout": "o@192.168.86.152:/home/o/Dev/posepuppet",
+      "commit": "89dea4f56fd69a96314c22489d1c204065c4dcde",
+      "current_branch": "main",
+      "label": "ubuntu-canonical-visual-qa",
+      "log_one_line": "89dea4f Complete generated avatar visual rig QA",
+      "status_short_branch": "## main...origin/main\n"
     }
-  },
+  ],
   "timestamp": "20260611-204228"
 }
