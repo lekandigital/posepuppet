@@ -1,3 +1,10 @@
+## 2026-06-12 ~07:05 (Gate 1 APPROVED — P0 fully closed, P1 next)
+Done: branch pass-2-instrument; reference.css read (grammar internalized, palette excluded); 4 new clips remuxed→y4m, frame-verified, sanity-evaled (facetouch 100%/4.98 deg, fullbody 100%/6.71 deg; hand clips stream fine, HandLandmarker is their consumer)
+Gate 1: approved — plan + electives B1 (velocity VFX) + B2 (auto-director); woody → local-only, astronaut default again
+FPS: baseline unchanged (committed); suite green 37/5 skipped
+Blockers: none
+Next: woody demotion commit, then P1 design tokens + shell → design plan + mockups → GATE 2
+
 ## 2026-06-12 ~06:40 (Pass 2 P0 complete — awaiting USER GATE 1)
 Done: repo inspected; suite fixed (generated-VRM smokes skip when local file absent) → 37 passed/5 skipped green; eval honesty guards (per-file VRM names, load-fail = console.error, avatarRequested + mismatch exit); guarded 9-run baseline; PLAN.md with elective proposal
 Sync metric: robot 9.49/2.24/18.87°, astronaut 10.92/2.29/20.38°, woody 9.02/2.14/17.88° (arms/torso/fast) — all pass-1 bars hold

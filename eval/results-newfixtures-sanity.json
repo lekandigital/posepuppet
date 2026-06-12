@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "date": "2026-06-12T07:12:26.549Z",
+    "machine": "darwin arm64 — Apple M5",
+    "mode": "headed",
+    "durationSecPerFixture": 30,
+    "note": "headed run on real hardware; FPS numbers are representative"
+  },
+  "results": [
+    {
+      "fixture": "facetouch",
+      "avatar": "robot",
+      "durationSec": 30,
+      "videoFrames": 878,
+      "detectedFrames": 878,
+      "detectionRate": 1,
+      "poseFps": 29.26,
+      "renderFps": 115.92,
+      "droppedFrames": 17,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 29,
+        "t15": 26,
+        "t30": 28
+      },
+      "sync": {
+        "leftUpperArm": 2.35,
+        "leftForearm": 8.61,
+        "rightUpperArm": 4.43,
+        "rightForearm": 4.52,
+        "torso": 0.64,
+        "upperLimbsMean": 4.98
+      },
+      "finishedAt": "2026-06-12T07:10:51.184Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "fullbody",
+      "avatar": "robot",
+      "durationSec": 30,
+      "videoFrames": 888,
+      "detectedFrames": 888,
+      "detectionRate": 1,
+      "poseFps": 29.6,
+      "renderFps": 118.93,
+      "droppedFrames": 11,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t15": 54,
+        "t30": 53
+      },
+      "sync": {
+        "leftUpperArm": 2.64,
+        "leftForearm": 6.5,
+        "rightUpperArm": 2.42,
+        "rightForearm": 15.28,
+        "torso": 1.66,
+        "upperLimbsMean": 6.71
+      },
+      "finishedAt": "2026-06-12T07:11:22.687Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "hand_open_close",
+      "avatar": "robot",
+      "durationSec": 30,
+      "videoFrames": 870,
+      "detectedFrames": 619,
+      "detectionRate": 0.71,
+      "poseFps": 28.98,
+      "renderFps": 114.56,
+      "droppedFrames": 23,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 29,
+        "t15": 25,
+        "t30": 24
+      },
+      "sync": {
+        "leftUpperArm": 37.76,
+        "leftForearm": 23.29,
+        "rightUpperArm": 46.43,
+        "rightForearm": 87.27,
+        "torso": 21.19,
+        "upperLimbsMean": 48.69
+      },
+      "finishedAt": "2026-06-12T07:11:54.477Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "hand_pinch_point",
+      "avatar": "robot",
+      "durationSec": 30,
+      "videoFrames": 887,
+      "detectedFrames": 719,
+      "detectionRate": 0.81,
+      "poseFps": 29.57,
+      "renderFps": 115.73,
+      "droppedFrames": 13,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 29,
+        "t15": 23,
+        "t30": 21
+      },
+      "sync": {
+        "rightUpperArm": 43.16,
+        "torso": 42.48,
+        "leftUpperArm": 68.88,
+        "rightForearm": 40.8,
+        "leftForearm": 110.46,
+        "upperLimbsMean": 65.82
+      },
+      "finishedAt": "2026-06-12T07:12:26.314Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    }
+  ]
+}

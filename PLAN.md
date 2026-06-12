@@ -1,7 +1,10 @@
 # PLAN.md — Pass 2: The Instrument Pass
 
-Status: P0 complete. Awaiting USER GATE 1 (this plan + elective selection)
-and the USER ACTION below (missing inputs).
+Status: **USER GATE 1 APPROVED 2026-06-12** (in-session structured reply),
+after both USER ACTION items resolved and re-verified. Approved: this plan;
+electives = Tier B1 (velocity VFX) + B2 (auto-director camera), all else
+skipped; R1 = woody demoted to local-only, astronaut returns as default.
+Work proceeds on branch `pass-2-instrument`.
 
 ---
 
@@ -91,7 +94,17 @@ describes) and is read and committed. One P1 note from it: the reference
 imports Google Fonts; PosePuppet self-hosts or system-stacks its fonts so
 the "0 network requests" receipt stays literally true.
 
-**b) The four new fixture clips are missing.** `fixtures/` has only the
+**b) ~~The four new fixture clips are missing.~~ RESOLVED 2026-06-12** —
+all four arrived as 1620×1080@30 H.264 (.mov, remuxed to .mp4), converted
+to y4m through `npm run prepare-fixtures`. Content verified against spec by
+frame inspection. 30 s detection-sanity eval (robot, headed, archived at
+`eval/results-newfixtures-sanity.json`): facetouch detection 100% /
+upperLimbs 4.98°, fullbody 100% / 6.71° — both fully usable. The hand
+clips stream at full rate; their pose-detection numbers (71–81%, sync
+49–66°) are BlazePose hallucinating a body from a hand and are expected —
+P3 consumes these clips via HandLandmarker, not PoseLandmarker.
+
+Original recording specs kept below for reference: `fixtures/` has only the
 pass-1 clips (arms, torso, fast, fast2). Please record and drop these as
 `.mp4` into `fixtures/` (any orientation, ≥720p, ~10–20 s each — same as
 pass 1; `npm run prepare-fixtures` handles conversion; nothing is ever
@@ -104,9 +117,8 @@ committed):
 | `facetouch.mp4` | Frame from hips up. Bring a hand slowly to your cheek, hold 1 s, away; then chin, forehead, mouth-cover. Both hands across the takes. Slow and deliberate beats fast. |
 | `fullbody.mp4` | Whole body in frame, head to feet, ~2–3 m back. March in place, shift weight side to side, one small squat, lift each foot, a small step left/right. ~20 s. |
 
-Blocks: P2 face-touch + full-body verification, P3 hand fixtures, the
-pinch→jaw eval metric. P2's wrist/occlusion work and all of P1 can proceed
-without them.
+(Nothing is blocked anymore; the table above stays as the record of what
+was asked for.)
 
 ## 4. Risks
 

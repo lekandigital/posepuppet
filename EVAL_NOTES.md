@@ -1,5 +1,22 @@
 # Eval notes
 
+### P0 addendum — new inputs verified, Gate 1 closed (2026-06-12)
+design/reference.css arrived (1,013 lines; grammar as described — token
+theme, 1px rules, Fraunces/Inter/JetBrains Mono roles, grain/vignette,
+light+dark via data-theme; its warm paper palette is explicitly NOT carried
+over per the palette law). The four new clips arrived as 1620×1080@30 H.264
+.mov, were remuxed to .mp4 and converted to y4m via prepare-fixtures.
+Frame inspection confirms each matches its spec (open/close fist cycles,
+pinch-talk + pointing, hips-up face touches at a desk, head-to-feet full
+body — fullbody's background is heavily blown out but detection doesn't
+care). 30 s sanity eval, robot, headed (eval/results-newfixtures-sanity.json):
+facetouch 100% detection / 4.98° upperLimbs, fullbody 100% / 6.71° —
+better sync than the arms fixture itself; hand clips stream at full rate,
+and their pose rows (71–81% detection, 49–66° sync) are BlazePose
+hallucinating a torso from a hand — expected, harmless, and exactly why
+P3 uses HandLandmarker on them. No blockers → USER GATE 1 approved with
+electives B1+B2 and the woody local-only demotion.
+
 ## P0 (pass 2) — inspect, baseline, honesty guards (2026-06-12)
 Repo inspected end to end (~3k lines; reading + attachment points recorded
 in PLAN.md §1). Suite was red at P0: the five generated-avatar load smokes
