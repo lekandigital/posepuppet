@@ -4,6 +4,7 @@
 import type { AvatarId } from './rig/avatarRegistry';
 
 export interface Config {
+  theme: 'dark' | 'light';
   mirror: boolean;
   smoothing: boolean;
   minCutoff: number;
@@ -21,6 +22,7 @@ export interface Config {
 // ~100x smaller than the pixel-space classics, so beta is ~100x larger than
 // the textbook 0.007 to get the same speed-adaptive behavior.
 const DEFAULTS: Config = {
+  theme: 'dark',
   mirror: true,
   smoothing: true,
   minCutoff: 1.2,

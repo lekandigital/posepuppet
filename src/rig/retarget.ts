@@ -468,6 +468,13 @@ export class Retargeter {
     this.rootTarget.set(dx, dy, dz);
   }
 
+  /** Number of bones currently tracking (confident); for the signal chain. */
+  activeBoneCount(): number {
+    let n = 0;
+    for (const st of this.states.values()) if (st.confident) n++;
+    return n;
+  }
+
   /** Render tick: slerp bones toward targets; decay unconfident bones.
    *  Hand bones use slightly slower slerp for a natural wrist lag. */
   tick(dt: number): void {
