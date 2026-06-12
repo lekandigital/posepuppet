@@ -83,12 +83,13 @@ fallback), and `eval/run.mjs` records `avatarRequested` and exits non-zero
 on any requested/measured mismatch. The table above is from the guarded
 re-run.
 
-## 3. USER ACTION — missing inputs (blocking parts of P1–P3)
+## 3. USER ACTION — missing inputs (blocking parts of P2–P3)
 
-**a) `design/reference.css` is missing.** CLAUDE.md says to read it first;
-it isn't in the repo (or Downloads). Please drop it at
-`design/reference.css`. Blocks the P1 design plan. (Everything in P0 and
-the non-visual motion work can proceed meanwhile.)
+**a) ~~`design/reference.css` is missing.~~ RESOLVED during P0** — the file
+appeared in the repo (1,013 lines, the grammar exactly as CLAUDE.md
+describes) and is read and committed. One P1 note from it: the reference
+imports Google Fonts; PosePuppet self-hosts or system-stacks its fonts so
+the "0 network requests" receipt stays literally true.
 
 **b) The four new fixture clips are missing.** `fixtures/` has only the
 pass-1 clips (arms, torso, fast, fast2). Please record and drop these as
