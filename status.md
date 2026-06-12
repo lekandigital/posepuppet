@@ -1,3 +1,10 @@
+## 2026-06-12 ~08:10 (P1 COMPLETE — design system live everywhere)
+Done: Gate 2 approved + full rollout (tokens, shell, chain, receipt, cards, coach card, engineering view, palette+shortcuts, themes persisted); 2 bugs fixed (video-layer compositing hole, font-load receipt false positive); design.spec.ts added (contrast both themes, reduced-motion, focus)
+Sync metric: arms 9.40/11.02, torso 2.23/2.30, fast 18.98/19.86 (robot/astronaut) — unchanged within noise
+FPS: pose 29.5-29.7, render 118-119 — floors hold with new UI on (results-p1-ui.json)
+Blockers: none
+Next: P2 motion core — wrists/palms, face-touch, full-body, occlusion recovery, expressiveness layer
+
 ## 2026-06-12 ~07:45 (P1 design plan + mockups ready — awaiting USER GATE 2)
 Done: reference.css grammar studied in full; DESIGN_PLAN.md (tokens both themes, type roles incl. self-hosted fonts, wireframe, signature = take-bar instrument strip w/ signal chain, mono label map, atmosphere rules); shell mockups dark/light/take-state at 1440x810; self-critique + one revision (light theme keeps deep stage)
 Sync metric: unchanged from P0 baseline (no pipeline changes this step)

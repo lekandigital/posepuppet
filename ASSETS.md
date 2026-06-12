@@ -7,6 +7,12 @@
 | Procedural robot | built from three.js primitives in `src/rig/robot.ts` | ours | yes (code only) |
 | MediaPipe `pose_landmarker_full.task` | Google, fetched postinstall | Apache-2.0 | no (downloaded to `public/models/`) |
 | MediaPipe tasks-vision WASM | Google, copied from node_modules postinstall | Apache-2.0 | no (copied to `public/mediapipe-wasm/`) |
+| Inter (variable) | `@fontsource-variable/inter` npm package, bundled at build | SIL OFL 1.1 | no (node_modules → dist assets) |
+| JetBrains Mono (variable) | `@fontsource-variable/jetbrains-mono`, bundled at build | SIL OFL 1.1 | no (node_modules → dist assets) |
+| Fraunces (variable) | `@fontsource-variable/fraunces`, bundled at build | SIL OFL 1.1 | no (node_modules → dist assets) |
+
+Fonts are self-hosted and served same-origin so the privacy receipt's
+"0 external requests" stays literally true — no Google Fonts at runtime.
 
 Fixture videos are personal camera footage and are never committed (gitignored
 from commit 1).

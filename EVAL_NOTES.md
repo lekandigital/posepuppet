@@ -1,5 +1,35 @@
 # Eval notes
 
+## P1 — design system rolled out (2026-06-12)
+Gate 2 approved; the glass-cockpit shell is live on the real app. Token
+system both themes; self-hosted variable fonts (Inter/JetBrains Mono/
+Fraunces, OFL, in ASSETS.md); command bar (serif wordmark, mode selector,
+privacy receipt, controls); stage hero with viewfinder ticks + mono label;
+camera panel docked inside the stage as the input signal (LIVE chip,
+TRACKING/CAM footer); right rail with avatar cards (capability chips:
+robot/astronaut "Fully supported", woody "Experimental · local"), coach
+card, privacy line; take bar carrying the live signal chain
+CAM▸POSE▸SMOOTH▸RIG▸RENDER▸REC (signature element — REC lights red while
+recording, POSE goes red on signal loss); engineering view (#panel) in
+the mono language, toggleable ⚙/d, eval untouched; ⌘K command palette +
+single-key shortcuts (r/c/a/t/d/m/f/v); theme persisted in config.
+Two real bugs found by looking: (1) Chromium composites an opaque
+background on the accelerated-video layer y-flipped over the WebGL canvas
+(feed-sized hole at the mirrored position) — fixed by keeping that layer
+backgroundless, comment pinned in styles.css; (2) lazy font-subset loads
+arrive after fonts.ready and falsely dirtied the receipt — receipt now
+counts EXTERNAL (cross-origin) requests, which is the actual trust claim
+(DECISIONS.md). Verification: automated contrast checks pass both themes
+(tests/design.spec.ts), reduced-motion smoke passes, keyboard focus
+visible, suite 41 passed/5 skipped. Screenshot board media/board-p1/
+(dark/light/narrow/recording/palette/engineering — local, gitignored).
+Vision critique: cockpit reads, accents stay role-bound, narrow width
+holds; nits noted (REC button wraps at 1024px, engineering panel overlaps
+rail) for later polish. Perf with the new UI on (eval/results-p1-ui.json
+vs eval/results.json baseline): pose 29.5-29.7 fps (unchanged), render
+118-119 (slightly up), sync within noise, detection 100%, 0 console
+errors — floors hold, nothing becomes opt-in.
+
 ### P1 design gate — plan + mockups (2026-06-12)
 DESIGN_PLAN.md translates the reference grammar (1px rules, shared-border
 grids, three type roles, glass chrome, grain/vignette, light+dark) into the

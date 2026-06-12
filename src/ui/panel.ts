@@ -178,10 +178,6 @@ export function createPanel(rig?: PanelRigApi): void {
     btn.title = 'settings (d)';
     document.getElementById('controls')!.append(btn);
     btn.onclick = () => document.getElementById('panel')!.classList.toggle('hidden');
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'd' && !(e.target instanceof HTMLInputElement)) {
-        document.getElementById('panel')!.classList.toggle('hidden');
-      }
-    });
+    // the 'd' shortcut is registered through the command palette (main.ts)
   }
 }
