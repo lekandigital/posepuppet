@@ -11,6 +11,13 @@ export interface GeneratedAvatarDef {
   warningLabel: 'experimental';
   profile: 'humanoid' | 'creature' | 'hand_only';
   source: 'generated-vrm-smoke-test';
+  loader?: 'vrm' | 'raw-gltf';
+  /** Query-param-only display normalization for generated candidate QA. */
+  stageProfile?: {
+    targetSize?: number;
+    rootRotation?: [number, number, number];
+    rootPosition?: [number, number, number];
+  };
 }
 
 /**
@@ -104,6 +111,34 @@ export const GENERATED_AVATARS: Record<string, GeneratedAvatarDef> = {
     id: 'jack-sparrow',
     label: 'Jack Sparrow Candidate VRM',
     url: '/avatars/generated/jack-sparrow.vrm',
+    enabledInUi: false,
+    warningLabel: 'experimental',
+    profile: 'humanoid',
+    source: 'generated-vrm-smoke-test',
+  },
+  elsa: {
+    id: 'elsa',
+    label: 'Elsa Candidate VRM',
+    url: '/avatars/generated/elsa.vrm',
+    enabledInUi: false,
+    warningLabel: 'experimental',
+    profile: 'humanoid',
+    source: 'generated-vrm-smoke-test',
+    loader: 'raw-gltf',
+  },
+  'buzz-lightyear': {
+    id: 'buzz-lightyear',
+    label: 'Buzz Lightyear Candidate VRM',
+    url: '/avatars/generated/buzz-lightyear.vrm',
+    enabledInUi: false,
+    warningLabel: 'experimental',
+    profile: 'humanoid',
+    source: 'generated-vrm-smoke-test',
+  },
+  'teal-v2': {
+    id: 'teal-v2',
+    label: 'Teal v2 Candidate VRM',
+    url: '/avatars/generated/teal-v2.vrm',
     enabledInUi: false,
     warningLabel: 'experimental',
     profile: 'humanoid',

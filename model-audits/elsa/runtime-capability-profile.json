@@ -1,66 +1,93 @@
 {
   "active_candidate": {
-    "attempt_id": "",
-    "browser_smoke": "fail",
-    "visual_review": "not_available",
-    "vrm_path": ""
+    "accepted": false,
+    "best_attempt": "attempt-008-raw-gltf-normalize-ground",
+    "browser_smoke": "pass",
+    "candidate_vrm_path": "/Users/lekan/posepuppet-working-hard-fix/generated-vrms/elsa.vrm",
+    "pose_suite": "not_poseable_missing_required_lower_body_bones",
+    "visual_review": "blank_floor_only"
   },
-  "blockers": [
-    "browser_smoke_fail",
-    "feet_not_ready",
-    "no_accepted_generated_vrm_candidate",
-    "visual_review_needed"
+  "attempt_count": 3,
+  "attempts": [
+    {
+      "attempt_id": "attempt-002-camera-framing-no-scale",
+      "browser_smoke": "failed",
+      "capture_results": "model-working-hard-fix/elsa/attempts/attempt-002-camera-framing-no-scale/visual-review/capture-results.json",
+      "classification": "failed_browser_load",
+      "contact_sheet": "model-working-hard-fix/elsa/attempts/attempt-002-camera-framing-no-scale/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/elsa/attempts/attempt-002-camera-framing-no-scale/visual-review/pose-suite",
+      "query": "",
+      "slug": "elsa",
+      "status": "error",
+      "targeted_change": "camera framing no scale",
+      "visual_label": "see_contact_sheet",
+      "warnings": [
+        "[warning] [generated-avatar] failed to load elsa: VRMHumanoidLoaderPlugin: These humanoid bones are required but not exist: spine, leftUpperLeg, leftLowerLeg, leftFoot, rightUpperLeg, rightLowerLeg, rightFoot"
+      ]
+    },
+    {
+      "attempt_id": "attempt-007-raw-gltf-loader",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/elsa/attempts/attempt-007-raw-gltf-loader/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/elsa/attempts/attempt-007-raw-gltf-loader/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/elsa/attempts/attempt-007-raw-gltf-loader/visual-review/pose-suite",
+      "query": "&avatarLoader=raw-gltf",
+      "slug": "elsa",
+      "status": "loaded",
+      "targeted_change": "raw GLTF loader",
+      "visual_label": "see_contact_sheet",
+      "warnings": []
+    },
+    {
+      "attempt_id": "attempt-008-raw-gltf-normalize-ground",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/elsa/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/capture-results.json",
+      "classification": "best_deferred_evidence",
+      "contact_sheet": "model-working-hard-fix/elsa/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "not_poseable_missing_required_lower_body_bones",
+      "pose_suite_dir": "model-working-hard-fix/elsa/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/pose-suite",
+      "query": "&avatarLoader=raw-gltf&avatarNormalize=1",
+      "slug": "elsa",
+      "status": "loaded",
+      "targeted_change": "raw GLTF normalize ground",
+      "visual_label": "blank_floor_only",
+      "warnings": []
+    }
   ],
+  "best_attempt": "attempt-008-raw-gltf-normalize-ground",
+  "best_capture_results": "model-working-hard-fix/elsa/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/capture-results.json",
+  "best_contact_sheet": "model-working-hard-fix/elsa/attempts/attempt-008-raw-gltf-normalize-ground/visual-review/contact-sheet.png",
+  "blocker": "VRM loader rejects the candidate because required humanoid lower-body bones are missing; raw GLTF load succeeds but remains visually blank after normalization. Source audit shows only upper-body useful mapping plus duplicate/reflection source content.",
   "body_tracking": {
     "arms": "disabled",
-    "feet": "disabled",
-    "head": "disabled",
     "legs": "disabled",
-    "root_motion": "disabled",
-    "torso": "disabled"
+    "reason": "VRM loader rejects the candidate because required humanoid lower-body bones are missing; raw GLTF load succeeds but remains visually blank after normalization. Source audit shows only upper-body useful mapping plus duplicate/reflection source content."
   },
-  "created_at": "2026-06-11T18:11:49+00:00",
-  "disabled_controls": [
-    "face_anchors",
-    "feet",
-    "fingers",
-    "leftLowerLeg",
-    "leftUpperLeg",
-    "rightLowerLeg",
-    "rightUpperLeg",
-    "root_motion",
-    "shoulders",
-    "toes"
-  ],
-  "display_name": "Elsa",
-  "enabled_controls": [],
-  "face_touch": {
-    "mode": "ik_required",
-    "notes": [
-      "IK and visual validation required before support claim."
-    ],
-    "safe_first_gesture": "hand_to_cheek",
-    "visual_result": "not_available"
+  "candidate_vrm_path": "/Users/lekan/posepuppet-working-hard-fix/generated-vrms/elsa.vrm",
+  "created_at": "2026-06-11T23:53:28.709120+00:00",
+  "decision": "deferred",
+  "display": "Elsa",
+  "pose_label": "not_poseable_missing_required_lower_body_bones",
+  "public_ui": {
+    "enabledInUi": false,
+    "public_promotion": false,
+    "query_param_only": true
   },
-  "game_modes": {
-    "flying": "defer",
-    "gesture_to_intent": "not_recommended",
-    "rowing": "defer",
-    "walking": "defer"
-  },
-  "hand_tracking": {
-    "finger_chains": "partial",
-    "left_hand": "supported",
-    "mode": "palm_only",
-    "right_hand": "supported"
-  },
-  "notes": [
-    "Generated candidates remain query-param-only and excluded from public avatar cycling."
-  ],
-  "quality_label": "defer",
-  "runtime_profile": "humanoid_with_offsets",
-  "schema_version": "posepuppet-runtime-capability-profile-v2",
+  "quality_label": "blocked_required_bones",
+  "query": "avatarLoader=raw-gltf&avatarNormalize=1",
+  "recommendation": "Do not activate. Requires manual artist/source repair to add or recover lower-body bones before VRM humanoid conversion can be trusted.",
+  "reference_only": false,
+  "runtime_profile": "deferred",
+  "schema_version": "posepuppet-hard-model-repair-model-summary-v1",
   "slug": "elsa",
-  "warning_label": "defer",
-  "warning_text": "Deferred until conversion, validation, visual review, and browser smoke pass."
+  "visual_label": "blank_floor_only"
 }

@@ -1,8 +1,8 @@
 # Source files for amazing-spider-man-2 candidate VRM
 
-Selected source: /home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm
+Selected source: /Users/lekan/posepuppet-working-hard-fix/generated-vrms/amazing-spider-man-2.vrm
 Selected format: vrm
 Selected from ZIP: False
 
 All known source paths:
-- /home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm
+- /Users/lekan/posepuppet-working-hard-fix/generated-vrms/amazing-spider-man-2.vrm

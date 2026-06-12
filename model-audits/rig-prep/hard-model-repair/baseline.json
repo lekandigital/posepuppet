@@ -1,0 +1,16 @@
+{
+  "baseline_source": "visual-QA failed models from prompt plus deferred set",
+  "created_at": "2026-06-11T23:53:28.709120+00:00",
+  "schema_version": "posepuppet-hard-model-baseline-v1",
+  "starting_state": "models had conversion/smoke artifacts but failed visual QA; isolated hard-fix worktree used only",
+  "target_models": [
+    "amazing-spider-man-2",
+    "terminator-t-800",
+    "spider-man-no-way-home",
+    "spider-man-playstation",
+    "jack-sparrow",
+    "elsa",
+    "buzz-lightyear",
+    "teal-v2"
+  ]
+}

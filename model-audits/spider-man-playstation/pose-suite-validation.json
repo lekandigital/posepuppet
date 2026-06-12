@@ -1,374 +1,153 @@
 {
-  "attempt_id": "attempt-001-baseline",
-  "created_at": "2026-06-11T18:11:49+00:00",
-  "pose_tests": [
+  "active_candidate": true,
+  "attempt_count": 6,
+  "attempts": [
     {
-      "applied": true,
-      "bones_driven": [
-        "chest",
-        "head",
-        "hips"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "neutral",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-001-current-baseline",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/spider-man-playstation/attempts/attempt-001-current-baseline/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/spider-man-playstation/attempts/attempt-001-current-baseline/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/spider-man-playstation/attempts/attempt-001-current-baseline/visual-review/pose-suite",
+      "query": "",
+      "slug": "spider-man-playstation",
+      "status": "loaded",
+      "targeted_change": "current baseline",
+      "visual_label": "see_contact_sheet",
+      "warnings": [
+        "[warning] [.WebGL-0x114004d5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x114004d5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x114004d5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x114004d5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ]
     },
     {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "arms_out",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-002-camera-framing-no-scale",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/spider-man-playstation/attempts/attempt-002-camera-framing-no-scale/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/spider-man-playstation/attempts/attempt-002-camera-framing-no-scale/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/spider-man-playstation/attempts/attempt-002-camera-framing-no-scale/visual-review/pose-suite",
+      "query": "",
+      "slug": "spider-man-playstation",
+      "status": "loaded",
+      "targeted_change": "camera framing no scale",
+      "visual_label": "see_contact_sheet",
+      "warnings": []
     },
     {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "arms_up",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-002-root-rotate-minus-90",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/spider-man-playstation/attempts/attempt-002-root-rotate-minus-90/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/spider-man-playstation/attempts/attempt-002-root-rotate-minus-90/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/spider-man-playstation/attempts/attempt-002-root-rotate-minus-90/visual-review/pose-suite",
+      "query": "&avatarRotateX=-1.57079632679",
+      "slug": "spider-man-playstation",
+      "status": "loaded",
+      "targeted_change": "root rotate minus",
+      "visual_label": "see_contact_sheet",
+      "warnings": [
+        "[warning] [.WebGL-0x12c004d5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x12c004d5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x12c004d5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x12c004d5a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ]
     },
     {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "arms_forward",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-003-root-rotate-plus-90",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/spider-man-playstation/attempts/attempt-003-root-rotate-plus-90/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/spider-man-playstation/attempts/attempt-003-root-rotate-plus-90/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/spider-man-playstation/attempts/attempt-003-root-rotate-plus-90/visual-review/pose-suite",
+      "query": "&avatarRotateX=1.57079632679",
+      "slug": "spider-man-playstation",
+      "status": "loaded",
+      "targeted_change": "root rotate plus",
+      "visual_label": "see_contact_sheet",
+      "warnings": [
+        "[warning] [.WebGL-0x11400615400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11400615400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11400615400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11400615400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ]
     },
     {
-      "applied": true,
-      "bones_driven": [
-        "leftLowerArm",
-        "rightLowerArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "elbow_bend",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-004-raw-no-normalize",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/spider-man-playstation/attempts/attempt-004-raw-no-normalize/visual-review/capture-results.json",
+      "classification": "superseded_attempt",
+      "contact_sheet": "model-working-hard-fix/spider-man-playstation/attempts/attempt-004-raw-no-normalize/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "static_or_not_visible",
+      "pose_suite_dir": "model-working-hard-fix/spider-man-playstation/attempts/attempt-004-raw-no-normalize/visual-review/pose-suite",
+      "query": "&avatarNormalize=0",
+      "slug": "spider-man-playstation",
+      "status": "loaded",
+      "targeted_change": "raw no normalize",
+      "visual_label": "see_contact_sheet",
+      "warnings": [
+        "[warning] [.WebGL-0x134004e6600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x134004e6600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x134004e6600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x134004e6600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ]
     },
     {
-      "applied": true,
-      "bones_driven": [
-        "leftHand",
-        "rightHand"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "wrist_rotate",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftHand",
-        "rightHand"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "palm_forward",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "chest",
-        "hips"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "lean_left",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "chest",
-        "hips"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "lean_right",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "chest",
-        "hips"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "torso_turn",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftLowerLeg",
-        "leftUpperLeg",
-        "rightLowerLeg",
-        "rightUpperLeg"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "walking_stride_proxy",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftFoot",
-        "rightFoot"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "foot_lift",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftFoot",
-        "rightFoot"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "foot_rotate",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftLowerArm",
-        "leftUpperArm",
-        "rightLowerArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "rowing_stroke",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "leftUpperArm",
-        "rightUpperArm"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "flying_arms_out",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "head",
-        "leftHand",
-        "rightHand"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "hand_to_mouth_proxy",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
-    },
-    {
-      "applied": true,
-      "bones_driven": [
-        "head",
-        "leftHand",
-        "rightHand"
-      ],
-      "expected_visual": "pose proxy should be readable without detached geometry",
-      "measured": {
-        "bounds_changed": true,
-        "detached_meshes_detected": [],
-        "extreme_scale_or_explosion_detected": false,
-        "missing_bones": [],
-        "warnings": [
-          "visual screenshot review not available"
-        ]
-      },
-      "pose_name": "hand_to_cheek_proxy",
-      "reason": "structural mapping supports this proxy; visual review still required",
-      "result": "pass",
-      "visual_review": "not_available"
+      "attempt_id": "attempt-005-visual-pose-suite-fixed",
+      "browser_smoke": "pass",
+      "capture_results": "model-working-hard-fix/spider-man-playstation/attempts/attempt-005-visual-pose-suite-fixed/visual-review/capture-results.json",
+      "classification": "accepted_active_candidate",
+      "contact_sheet": "model-working-hard-fix/spider-man-playstation/attempts/attempt-005-visual-pose-suite-fixed/visual-review/contact-sheet.png",
+      "errors": [],
+      "motion_delta": 0.0,
+      "pose_label": "pose_responsive",
+      "pose_suite_dir": "model-working-hard-fix/spider-man-playstation/attempts/attempt-005-visual-pose-suite-fixed/visual-review/pose-suite",
+      "query": "",
+      "slug": "spider-man-playstation",
+      "status": "loaded",
+      "targeted_change": "visual pose suite fixed",
+      "visual_label": "visible_single_character",
+      "warnings": [
+        "[warning] [.WebGL-0x11c004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11c004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11c004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "[warning] [.WebGL-0x11c004e4800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ]
     }
   ],
-  "schema_version": "posepuppet-pose-suite-validation-v1",
+  "best_attempt": "attempt-005-visual-pose-suite-fixed",
+  "best_capture_results": "model-working-hard-fix/spider-man-playstation/attempts/attempt-005-visual-pose-suite-fixed/visual-review/capture-results.json",
+  "best_contact_sheet": "model-working-hard-fix/spider-man-playstation/attempts/attempt-005-visual-pose-suite-fixed/visual-review/contact-sheet.png",
+  "blocker": "",
+  "candidate_vrm_path": "/Users/lekan/posepuppet-working-hard-fix/generated-vrms/spider-man-playstation.vrm",
+  "created_at": "2026-06-11T23:53:28.709120+00:00",
+  "decision": "active_candidate",
+  "display": "Spider-Man PlayStation",
+  "pose_label": "pose_responsive",
+  "public_ui": {
+    "enabledInUi": false,
+    "public_promotion": false,
+    "query_param_only": true
+  },
+  "query": "",
+  "recommendation": "Safe to cherry-pick as a generated-avatar active candidate only; keep query-param-only and disabled in public UI until explicitly promoted.",
+  "reference_only": false,
+  "schema_version": "posepuppet-hard-model-repair-model-summary-v1",
   "slug": "spider-man-playstation",
-  "source": "generated-vrm",
-  "status": "partial"
+  "visual_label": "visible_single_character"
 }

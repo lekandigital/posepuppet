@@ -9,7 +9,7 @@ One-sentence recommendation: Try this after confirming license and checking prop
 
 ## Source files
 
-- Selected source: `/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm`
+- Selected source: `/Users/lekan/posepuppet-working-hard-fix/generated-vrms/amazing-spider-man-2.vrm`
 - Selected format: `vrm`
 - From ZIP: `False`
 - License: unknown; verify before redistribution
@@ -20,7 +20,7 @@ One-sentence recommendation: Try this after confirming license and checking prop
 - Vertices: 8271
 - Triangles: 13480
 - Estimated height: 55.74192
-- Bounding box size: [182.51157, 250.82239, 55.74192]
+- Bounding box size: [182.5116, 250.82239, 55.74192]
 - Materials/textures: 7 materials, 4 images
 
 ## Rig summary

@@ -1,7 +1,7 @@
 # amazing-spider-man-2 post-VRM rig validation
 
 - Status: `pass`
-- Candidate VRM path: `/home/o/posepuppet-working/generated-vrms/amazing-spider-man-2.vrm`
+- Candidate VRM path: `/Users/lekan/posepuppet-working-hard-fix/generated-vrms/amazing-spider-man-2.vrm`
 - Candidate VRM size bytes: `11212744`
 - VRMC_vrm present: `true`
 - Humanoid bone count: `22`
