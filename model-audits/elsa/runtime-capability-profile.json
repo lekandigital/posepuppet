@@ -1,15 +1,15 @@
 {
   "active_candidate": {
-    "attempt_id": "",
     "browser_smoke": "fail",
-    "visual_review": "not_available",
-    "vrm_path": ""
+    "contact_sheet": "model-working/elsa/visual-review/contact-sheet.png",
+    "registry_decision": "not_registered",
+    "visual_review": "fail"
   },
   "blockers": [
-    "browser_smoke_fail",
-    "feet_not_ready",
-    "no_accepted_generated_vrm_candidate",
-    "visual_review_needed"
+    "missing_spine",
+    "missing_left_leg_chain",
+    "missing_right_leg_chain",
+    "missing_feet"
   ],
   "body_tracking": {
     "arms": "disabled",
@@ -19,7 +19,7 @@
     "root_motion": "disabled",
     "torso": "disabled"
   },
-  "created_at": "2026-06-11T18:11:49+00:00",
+  "created_at": "2026-06-11T23:21:07+00:00",
   "disabled_controls": [
     "face_anchors",
     "feet",
@@ -57,9 +57,9 @@
   "notes": [
     "Generated candidates remain query-param-only and excluded from public avatar cycling."
   ],
-  "quality_label": "defer",
-  "runtime_profile": "humanoid_with_offsets",
-  "schema_version": "posepuppet-runtime-capability-profile-v2",
+  "quality_label": "deferred_manual_rig_repair",
+  "runtime_profile": "deferred",
+  "schema_version": "posepuppet-runtime-capability-profile-v3",
   "slug": "elsa",
   "warning_label": "defer",
   "warning_text": "Deferred until conversion, validation, visual review, and browser smoke pass."

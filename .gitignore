@@ -66,3 +66,7 @@ media/
 .DS_Store
 *.local
 .vercel
+
+# VRM Viewer — model binaries are copied at build time, keep manifest tracked
+public/vrm-viewer/models/
+!public/vrm-viewer/manifest.json

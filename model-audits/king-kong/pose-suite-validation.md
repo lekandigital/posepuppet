@@ -14,3 +14,12 @@
 | `tail_swing` | `not_tested` | creature profile runtime does not exist yet |
 | `root_motion_proxy` | `not_tested` | creature profile runtime does not exist yet |
 | `gesture_to_intent_pose` | `not_tested` | creature profile runtime does not exist yet |
+
+## Visual QA Continuation
+
+- Status: `pass`
+- Runtime profile: `creature`
+- Pose renders: `4`
+- Contact sheet: `model-working/king-kong/source-preview/contact-sheet.png`
+
+Proxy poses were rendered from the source rig only; no humanoid runtime support is implied. Earlier structural pose-suite details above are preserved.

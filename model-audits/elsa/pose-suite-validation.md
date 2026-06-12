@@ -24,3 +24,11 @@
 | `hand_to_mouth_proxy` | `pass` | structural mapping supports this proxy; visual review still required |
 | `hand_to_cheek_proxy` | `pass` | structural mapping supports this proxy; visual review still required |
 | `finger_curl` | `partial` | curl preset only; full finger runtime is not claimed |
+
+## Visual QA Continuation
+
+- Status: `blocked`
+- Pose count: `0`
+- Contact sheet: `model-working/elsa/visual-review/contact-sheet.png`
+
+Browser visual pose capture could not run because Three-VRM rejected the required humanoid bones before the candidate loaded. Earlier structural pose-suite details above are preserved.

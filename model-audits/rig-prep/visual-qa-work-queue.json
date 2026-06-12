@@ -1,0 +1,62 @@
+{
+  "created_at": "2026-06-11T23:21:07+00:00",
+  "groups": [
+    {
+      "group": "A",
+      "name": "active_visual_accepted",
+      "slugs": [
+        "darth-vader",
+        "fortnite-batman",
+        "iron-man",
+        "shrek",
+        "woody"
+      ]
+    },
+    {
+      "group": "B",
+      "name": "active_downgraded_or_rejected",
+      "slugs": [
+        "amazing-spider-man-2",
+        "jack-sparrow",
+        "spider-man-no-way-home",
+        "spider-man-playstation",
+        "terminator-t-800"
+      ]
+    },
+    {
+      "group": "C",
+      "name": "deferred_manual_rig_repair",
+      "slugs": [
+        "buzz-lightyear",
+        "elsa",
+        "teal-v2"
+      ]
+    },
+    {
+      "group": "D",
+      "name": "hand_only_preview",
+      "slugs": [
+        "rigged-hand"
+      ]
+    },
+    {
+      "group": "E",
+      "name": "creature_static_preview_pass",
+      "slugs": [
+        "godzilla",
+        "grogu",
+        "king-kong",
+        "olaf"
+      ]
+    },
+    {
+      "group": "F",
+      "name": "creature_static_preview_needs_repair",
+      "slugs": [
+        "baby-yoda",
+        "xenomorph"
+      ]
+    }
+  ],
+  "schema_version": "posepuppet-visual-qa-work-queue-v1"
+}

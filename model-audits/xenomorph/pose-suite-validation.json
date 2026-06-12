@@ -147,8 +147,71 @@
       "visual_review": "not_available"
     }
   ],
+  "runtime_profile": "creature",
   "schema_version": "posepuppet-pose-suite-validation-v1",
   "slug": "xenomorph",
   "source": "audit-only",
-  "status": "not_attempted"
+  "source_preview_pose_suite": {
+    "contact_sheet": "model-working/xenomorph/source-preview/contact-sheet.png",
+    "created_at": "2026-06-11T23:21:07+00:00",
+    "notes": [
+      "Source pose suite is a feasibility probe, not a browser runtime implementation."
+    ],
+    "pose_render_count": 4,
+    "pose_tests": [
+      {
+        "matched_bone_count": 5,
+        "matched_bones_sample": [
+          "XenosBiped_Neck_01SHJnt_08",
+          "XenosBiped_Neck_TopSHJnt_09",
+          "XenosBiped_Head_JawSHJnt_010",
+          "XenosBiped_Head_JawEndSHJnt_011",
+          "XenosBiped_Head_TopSHJnt_017"
+        ],
+        "pose_name": "creature_head_turn",
+        "result": "partial",
+        "screenshot_path": "model-working/xenomorph/source-preview/screenshots/pose-creature_head_turn.png"
+      },
+      {
+        "matched_bone_count": 0,
+        "matched_bones_sample": [],
+        "pose_name": "creature_arm_raise",
+        "result": "partial",
+        "screenshot_path": "model-working/xenomorph/source-preview/screenshots/pose-creature_arm_raise.png"
+      },
+      {
+        "matched_bone_count": 28,
+        "matched_bones_sample": [
+          "XenosBiped_TailRoot_SHJnt_097",
+          "XenosBiped_Tail01_SHJnt_098",
+          "XenosBiped_Tail02_SHJnt_099",
+          "XenosBiped_Tail03_SHJnt_0100",
+          "XenosBiped_Tail04_SHJnt_0101",
+          "XenosBiped_Tail05_SHJnt_0102",
+          "XenosBiped_Tail06_SHJnt_0103",
+          "XenosBiped_Tail07_SHJnt_0104",
+          "XenosBiped_Tail08_SHJnt_0105",
+          "XenosBiped_Tail09_SHJnt_0106",
+          "XenosBiped_Tail10_SHJnt_0107",
+          "XenosBiped_Tail11_SHJnt_0108"
+        ],
+        "pose_name": "creature_tail_sway",
+        "result": "partial",
+        "screenshot_path": "model-working/xenomorph/source-preview/screenshots/pose-creature_tail_sway.png"
+      },
+      {
+        "matched_bone_count": 2,
+        "matched_bones_sample": [
+          "XenosBiped_Head_JawSHJnt_010",
+          "XenosBiped_Head_JawEndSHJnt_011"
+        ],
+        "pose_name": "creature_jaw_open",
+        "result": "partial",
+        "screenshot_path": "model-working/xenomorph/source-preview/screenshots/pose-creature_jaw_open.png"
+      }
+    ],
+    "source": "source-glb-blender-preview"
+  },
+  "status": "partial",
+  "visual_review": "partial"
 }
