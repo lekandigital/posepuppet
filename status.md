@@ -1,3 +1,10 @@
+## 2026-06-12 ~07:45 (P1 design plan + mockups ready — awaiting USER GATE 2)
+Done: reference.css grammar studied in full; DESIGN_PLAN.md (tokens both themes, type roles incl. self-hosted fonts, wireframe, signature = take-bar instrument strip w/ signal chain, mono label map, atmosphere rules); shell mockups dark/light/take-state at 1440x810; self-critique + one revision (light theme keeps deep stage)
+Sync metric: unchanged from P0 baseline (no pipeline changes this step)
+FPS: unchanged from P0 baseline
+Blockers: USER GATE 2 — design direction approval before full rollout
+Next: on approval — token CSS + shell around the live app, every surface restyled, engineering view, privacy receipt counter, Cmd+K palette, settings persistence
+
 ## 2026-06-12 ~07:05 (Gate 1 APPROVED — P0 fully closed, P1 next)
 Done: branch pass-2-instrument; reference.css read (grammar internalized, palette excluded); 4 new clips remuxed→y4m, frame-verified, sanity-evaled (facetouch 100%/4.98 deg, fullbody 100%/6.71 deg; hand clips stream fine, HandLandmarker is their consumer)
 Gate 1: approved — plan + electives B1 (velocity VFX) + B2 (auto-director); woody → local-only, astronaut default again

@@ -1,5 +1,19 @@
 # Eval notes
 
+### P1 design gate — plan + mockups (2026-06-12)
+DESIGN_PLAN.md translates the reference grammar (1px rules, shared-border
+grids, three type roles, glass chrome, grain/vignette, light+dark) into the
+mandated vibrant palette: graphite base, glass panes, electric blue / cyan /
+violet / pale-green accents bound to roles (action / signal / memory /
+privacy) — no warm hues anywhere. Signature element: the take bar as an
+instrument strip carrying a live CAM▸POSE▸SMOOTH▸RIG▸RENDER signal chain.
+Mockups (design/mockups/shell-{dark,light,take}.png, synthetic content
+only): dark and take-state passed vision review on first pass — the
+take-state serif shot prompt is the type system's identity moment working
+as intended; the light theme failed it (pale stage washed out the avatar)
+and was revised once to the NLE-viewer pattern (deep stage inside light
+chrome). Gate-2 artifacts committed; full rollout blocked on approval.
+
 ### P0 addendum — new inputs verified, Gate 1 closed (2026-06-12)
 design/reference.css arrived (1,013 lines; grammar as described — token
 theme, 1px rules, Fraunces/Inter/JetBrains Mono roles, grain/vignette,
