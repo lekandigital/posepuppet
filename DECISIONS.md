@@ -107,3 +107,10 @@ The talking-head puppet follows hand position at half gain, clamped to
 the stage box: full positional mapping walked the puppet off frame on
 real footage. The expressive hand and x-ray keep full positional range —
 their point is literal following.
+
+## 2026-06-12 — Gate-3 fixes: capability labels over forced features
+The astronaut's hands are mittens (no finger geometry); rather than fake
+finger motion, both default avatars now carry "Fingers not supported"
+chips and the roster gap is queued for P6/Gate 4 (Seed-san — VRM1
+reference model, already in public/avatars — or a 100Avatars CC0 pick
+with real fingers). Spec rule applied: "a capability label, not a bug."

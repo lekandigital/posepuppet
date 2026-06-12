@@ -1,3 +1,10 @@
+## 2026-06-12 ~12:30 (Gate 3 feedback FIXED — P4 next)
+Done: 6 live-test fixes — computed finger curl axes (verified on Seed-san; astronaut = mittens, now labeled), real head colliders (skinned-vertex sampling) + person-frame contact bias, exaggeration dead-zone/soft-knee/no-pitch, beaky pinch auto-range, crossfade fade-out-only w/ depth discipline, half-rate slerp during re-acquisition
+Sync metric: facetouch reach 99.8%/100% pen 0/0; pinch->jaw r=0.899 (up from 0.886); arms 9.77 (45s, within noise)
+FPS: render 117-119 everywhere, pose ~29.6 — floors hold
+Blockers: none (roster lacks a finger-capable avatar — P6/Gate-4 candidate: Seed-san or a 100Avatars pick)
+Next: P4 Motion Memory (ring buffer, IndexedDB loops, ghost duet, echo chorus, replay, re-skin, round-trip test)
+
 ## 2026-06-12 ~10:40 (P3 COMPLETE — hand-only mode ships; GATE 3 next)
 Done: HandLandmarker postinstall + detector; hand-only mode (own stage treatment, roster cards, HAND chain cell, overlay skeleton); puppets: expressive hand / beaky (pinch=jaw, palm=head, crest spring) / x-ray wireframe+trail; pinch->jaw metric; handmode spec
 Sync metric: pinch->jaw r=0.886 (pinch fixture) and 0.937 (open_close), bar r>=0.8 — PASS; 100% hand detection both clips

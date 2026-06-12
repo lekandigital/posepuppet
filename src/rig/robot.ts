@@ -177,6 +177,8 @@ export function createRobot(): Avatar {
     object: root,
     bones,
     joints,
+    // skull sphere (r=0.13 at +0.13 above the head pivot); antenna excluded
+    headGeometry: { centerLocal: new THREE.Vector3(0, 0.13, 0.01), radius: 0.155 },
     applyHandState(side, openness) {
       // no fingers on the robot: an open hand reads as a flatter, wider
       // mitt; a fist as a tight ball

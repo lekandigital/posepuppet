@@ -90,8 +90,11 @@ export function createBeaky(): HandPuppet & { jawAngle(): number; pinchNorm(): n
   let crestPos = 0;
   let prevQuat = new THREE.Quaternion();
 
-  const PINCH_CLOSED = 0.25; // pinchNorm at touching fingertips
-  const PINCH_OPEN = 1.1; // wide open
+  // pinch auto-ranging: fixed thresholds left half the jaw unused at the
+  // Gate-3 live test (mouth never fully closed). Track the session's
+  // observed range (slow decay toward each other re-adapts to new hands).
+  let pinchLo = 0.45;
+  let pinchHi = 0.75;
   const JAW_MAX = 0.62; // rad
 
   return {
@@ -100,7 +103,13 @@ export function createBeaky(): HandPuppet & { jawAngle(): number; pinchNorm(): n
     onHandFrame(frame: HandFrame | null) {
       palm.onFrame(frame);
       if (frame) {
-        const t = THREE.MathUtils.clamp((palm.pinch - PINCH_CLOSED) / (PINCH_OPEN - PINCH_CLOSED), 0, 1);
+        pinchLo = Math.min(pinchLo, palm.pinch);
+        pinchHi = Math.max(pinchHi, palm.pinch);
+        // slow shrink so one outlier doesn't deaden the range forever
+        pinchLo += (pinchHi - pinchLo) * 0.0005;
+        pinchHi -= (pinchHi - pinchLo) * 0.0005;
+        const span = Math.max(pinchHi - pinchLo, 0.15);
+        const t = THREE.MathUtils.clamp((palm.pinch - pinchLo) / span, 0, 1);
         jawTarget = t * JAW_MAX;
       }
     },
