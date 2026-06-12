@@ -16,7 +16,8 @@
     "audit:quick": "python3 tools/audit_model.py --self-test && python3 tools/validate_model_audits.py model-audits",
     "audit:validate": "python3 tools/validate_model_audits.py model-audits",
     "audit:staleness": "python3 tools/check_audit_staleness.py models_for_animation model-audits",
-    "audit:all": "npm run audit:self-test && npm run audit:models && npm run audit:validate && npm run audit:staleness"
+    "audit:all": "npm run audit:self-test && npm run audit:models && npm run audit:validate && npm run audit:staleness",
+    "vrm:manifest": "node scripts/build-vrm-manifest.mjs"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.35",

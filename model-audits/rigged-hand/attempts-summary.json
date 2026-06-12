@@ -1,29 +1,23 @@
 {
   "attempts": [
     {
-      "attempt_id": "attempt-001-baseline",
+      "attempt_id": "attempt-source-preview-pose-suite",
+      "attempt_manifest": "model-working/rigged-hand/attempts/attempt-source-preview-pose-suite/attempt-manifest.json",
       "blockers": [
-        "feet_not_ready",
-        "no_accepted_generated_vrm_candidate",
-        "not_full_avatar",
-        "requires_hand_landmarker_mode",
-        "visual_review_needed"
+        "not_full_body",
+        "browser_hand_runtime_not_implemented"
       ],
-      "browser_smoke": "not_attempted",
-      "classification": "deferred",
-      "label": "baseline-source-audit",
-      "post_vrm_validation": "not_applicable",
-      "source": "audit/spec source",
-      "visual_review": "not_available",
-      "vrm_exists": false,
-      "vrm_path": ""
+      "classification": "hand_only_preview_partial",
+      "contact_sheet": "model-working/rigged-hand/source-preview/contact-sheet.png",
+      "pose_suite": "partial",
+      "visual_review": "partial"
     }
   ],
   "best_attempt_id": "",
   "category": "hand_only",
-  "created_at": "2026-06-11T18:11:49+00:00",
+  "created_at": "2026-06-11T23:21:07+00:00",
   "display_name": "Rigged Hand",
-  "final_classification": "hand_only",
-  "schema_version": "posepuppet-attempts-summary-v1",
+  "final_classification": "hand_only_preview_partial",
+  "schema_version": "posepuppet-attempts-summary-v2",
   "slug": "rigged-hand"
 }

@@ -1,17 +1,12 @@
 {
   "active_candidate": {
-    "attempt_id": "",
-    "browser_smoke": "not_attempted",
-    "visual_review": "not_available",
-    "vrm_path": ""
+    "browser_smoke": "not_registered",
+    "contact_sheet": "model-working/baby-yoda/source-preview/contact-sheet.png",
+    "registry_decision": "not_registered",
+    "visual_review": "fail"
   },
   "blockers": [
-    "creature_profile_needed",
-    "feet_not_ready",
-    "hand_control_not_ready",
-    "no_accepted_generated_vrm_candidate",
-    "static_preview_only",
-    "visual_review_needed"
+    "source_preview_scale_or_framing_bad"
   ],
   "body_tracking": {
     "arms": "disabled",
@@ -21,7 +16,7 @@
     "root_motion": "disabled",
     "torso": "disabled"
   },
-  "created_at": "2026-06-11T18:11:49+00:00",
+  "created_at": "2026-06-11T23:21:07+00:00",
   "disabled_controls": [
     "chest",
     "creature_jaw",
@@ -72,9 +67,9 @@
   "notes": [
     "Generated candidates remain query-param-only and excluded from public avatar cycling."
   ],
-  "quality_label": "creature_profile_needed",
+  "quality_label": "creature_preview_fail",
   "runtime_profile": "creature",
-  "schema_version": "posepuppet-runtime-capability-profile-v2",
+  "schema_version": "posepuppet-runtime-capability-profile-v3",
   "slug": "baby-yoda",
   "warning_label": "creature_profile_needed",
   "warning_text": "Creature asset needs a custom profile or static preview path before runtime use."

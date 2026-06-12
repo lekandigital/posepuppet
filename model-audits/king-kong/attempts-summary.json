@@ -1,27 +1,22 @@
 {
   "attempts": [
     {
-      "attempt_id": "attempt-001-baseline",
+      "attempt_id": "attempt-source-preview-pose-suite",
+      "attempt_manifest": "model-working/king-kong/attempts/attempt-source-preview-pose-suite/attempt-manifest.json",
       "blockers": [
-        "creature_profile_needed",
-        "no_accepted_generated_vrm_candidate",
-        "visual_review_needed"
+        "custom_creature_runtime_needed"
       ],
-      "browser_smoke": "not_attempted",
-      "classification": "deferred",
-      "label": "baseline-source-audit",
-      "post_vrm_validation": "not_applicable",
-      "source": "audit/spec source",
-      "visual_review": "not_available",
-      "vrm_exists": false,
-      "vrm_path": ""
+      "classification": "creature_preview_pass",
+      "contact_sheet": "model-working/king-kong/source-preview/contact-sheet.png",
+      "pose_suite": "pass",
+      "visual_review": "pass"
     }
   ],
-  "best_attempt_id": "",
+  "best_attempt_id": "attempt-source-preview-pose-suite",
   "category": "creature",
-  "created_at": "2026-06-11T18:11:49+00:00",
+  "created_at": "2026-06-11T23:21:07+00:00",
   "display_name": "King Kong",
-  "final_classification": "creature_profile_needed",
-  "schema_version": "posepuppet-attempts-summary-v1",
+  "final_classification": "creature_preview_pass",
+  "schema_version": "posepuppet-attempts-summary-v2",
   "slug": "king-kong"
 }

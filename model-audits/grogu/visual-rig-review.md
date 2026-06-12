@@ -1,5 +1,8 @@
 # Grogu visual rig review
 
-- Visual label: `visual_not_available`
-- Requires future vision review: `true`
-- Decision: `do_not_claim_visual_quality`
+- Visual review: `pass`
+- Runtime profile: `creature`
+- Forced to humanoid: `false`
+- Contact sheet: `model-working/grogu/source-preview/contact-sheet.png`
+
+Source preview is readable and proxy creature poses are visible; this is a strong creature/static-preview candidate.

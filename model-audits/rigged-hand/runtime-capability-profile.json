@@ -1,16 +1,13 @@
 {
   "active_candidate": {
-    "attempt_id": "",
-    "browser_smoke": "not_attempted",
-    "visual_review": "not_available",
-    "vrm_path": ""
+    "browser_smoke": "not_registered",
+    "contact_sheet": "model-working/rigged-hand/source-preview/contact-sheet.png",
+    "registry_decision": "not_registered",
+    "visual_review": "partial"
   },
   "blockers": [
-    "feet_not_ready",
-    "no_accepted_generated_vrm_candidate",
-    "not_full_avatar",
-    "requires_hand_landmarker_mode",
-    "visual_review_needed"
+    "not_full_body",
+    "browser_hand_runtime_not_implemented"
   ],
   "body_tracking": {
     "arms": "disabled",
@@ -20,7 +17,7 @@
     "root_motion": "disabled",
     "torso": "disabled"
   },
-  "created_at": "2026-06-11T18:11:49+00:00",
+  "created_at": "2026-06-11T23:21:07+00:00",
   "disabled_controls": [
     "chest",
     "face_touch",
@@ -64,9 +61,9 @@
   "notes": [
     "Generated candidates remain query-param-only and excluded from public avatar cycling."
   ],
-  "quality_label": "hand_only",
+  "quality_label": "hand_only_preview_partial",
   "runtime_profile": "hand_only",
-  "schema_version": "posepuppet-runtime-capability-profile-v2",
+  "schema_version": "posepuppet-runtime-capability-profile-v3",
   "slug": "rigged-hand",
   "warning_label": "hand_only",
   "warning_text": "Hand-only asset; requires a dedicated hand tracking mode and is not a full avatar."

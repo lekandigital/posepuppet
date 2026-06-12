@@ -1,5 +1,8 @@
 # Godzilla visual rig review
 
-- Visual label: `visual_not_available`
-- Requires future vision review: `true`
-- Decision: `do_not_claim_visual_quality`
+- Visual review: `pass`
+- Runtime profile: `creature`
+- Forced to humanoid: `false`
+- Contact sheet: `model-working/godzilla/source-preview/contact-sheet.png`
+
+Source preview is readable, creature anatomy is obvious, and proxy head/arm/tail/jaw pose renders completed.

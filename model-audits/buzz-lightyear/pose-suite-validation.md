@@ -23,3 +23,11 @@
 | `flying_arms_out` | `partial` | missing mapped bones: leftUpperArm, rightUpperArm |
 | `hand_to_mouth_proxy` | `partial` | missing mapped bones: head, leftHand, rightHand |
 | `hand_to_cheek_proxy` | `partial` | missing mapped bones: head, leftHand, rightHand |
+
+## Visual QA Continuation
+
+- Status: `blocked`
+- Pose count: `0`
+- Contact sheet: `model-working/buzz-lightyear/visual-review/contact-sheet.png`
+
+Browser visual pose capture could not run because Three-VRM rejected the required humanoid bones before the candidate loaded. Earlier structural pose-suite details above are preserved.

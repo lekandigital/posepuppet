@@ -1,19 +1,33 @@
 {
-  "attempt_id": "attempt-001-baseline",
-  "contact_sheet_path": "",
-  "created_at": "2026-06-11T18:11:49+00:00",
-  "decision": "do_not_claim_visual_quality",
-  "questions": {
-    "acceptable_for_query_param_experimental_use": "not_available",
-    "limbs_attached": "not_available",
-    "model_loaded": "not_available",
-    "scale_reasonable": "not_available",
-    "textures_intact": "not_available"
+  "accepted_for_active_registry": false,
+  "attempt_id": "attempt-source-preview-pose-suite",
+  "blockers": [
+    "custom_creature_runtime_needed"
+  ],
+  "created_at": "2026-06-11T23:21:07+00:00",
+  "display_name": "Godzilla",
+  "evidence": {
+    "attempt_manifest": "model-working/godzilla/attempts/attempt-source-preview-pose-suite/attempt-manifest.json",
+    "contact_sheet": "model-working/godzilla/source-preview/contact-sheet.png",
+    "contact_sheet_committed": false,
+    "pose_render_count": 4,
+    "preview_manifest": "model-working/godzilla/source-preview/screenshots/preview-manifest.json",
+    "source_audit": "model-working/godzilla/source-preview/audit.json"
   },
-  "requires_future_vision_review": true,
-  "schema_version": "posepuppet-visual-rig-review-v1",
-  "screenshots": [],
+  "final_classification": "creature_preview_pass",
+  "next_steps": [
+    "Use a creature-specific runtime profile.",
+    "Do not assign this to standard humanoid retargeting."
+  ],
+  "registry_decision": "not_registered",
+  "runtime_profile": "creature",
+  "safety": {
+    "forced_to_humanoid": false,
+    "generated_assets_committed": false
+  },
+  "schema_version": "posepuppet-visual-rig-review-v3",
   "slug": "godzilla",
-  "visual_label": "visual_not_available",
-  "visual_review": "not_available"
+  "source": "source-glb-blender-preview",
+  "summary": "Source preview is readable, creature anatomy is obvious, and proxy head/arm/tail/jaw pose renders completed.",
+  "visual_review": "pass"
 }

@@ -23,3 +23,12 @@
 | `flying_arms_out` | `pass` | structural mapping supports this proxy; visual review still required |
 | `hand_to_mouth_proxy` | `pass` | structural mapping supports this proxy; visual review still required |
 | `hand_to_cheek_proxy` | `pass` | structural mapping supports this proxy; visual review still required |
+
+## Visual QA Continuation
+
+- Status: `partial`
+- Pose images reviewed: `25`
+- Contact sheet: `model-working/spider-man-playstation/visual-review/contact-sheet.png`
+- Visual review: `partial`
+
+Browser visual QA drove neutral, arm, elbow, wrist, torso, walking, foot, rowing, flying, and face-touch proxy poses. The earlier structural pose-suite details above are preserved.

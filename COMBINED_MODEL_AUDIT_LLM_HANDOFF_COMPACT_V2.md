@@ -608,3 +608,11 @@ Start with Level 1. Open Level 2 only if implementation needs reasoning context.
 - Manual mapping needed: `buzz-lightyear, teal-v2`
 - Creature profile needed: `baby-yoda, godzilla, grogu, king-kong, olaf, xenomorph`
 - Visual quality is not claimed where contact sheets/screenshots are unavailable.
+
+## Visual QA Continuation Result
+
+- Accepted active generated candidates after visual review: `darth-vader, fortnite-batman, iron-man, shrek, woody`.
+- Downgraded or rejected generated candidates: `amazing-spider-man-2, jack-sparrow, spider-man-no-way-home, spider-man-playstation, terminator-t-800`.
+- Deferred manual rig repair: `buzz-lightyear, elsa, teal-v2`.
+- Hand-only and creature/static source previews have ignored contact sheets under `model-working/<slug>/source-preview/`.
+- Generated screenshots/contact sheets and VRMs remain untracked; see `model-audits/rig-prep/visual-qa-continuation-summary.md` for evidence refs.

@@ -1,0 +1,99 @@
+{
+  "created_at": "2026-06-11T23:21:07+00:00",
+  "models": {
+    "baby-yoda": {
+      "blockers": [
+        "source_preview_scale_or_framing_bad"
+      ],
+      "display": "Baby Yoda",
+      "next_steps": [
+        "Repair preview framing and scale before runtime experiments.",
+        "Keep out of humanoid mode."
+      ],
+      "profile": "creature",
+      "summary": "Source renders are dominated by the ground plane and tiny model scale; a creature preview was attempted but the candidate needs framing/scale repair.",
+      "visual_review": "fail"
+    },
+    "godzilla": {
+      "blockers": [
+        "custom_creature_runtime_needed"
+      ],
+      "display": "Godzilla",
+      "next_steps": [
+        "Use a creature-specific runtime profile.",
+        "Do not assign this to standard humanoid retargeting."
+      ],
+      "profile": "creature",
+      "summary": "Source preview is readable, creature anatomy is obvious, and proxy head/arm/tail/jaw pose renders completed.",
+      "visual_review": "pass"
+    },
+    "grogu": {
+      "blockers": [
+        "custom_creature_runtime_needed"
+      ],
+      "display": "Grogu",
+      "next_steps": [
+        "Use creature-specific offsets and controls.",
+        "Keep out of standard humanoid mode."
+      ],
+      "profile": "creature",
+      "summary": "Source preview is readable and proxy creature poses are visible; this is a strong creature/static-preview candidate.",
+      "visual_review": "pass"
+    },
+    "king-kong": {
+      "blockers": [
+        "custom_creature_runtime_needed"
+      ],
+      "display": "King Kong",
+      "next_steps": [
+        "Use creature-specific runtime rules.",
+        "Do not treat as a standard full-body human despite bipedal structure."
+      ],
+      "profile": "creature",
+      "summary": "Source preview is readable with bipedal creature proportions; proxy creature poses render, but custom creature logic is required.",
+      "visual_review": "pass"
+    },
+    "olaf": {
+      "blockers": [
+        "custom_creature_runtime_needed"
+      ],
+      "display": "Olaf",
+      "next_steps": [
+        "Use static or creature profile only.",
+        "Do not force humanoid leg/torso assumptions."
+      ],
+      "profile": "creature",
+      "summary": "Source preview is readable and static/creature pose proxies render; anatomy is non-human and should stay creature/static-preview only.",
+      "visual_review": "pass"
+    },
+    "rigged-hand": {
+      "blockers": [
+        "not_full_body",
+        "browser_hand_runtime_not_implemented"
+      ],
+      "display": "Rigged Hand",
+      "next_steps": [
+        "Build a dedicated hand-only runtime before website use.",
+        "Do not add hips, legs, or full-body humanoid assumptions."
+      ],
+      "profile": "hand_only",
+      "summary": "Source renders show a hand-only asset with a long sleeve/arm mesh. Hand/finger proxy pose renders were attempted; framing is imperfect but the asset must remain hand-only.",
+      "visual_review": "partial"
+    },
+    "xenomorph": {
+      "blockers": [
+        "tail_dominant_bounds",
+        "custom_framing_needed"
+      ],
+      "display": "Xenomorph",
+      "next_steps": [
+        "Create creature framing rules that ignore extreme tail bounds when needed.",
+        "Keep out of humanoid mode."
+      ],
+      "profile": "creature",
+      "summary": "Source rig is visible, but the long tail dominates bounds and proxy renders are poorly framed; this needs custom creature framing before preview acceptance.",
+      "visual_review": "partial"
+    }
+  },
+  "schema_version": "posepuppet-special-preview-summary-v1"
+}

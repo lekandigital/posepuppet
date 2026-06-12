@@ -380,5 +380,29 @@
   "schema_version": "posepuppet-pose-suite-validation-v1",
   "slug": "elsa",
   "source": "generated-vrm-reference",
-  "status": "partial"
+  "status": "blocked",
+  "visual_qa": {
+    "blockers": [
+      "missing_spine",
+      "missing_left_leg_chain",
+      "missing_right_leg_chain",
+      "missing_feet"
+    ],
+    "browser_capture_status": "error",
+    "classification": "deferred_manual_rig_repair",
+    "contact_sheet": "model-working/elsa/visual-review/contact-sheet.png",
+    "created_at": "2026-06-11T23:21:07+00:00",
+    "pose_frame_count": 0,
+    "required_bones": [
+      "spine",
+      "leftUpperLeg",
+      "leftLowerLeg",
+      "leftFoot",
+      "rightUpperLeg",
+      "rightLowerLeg",
+      "rightFoot"
+    ],
+    "source": "generated-vrm-browser-visual-qa"
+  },
+  "visual_review": "fail"
 }

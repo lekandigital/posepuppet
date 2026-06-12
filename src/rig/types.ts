@@ -14,8 +14,10 @@ export type BoneName =
   | 'rightHand'
   | 'leftUpperLeg'
   | 'leftLowerLeg'
+  | 'leftFoot'
   | 'rightUpperLeg'
-  | 'rightLowerLeg';
+  | 'rightLowerLeg'
+  | 'rightFoot';
 
 /** Joint anchor points used for the screen-space sync metric. */
 export type JointName =

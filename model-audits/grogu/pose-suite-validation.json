@@ -147,8 +147,64 @@
       "visual_review": "not_available"
     }
   ],
+  "runtime_profile": "creature",
   "schema_version": "posepuppet-pose-suite-validation-v1",
   "slug": "grogu",
   "source": "audit-only",
-  "status": "not_attempted"
+  "source_preview_pose_suite": {
+    "contact_sheet": "model-working/grogu/source-preview/contact-sheet.png",
+    "created_at": "2026-06-11T23:21:07+00:00",
+    "notes": [
+      "Source pose suite is a feasibility probe, not a browser runtime implementation."
+    ],
+    "pose_render_count": 4,
+    "pose_tests": [
+      {
+        "matched_bone_count": 6,
+        "matched_bones_sample": [
+          "forehead.L_59",
+          "forehead.L.001_58",
+          "forehead.L.002_57",
+          "forehead.R_72",
+          "forehead.R.001_71",
+          "forehead.R.002_70"
+        ],
+        "pose_name": "creature_head_turn",
+        "result": "pass",
+        "screenshot_path": "model-working/grogu/source-preview/screenshots/pose-creature_head_turn.png"
+      },
+      {
+        "matched_bone_count": 2,
+        "matched_bones_sample": [
+          "upper_arm.L_111",
+          "upper_arm.R_126"
+        ],
+        "pose_name": "creature_arm_raise",
+        "result": "pass",
+        "screenshot_path": "model-working/grogu/source-preview/screenshots/pose-creature_arm_raise.png"
+      },
+      {
+        "matched_bone_count": 0,
+        "matched_bones_sample": [],
+        "pose_name": "creature_tail_sway",
+        "result": "pass",
+        "screenshot_path": "model-working/grogu/source-preview/screenshots/pose-creature_tail_sway.png"
+      },
+      {
+        "matched_bone_count": 4,
+        "matched_bones_sample": [
+          "jaw.L_55",
+          "jaw.L.001_54",
+          "jaw.R_68",
+          "jaw.R.001_67"
+        ],
+        "pose_name": "creature_jaw_open",
+        "result": "pass",
+        "screenshot_path": "model-working/grogu/source-preview/screenshots/pose-creature_jaw_open.png"
+      }
+    ],
+    "source": "source-glb-blender-preview"
+  },
+  "status": "pass",
+  "visual_review": "pass"
 }

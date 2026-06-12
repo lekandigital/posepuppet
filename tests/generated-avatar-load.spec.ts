@@ -4,223 +4,32 @@
 // mode skips both.
 import { test, expect } from '@playwright/test';
 
+const acceptedGeneratedAvatars = ['woody', 'darth-vader', 'fortnite-batman', 'iron-man', 'shrek'];
+
 test.describe('generated avatar smoke tests', () => {
-  test('generated Woody candidate loads without crash', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(String(e)));
+  for (const slug of acceptedGeneratedAvatars) {
+    test(`generated ${slug} candidate loads without crash`, async ({ page }) => {
+      const errors: string[] = [];
+      page.on('pageerror', (e) => errors.push(String(e)));
 
-    await page.goto('/?generatedAvatar=woody&smoke=avatar-load-only');
+      await page.goto(`/?generatedAvatar=${slug}&smoke=avatar-load-only`);
 
-    // Wait for avatar load to complete (loaded or error)
-    await page.waitForFunction(
-      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
-      undefined,
-      { timeout: 30_000 },
-    );
+      await page.waitForFunction(
+        () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
+        undefined,
+        { timeout: 30_000 },
+      );
 
-    const status = await page.evaluate(() => window.__PP.avatarStatus);
-    expect(status).toBe('loaded');
+      const status = await page.evaluate(() => window.__PP.avatarStatus);
+      expect(status).toBe('loaded');
 
-    // Stage canvas should be present and rendering
-    const stage = page.locator('#stage');
-    await expect(stage).toBeVisible();
-
-    // App shell has test markers
-    await expect(page.locator('[data-testid="posepuppet-app"]')).toBeVisible();
-    await expect(page.locator('[data-testid="avatar-warning"]')).toBeVisible();
-
-    // No page-level crashes
-    expect(errors).toEqual([]);
-  });
-
-  test('generated Darth Vader candidate loads without crash', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(String(e)));
-
-    await page.goto('/?generatedAvatar=darth-vader&smoke=avatar-load-only');
-
-    await page.waitForFunction(
-      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
-      undefined,
-      { timeout: 30_000 },
-    );
-
-    const status = await page.evaluate(() => window.__PP.avatarStatus);
-    expect(status).toBe('loaded');
-
-    const stage = page.locator('#stage');
-    await expect(stage).toBeVisible();
-
-    expect(errors).toEqual([]);
-  });
-
-  test('generated fortnite-batman candidate loads without crash', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(String(e)));
-
-    await page.goto('/?generatedAvatar=fortnite-batman&smoke=avatar-load-only');
-
-    await page.waitForFunction(
-      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
-      undefined,
-      { timeout: 30_000 },
-    );
-
-    const status = await page.evaluate(() => window.__PP.avatarStatus);
-    expect(status).toBe('loaded');
-
-    const stage = page.locator('#stage');
-    await expect(stage).toBeVisible();
-
-    expect(errors).toEqual([]);
-  });
-
-  test('generated iron-man candidate loads without crash', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(String(e)));
-
-    await page.goto('/?generatedAvatar=iron-man&smoke=avatar-load-only');
-
-    await page.waitForFunction(
-      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
-      undefined,
-      { timeout: 30_000 },
-    );
-
-    const status = await page.evaluate(() => window.__PP.avatarStatus);
-    expect(status).toBe('loaded');
-
-    const stage = page.locator('#stage');
-    await expect(stage).toBeVisible();
-
-    expect(errors).toEqual([]);
-  });
-
-  test('generated shrek candidate loads without crash', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(String(e)));
-
-    await page.goto('/?generatedAvatar=shrek&smoke=avatar-load-only');
-
-    await page.waitForFunction(
-      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
-      undefined,
-      { timeout: 30_000 },
-    );
-
-    const status = await page.evaluate(() => window.__PP.avatarStatus);
-    expect(status).toBe('loaded');
-
-    const stage = page.locator('#stage');
-    await expect(stage).toBeVisible();
-
-    expect(errors).toEqual([]);
-  });
-
-  test('generated amazing-spider-man-2 candidate loads without crash', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(String(e)));
-
-    await page.goto('/?generatedAvatar=amazing-spider-man-2&smoke=avatar-load-only');
-
-    await page.waitForFunction(
-      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
-      undefined,
-      { timeout: 30_000 },
-    );
-
-    const status = await page.evaluate(() => window.__PP.avatarStatus);
-    expect(status).toBe('loaded');
-
-    const stage = page.locator('#stage');
-    await expect(stage).toBeVisible();
-
-    expect(errors).toEqual([]);
-  });
-
-  test('generated terminator-t-800 candidate loads without crash', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(String(e)));
-
-    await page.goto('/?generatedAvatar=terminator-t-800&smoke=avatar-load-only');
-
-    await page.waitForFunction(
-      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
-      undefined,
-      { timeout: 30_000 },
-    );
-
-    const status = await page.evaluate(() => window.__PP.avatarStatus);
-    expect(status).toBe('loaded');
-
-    const stage = page.locator('#stage');
-    await expect(stage).toBeVisible();
-
-    expect(errors).toEqual([]);
-  });
-
-  test('generated spider-man-no-way-home candidate loads without crash', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(String(e)));
-
-    await page.goto('/?generatedAvatar=spider-man-no-way-home&smoke=avatar-load-only');
-
-    await page.waitForFunction(
-      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
-      undefined,
-      { timeout: 30_000 },
-    );
-
-    const status = await page.evaluate(() => window.__PP.avatarStatus);
-    expect(status).toBe('loaded');
-
-    const stage = page.locator('#stage');
-    await expect(stage).toBeVisible();
-
-    expect(errors).toEqual([]);
-  });
-
-  test('generated spider-man-playstation candidate loads without crash', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(String(e)));
-
-    await page.goto('/?generatedAvatar=spider-man-playstation&smoke=avatar-load-only');
-
-    await page.waitForFunction(
-      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
-      undefined,
-      { timeout: 30_000 },
-    );
-
-    const status = await page.evaluate(() => window.__PP.avatarStatus);
-    expect(status).toBe('loaded');
-
-    const stage = page.locator('#stage');
-    await expect(stage).toBeVisible();
-
-    expect(errors).toEqual([]);
-  });
-
-  test('generated jack-sparrow candidate loads without crash', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(String(e)));
-
-    await page.goto('/?generatedAvatar=jack-sparrow&smoke=avatar-load-only');
-
-    await page.waitForFunction(
-      () => window.__PP?.avatarStatus === 'loaded' || window.__PP?.avatarStatus === 'error',
-      undefined,
-      { timeout: 30_000 },
-    );
-
-    const status = await page.evaluate(() => window.__PP.avatarStatus);
-    expect(status).toBe('loaded');
-
-    const stage = page.locator('#stage');
-    await expect(stage).toBeVisible();
-
-    expect(errors).toEqual([]);
-  });
+      const stage = page.locator('#stage');
+      await expect(stage).toBeVisible();
+      await expect(page.locator('[data-testid="posepuppet-app"]')).toBeVisible();
+      await expect(page.locator('[data-testid="avatar-warning"]')).toBeVisible();
+      expect(errors).toEqual([]);
+    });
+  }
 
   test('missing generated avatar falls back without crash', async ({ page }) => {
     const warnings: string[] = [];

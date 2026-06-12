@@ -1,19 +1,46 @@
 {
-  "attempt_id": "attempt-001-baseline",
-  "contact_sheet_path": "",
-  "created_at": "2026-06-11T18:11:49+00:00",
-  "decision": "do_not_claim_visual_quality",
-  "questions": {
-    "acceptable_for_query_param_experimental_use": "not_available",
-    "limbs_attached": "not_available",
-    "model_loaded": "not_available",
-    "scale_reasonable": "not_available",
-    "textures_intact": "not_available"
+  "accepted_for_active_registry": false,
+  "attempt_id": "attempt-visual-qa-serving-fixed-vrm-required-bones",
+  "blockers": [
+    "missing_humanoid_required_bones",
+    "generic_bone_tree",
+    "manual_mapping_needed"
+  ],
+  "browser_capture_status": "error",
+  "created_at": "2026-06-11T23:21:07+00:00",
+  "display_name": "Buzz Lightyear",
+  "evidence": {
+    "attempt_manifest": "model-working/buzz-lightyear/attempts/attempt-visual-qa-serving-fixed-vrm-required-bones/attempt-manifest.json",
+    "capture_manifest": "model-working/buzz-lightyear/visual-review/capture-results.json",
+    "contact_sheet": "model-working/buzz-lightyear/visual-review/contact-sheet.png",
+    "contact_sheet_committed": false
   },
-  "requires_future_vision_review": true,
-  "schema_version": "posepuppet-visual-rig-review-v1",
-  "screenshots": [],
+  "final_classification": "deferred_manual_rig_repair",
+  "next_steps": [
+    "Inspect bone positions, vertex groups, and mesh names in Blender to build a manual map.",
+    "Do not rely on bone names for this source."
+  ],
+  "registry_decision": "not_registered",
+  "required_bones": [
+    "hips",
+    "spine",
+    "head",
+    "leftUpperLeg",
+    "leftLowerLeg",
+    "leftFoot",
+    "rightUpperLeg",
+    "rightLowerLeg",
+    "rightFoot",
+    "leftUpperArm",
+    "leftLowerArm",
+    "leftHand",
+    "rightUpperArm",
+    "rightLowerArm",
+    "rightHand"
+  ],
+  "schema_version": "posepuppet-visual-rig-review-v3",
   "slug": "buzz-lightyear",
-  "visual_label": "visual_not_available",
-  "visual_review": "not_available"
+  "source": "generated-vrm-browser-capture",
+  "summary": "Serving was repaired, but the candidate VRM has no usable Three-VRM humanoid mapping; source audit shows generic Bone.* hierarchy without semantic recovery from names alone.",
+  "visual_review": "fail"
 }
