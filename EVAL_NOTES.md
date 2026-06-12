@@ -1,5 +1,15 @@
 # Eval notes
 
+### P2/P3 FPS floor verdict (2026-06-12, display awake)
+Deferred floor check completed (results-p3-motion.json, envThrottled=false,
+6×60 s headed, all P2+P3 features on): pose 29.35–29.73 fps on every run
+(baseline 28.46–29.78 — unchanged), sync within noise on all six rows
+(e.g. arms/robot 9.49→9.48), detection 100%, zero console errors. Render
+readings now track ProMotion's adaptive refresh (59.5–119.5 across runs);
+torso/robot at 119.51 fps with everything enabled demonstrates the render
+loop kept its full headroom — the 59.x rows are the display at 60 Hz, not
+load. FLOORS HOLD; nothing becomes opt-in.
+
 ## P3 — hand-only mode and creatures (2026-06-12)
 A first-class second mode. HandLandmarker (21 landmarks, Apache-2.0, same
 postinstall family as the pose models — ASSETS.md) drives one hand; the
