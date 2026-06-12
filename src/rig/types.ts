@@ -44,6 +44,9 @@ export interface Avatar {
   bones: Partial<Record<BoneName, THREE.Object3D>>;
   /** Joint anchors whose world positions define limb segments on screen. */
   joints: Partial<Record<JointName, THREE.Object3D>>;
+  /** Open/fist/point approximation (0=fist … 1=open). Optional: rigs
+   *  without finger bones simply don't implement it. */
+  applyHandState?(side: 'left' | 'right', openness: number, point: boolean): void;
   /** Idle/secondary animation; called every render tick. */
   update(dt: number, time: number): void;
   dispose(): void;

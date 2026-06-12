@@ -13,6 +13,7 @@ import { createChain } from './ui/chain';
 import { createReceipt } from './ui/receipt';
 import { createAvatarCards } from './ui/cards';
 import { createPalette } from './ui/palette';
+import { createCoach } from './ui/coach';
 import { createPanel } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
 import { createDetector, type ModelVariant } from './pose/detector';
@@ -111,6 +112,7 @@ async function boot() {
   const isAvatarVisualReview = smokeMode === 'avatar-visual-review';
   const isGeneratedOnlyMode = isAvatarLoadOnly || isAvatarVisualReview;
   if (params.has('mirror')) config.mirror = params.get('mirror') !== '0';
+  if (params.has('body')) config.bodyMode = params.get('body') === 'full' ? 'full' : 'upper';
   if (params.has('avatar')) {
     const av = params.get('avatar')!;
     config.avatar = isAvatarId(av) ? av : 'astronaut';
@@ -125,6 +127,21 @@ async function boot() {
   // of P3; Setup re-runs neutral-pose calibration
   document.getElementById('mode-setup')!.addEventListener('click', () => calibrateWithCountdown());
 
+  // exaggeration slider (the expressiveness layer's visible control)
+  const exagSlider = document.getElementById('exag-slider') as HTMLInputElement | null;
+  const exagVal = document.getElementById('exag-val');
+  if (exagSlider && exagVal) {
+    exagSlider.value = String(config.exaggeration);
+    exagVal.textContent = config.exaggeration.toFixed(2).replace(/0$/, '');
+    exagSlider.oninput = () => setConfig('exaggeration', Number(exagSlider.value));
+    onConfigChange((key) => {
+      if (key === 'exaggeration') {
+        exagVal.textContent = config.exaggeration.toFixed(2).replace(/0$/, '');
+        if (exagSlider.value !== String(config.exaggeration)) exagSlider.value = String(config.exaggeration);
+      }
+    });
+  }
+
   // theme toggle (persisted)
   const themeBtn = document.createElement('button');
   themeBtn.id = 'theme-btn';
@@ -138,6 +155,7 @@ async function boot() {
 
   const els = { video, overlay, pane };
   const hud = createChain();
+  const coach = createCoach();
   const receipt = createReceipt();
   const stage = createStage(stageCanvas);
 
@@ -463,20 +481,60 @@ async function boot() {
     setCorrectionEuler: (b, e) => retargeter.setCorrectionEuler(b, e),
   });
 
-  // live avatar switcher: robot → astronaut → woody → robot (see ASSETS.md)
+  // live avatar switcher with crossfade: both avatars share the stage for a
+  // beat while opacity swaps; the retargeter's re-acquisition blend ramps
+  // the new rig from rest onto the live pose — the switch never pops
   let avatarLoading = false;
   let currentAvatarId: AvatarId = 'robot';
+
+  function setTreeOpacity(obj: THREE.Object3D, opacity: number): void {
+    obj.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        const mat = m as THREE.Material & { opacity: number };
+        if (opacity < 1 && !mat.userData.ppWasTransparent) {
+          mat.userData.ppWasTransparent = mat.transparent;
+          mat.transparent = true;
+        }
+        mat.opacity = opacity;
+        if (opacity >= 1 && mat.userData.ppWasTransparent !== undefined) {
+          mat.transparent = mat.userData.ppWasTransparent as boolean;
+          delete mat.userData.ppWasTransparent;
+        }
+      }
+    });
+  }
+
+  function crossfadeAvatars(prev: Avatar, next: Avatar, sec = 0.45): void {
+    setTreeOpacity(next.object, 0);
+    const t0 = performance.now();
+    const step = () => {
+      const t = Math.min((performance.now() - t0) / (sec * 1000), 1);
+      setTreeOpacity(prev.object, 1 - t);
+      setTreeOpacity(next.object, t);
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        setTreeOpacity(next.object, 1); // restores transparent flags
+        prev.dispose();
+      }
+    };
+    requestAnimationFrame(step);
+  }
+
   async function setAvatar(id: AvatarId): Promise<void> {
     if (avatarLoading || currentAvatarId === id) return;
     avatarLoading = true;
     try {
       const next = await loadAvatarById(id);
       stage.scene.add(next.object);
-      avatar.dispose();
+      const prev = avatar;
       avatar = next;
       retargeter.bind(avatar);
       installVisualQaHook();
       currentAvatarId = id;
+      crossfadeAvatars(prev, next);
     } catch (err) {
       const def = getAvatarDef(id);
       // error, not warn: eval counts console errors, so a failed load can
@@ -720,6 +778,8 @@ async function boot() {
         detector,
         video,
         getAvatar: () => avatar,
+        getHeadRadius: () => retargeter.faceTouchDebug.left.headR,
+        getFaceTouch: () => retargeter.faceTouchDebug,
       })
     : null;
   evalCollector?.start();
@@ -748,6 +808,17 @@ async function boot() {
 
   detector.start(video, onPoseFrame);
 
+  // performance auto-tuner: sustained low pose FPS on the full model →
+  // the coach offers the lite model + reduced effects, one click. Suggested
+  // at most once per session; applying flips model and adds a perf-lite
+  // class that drops backdrop blur and halo shadows.
+  let lowFpsSec = 0;
+  let tunerOffered = false;
+  function applyPerfLite(): void {
+    setConfig('model', 'lite');
+    document.body.classList.add('perf-lite');
+  }
+
   let hudAccum = 0;
   stage.onTick((dt, time) => {
     retargeter.tick(dt);
@@ -759,6 +830,22 @@ async function boot() {
       hud.setPoseFps(detector.poseFps());
       hud.setRig(retargeter.activeBoneCount());
       hud.tick(window.__PP.lastDetectionAt, window.__PP.videoReady);
+
+      const fps = detector.poseFps();
+      const live = window.__PP.videoReady && performance.now() - window.__PP.lastDetectionAt < 1500;
+      if (!tunerOffered && config.model === 'full' && live && fps > 0 && fps < 22) {
+        lowFpsSec += 0.25;
+        if (lowFpsSec >= 5) {
+          tunerOffered = true;
+          coach.set(
+            'Performance',
+            'Tracking is running slow on this machine. The lite model keeps motion smooth.',
+            { label: 'Switch to lite', run: applyPerfLite },
+          );
+        }
+      } else if (fps >= 24) {
+        lowFpsSec = 0;
+      }
     }
   });
 }

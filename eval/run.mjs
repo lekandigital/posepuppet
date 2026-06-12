@@ -45,6 +45,37 @@ if (!(await serverUp())) {
   }
 }
 
+// environment sanity: a blank page must sustain a high rAF rate, or the
+// machine is throttling (screen asleep/locked, low-power) and any FPS
+// floor measured here would be a lie. Sync metrics stay valid either way.
+let envThrottled = false;
+if (!headless) {
+  const probe = await chromium.launch({ headless: false, args: ['--disable-backgrounding-occluded-windows'] });
+  const ppage = await probe.newPage();
+  await ppage.goto('about:blank');
+  const rafFps = await ppage.evaluate(
+    () =>
+      new Promise((res) => {
+        let n = 0;
+        const t0 = performance.now();
+        const loop = () => {
+          n++;
+          if (performance.now() - t0 < 1000) requestAnimationFrame(loop);
+          else res(n);
+        };
+        requestAnimationFrame(loop);
+      }),
+  );
+  await probe.close();
+  if (rafFps < 50) {
+    envThrottled = true;
+    console.warn(
+      `!! environment throttled: blank-page rAF = ${rafFps}/s (display asleep/locked?). ` +
+        'FPS numbers from this run are NOT floor evidence; sync metrics are still valid.',
+    );
+  }
+}
+
 const results = [];
 try {
   for (const avatar of avatars)
@@ -59,6 +90,12 @@ try {
         `--use-file-for-fake-video-capture=${y4m}`,
         '--autoplay-policy=no-user-gesture-required',
         '--enable-precise-memory-info',
+        // headed perf runs must not be rAF-throttled when another window
+        // covers them — without these, render FPS reads ~30 and the floor
+        // check is meaningless
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding',
+        '--disable-background-timer-throttling',
       ],
     });
     const page = await browser.newPage({ viewport: { width: 1440, height: 810 } });
@@ -66,7 +103,8 @@ try {
     page.on('console', (m) => m.type() === 'error' && consoleErrors.push(m.text()));
     page.on('pageerror', (e) => consoleErrors.push(String(e)));
 
-    await page.goto(`${BASE}/?eval=${fixture}&dur=${dur}&avatar=${avatar}`);
+    const extra = fixture.startsWith('fullbody') ? '&body=full' : '';
+    await page.goto(`${BASE}/?eval=${fixture}&dur=${dur}&avatar=${avatar}${extra}`);
     const handle = await page.waitForFunction(() => window.__EVAL_RESULT, undefined, {
       timeout: (dur + 120) * 1000,
     });
@@ -102,6 +140,7 @@ const out = {
     date: new Date().toISOString(),
     machine: `${os.platform()} ${os.arch()} — ${os.cpus()[0]?.model ?? 'unknown'}`,
     mode: headless ? 'headless' : 'headed',
+    envThrottled,
     durationSecPerFixture: dur,
     note: headless
       ? 'headless run: FPS numbers are NOT representative of real hardware'

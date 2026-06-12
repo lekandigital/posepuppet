@@ -85,13 +85,76 @@ export async function loadVrmAvatar(url: string): Promise<Avatar> {
   // distinguishable name per file ('vrm:woody') so eval results can never
   // silently attribute one VRM's numbers to another
   const slug = url.split('/').pop()?.replace(/\.(vrm|glb)$/i, '').toLowerCase() ?? 'unknown';
+  // finger chains for open/fist/point approximations (where the rig has
+  // them). VRM humanoid names; raw nodes; curl axis is the VRM0 convention
+  // (fingers along ±x, curl about z, thumbs about y), signs per side.
+  type FingerChain = { nodes: THREE.Object3D[]; rests: THREE.Quaternion[]; isThumb: boolean };
+  const fingerChains: Record<'left' | 'right', FingerChain[]> = { left: [], right: [] };
+  for (const side of ['left', 'right'] as const) {
+    for (const finger of ['Thumb', 'Index', 'Middle', 'Ring', 'Little'] as const) {
+      const nodes: THREE.Object3D[] = [];
+      for (const seg of ['Metacarpal', 'Proximal', 'Intermediate', 'Distal'] as const) {
+        const name = `${side}${finger}${seg}`;
+        const node = vrm.humanoid.getRawBoneNode(name as Parameters<typeof vrm.humanoid.getRawBoneNode>[0]);
+        if (node) nodes.push(node);
+      }
+      if (nodes.length) {
+        fingerChains[side].push({
+          nodes,
+          rests: nodes.map((n) => n.quaternion.clone()),
+          isThumb: finger === 'Thumb',
+        });
+      }
+    }
+  }
+  const curlQ = new THREE.Quaternion();
+  const curlAxisZ = new THREE.Vector3(0, 0, 1);
+  const curlAxisY = new THREE.Vector3(0, 1, 0);
+
+  // idle life: periodic blinks through the VRM expression manager (where
+  // the model ships blendshapes); randomized cadence so it never reads
+  // mechanical. Springbones (hair/accessories) already run via vrm.update.
+  let blinkClock = 0;
+  let nextBlink = 2 + Math.random() * 3;
+  const canBlink = Boolean(vrm.expressionManager?.getExpressionTrackName('blink'));
+
   return {
     name: `vrm:${slug}`,
     object: root,
     bones,
     joints,
+    applyHandState(side, openness, point) {
+      const chains = fingerChains[side];
+      if (!chains.length) return;
+      const sign = side === 'left' ? 1 : -1;
+      for (let f = 0; f < chains.length; f++) {
+        const chain = chains[f];
+        // pointing: index (first non-thumb chain) stays extended
+        const isIndex = !chain.isThumb && f === (chains[0]?.isThumb ? 1 : 0);
+        const ext = point && isIndex ? 1 : openness;
+        const maxCurl = chain.isThumb ? 0.5 : 1.1; // rad at the proximal joint
+        for (let i = 0; i < chain.nodes.length; i++) {
+          const segCurl = (1 - ext) * maxCurl * (i === 0 ? 1 : 0.75);
+          curlQ.setFromAxisAngle(chain.isThumb ? curlAxisY : curlAxisZ, sign * -segCurl);
+          chain.nodes[i].quaternion.copy(chain.rests[i]).multiply(curlQ);
+        }
+      }
+    },
     update(dt) {
-      vrm.update(dt); // springbones etc.
+      if (canBlink) {
+        blinkClock += dt;
+        const t = blinkClock - nextBlink;
+        if (t > 0) {
+          // 160 ms close-open envelope
+          const v = t < 0.08 ? t / 0.08 : t < 0.16 ? 1 - (t - 0.08) / 0.08 : 0;
+          vrm.expressionManager!.setValue('blink', Math.max(0, v));
+          if (t >= 0.16) {
+            blinkClock = 0;
+            nextBlink = 2 + Math.random() * 3.5;
+          }
+        }
+      }
+      vrm.update(dt); // springbones, expressions
     },
     dispose() {
       root.removeFromParent();
