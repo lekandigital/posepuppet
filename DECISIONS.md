@@ -69,3 +69,12 @@ shared the name 'vrm'). Three changes: per-file VRM names ('vrm:woody'),
 failed avatar load is now console.error (eval counts it), and eval/run.mjs
 records avatarRequested + exits non-zero on requested/measured mismatch.
 Baseline re-run under these guards before anything diffs against it.
+
+## 2026-06-12 — Gate 1: woody demoted to local-only; astronaut default again
+Gate-1 decision (structured reply): woody.vrm is a fan rig of a licensed
+character and cannot ship publicly. Untracked + gitignored (remains in git
+history — flagged; a history rewrite was offered and not chosen), registry
+entry marked optional with a boot-time HEAD probe that removes it from the
+avatar cycle when the file is absent, default avatar back to the CC0
+astronaut. Electives locked at the same gate: Tier B1 velocity VFX + B2
+auto-director camera; B3 parallax and both Tier C items skipped.

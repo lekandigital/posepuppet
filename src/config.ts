@@ -28,7 +28,7 @@ const DEFAULTS: Config = {
   slerpRate: 28,
   relaxSec: 0.7,
   model: 'full',
-  avatar: 'woody',
+  avatar: 'astronaut', // CC0, redistributable — woody is local-only (Gate 1)
   bodyMode: 'upper',
   rootMotion: true,
   wristGain: 1.25,

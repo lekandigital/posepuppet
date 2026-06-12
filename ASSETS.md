@@ -67,9 +67,15 @@ records the approval + exact license text alongside the download URL).
 - **Reference GLB:** `/Users/lekan/Downloads/woody/woody_toy_story_rig_free_download.glb`
 - **Runtime VRM path:** `public/avatars/woody.vrm`
 - **Rig type:** Mixamo (`mixamorig:Hips`, `mixamorig:LeftArm`, etc. — 64 bones)
-- **Status:** user-provided licensed asset — **not committed to git** by default.
-  License terms must be recorded before any public redistribution.
-  The app only expects the final VRM file to exist locally at the runtime path above.
+- **Status: LOCAL-ONLY, NOT REDISTRIBUTABLE (Gate 1 decision, 2026-06-12).**
+  This is a fan-made rig of a licensed Disney/Pixar character; it cannot ship
+  in a public repo or deploy. It was committed and deployed for a period
+  after pass 1 — that commit was reverted at pass-2 Gate 1: the file is
+  untracked + gitignored again (note: it still exists in git history), the
+  registry marks it `optional` and removes it from the avatar cycle when the
+  file is absent, and the default avatar is the CC0 astronaut. Woody never
+  appears in screenshots, demo clips, or POSTS.md claims for pass 2. The app
+  only expects the final VRM file to exist locally at the runtime path above.
 
 #### Local usage
 

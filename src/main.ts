@@ -15,7 +15,15 @@ import type { LandmarkPoint, PoseFrame } from './pose/types';
 import { createRobot } from './rig/robot';
 import { Retargeter } from './rig/retarget';
 import type { Avatar, BoneName } from './rig/types';
-import { type AvatarId, isAvatarId, getAvatarDef, nextAvatarId, loadAvatarById } from './rig/avatarRegistry';
+import {
+  type AvatarId,
+  isAvatarId,
+  isAvatarAvailable,
+  probeOptionalAvatars,
+  getAvatarDef,
+  nextAvatarId,
+  loadAvatarById,
+} from './rig/avatarRegistry';
 import { getGeneratedAvatarDef } from './rig/generatedAvatarRegistry';
 import { EvalCollector } from './eval/runner';
 import { createRecorder, createRecordButton, updateRecordButton } from './record/recorder';
@@ -89,8 +97,12 @@ async function boot() {
   if (params.has('mirror')) config.mirror = params.get('mirror') !== '0';
   if (params.has('avatar')) {
     const av = params.get('avatar')!;
-    config.avatar = isAvatarId(av) ? av : 'woody';
+    config.avatar = isAvatarId(av) ? av : 'astronaut';
   }
+  // optional avatars (local-only files) leave the cycle when absent; a
+  // persisted/requested choice that's gone falls back to the default
+  await probeOptionalAvatars();
+  if (!isAvatarAvailable(config.avatar)) config.avatar = 'astronaut';
   // ?src=file plays the fixture mp4 directly (manual eval without fake cam)
   const videoSrc =
     params.get('video') ?? (evalFixture && params.get('src') === 'file' ? `/fixtures/${evalFixture}.mp4` : null);
