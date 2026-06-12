@@ -1,3 +1,10 @@
+## 2026-06-12 ~06:40 (Pass 2 P0 complete — awaiting USER GATE 1)
+Done: repo inspected; suite fixed (generated-VRM smokes skip when local file absent) → 37 passed/5 skipped green; eval honesty guards (per-file VRM names, load-fail = console.error, avatarRequested + mismatch exit); guarded 9-run baseline; PLAN.md with elective proposal
+Sync metric: robot 9.49/2.24/18.87°, astronaut 10.92/2.29/20.38°, woody 9.02/2.14/17.88° (arms/torso/fast) — all pass-1 bars hold
+FPS: pose 28.5–29.8, render 114–118 (headed, Apple M5); detection 100%; 0 console errors; memory flat
+Blockers: USER GATE 1 (PLAN.md + electives + woody/R1 call); USER ACTION — design/reference.css missing, 4 new fixture clips missing (specs in PLAN.md §3)
+Next: on approval → P1 design system + shell (design plan + mockups → GATE 2)
+
 ## 2026-06-10 ~18:55 (SHIPPED — goal contract green)
 Done: M4 gate APPROVED live by Lekan (lean-right, turns, legs, calibrate, mid-motion switch all good); DEMO_SCRIPT finalized; POSTS.md drafted (3 variants + thread + self-reply + verification table); trails/confidence/theme skipped per contract (DECISIONS.md)
 Sync metric: robot/vrm — arms 9.51/10.86°, torso 2.17/2.28°, fast 19.18/20.26° (all bars ✓)

@@ -82,8 +82,11 @@ export async function loadVrmAvatar(url: string): Promise<Avatar> {
     if (node) joints[joint] = node;
   }
 
+  // distinguishable name per file ('vrm:woody') so eval results can never
+  // silently attribute one VRM's numbers to another
+  const slug = url.split('/').pop()?.replace(/\.(vrm|glb)$/i, '').toLowerCase() ?? 'unknown';
   return {
-    name: 'vrm',
+    name: `vrm:${slug}`,
     object: root,
     bones,
     joints,

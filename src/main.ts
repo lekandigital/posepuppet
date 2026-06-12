@@ -437,7 +437,9 @@ async function boot() {
       currentAvatarId = id;
     } catch (err) {
       const def = getAvatarDef(id);
-      console.warn(
+      // error, not warn: eval counts console errors, so a failed load can
+      // never again silently measure the fallback avatar as if it were `id`
+      console.error(
         `Failed to load avatar "${id}" from ${def.url ?? '(procedural)'}. ` +
         `Is the licensed VRM file present?`,
         err,
