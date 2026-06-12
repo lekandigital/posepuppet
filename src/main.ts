@@ -12,6 +12,7 @@ import { createStage } from './stage/scene';
 import { createChain } from './ui/chain';
 import { createReceipt } from './ui/receipt';
 import { createAvatarCards } from './ui/cards';
+import { createPalette } from './ui/palette';
 import { createPanel } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
 import { createDetector, type ModelVariant } from './pose/detector';
@@ -685,6 +686,30 @@ async function boot() {
   // every boot asset (model, wasm, fonts, avatar) is now in — from here on
   // the privacy receipt counts every network request, truthfully
   void document.fonts.ready.then(() => receipt.arm());
+
+  // command palette (⌘K) + single-key shortcuts — instrument controls
+  const toggleCmd = (key: 'mirror' | 'smoothing' | 'rootMotion') => () => setConfig(key, !config[key]);
+  createPalette([
+    { id: 'record', label: 'record · start / stop take', key: 'r',
+      run: () => (recorder.recording ? recorder.stop() : recorder.start(15)) },
+    { id: 'calibrate', label: 'calibrate · capture neutral pose (3-2-1)', key: 'c',
+      run: calibrateWithCountdown },
+    { id: 'avatar-next', label: 'avatar · next', key: 'a',
+      run: () => setConfig('avatar', nextAvatarId(config.avatar)) },
+    { id: 'theme', label: 'theme · toggle light / dark', key: 't',
+      run: () => setConfig('theme', config.theme === 'dark' ? 'light' : 'dark') },
+    { id: 'engineering', label: 'engineering view · toggle', key: 'd',
+      run: () => document.getElementById('panel')!.classList.toggle('hidden') },
+    { id: 'mirror', label: 'mirror · toggle', key: 'm', run: toggleCmd('mirror') },
+    { id: 'smoothing', label: 'smoothing · toggle', run: toggleCmd('smoothing') },
+    { id: 'legs', label: 'full body (legs) · toggle', key: 'f',
+      run: () => setConfig('bodyMode', config.bodyMode === 'full' ? 'upper' : 'full') },
+    { id: 'root', label: 'root motion · toggle', run: toggleCmd('rootMotion') },
+    { id: 'video', label: 'input · load video file / back to camera', key: 'v',
+      run: () => fileBtn.click() },
+    { id: 'model', label: 'pose model · toggle full / lite',
+      run: () => setConfig('model', config.model === 'full' ? 'lite' : 'full') },
+  ]);
   onConfigChange((key) => {
     if (key === 'model') void detector.setModel(config.model);
   });

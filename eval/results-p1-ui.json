@@ -1,0 +1,191 @@
+{
+  "meta": {
+    "date": "2026-06-12T11:29:49.903Z",
+    "machine": "darwin arm64 — Apple M5",
+    "mode": "headed",
+    "durationSecPerFixture": 60,
+    "note": "headed run on real hardware; FPS numbers are representative"
+  },
+  "results": [
+    {
+      "fixture": "arms",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1778,
+      "detectedFrames": 1778,
+      "detectionRate": 1,
+      "poseFps": 29.66,
+      "renderFps": 118.83,
+      "droppedFrames": 17,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 30,
+        "t30": 28,
+        "t60": 27
+      },
+      "sync": {
+        "leftUpperArm": 7.32,
+        "leftForearm": 11.41,
+        "rightUpperArm": 7.72,
+        "rightForearm": 11.17,
+        "torso": 0.68,
+        "upperLimbsMean": 9.4
+      },
+      "finishedAt": "2026-06-12T11:24:42.618Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "torso",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1782,
+      "detectedFrames": 1782,
+      "detectionRate": 1,
+      "poseFps": 29.71,
+      "renderFps": 118.13,
+      "droppedFrames": 16,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 29,
+        "t30": 26,
+        "t60": 26
+      },
+      "sync": {
+        "leftUpperArm": 1.34,
+        "leftForearm": 1.34,
+        "rightUpperArm": 2.94,
+        "rightForearm": 3.28,
+        "torso": 1.44,
+        "upperLimbsMean": 2.23
+      },
+      "finishedAt": "2026-06-12T11:25:44.232Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "fast",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1783,
+      "detectedFrames": 1783,
+      "detectionRate": 1,
+      "poseFps": 29.71,
+      "renderFps": 118.51,
+      "droppedFrames": 14,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 29,
+        "t30": 25,
+        "t60": 27
+      },
+      "sync": {
+        "leftUpperArm": 16.33,
+        "leftForearm": 23.38,
+        "rightUpperArm": 16.44,
+        "rightForearm": 19.77,
+        "torso": 2.34,
+        "upperLimbsMean": 18.98
+      },
+      "finishedAt": "2026-06-12T11:26:45.341Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "arms",
+      "avatar": "vrm:astronaut",
+      "durationSec": 60,
+      "videoFrames": 1771,
+      "detectedFrames": 1771,
+      "detectionRate": 1,
+      "poseFps": 29.54,
+      "renderFps": 119.25,
+      "droppedFrames": 27,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 33,
+        "t30": 32,
+        "t60": 28
+      },
+      "sync": {
+        "leftUpperArm": 5.85,
+        "leftForearm": 17.31,
+        "rightUpperArm": 7.57,
+        "rightForearm": 13.34,
+        "torso": 0.49,
+        "upperLimbsMean": 11.02
+      },
+      "finishedAt": "2026-06-12T11:27:46.931Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "astronaut",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "torso",
+      "avatar": "vrm:astronaut",
+      "durationSec": 60,
+      "videoFrames": 1781,
+      "detectedFrames": 1781,
+      "detectionRate": 1,
+      "poseFps": 29.69,
+      "renderFps": 118.52,
+      "droppedFrames": 17,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 33,
+        "t30": 28,
+        "t60": 28
+      },
+      "sync": {
+        "leftUpperArm": 1.86,
+        "leftForearm": 1.8,
+        "rightUpperArm": 2.73,
+        "rightForearm": 2.81,
+        "torso": 1.74,
+        "upperLimbsMean": 2.3
+      },
+      "finishedAt": "2026-06-12T11:28:48.328Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "astronaut",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "fast",
+      "avatar": "vrm:astronaut",
+      "durationSec": 60,
+      "videoFrames": 1782,
+      "detectedFrames": 1782,
+      "detectionRate": 1,
+      "poseFps": 29.7,
+      "renderFps": 118.69,
+      "droppedFrames": 15,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 33,
+        "t30": 32,
+        "t60": 27
+      },
+      "sync": {
+        "leftUpperArm": 15.31,
+        "leftForearm": 26.15,
+        "rightUpperArm": 16.43,
+        "rightForearm": 21.56,
+        "torso": 2.36,
+        "upperLimbsMean": 19.86
+      },
+      "finishedAt": "2026-06-12T11:29:49.740Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "astronaut",
+      "avatarMismatch": false
+    }
+  ]
+}
