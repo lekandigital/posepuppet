@@ -1,10 +1,17 @@
 // Boot + the imperative capture → detect → retarget → render pipeline.
 // No framework in the hot path; UI chrome is plain DOM.
 
+import '@fontsource-variable/inter/index.css';
+import '@fontsource-variable/jetbrains-mono/index.css';
+import '@fontsource-variable/fraunces/index.css';
+import './styles.css';
+
 import * as THREE from 'three';
 import { startCamera, startVideoFile, watchLayout, layoutOverlay, setMirrored } from './camera';
 import { createStage } from './stage/scene';
-import { createHud } from './ui/hud';
+import { createChain } from './ui/chain';
+import { createReceipt } from './ui/receipt';
+import { createAvatarCards } from './ui/cards';
 import { createPanel } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
 import { createDetector, type ModelVariant } from './pose/detector';
@@ -76,10 +83,18 @@ declare global {
 async function boot() {
   const video = document.getElementById('video') as HTMLVideoElement;
   const overlay = document.getElementById('overlay') as HTMLCanvasElement;
-  const pane = document.getElementById('camera-pane')!;
+  // layout target is the feed box, not the whole camera panel (which now
+  // carries a header/footer); countdown + status overlays land here too
+  const pane = document.getElementById('camera-feed')!;
   const statusEl = document.getElementById('camera-status')!;
   const stageCanvas = document.getElementById('stage') as HTMLCanvasElement;
   const overlayCtx = overlay.getContext('2d')!;
+
+  // theme before anything paints; persisted via the config store
+  document.documentElement.dataset.theme = config.theme;
+  onConfigChange((key) => {
+    if (key === 'theme') document.documentElement.dataset.theme = config.theme;
+  });
 
   // Add test markers for Playwright
   document.body.setAttribute('data-testid', 'posepuppet-app');
@@ -103,12 +118,26 @@ async function boot() {
   // persisted/requested choice that's gone falls back to the default
   await probeOptionalAvatars();
   if (!isAvatarAvailable(config.avatar)) config.avatar = 'astronaut';
+  createAvatarCards();
+
+  // command-bar mode selector: Character is the only live mode this side
+  // of P3; Setup re-runs neutral-pose calibration
+  document.getElementById('mode-setup')!.addEventListener('click', () => calibrateWithCountdown());
+
+  // theme toggle (persisted)
+  const themeBtn = document.createElement('button');
+  themeBtn.id = 'theme-btn';
+  themeBtn.textContent = '◐';
+  themeBtn.title = 'toggle light/dark theme (t)';
+  themeBtn.onclick = () => setConfig('theme', config.theme === 'dark' ? 'light' : 'dark');
+  document.getElementById('controls')!.append(themeBtn);
   // ?src=file plays the fixture mp4 directly (manual eval without fake cam)
   const videoSrc =
     params.get('video') ?? (evalFixture && params.get('src') === 'file' ? `/fixtures/${evalFixture}.mp4` : null);
 
   const els = { video, overlay, pane };
-  const hud = createHud();
+  const hud = createChain();
+  const receipt = createReceipt();
   const stage = createStage(stageCanvas);
 
   let avatar: Avatar = createRobot();
@@ -577,9 +606,12 @@ async function boot() {
   try {
     if (videoSrc) {
       await startVideoFile(video, videoSrc);
+      hud.setLive(false);
+      hud.setCam(`FILE ${video.videoWidth}×${video.videoHeight}`);
     } else {
       await startCamera(video);
       hud.setLive(true);
+      hud.setCam(`LIVE ${video.videoWidth}×${video.videoHeight}`);
     }
     statusEl.classList.add('hidden');
     window.__PP.videoReady = true;
@@ -595,7 +627,10 @@ async function boot() {
     video,
     overlay,
     stage: stageCanvas,
-    onState: updateRecordButton,
+    onState: (recording, elapsedSec) => {
+      updateRecordButton(recording, elapsedSec);
+      hud.setRec(recording, elapsedSec);
+    },
   });
   createRecordButton(recorder);
 
@@ -615,6 +650,7 @@ async function boot() {
         fileMode = false;
         fileBtn.textContent = 'load video';
         hud.setLive(true);
+        hud.setCam(`LIVE ${video.videoWidth}×${video.videoHeight}`);
         smoother.reset();
         layoutOverlay(els);
       });
@@ -629,6 +665,7 @@ async function boot() {
       fileMode = true;
       fileBtn.textContent = '↩ camera';
       hud.setLive(false);
+      hud.setCam(`FILE ${video.videoWidth}×${video.videoHeight}`);
       smoother.reset();
       layoutOverlay(els);
     });
@@ -644,6 +681,10 @@ async function boot() {
   const detector = await createDetector(modelVariant);
   statusEl.classList.add('hidden');
   window.__PP.poseFps = () => detector.poseFps();
+
+  // every boot asset (model, wasm, fonts, avatar) is now in — from here on
+  // the privacy receipt counts every network request, truthfully
+  void document.fonts.ready.then(() => receipt.arm());
   onConfigChange((key) => {
     if (key === 'model') void detector.setModel(config.model);
   });
@@ -691,6 +732,8 @@ async function boot() {
       hudAccum = 0;
       hud.setRenderFps(stage.renderFps());
       hud.setPoseFps(detector.poseFps());
+      hud.setRig(retargeter.activeBoneCount());
+      hud.tick(window.__PP.lastDetectionAt, window.__PP.videoReady);
     }
   });
 }

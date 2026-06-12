@@ -78,3 +78,19 @@ entry marked optional with a boot-time HEAD probe that removes it from the
 avatar cycle when the file is absent, default avatar back to the CC0
 astronaut. Electives locked at the same gate: Tier B1 velocity VFX + B2
 auto-director camera; B3 parallax and both Tier C items skipped.
+
+## 2026-06-12 — Privacy receipt counts EXTERNAL requests in the headline
+The spec sketch says "0 NETWORK REQUESTS"; shipped as "0 EXTERNAL REQUESTS".
+Reason: variable fonts load per-unicode-range subsets lazily, so a same-
+origin font file can arrive after document.fonts.ready and falsely dirty
+the counter — and same-origin static assets are the app serving itself,
+not a privacy event. The enforced claim is "nothing talks to anyone
+else's server": every cross-origin resource/beacon/socket counts from the
+moment boot assets settle. README privacy wording already matches this
+("zero runtime network requests; model and WASM served same-origin").
+
+## 2026-06-12 — No opaque background on the camera-feed layer
+Chromium (headless GL at least) mis-composites an opaque background on
+the promoted layer that contains the accelerated <video>: the bg quad
+paints y-flipped over the WebGL stage as a feed-sized hole. The dark fill
+lives on .camera-pane instead; comment pinned in styles.css.
