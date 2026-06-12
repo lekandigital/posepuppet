@@ -40,6 +40,10 @@ export type JointName =
 export interface Avatar {
   name: string;
   object: THREE.Object3D;
+  /** head collider for face-touch: center in head-bone LOCAL space +
+   *  radius (m). Computed from real geometry at load; without it the
+   *  retargeter falls back to a generic estimate. */
+  headGeometry?: { centerLocal: THREE.Vector3; radius: number };
   /** Drivable bone pivots; rotations are applied here by the retargeter. */
   bones: Partial<Record<BoneName, THREE.Object3D>>;
   /** Joint anchors whose world positions define limb segments on screen. */

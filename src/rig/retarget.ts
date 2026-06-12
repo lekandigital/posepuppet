@@ -247,7 +247,10 @@ export class Retargeter {
       }
     }
     const headNode = this.avatar.bones.head;
-    if (headNode) {
+    if (this.avatar.headGeometry) {
+      // real geometry (robot: authored; VRM: skinned-vertex estimate)
+      this.headRadius = this.avatar.headGeometry.radius;
+    } else if (headNode) {
       const box = new THREE.Box3().setFromObject(headNode);
       if (!box.isEmpty()) {
         const size = box.getSize(new THREE.Vector3());
@@ -377,9 +380,20 @@ export class Retargeter {
     const ang = 2 * Math.acos(Math.abs(w));
     const s = Math.sqrt(Math.max(1 - w * w, 0));
     if (s < 1e-4 || ang < 1e-4) return;
-    const overshoot = (ex - 1) * Math.min(1, velAngle / 6) * 0.35;
-    const scale = Math.min(ex + overshoot, 2.4);
-    const newAng = Math.min(ang * scale, MAX_SWING_FROM_REST);
+    // dead zone: never scale small swings — multiplying rest noise made
+    // 2.0 read "fidgety" at the Gate-3 live test
+    const DEAD = 0.14; // ~8°
+    if (ang <= DEAD) return;
+    const overshoot = (ex - 1) * Math.min(1, velAngle / 6) * 0.18;
+    const scale = Math.min(ex + overshoot, 2.2);
+    // soft knee: full scaling up to ~55°, fading to none by ~110° — big
+    // gestures already fill the pose space; doubling them folded arms
+    // through the body live
+    const KNEE_LO = 0.96; // ~55°
+    const KNEE_HI = 1.92; // ~110°
+    const knee = ang < KNEE_LO ? 1 : ang > KNEE_HI ? 0 : 1 - (ang - KNEE_LO) / (KNEE_HI - KNEE_LO);
+    const effScale = 1 + (scale - 1) * knee;
+    const newAng = Math.min(DEAD + (ang - DEAD) * effScale, MAX_SWING_FROM_REST);
     tmpV3.set(q.x / s, q.y / s, q.z / s);
     if (w < 0) tmpV3.negate();
     q.setFromAxisAngle(tmpV3, newAng);
@@ -485,7 +499,8 @@ export class Retargeter {
     // the per-axis clamps below still bound the result
     const chestEx = 1 + (config.exaggeration - 1) * 0.5;
     if (chestEx > 1.001) {
-      tmpE.x *= chestEx;
+      // yaw + lean only: scaling pitch turned hands-overhead detection
+      // noise into a phantom lean-back at the Gate-3 live test
       tmpE.y *= chestEx;
       tmpE.z *= chestEx;
     }
@@ -695,12 +710,23 @@ export class Retargeter {
       const dirOff = tmpV1.sub(headP);
       if (dirOff.lengthSq() < 1e-6) dirOff.set(side === 'left' ? 1 : -1, 0, 0.3);
       dirOff.normalize();
-      // keep the contact point on the front hemisphere — you touch your
-      // cheek/chin/forehead, not the back of the skull
-      dirOff.z = Math.abs(dirOff.z) * 0.6 + 0.25;
-      dirOff.normalize();
+      // bias the contact onto the PERSON'S front hemisphere (their face
+      // normal from ears→nose) — forcing camera-z here put the contact on
+      // the wrong side whenever the body was turned (Gate-3 live finding)
+      const nose = world[LM.nose];
+      if (nose.visibility > VIS_OFF) {
+        mpToThree(nose, tmpV2);
+        tmpV2.sub(headP).normalize(); // person's face normal (mirrored space)
+        const d = dirOff.dot(tmpV2);
+        if (d < 0.2) dirOff.addScaledVector(tmpV2, 0.2 - d).normalize();
+      } else {
+        dirOff.z = Math.abs(dirOff.z) * 0.6 + 0.25;
+        dirOff.normalize();
+      }
 
+      const headGeo = this.avatar.headGeometry;
       headNode.getWorldPosition(tmpV2);
+      if (headGeo) headNode.localToWorld(tmpV2.copy(headGeo.centerLocal));
       const target = tmpV2.clone().addScaledVector(dirOff, this.headRadius * 1.18);
       const S = shoulderJ.getWorldPosition(new THREE.Vector3());
 
@@ -737,6 +763,7 @@ export class Retargeter {
       this.blendDirIntoTarget(foreSt, dirFore, ft[side], forePredParentQ);
 
       // eval/debug: where would the avatar wrist land relative to its head
+      // center (tmpV2 still holds it)
       dbg.dist = elbow.addScaledVector(dirFore, L2).distanceTo(tmpV2);
     }
   }
@@ -849,7 +876,11 @@ export class Retargeter {
         st.target.slerp(st.restLocal, 1 - MAX_SWING_FROM_REST / dev);
       }
 
-      st.node.quaternion.slerp(st.target, st.isHand ? kHand : k);
+      // during the re-acquisition blend the node also slerps at half rate —
+      // the detector's own re-convergence wobble was reading as fidget live
+      const settling = st.confident && st.reacqSec < st.reacqDur;
+      const kEff = st.isHand ? kHand : settling ? k * 0.5 : k;
+      st.node.quaternion.slerp(st.target, kEff);
 
       // …and on the enacted bone: the slerp path between two in-limit
       // targets can bulge past the limit on the rotation sphere

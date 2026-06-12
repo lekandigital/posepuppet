@@ -10,6 +10,37 @@ torso/robot at 119.51 fps with everything enabled demonstrates the render
 loop kept its full headroom — the 59.x rows are the display at 60 Hz, not
 load. FLOORS HOLD; nothing becomes opt-in.
 
+### Gate-3 live-test fixes (2026-06-12)
+Lekan's live report → six root causes, all fixed and re-verified:
+1. VRM finger curls bent backwards → curl axes now COMPUTED per segment
+   from the rig's own geometry (palm plane × bone direction, sign toward
+   the palm). Verified on Seed-san (real fingers: fist closes correctly);
+   the astronaut turns out to have MITTEN hands — no finger geometry to
+   move at all — which becomes an honest capability chip ("Fingers not
+   supported", both default avatars) and a roster gap to fill at P6/Gate 4.
+2. Face-touch hovering at the chest (robot), through the helmet
+   (astronaut), wrong-side gap when turned → head collider now comes from
+   real geometry (robot: authored skull sphere; VRM: skinned-vertex
+   sampling — a bbox of the head bone sees nothing on skinned meshes, so
+   the astronaut had been using the 0.12 m default inside its big helmet),
+   contact targets are placed from the head CENTER not the pivot, and the
+   front-hemisphere bias uses the person's own face normal (ears→nose)
+   instead of camera-z. Re-verified: reach 99.8%/100%, penetration 0/0.
+3. Exaggeration fidgety at 2.0, arms folding through the body, phantom
+   lean-back → dead zone (no scaling under ~8°, so rest noise is never
+   amplified), soft knee (full scaling to ~55°, none past ~110°), gentler
+   overshoot, and chest pitch is no longer scaled at all.
+4. Beaky's mouth never fully closed → pinch auto-ranging (session min/max
+   with slow re-adaptation). pinch→jaw r improved 0.886→0.899.
+5. Avatar crossfade showed the old avatar through the new one → fade-out
+   only: the new avatar is opaque from frame one; the old one fades with
+   depthWrite off + depthTest on + late renderOrder, so hidden parts stay
+   hidden.
+6. Re-entry fidget after occlusion → bones slerp at half rate during the
+   re-acquisition window (the detector's own re-convergence wobble was
+   driving the rig). Arms sync 9.77° on a 45 s window — within noise.
+Suite 47 passed / 5 skipped. All six verified by eval or screenshot.
+
 ## P3 — hand-only mode and creatures (2026-06-12)
 A first-class second mode. HandLandmarker (21 landmarks, Apache-2.0, same
 postinstall family as the pose models — ASSETS.md) drives one hand; the

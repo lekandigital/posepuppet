@@ -15,8 +15,10 @@ interface CardDef {
 }
 
 const CARDS: CardDef[] = [
-  { id: 'robot', label: 'robot', glyph: '◼', chip: 'Fully supported', chipClass: 'ok' },
-  { id: 'astronaut', label: 'astronaut', glyph: '▲', chip: 'Fully supported', chipClass: 'ok' },
+  // honest labels (Gate-3 live findings): neither default avatar has
+  // movable finger geometry; the robot's face-touch reads reach-to-collar
+  { id: 'robot', label: 'robot', glyph: '◼', chip: 'Fingers not supported', chipClass: 'warn' },
+  { id: 'astronaut', label: 'astronaut', glyph: '▲', chip: 'Fingers not supported', chipClass: 'warn' },
   { id: 'woody', label: 'woody', glyph: '◆', chip: 'Experimental · local', chipClass: 'exp' },
 ];
 

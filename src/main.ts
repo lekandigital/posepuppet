@@ -80,6 +80,7 @@ declare global {
       frameAvatar: () => { framed: boolean; bbox: { center: number[]; size: number[] } | null };
       clearPose: () => void;
       applyPose: (poseName: string) => VisualQaPoseResult;
+      applyHandState: (side: 'left' | 'right', openness: number, point: boolean) => void;
     };
   }
 }
@@ -454,6 +455,7 @@ async function boot() {
       frameAvatar: frameVisualQaAvatar,
       clearPose: clearVisualQaPose,
       applyPose: applyVisualQaPose,
+      applyHandState: (side, openness, point) => avatar.applyHandState?.(side, openness, point),
     };
   }
   installVisualQaHook();
@@ -516,19 +518,27 @@ async function boot() {
     });
   }
 
-  function crossfadeAvatars(prev: Avatar, next: Avatar, sec = 0.45): void {
-    setTreeOpacity(next.object, 0);
+  function crossfadeAvatars(prev: Avatar, sec = 0.4): void {
+    // fade the OLD avatar out over the new one; the new one stays opaque
+    // from frame one. Fading both let the old avatar's far side show
+    // through the new body (transparent depth sorting) — Gate-3 finding.
+    prev.object.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      mesh.renderOrder = 999; // draw last, blended over the new avatar
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        const mat = m as THREE.Material;
+        mat.transparent = true;
+        mat.depthWrite = false; // don't punch holes…
+        mat.depthTest = true; // …but stay hidden behind the new body
+      }
+    });
     const t0 = performance.now();
     const step = () => {
       const t = Math.min((performance.now() - t0) / (sec * 1000), 1);
       setTreeOpacity(prev.object, 1 - t);
-      setTreeOpacity(next.object, t);
-      if (t < 1) {
-        requestAnimationFrame(step);
-      } else {
-        setTreeOpacity(next.object, 1); // restores transparent flags
-        prev.dispose();
-      }
+      if (t < 1) requestAnimationFrame(step);
+      else prev.dispose();
     };
     requestAnimationFrame(step);
   }
@@ -544,7 +554,7 @@ async function boot() {
       retargeter.bind(avatar);
       installVisualQaHook();
       currentAvatarId = id;
-      crossfadeAvatars(prev, next);
+      crossfadeAvatars(prev);
     } catch (err) {
       const def = getAvatarDef(id);
       // error, not warn: eval counts console errors, so a failed load can
