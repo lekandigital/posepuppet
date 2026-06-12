@@ -1,3 +1,10 @@
+## 2026-06-12 ~10:40 (P3 COMPLETE — hand-only mode ships; GATE 3 next)
+Done: HandLandmarker postinstall + detector; hand-only mode (own stage treatment, roster cards, HAND chain cell, overlay skeleton); puppets: expressive hand / beaky (pinch=jaw, palm=head, crest spring) / x-ray wireframe+trail; pinch->jaw metric; handmode spec
+Sync metric: pinch->jaw r=0.886 (pinch fixture) and 0.937 (open_close), bar r>=0.8 — PASS; 100% hand detection both clips
+FPS: display awake again — full 6x60s floor re-measure running (results-p3-motion.json)
+Blockers: USER GATE 3 — live webcam test (script ready)
+Next: fix what the live test reports, then P4 Motion Memory
+
 ## 2026-06-12 ~09:30 (P2 COMPLETE — motion core + expressiveness)
 Done: occlusion recovery (coast/limits/adaptive reacq blend + dropout tests); face-touch IK magnetism (100% reach, 0% penetration both avatars on facetouch.mp4); feet + legs metric (legsMean 5.6/6.2 deg on fullbody.mp4); exaggeration slider + squash + antenna spring + idle life + VRM blinks + switch crossfade + auto-tuner; hand open/fist/point from pose landmarks (VRM finger curls)
 Sync metric: arms 9.57 deg (vs 9.49 baseline, within noise); facetouch upper 6.4/9.6; fullbody upper 6.4/7.9 + legs 5.6/6.2

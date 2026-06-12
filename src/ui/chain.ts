@@ -9,6 +9,7 @@ import { config } from '../config';
 type NodeState = 'on' | 'dim' | 'bad';
 
 export interface Chain {
+  setSource(s: 'pose' | 'hand'): void; // relabels the detection node
   setCam(label: string | null): void; // "LIVE 1280×720" | "FILE" | null=lost
   setPoseFps(fps: number): void;
   setRenderFps(fps: number): void;
@@ -41,7 +42,12 @@ export function createChain(): Chain {
 
   let lastPoseFps = 0;
 
+  const poseLabel = pose.querySelector('b')!;
+
   return {
+    setSource(s) {
+      poseLabel.textContent = s === 'hand' ? 'HAND' : 'POSE';
+    },
     setCam(label) {
       if (label) {
         camVal.textContent = label.split(' ')[0]; // LIVE | FILE

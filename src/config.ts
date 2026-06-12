@@ -5,6 +5,8 @@ import type { AvatarId } from './rig/avatarRegistry';
 
 export interface Config {
   theme: 'dark' | 'light';
+  mode: 'character' | 'hand'; // future game modes exist as types only
+  handPuppet: 'hand' | 'beaky' | 'xray';
   mirror: boolean;
   smoothing: boolean;
   minCutoff: number;
@@ -24,6 +26,8 @@ export interface Config {
 // the textbook 0.007 to get the same speed-adaptive behavior.
 const DEFAULTS: Config = {
   theme: 'dark',
+  mode: 'character',
+  handPuppet: 'beaky',
   mirror: true,
   smoothing: true,
   minCutoff: 1.2,

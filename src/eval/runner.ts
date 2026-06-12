@@ -23,6 +23,9 @@ export interface EvalResult {
   delegate: 'GPU' | 'CPU';
   memoryMB: Record<string, number> | null;
   sync: Partial<Record<LimbName | 'upperLimbsMean' | 'legsMean', number>>;
+  /** hand-only mode: pinch→jaw tracking quality (Pearson r between the
+   *  normalized pinch input and the enacted jaw angle, per frame) */
+  pinchJaw?: { r: number; samples: number };
   /** face-touch reach check (frames where the person's wrist was at their
    *  head): does the avatar's wrist reach its own head region without
    *  passing through it? */
@@ -51,6 +54,8 @@ interface Deps {
   getHeadRadius?: () => number;
   /** live face-touch engagement weights from the retargeter */
   getFaceTouch?: () => { left: { w: number }; right: { w: number } };
+  /** detection-loop FPS override (hand mode reports the hand detector) */
+  getDetectionFps?: () => number;
 }
 
 export class EvalCollector {
@@ -67,6 +72,8 @@ export class EvalCollector {
   private ftPenetration = 0;
   private ftWrist = new THREE.Vector3();
   private ftHead = new THREE.Vector3();
+  private pjPinch: number[] = [];
+  private pjJaw: number[] = [];
 
   constructor(
     private fixture: string,
@@ -87,10 +94,23 @@ export class EvalCollector {
         return;
       }
       const rf = this.deps.stage.renderFps();
-      const pf = this.deps.detector.poseFps();
+      const pf = this.deps.getDetectionFps?.() ?? this.deps.detector.poseFps();
       if (rf > 0) this.renderFpsSamples.push(rf);
       if (pf > 0) this.poseFpsSamples.push(pf);
     }, 1000);
+  }
+
+  /** Hand-only mode frames: detection bookkeeping + the pinch→jaw pair
+   *  for the correlation metric (only when the beaky puppet is live). */
+  onHandFrame(detected: boolean, signals: { pinch: number; jaw: number } | null): void {
+    if (this.done || this.startTime === 0) return;
+    this.videoFrames++;
+    if (!detected) return;
+    this.detectedFrames++;
+    if (signals) {
+      this.pjPinch.push(signals.pinch);
+      this.pjJaw.push(signals.jaw);
+    }
   }
 
   /** Called once per processed video frame, with mirrored landmarks (the
@@ -151,6 +171,26 @@ export class EvalCollector {
       sync[k as LimbName] = round(v as number);
     }
 
+    let pinchJaw: EvalResult['pinchJaw'];
+    if (this.pjPinch.length > 30) {
+      const n = this.pjPinch.length;
+      const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
+      const mp = mean(this.pjPinch);
+      const mj = mean(this.pjJaw);
+      let num = 0;
+      let dp = 0;
+      let dj = 0;
+      for (let i = 0; i < n; i++) {
+        const a = this.pjPinch[i] - mp;
+        const b = this.pjJaw[i] - mj;
+        num += a * b;
+        dp += a * a;
+        dj += b * b;
+      }
+      const denom = Math.sqrt(dp * dj);
+      pinchJaw = { r: denom > 1e-9 ? Math.round((num / denom) * 1000) / 1000 : 0, samples: n };
+    }
+
     const faceTouch =
       this.ftEngaged > 0
         ? {
@@ -175,6 +215,7 @@ export class EvalCollector {
       delegate: this.deps.detector.delegate(),
       memoryMB: Object.keys(this.memory).length ? this.memory : null,
       sync,
+      pinchJaw,
       faceTouch,
       finishedAt: new Date().toISOString(),
     };

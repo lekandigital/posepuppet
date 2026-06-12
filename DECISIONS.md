@@ -94,3 +94,16 @@ Chromium (headless GL at least) mis-composites an opaque background on
 the promoted layer that contains the accelerated <video>: the bg quad
 paints y-flipped over the WebGL stage as a feed-sized hole. The dark fill
 lives on .camera-pane instead; comment pinned in styles.css.
+
+## 2026-06-12 — P3: true finger tracking ships in hand-only mode ONLY
+HandLandmarker (21 landmarks) drives hand-only mode — that mode IS finger
+tracking. It does not spread to full-body avatars this pass: running both
+models per frame costs pose-loop budget, and the P2 pose-landmark
+open/fist/point approximation already covers character mode's needs.
+Revisit only if a P8 perf margin makes dual-model free.
+
+## 2026-06-12 — Beaky stays center-weighted
+The talking-head puppet follows hand position at half gain, clamped to
+the stage box: full positional mapping walked the puppet off frame on
+real footage. The expressive hand and x-ray keep full positional range —
+their point is literal following.
