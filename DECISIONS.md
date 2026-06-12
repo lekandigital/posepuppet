@@ -46,3 +46,26 @@ indistinguishable for this use; 30 fps matches typical webcam delivery.
 `public/models/pose_landmarker_full.task` (Apache-2.0, Google) is downloaded
 postinstall if missing. Neither binary lives in git; the app itself serves
 everything same-origin and makes zero runtime network requests.
+
+## 2026-06-12 — P0: generated-avatar load smokes skip when the local VRM is absent
+The five generated-avatar load tests hard-failed because the candidate VRMs
+(public/avatars/generated/, deliberately gitignored, local working binaries
+from the post-pass-1 audit workstream) are no longer on disk. Asserting
+'loaded' on files the repo promises never to ship makes the suite red on any
+fresh checkout, so the load smokes now skip when the .vrm is missing; the
+fallback and UI-isolation tests still always run. Coverage returns
+automatically on machines that have the candidates.
+
+## 2026-06-12 — P0: pass-1 eval results archived before re-baselining
+eval/results.json is overwritten by every run; the pass-1 final numbers are
+copied to eval/results-pass1-final.json so the pass-2 before/after table can
+cite both files directly rather than digging through git history.
+
+## 2026-06-12 — P0: eval can no longer silently measure the fallback avatar
+First baseline attempt mislabeled 3 of 9 rows: woody's VRM load failed
+intermittently, setAvatar's catch only console.warn'd and reverted to the
+robot, and eval recorded robot numbers under a woody run (all VRMs also
+shared the name 'vrm'). Three changes: per-file VRM names ('vrm:woody'),
+failed avatar load is now console.error (eval counts it), and eval/run.mjs
+records avatarRequested + exits non-zero on requested/measured mismatch.
+Baseline re-run under these guards before anything diffs against it.

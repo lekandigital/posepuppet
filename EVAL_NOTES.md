@@ -1,5 +1,30 @@
 # Eval notes
 
+## P0 (pass 2) — inspect, baseline, honesty guards (2026-06-12)
+Repo inspected end to end (~3k lines; reading + attachment points recorded
+in PLAN.md §1). Suite was red at P0: the five generated-avatar load smokes
+required gitignored local-only candidate VRMs that are no longer on disk —
+they now skip when the file is absent; suite green 37 passed / 5 skipped,
+tsc clean. First 9-run baseline attempt caught a real honesty bug: woody's
+VRM load failed intermittently, setAvatar's catch only console.warn'd and
+quietly measured the robot under woody's name (sync values robot-identical,
+the tell). Fixed before trusting any number: per-file VRM names
+('vrm:woody'), failed avatar loads are console.error (eval counts them),
+run.mjs records avatarRequested and exits non-zero on mismatch. Guarded
+re-run (60 s × 3 fixtures × robot/astronaut/woody, headed, Apple M5, GPU):
+detection 100% on all 9, pose 28.5–29.8 fps (clip-capped), render
+114–118 fps, memory flat, zero console errors, zero mismatches. Sync
+upperLimbsMean — robot 9.49/2.24/18.87°, astronaut 10.92/2.29/20.38°,
+woody 9.02/2.14/17.88° (arms/torso/fast) — all under the pass-1 bars on
+all three avatars; full table in PLAN.md §2 and eval/results.json
+(pass-1 finals archived at eval/results-pass1-final.json). Screenshot
+media/p0-before-redesign.png (local, media/ gitignored) records the
+pre-redesign shell as the design-gate "before". Missing inputs found and
+specced for USER ACTION: design/reference.css and the four new fixture
+clips (hand_open_close, hand_pinch_point, facetouch, fullbody) — exact
+re-record specs in PLAN.md §3. Woody redistributability flagged as R1
+for the Gate-1 decision.
+
 ## M5 — Hand/wrist expressiveness (2026-06-10)
 Added `leftHand`/`rightHand` bone driving across all avatars (robot, astronaut,
 Woody). The retargeter now builds a palm orientation from BlazePose landmarks

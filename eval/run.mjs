@@ -73,12 +73,24 @@ try {
     const result = await handle.jsonValue();
     result.consoleErrors = consoleErrors;
     result.mode = headless ? 'headless (not representative for FPS)' : 'headed';
+    // honesty guard: record what was requested, and refuse to let a silent
+    // fallback (e.g. a VRM that failed to load → robot) pass as a clean run
+    result.avatarRequested = avatar;
+    const loadedMatches = avatar === 'robot' ? result.avatar === 'robot' : result.avatar === `vrm:${avatar}`;
+    result.avatarMismatch = !loadedMatches;
     results.push(result);
     console.log(
       `  detection ${(result.detectionRate * 100).toFixed(1)}%  pose ${result.poseFps}fps  ` +
         `render ${result.renderFps}fps  upperLimbs ${result.sync.upperLimbsMean ?? '—'}°  ` +
         `errors ${consoleErrors.length}`,
     );
+    if (result.avatarMismatch) {
+      console.error(
+        `  !! avatar mismatch: requested "${avatar}" but the page measured "${result.avatar}" — ` +
+          `this row is NOT a valid measurement of ${avatar}`,
+      );
+      process.exitCode = 1;
+    }
     await browser.close();
   }
 } finally {
