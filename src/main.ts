@@ -14,6 +14,8 @@ import { createReceipt } from './ui/receipt';
 import { createAvatarCards } from './ui/cards';
 import { createPalette } from './ui/palette';
 import { createCoach } from './ui/coach';
+import { createHandMode, HAND_PUPPETS, isHandPuppetId } from './hand/mode';
+import type { HandPuppetId } from './hand/types';
 import { createPanel } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
 import { createDetector, type ModelVariant } from './pose/detector';
@@ -113,6 +115,11 @@ async function boot() {
   const isGeneratedOnlyMode = isAvatarLoadOnly || isAvatarVisualReview;
   if (params.has('mirror')) config.mirror = params.get('mirror') !== '0';
   if (params.has('body')) config.bodyMode = params.get('body') === 'full' ? 'full' : 'upper';
+  if (params.has('mode')) config.mode = params.get('mode') === 'hand' ? 'hand' : 'character';
+  if (params.has('puppet')) {
+    const pp = params.get('puppet')!;
+    if (isHandPuppetId(pp)) config.handPuppet = pp;
+  }
   if (params.has('avatar')) {
     const av = params.get('avatar')!;
     config.avatar = isAvatarId(av) ? av : 'astronaut';
@@ -158,6 +165,9 @@ async function boot() {
   const coach = createCoach();
   const receipt = createReceipt();
   const stage = createStage(stageCanvas);
+  const handMode = createHandMode();
+  stage.scene.add(handMode.object);
+  handMode.object.visible = false;
 
   let avatar: Avatar = createRobot();
   stage.scene.add(avatar.object);
@@ -780,6 +790,7 @@ async function boot() {
         getAvatar: () => avatar,
         getHeadRadius: () => retargeter.faceTouchDebug.left.headR,
         getFaceTouch: () => retargeter.faceTouchDebug,
+        getDetectionFps: () => (config.mode === 'hand' ? handMode.handFps() : detector.poseFps()),
       })
     : null;
   evalCollector?.start();
@@ -806,7 +817,114 @@ async function boot() {
     }
   }
 
-  detector.start(video, onPoseFrame);
+  // in hand mode the pose detector never starts (it would hallucinate a
+  // body from the hand and pollute eval sync rows); switching back to
+  // character mode starts it via applyMode
+  if (config.mode !== 'hand') detector.start(video, onPoseFrame);
+
+  // ── hand-only mode: a first-class mode beside Character ─────────────
+  const stageLabel = document.getElementById('stage-label');
+  const stageAvatarEl = document.getElementById('stage-avatar');
+  const modeCharBtn = document.getElementById('mode-character') as HTMLButtonElement;
+  const modeHandBtn = document.getElementById('mode-hand') as HTMLButtonElement;
+  modeHandBtn.disabled = false;
+  modeHandBtn.title = 'one-hand puppets: expressive hand, beaky, x-ray';
+
+  function syncStageLabel(): void {
+    if (!stageLabel || !stageAvatarEl) return;
+    const name = config.mode === 'hand' ? handMode.puppetId() : getAvatarDef(config.avatar).label;
+    const suffix = config.mode === 'hand' ? 'HAND-ONLY' : 'CHARACTER MODE';
+    stageLabel.innerHTML = '';
+    stageLabel.append('STAGE · ');
+    stageAvatarEl.textContent = name.toUpperCase();
+    stageLabel.append(stageAvatarEl);
+    stageLabel.append(` · ${suffix}`);
+  }
+
+  async function applyMode(): Promise<void> {
+    const hand = config.mode === 'hand';
+    modeCharBtn.setAttribute('aria-pressed', String(!hand));
+    modeHandBtn.setAttribute('aria-pressed', String(hand));
+    document.body.classList.toggle('hand-mode', hand);
+    if (hand) {
+      detector.stop();
+      avatar.object.visible = false;
+      handMode.object.visible = true;
+      stage.setTreatment('hand');
+      handMode.setPuppet(config.handPuppet);
+      await handMode.start(video);
+      hud.setSource('hand');
+    } else {
+      handMode.stop();
+      handMode.object.visible = false;
+      avatar.object.visible = true;
+      stage.setTreatment('character');
+      drawSkeleton(overlayCtx, null, overlay.width, overlay.height);
+      detector.start(video, onPoseFrame);
+      hud.setSource('pose');
+    }
+    syncStageLabel();
+    rebuildCards();
+  }
+
+  modeCharBtn.onclick = () => setConfig('mode', 'character');
+  modeHandBtn.onclick = () => setConfig('mode', 'hand');
+  onConfigChange((key) => {
+    if (key === 'mode') void applyMode();
+    if (key === 'handPuppet' && config.mode === 'hand') {
+      handMode.setPuppet(config.handPuppet);
+      syncStageLabel();
+      rebuildCards();
+    }
+    if (key === 'avatar') syncStageLabel();
+  });
+
+  // hand-mode overlay drawing + puppet card roster
+  handMode.onFrameHook = (frame) => {
+    if (config.mode !== 'hand') return;
+    if (frame) {
+      window.__PP.lastDetectionAt = frame.wallTimeMs;
+      window.__PP.detectionCount++;
+    }
+    handMode.drawOverlay(overlayCtx, overlay.width, overlay.height);
+    evalCollector?.onHandFrame(Boolean(frame), handMode.beakySignals());
+  };
+
+  function rebuildCards(): void {
+    const host = document.getElementById('avatar-cards');
+    const count = document.getElementById('avatar-count');
+    if (!host) return;
+    if (config.mode === 'hand') {
+      host.innerHTML = '';
+      if (count) count.textContent = String(HAND_PUPPETS.length).padStart(2, '0');
+      for (const def of HAND_PUPPETS) {
+        const card = document.createElement('button');
+        card.className = 'card' + (def.id === config.handPuppet ? ' on' : '');
+        card.dataset.puppet = def.id;
+        const preview = document.createElement('div');
+        preview.className = 'preview';
+        preview.textContent = def.glyph;
+        const nm = document.createElement('div');
+        nm.className = 'nm';
+        nm.textContent = def.label;
+        const chip = document.createElement('span');
+        chip.className = 'chip exp';
+        chip.textContent = def.chip;
+        const note = document.createElement('div');
+        note.className = 'card-note';
+        note.textContent = def.note;
+        card.append(preview, nm, chip, note);
+        card.onclick = () => setConfig('handPuppet', def.id as HandPuppetId);
+        host.append(card);
+      }
+    } else {
+      host.innerHTML = '';
+      createAvatarCards();
+    }
+  }
+
+  if (config.mode === 'hand') await applyMode();
+  else syncStageLabel();
 
   // performance auto-tuner: sustained low pose FPS on the full model →
   // the coach offers the lite model + reduced effects, one click. Suggested
@@ -821,14 +939,18 @@ async function boot() {
 
   let hudAccum = 0;
   stage.onTick((dt, time) => {
-    retargeter.tick(dt);
-    avatar.update(dt, time);
+    if (config.mode === 'hand') {
+      handMode.tick(dt, time);
+    } else {
+      retargeter.tick(dt);
+      avatar.update(dt, time);
+    }
     hudAccum += dt;
     if (hudAccum > 0.25) {
       hudAccum = 0;
       hud.setRenderFps(stage.renderFps());
-      hud.setPoseFps(detector.poseFps());
-      hud.setRig(retargeter.activeBoneCount());
+      hud.setPoseFps(config.mode === 'hand' ? handMode.handFps() : detector.poseFps());
+      hud.setRig(config.mode === 'hand' ? (handMode.lastDetectionAt() > 0 ? 1 : 0) : retargeter.activeBoneCount());
       hud.tick(window.__PP.lastDetectionAt, window.__PP.videoReady);
 
       const fps = detector.poseFps();

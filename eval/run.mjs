@@ -103,7 +103,8 @@ try {
     page.on('console', (m) => m.type() === 'error' && consoleErrors.push(m.text()));
     page.on('pageerror', (e) => consoleErrors.push(String(e)));
 
-    const extra = fixture.startsWith('fullbody') ? '&body=full' : '';
+    let extra = fixture.startsWith('fullbody') ? '&body=full' : '';
+    if (fixture.startsWith('hand_')) extra = '&mode=hand&puppet=beaky';
     await page.goto(`${BASE}/?eval=${fixture}&dur=${dur}&avatar=${avatar}${extra}`);
     const handle = await page.waitForFunction(() => window.__EVAL_RESULT, undefined, {
       timeout: (dur + 120) * 1000,
@@ -120,6 +121,7 @@ try {
     console.log(
       `  detection ${(result.detectionRate * 100).toFixed(1)}%  pose ${result.poseFps}fps  ` +
         `render ${result.renderFps}fps  upperLimbs ${result.sync.upperLimbsMean ?? '—'}°  ` +
+        (result.pinchJaw ? `pinch→jaw r=${result.pinchJaw.r} (n=${result.pinchJaw.samples})  ` : '') +
         `errors ${consoleErrors.length}`,
     );
     if (result.avatarMismatch) {

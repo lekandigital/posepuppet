@@ -1,5 +1,43 @@
 # Eval notes
 
+## P3 — hand-only mode and creatures (2026-06-12)
+A first-class second mode. HandLandmarker (21 landmarks, Apache-2.0, same
+postinstall family as the pose models — ASSETS.md) drives one hand; the
+pose detector never starts in hand mode (it hallucinated a torso from a
+hand and polluted eval sync rows — caught and gated). The mode has its own
+stage treatment (violet rim, closer camera, deeper background), its own
+roster cards with capability notes, the chain's detection cell relabels
+POSE→HAND, and the camera overlay draws the 21-point hand skeleton.
+Decision (DECISIONS.md): true finger tracking ships HERE only — character
+mode keeps the P2 pose-landmark approximations; dual-model cost isn't
+worth it this pass.
+
+ROSTER: (1) expressive hand — stylized robot glove following all 21
+landmarks, segments re-posed between smoothed joints, lit fingertips;
+(2) beaky — the talking bird: palm aims the head, thumb–index pinch is
+the jaw, glowing crest blades ride a follow-through spring, idle
+look-around + breathing when the hand leaves; center-weighted position
+(half travel, clamped) after footage showed full mapping walking it off
+frame; (3) x-ray self-portrait — additive cyan wireframe skeleton with
+bright joints and a violet lagged trail (a one-line motion delay line),
+opacity pulse when lost.
+
+METRIC: pinch→jaw Pearson correlation, sampled per hand-frame from the
+retargeting layer's own signals. hand_pinch_point.mp4: r=0.886 (n=849);
+hand_open_close.mp4: r=0.937 (n=863) — both clear the r≥0.8 bar; 100%
+hand detection on both clips, ~29.5 hand-fps (clip-capped), 0 errors.
+tests/handmode.spec.ts: each puppet boots on the hand fixture and tracks
+without errors; mode switch back to character restarts pose tracking
+(found a real race: clicking the mode buttons before boot finishes hits
+unbound handlers — test now waits for the mode system, a UX TODO noted
+for P6 onboarding).
+
+Screenshots media/board-p3/ (beaky/hand/xray on the violet stage). Suite
+47 passed / 5 skipped, tsc clean. Display woke mid-phase: render readings
+recovered (59–85 fps), so the deferred P2 FPS floor check is running as
+a full 6×60 s re-measure (results-p3-motion.json) — numbers in the next
+entry/commit.
+
 ## P2 — motion core + expressiveness (2026-06-12)
 The puppet got better hands, a body, and a pulse. All sync numbers below
 are honest per-frame geometry (valid regardless of machine state); the

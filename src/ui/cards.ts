@@ -20,6 +20,8 @@ const CARDS: CardDef[] = [
   { id: 'woody', label: 'woody', glyph: '◆', chip: 'Experimental · local', chipClass: 'exp' },
 ];
 
+let listenerInstalled = false;
+
 export function createAvatarCards(): void {
   const host = document.getElementById('avatar-cards');
   const count = document.getElementById('avatar-count');
@@ -57,8 +59,18 @@ export function createAvatarCards(): void {
     for (const [id, el] of els) el.classList.toggle('on', id === config.avatar);
     if (stageAvatar) stageAvatar.textContent = config.avatar.toUpperCase();
   }
-  onConfigChange((key) => {
-    if (key === 'avatar') sync();
-  });
+  if (!listenerInstalled) {
+    listenerInstalled = true;
+    onConfigChange((key) => {
+      if (key === 'avatar') {
+        // cards may have been rebuilt since; resolve nodes fresh
+        document.querySelectorAll<HTMLElement>('#avatar-cards .card[data-avatar]').forEach((el) => {
+          el.classList.toggle('on', el.dataset.avatar === config.avatar);
+        });
+        const sa = document.getElementById('stage-avatar');
+        if (sa && sa.isConnected) sa.textContent = config.avatar.toUpperCase();
+      }
+    });
+  }
   sync();
 }

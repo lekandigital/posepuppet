@@ -444,6 +444,12 @@ button.active, button[aria-pressed="true"] {
 .card.on .preview { color: var(--cyan); text-shadow: var(--halo-cyan); }
 .card .nm { font-family: var(--sans); font-size: 12px; color: var(--ink); font-weight: 500; }
 
+.card-note {
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--ink-3);
+}
+
 .coach-card { padding: 2px 13px 13px; }
 .coach-eyebrow {
   font-family: var(--mono);
