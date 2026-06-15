@@ -539,6 +539,35 @@ body.perf-lite::before { display: none; } /* grain off */
   text-transform: uppercase;
   white-space: nowrap;
 }
+.tb-btn {
+  border: 0;
+  padding: 4px 8px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--ink-3);
+  background: transparent;
+}
+.tb-btn:hover { color: var(--ink); border: 0; }
+.tb-btn.ghost:hover, .tb-btn.ghost.on { color: var(--violet); text-shadow: 0 0 10px rgba(157, 123, 255, 0.4); }
+.tb-btn.on { color: var(--violet); }
+
+.rail-val.mem { color: var(--violet); text-shadow: none; }
+
+.loop-list { padding: 0 13px 12px; display: flex; flex-direction: column; gap: 4px; }
+.loop-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  color: var(--ink-2);
+}
+.loop-row .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.loop-row button { padding: 2px 6px; font-size: 8.5px; }
+.loop-row .play { border-color: var(--violet); color: var(--violet); }
+.loop-empty { font-family: var(--mono); font-size: 9px; color: var(--ink-3); letter-spacing: 0.05em; }
+
 .chain { display: flex; align-items: center; flex: 1; padding: 0 6px; overflow: hidden; }
 .chain .node {
   display: flex;

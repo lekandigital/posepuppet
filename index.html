@@ -60,6 +60,15 @@
           </div>
         </section>
         <section class="rail-sec">
+          <div class="rail-hdr"><span>Memory</span><span id="echo-val" class="rail-val mem">×1</span></div>
+          <div class="rail-slider">
+            <input type="range" id="echo-slider" min="1" max="4" step="1" value="1"
+              aria-label="echo chorus: 1 ghost to 4 staggered echoes" />
+            <div class="rail-slider-marks"><span>ghost</span><span>echo chorus</span></div>
+          </div>
+          <div id="loop-list" class="loop-list"></div>
+        </section>
+        <section class="rail-sec">
           <div class="rail-hdr"><span>Coach</span></div>
           <div class="coach-card" id="coach-card">
             <div class="coach-eyebrow" id="coach-eyebrow">Setup</div>
@@ -74,6 +83,10 @@
     </main>
 
     <footer id="takebar">
+      <div class="tb-cell" id="tb-transport">
+        <button id="ghost-btn" class="tb-btn ghost" title="loop your last 8 s on a ghost (g)">⬡ ghost</button>
+        <button id="replay-btn" class="tb-btn" title="instant replay — last 5 s, slow, side angle (i)">↺ replay</button>
+      </div>
       <div class="chain" id="chain">
         <span class="node dim" id="chain-cam"><b>CAM</b> <span>—</span></span>
         <span class="sep">▸</span>
