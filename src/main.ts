@@ -15,6 +15,9 @@ import { createAvatarCards } from './ui/cards';
 import { createPalette } from './ui/palette';
 import { createCoach } from './ui/coach';
 import { createHandMode, HAND_PUPPETS, isHandPuppetId } from './hand/mode';
+import { RingBuffer, encodePoseFrame, encodeHandFrame } from './memory/stream';
+import { createGhostPlayer } from './memory/ghost';
+import { saveLoop, listLoops, loadLoop, deleteLoop } from './memory/store';
 import type { HandPuppetId } from './hand/types';
 import { createPanel } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
@@ -169,6 +172,12 @@ async function boot() {
   const handMode = createHandMode();
   stage.scene.add(handMode.object);
   handMode.object.visible = false;
+
+  // Motion Memory: always-on ring buffers (last 12 s) + ghost player
+  const poseRing = new RingBuffer('pose', 12);
+  const handRing = new RingBuffer('hand', 12);
+  const ghosts = createGhostPlayer();
+  stage.scene.add(ghosts.object);
 
   let avatar: Avatar = createRobot();
   stage.scene.add(avatar.object);
@@ -765,6 +774,125 @@ async function boot() {
   // the privacy receipt counts every network request, truthfully
   void document.fonts.ready.then(() => receipt.arm());
 
+  // ── Motion Memory UI: ghost duet, echo chorus, instant replay, loops ──
+  const ghostBtn = document.getElementById('ghost-btn') as HTMLButtonElement;
+  const replayBtn = document.getElementById('replay-btn') as HTMLButtonElement;
+  const echoSlider = document.getElementById('echo-slider') as HTMLInputElement;
+  const echoVal = document.getElementById('echo-val');
+  let echoes = 1;
+  let replayActive = false;
+
+  async function toggleGhost(): Promise<void> {
+    if (ghosts.active) {
+      ghosts.stop();
+      ghostBtn.classList.remove('on');
+      return;
+    }
+    const loop = poseRing.snapshot(8, 'last take');
+    if (!loop) {
+      coach.set('Memory', 'Perform for a few seconds first — the ghost replays your last 8 seconds.');
+      return;
+    }
+    await ghosts.start(loop, config.avatar, { echoes, echoOffsetMs: 300 });
+    ghostBtn.classList.add('on');
+  }
+
+  async function instantReplay(): Promise<void> {
+    if (replayActive) return;
+    const loop = poseRing.snapshot(5, 'replay');
+    if (!loop) {
+      coach.set('Memory', 'Perform for a few seconds first — replay shows your last 5 seconds.');
+      return;
+    }
+    replayActive = true;
+    replayBtn.classList.add('on');
+    const wasGhosting = ghosts.active;
+    ghosts.stop();
+    // stage flips to replay framing IMMEDIATELY (the ghost build awaits
+    // VRM loads); slow-mo from a side angle, trails via tight echoes
+    avatar.object.visible = false;
+    stage.camera.position.set(2.6, 1.45, 1.6);
+    stage.camera.lookAt(0, 1.0, 0);
+    await ghosts.start(loop, config.avatar, {
+      echoes: 3,
+      echoOffsetMs: 120,
+      rate: 0.4,
+      placement: 'center',
+      baseOpacity: 0.75,
+    });
+    const replayMs = (loop.durationMs / 0.4) + 400;
+    setTimeout(() => {
+      ghosts.stop();
+      avatar.object.visible = config.mode !== 'hand';
+      stage.setTreatment(config.mode === 'hand' ? 'hand' : 'character');
+      replayBtn.classList.remove('on');
+      replayActive = false;
+      if (wasGhosting) void toggleGhost();
+    }, replayMs);
+  }
+
+  ghostBtn.onclick = () => void toggleGhost();
+  replayBtn.onclick = () => void instantReplay();
+  echoSlider.oninput = () => {
+    echoes = Number(echoSlider.value);
+    if (echoVal) echoVal.textContent = `×${echoes}`;
+    if (ghosts.active) ghosts.setEchoes(echoes);
+  };
+
+  // saved loops: tiny local list — save the last 8 s, play any loop on the
+  // CURRENT avatar (re-skin), delete. IndexedDB, fully local.
+  const loopList = document.getElementById('loop-list');
+  async function refreshLoopList(): Promise<void> {
+    if (!loopList) return;
+    const metas = await listLoops();
+    loopList.innerHTML = '';
+    if (!metas.length) {
+      const empty = document.createElement('div');
+      empty.className = 'loop-empty';
+      empty.textContent = 'no saved loops — ⌘K "save loop"';
+      loopList.append(empty);
+      return;
+    }
+    for (const m of metas.slice(0, 6)) {
+      const row = document.createElement('div');
+      row.className = 'loop-row';
+      const nm = document.createElement('span');
+      nm.className = 'nm';
+      nm.textContent = `${m.name} · ${(m.durationMs / 1000).toFixed(1)}s`;
+      const play = document.createElement('button');
+      play.className = 'play';
+      play.textContent = '▸';
+      play.title = 'play on the current avatar (re-skin)';
+      play.onclick = async () => {
+        const loop = await loadLoop(m.id);
+        if (loop && loop.kind === 'pose') {
+          await ghosts.start(loop, config.avatar, { echoes, echoOffsetMs: 300 });
+          ghostBtn.classList.add('on');
+        }
+      };
+      const del = document.createElement('button');
+      del.textContent = '×';
+      del.title = 'delete loop';
+      del.onclick = async () => {
+        await deleteLoop(m.id);
+        void refreshLoopList();
+      };
+      row.append(nm, play, del);
+      loopList.append(row);
+    }
+  }
+  void refreshLoopList();
+
+  async function saveCurrentLoop(): Promise<void> {
+    const loop = poseRing.snapshot(8, `take ${new Date().toLocaleTimeString()}`);
+    if (!loop) {
+      coach.set('Memory', 'Perform for a few seconds first, then save.');
+      return;
+    }
+    await saveLoop(loop);
+    void refreshLoopList();
+  }
+
   // command palette (⌘K) + single-key shortcuts — instrument controls
   const toggleCmd = (key: 'mirror' | 'smoothing' | 'rootMotion') => () => setConfig(key, !config[key]);
   createPalette([
@@ -787,6 +915,12 @@ async function boot() {
       run: () => fileBtn.click() },
     { id: 'model', label: 'pose model · toggle full / lite',
       run: () => setConfig('model', config.model === 'full' ? 'lite' : 'full') },
+    { id: 'ghost', label: 'memory · ghost duet on/off (last 8 s)', key: 'g',
+      run: () => void toggleGhost() },
+    { id: 'replay', label: 'memory · instant replay (last 5 s, slow)', key: 'i',
+      run: () => void instantReplay() },
+    { id: 'save-loop', label: 'memory · save last 8 s as loop',
+      run: () => void saveCurrentLoop() },
   ]);
   onConfigChange((key) => {
     if (key === 'model') void detector.setModel(config.model);
@@ -819,6 +953,7 @@ async function boot() {
       const world = config.mirror ? mirrorWorld(frame.world, mWorld) : frame.world;
       const worldSmooth = smoother.apply(world, frame.wallTimeMs);
       retargeter.updateFromPose(worldSmooth, norm);
+      poseRing.push(encodePoseFrame(worldSmooth, norm, frame.wallTimeMs));
       evalCollector?.onPoseFrame(norm);
     } else {
       drawSkeleton(overlayCtx, null, overlay.width, overlay.height);
@@ -895,6 +1030,7 @@ async function boot() {
     if (frame) {
       window.__PP.lastDetectionAt = frame.wallTimeMs;
       window.__PP.detectionCount++;
+      handRing.push(encodeHandFrame(frame.norm, frame.wallTimeMs));
     }
     handMode.drawOverlay(overlayCtx, overlay.width, overlay.height);
     evalCollector?.onHandFrame(Boolean(frame), handMode.beakySignals());
@@ -955,6 +1091,7 @@ async function boot() {
       retargeter.tick(dt);
       avatar.update(dt, time);
     }
+    ghosts.tick(dt, time);
     hudAccum += dt;
     if (hudAccum > 0.25) {
       hudAccum = 0;

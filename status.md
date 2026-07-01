@@ -1,3 +1,10 @@
+## 2026-06-12 ~13:30 (P4 COMPLETE — Motion Memory ships)
+Done: landmark-stream loops (int16, IndexedDB), always-on 12s rings (pose+hand), ghost duet (violet translucent copy), echo chorus slider (2-4 staggered echoes), instant replay (slow-mo, side angle, trail echoes, auto-restore), re-skin via saved-loop list, palette cmds g/i/save
+Sync metric: round-trip replay-on-second-avatar mean <5deg / max <12deg (memory.spec.ts, passes); quantization sub-mm
+FPS: unchanged (ghosts only tick when active)
+Blockers: none
+Next: P5 recording director (guided takes, hands-free gestures, framing check, 16:9+9:16, packaging, poster, caption)
+
 ## 2026-06-12 ~12:30 (Gate 3 feedback FIXED — P4 next)
 Done: 6 live-test fixes — computed finger curl axes (verified on Seed-san; astronaut = mittens, now labeled), real head colliders (skinned-vertex sampling) + person-frame contact bias, exaggeration dead-zone/soft-knee/no-pitch, beaky pinch auto-range, crossfade fade-out-only w/ depth discipline, half-rate slerp during re-acquisition
 Sync metric: facetouch reach 99.8%/100% pen 0/0; pinch->jaw r=0.899 (up from 0.886); arms 9.77 (45s, within noise)

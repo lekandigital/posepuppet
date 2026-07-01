@@ -114,3 +114,12 @@ finger motion, both default avatars now carry "Fingers not supported"
 chips and the roster gap is queued for P6/Gate 4 (Seed-san — VRM1
 reference model, already in public/avatars — or a 100Avatars CC0 pick
 with real fingers). Spec rule applied: "a capability label, not a bug."
+
+## 2026-06-12 — P4: Motion Memory records landmarks, not bone quaternions
+The spec sketches "capture the retargeted bone-quaternion stream"; shipped
+as the pipeline INPUT stream (mirrored+smoothed landmarks, int16). Bone
+quats are rig-specific — re-skin would need per-rig remapping and would
+bake in the recording avatar's rest pose. Replaying landmarks through a
+second Retargeter IS the retargeting layer doing the re-skin, exactly, on
+any roster character, and playback obeys the current expressiveness
+settings. Round-trip tolerance verified in tests/memory.spec.ts.

@@ -8,7 +8,6 @@ import * as THREE from 'three';
 import { Retargeter } from '../rig/retarget';
 import { loadAvatarById, type AvatarId } from '../rig/avatarRegistry';
 import type { Avatar } from '../rig/types';
-import type { LandmarkPoint } from '../pose/types';
 import { decodePoseFrame, blankLandmarks, type MotionLoop } from './stream';
 
 /** Ghost material: violet, translucent, additive-leaning — the Memory hue. */
@@ -73,11 +72,20 @@ class GhostInstance {
   }
 }
 
+export interface GhostOptions {
+  echoes: number; // 1 = single ghost … 4 = delay line
+  echoOffsetMs: number;
+  rate?: number; // playback speed (0.4 = slow-mo replay)
+  /** 'beside' = duet position next to the live avatar; 'center' = the
+   *  ghost IS the star (instant replay) */
+  placement?: 'beside' | 'center';
+  baseOpacity?: number;
+}
+
 export interface GhostPlayer {
   readonly object: THREE.Group;
   readonly active: boolean;
-  /** Start ghosts for a loop. echoes=1 → single ghost; N → delay line. */
-  start(loop: MotionLoop, avatarId: AvatarId, echoes: number, echoOffsetMs: number, rate?: number): Promise<void>;
+  start(loop: MotionLoop, avatarId: AvatarId, opts: GhostOptions): Promise<void>;
   stop(): void;
   setEchoes(n: number): void;
   tick(dt: number, time: number): void;
@@ -94,20 +102,28 @@ export function createGhostPlayer(): GhostPlayer {
   let playT = 0;
   let rate = 1;
   let wantEchoes = 1;
+  let placement: 'beside' | 'center' = 'beside';
+  let baseOpacity = 0.42;
   let building = false;
 
   async function build(n: number): Promise<void> {
     if (building || !loop) return;
     building = true;
     try {
-      // ghosts stand slightly behind and to the side of the live avatar
       while (ghosts.length > n) ghosts.pop()!.dispose();
       while (ghosts.length < n) {
         const i = ghosts.length;
         const av = await loadAvatarById(avatarId);
-        const g = new GhostInstance(av, i * echoOffset, Math.max(0.18, 0.42 - i * 0.08));
-        av.object.position.x += -0.55 - i * 0.4;
-        av.object.position.z += -0.25 - i * 0.18;
+        const g = new GhostInstance(av, i * echoOffset, Math.max(0.16, baseOpacity - i * 0.09));
+        if (placement === 'beside') {
+          // duet: ghosts stand beside/behind the live avatar
+          av.object.position.x += -0.55 - i * 0.4;
+          av.object.position.z += -0.25 - i * 0.18;
+        } else {
+          // replay: the first ghost takes center stage, echoes trail it
+          av.object.position.x += i * 0.12;
+          av.object.position.z += -i * 0.1;
+        }
         object.add(av.object);
         // Retargeter binds before the reposition above; rebind so the
         // ghost's root rest includes its stage offset
@@ -124,13 +140,15 @@ export function createGhostPlayer(): GhostPlayer {
     get active() {
       return ghosts.length > 0 && loop !== null;
     },
-    async start(l, id, echoes, echoOffsetMs, r = 1) {
+    async start(l, id, opts) {
       loop = l;
       avatarId = id;
-      echoOffset = echoOffsetMs;
-      rate = r;
+      echoOffset = opts.echoOffsetMs;
+      rate = opts.rate ?? 1;
+      placement = opts.placement ?? 'beside';
+      baseOpacity = opts.baseOpacity ?? 0.42;
       playT = 0;
-      wantEchoes = Math.max(1, Math.min(echoes, 4));
+      wantEchoes = Math.max(1, Math.min(opts.echoes, 4));
       while (ghosts.length) ghosts.pop()!.dispose();
       await build(wantEchoes);
     },

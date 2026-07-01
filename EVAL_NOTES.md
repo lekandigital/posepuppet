@@ -10,6 +10,37 @@ torso/robot at 119.51 fps with everything enabled demonstrates the render
 loop kept its full headroom — the 59.x rows are the display at 60 Hz, not
 load. FLOORS HOLD; nothing becomes opt-in.
 
+## P4 — Motion Memory (2026-06-12)
+One system, four features. Architecture decision (DECISIONS.md): loops
+record the retargeting pipeline's INPUT — mirrored, smoothed landmarks,
+int16-quantized (~400 B/frame) — not per-bone quaternions. Replaying
+through a second Retargeter reproduces the take on ANY rig, so re-skin is
+exact by construction and the current exaggeration/settings apply at
+playback. Always-on 12 s ring buffers (pose + hand); named loops persist
+to IndexedDB via structured clone (typed arrays as-is, fully local).
+
+GHOST DUET: ⬡ ghost in the take bar (or 'g') loops your last 8 s on a
+translucent violet copy of the current avatar — the Memory hue doing its
+job — beside the live one. ECHO CHORUS: the Memory rail slider turns the
+single ghost into up to 4 staggered echoes (300 ms apart) — a motion
+delay line; nearly free once ghosts exist, spectacular on waves. INSTANT
+REPLAY: ↺ replay (or 'i') hides the live avatar, moves the stage camera
+to a side angle, and plays the last 5 s at 0.4× with 3 tight echoes
+(120 ms) as motion trails, center stage; the stage restores itself after.
+Found in test: the camera/hide must flip BEFORE awaiting the ghost VRM
+builds or the replay looks dead for the first seconds. RE-SKIN: saved
+loops list in the Memory rail — ▸ plays any loop on the CURRENT avatar;
+record on the astronaut, switch to the robot, the robot performs it.
+
+Round-trip check (tests/memory.spec.ts): a synthetic waving fixture is
+recorded through the real ring buffer and replayed through a second
+avatar's retargeter — enacted bone trajectories match the live recording
+with mean < 5° / max < 12° (measured: passes), and int16 quantization
+error stays sub-millimeter. Suite 49 passed / 5 skipped, zero console
+errors through ghost/echo/replay exercises. Screenshots media/board-p4/.
+Upper-body loops are the honest scope: legs replay too when the loop was
+recorded in full-body mode, otherwise they idle (same rule as live).
+
 ### Gate-3 live-test fixes (2026-06-12)
 Lekan's live report → six root causes, all fixed and re-verified:
 1. VRM finger curls bent backwards → curl axes now COMPUTED per segment
