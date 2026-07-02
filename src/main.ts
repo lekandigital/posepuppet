@@ -1170,7 +1170,7 @@ async function boot() {
       const norm = config.mirror ? mirrorNorm(frame.norm, mNorm) : frame.norm;
       const world = config.mirror ? mirrorWorld(frame.world, mWorld) : frame.world;
       const worldSmooth = smoother.apply(world, frame.wallTimeMs);
-      retargeter.updateFromPose(worldSmooth, norm);
+      retargeter.updateFromPose(worldSmooth, norm, frame.wallTimeMs);
       poseRing.push(encodePoseFrame(worldSmooth, norm, frame.wallTimeMs));
       latestNorm = norm;
       intents.onLandmarks(norm, frame.wallTimeMs);

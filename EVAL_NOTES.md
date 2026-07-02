@@ -10,6 +10,41 @@ torso/robot at 119.51 fps with everything enabled demonstrates the render
 loop kept its full headroom — the 59.x rows are the display at 60 Hz, not
 load. FLOORS HOLD; nothing becomes opt-in.
 
+## P8 — ship (2026-06-12)
+FINAL EVAL: 17 × 60 s runs (5 fixtures × robot/astronaut/erika + 2 hand
+fixtures), environment verified un-throttled, zero avatar mismatches,
+zero console errors, memory flat on every run. Full table in README +
+eval/results.json. Floors vs pass 1: pose 28.2–29.9 (was ~29.7), render
+115–123 (was 114–119), arms/torso sync within noise, detection 100%.
+The refresh CAUGHT A BUG: shadowboxing engaged face-touch magnetism
+mid-punch (astronaut fast: 53 penetration frames, sync 24.7°) — fixed
+with a velocity gate (a fist at punch speed is not a face touch): 53→5
+frames, 24.7→23.4°. The fix broke the Motion Memory round-trip test,
+which exposed a second real flaw: target-velocity estimation used
+wall-clock, so REPLAYED loops computed garbage velocities — velocity now
+uses frame time everywhere (live wall time, loop-local time in ghosts,
+synthetic clocks in tests). Both fixes verified; suite 55 passed /
+5 skipped.
+
+PINCH→JAW at 60 s: r=0.941 (pinch clip), r=0.986 (open/close) — the bar
+is 0.8. FACE-TOUCH: reach 99.3–100%, penetration 0 on facetouch.mp4, all
+three avatars. LEGS: 5.6–6.3° on fullbody.mp4.
+
+VISION CRITIQUE of the final board (media/board-p8/): the cockpit reads
+as one instrument — mono chain alive at the bottom, receipt green, cards
+honest, Erika's articulated fist visible in the hero shot. Light theme
+holds the deep-stage-in-light-chrome pattern. Narrow (1024) keeps every
+control. Not template-adjacent: the four role-bound accents and the
+signal chain carry the signature. Onboarding is the serif identity moment.
+Grain/vignette never touch the stage. Remaining polish debt (honest):
+the REC button wraps at 1024 px; the engineering panel overlaps the rail
+when both are open; beaky's jaw rounds off fast consonants.
+
+SHIP DOCS: README rewritten (numbers table, roster, limitations,
+deliberately-skipped), CHANGELOG.md added, DEMO_SCRIPT v2 rebuilt around
+the money shots, POSTS.md drafted per the voice contract (3 variants +
+thread + verification table mapping every number to its source).
+
 ## P7 — electives B1 + B2 (2026-06-12)
 Velocity VFX (B1): pooled, zero steady-state allocation — cyan impact
 rings past 2.4 m/s wrist speed (0.45 s cooldown per hand), green-white
