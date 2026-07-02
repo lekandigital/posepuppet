@@ -10,6 +10,25 @@ torso/robot at 119.51 fps with everything enabled demonstrates the render
 loop kept its full headroom — the 59.x rows are the display at 60 Hz, not
 load. FLOORS HOLD; nothing becomes opt-in.
 
+## P7 — electives B1 + B2 (2026-06-12)
+Velocity VFX (B1): pooled, zero steady-state allocation — cyan impact
+rings past 2.4 m/s wrist speed (0.45 s cooldown per hand), green-white
+speed sparks along fast wrist paths, violet ground ripples underfoot on
+stomps in full-body mode. Driven by joint velocities already produced by
+the motion layer. Subtle by default, palette-toggleable, and the whole
+module short-circuits when off. Auto-director camera (B2): restraint as
+the feature — critically-damped lean following the performer's root
+(≤0.35 m), small push-in kicks on motion-energy spikes (≤0.16 m,
+overdamped return), slow idle orbit only after 4 s of lost tracking,
+easing home on re-acquisition. A camera-ownership counter keeps it from
+fighting the instant replay and poster orbit. Methodological catch: the
+auto-cam moved the projection under the screen-space sync metric and
+read as a fake +1.2° regression — eval now pins the camera
+(config.autoCam=false in eval mode; VFX stays ON so FPS includes its
+cost). With effects on: fast fixture pose 29.5 / render 117.6-117.7,
+sync 19.87° (baseline 18.87-19.21 — within run noise). B3 hologram
+parallax and both Tier C items skipped per Gate 1. Suite 55/5.
+
 ## P6 — guidance, roster, boundaries (2026-06-12)
 Onboarding: skippable first-run overlay in the full design grammar (serif
 italic headline, cyan mono step labels, double-border card) covering

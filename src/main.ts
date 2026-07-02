@@ -16,6 +16,8 @@ import { createPalette } from './ui/palette';
 import { createCoach } from './ui/coach';
 import { createOnboarding } from './ui/onboarding';
 import { createHandMode, HAND_PUPPETS, isHandPuppetId } from './hand/mode';
+import { createVfx } from './stage/vfx';
+import { createAutoCam } from './stage/autocam';
 import { RingBuffer, encodePoseFrame, encodeHandFrame } from './memory/stream';
 import { createGhostPlayer } from './memory/ghost';
 import { saveLoop, listLoops, loadLoop, deleteLoop } from './memory/store';
@@ -115,6 +117,10 @@ async function boot() {
 
   const params = new URLSearchParams(location.search);
   const evalFixture = params.get('eval');
+  // eval measures retargeting with a STATIC camera — the screen-space sync
+  // metric is only meaningful when the projection doesn't move. VFX stays
+  // on so FPS numbers include the effects' cost.
+  if (evalFixture) config.autoCam = false;
   const evalDuration = Number(params.get('dur') ?? 60);
   const modelVariant = (params.get('model') ?? config.model) as ModelVariant;
   const generatedAvatarSlug = params.get('generatedAvatar');
@@ -183,6 +189,12 @@ async function boot() {
   const handRing = new RingBuffer('hand', 12);
   const ghosts = createGhostPlayer();
   stage.scene.add(ghosts.object);
+
+  // electives: velocity VFX + auto-director camera (both toggleable)
+  const vfx = createVfx();
+  stage.scene.add(vfx.object);
+  let cameraOwned = 0; // replay/poster hold the camera while > 0
+  const autoCam = createAutoCam(stage.camera, () => cameraOwned > 0);
 
   let avatar: Avatar = createRobot();
   stage.scene.add(avatar.object);
@@ -816,6 +828,7 @@ async function boot() {
       return;
     }
     replayActive = true;
+    cameraOwned++;
     replayBtn.classList.add('on');
     const wasGhosting = ghosts.active;
     ghosts.stop();
@@ -838,6 +851,7 @@ async function boot() {
       stage.setTreatment(config.mode === 'hand' ? 'hand' : 'character');
       replayBtn.classList.remove('on');
       replayActive = false;
+      cameraOwned--;
       if (wasGhosting) void toggleGhost();
     }, replayMs);
   }
@@ -998,6 +1012,7 @@ async function boot() {
   async function exportPoster(): Promise<void> {
     if (posterBusy) return;
     posterBusy = true;
+    cameraOwned++;
     const cam = stage.camera;
     const origPos = cam.position.clone();
     const origQuat = cam.quaternion.clone();
@@ -1072,11 +1087,13 @@ async function boot() {
       cam.quaternion.copy(origQuat);
       cam.updateProjectionMatrix();
       posterBusy = false;
+      cameraOwned--;
     }
   }
 
   // command palette (⌘K) + single-key shortcuts — instrument controls
   const toggleCmd = (key: 'mirror' | 'smoothing' | 'rootMotion') => () => setConfig(key, !config[key]);
+  const toggleCmd2 = (key: 'vfx' | 'autoCam') => () => setConfig(key, !config[key]);
   createPalette([
     { id: 'record', label: 'record · start / stop take', key: 'r',
       run: () => (recorder.recording ? recorder.stop() : recorder.start(15)) },
@@ -1120,6 +1137,8 @@ async function boot() {
       run: () => void exportPoster() },
     { id: 'help', label: 'help · how to use (onboarding)',
       run: () => onboarding.show() },
+    { id: 'vfx', label: 'velocity vfx · toggle', run: toggleCmd2('vfx') },
+    { id: 'autocam', label: 'auto-director camera · toggle', run: toggleCmd2('autoCam') },
   ]);
   onConfigChange((key) => {
     if (key === 'model') void detector.setModel(config.model);
@@ -1295,6 +1314,13 @@ async function boot() {
       avatar.update(dt, time);
     }
     ghosts.tick(dt, time);
+    vfx.tick(dt, avatar);
+    autoCam.tick(
+      dt,
+      avatar.object.position.x,
+      retargeter.motionEnergy(),
+      performance.now() - window.__PP.lastDetectionAt < 1200,
+    );
     hudAccum += dt;
     if (hudAccum > 0.25) {
       hudAccum = 0;
