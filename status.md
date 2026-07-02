@@ -1,3 +1,10 @@
+## 2026-06-12 ~18:30 (P8 COMPLETE — awaiting GATE 5)
+Done: final 17-run eval (clean, un-throttled, 0 errors); 2 bugs caught+fixed by the refresh (face-touch velocity gate: punch penetrations 53->5; frame-time velocity estimation: replay determinism); README/CHANGELOG/DEMO_SCRIPT-v2/POSTS.md shipped with verification table; final screenshot board + vision critique
+Sync metric: arms 9.49-10.96 / torso 2.20-2.40 / fast 17.33-23.37 / legs 5.6-6.3; pinch-jaw r=0.941-0.986; face-touch 99.3-100%/0 pen
+FPS: pose 28.2-29.9, render 115-123, all effects on — floors hold
+Blockers: USER GATE 5 — filming session + verification-table check + approval
+Next: film DEMO_SCRIPT v2, pick a POSTS variant
+
 ## 2026-06-12 ~17:00 (P7 COMPLETE — electives ship)
 Done: velocity VFX (impact rings/sparks/ground ripples, pooled, toggleable), auto-director camera (lean/kick/idle-orbit springs, camera-ownership lock, toggleable); eval pins the camera so the sync metric stays valid
 Sync metric: fast 19.87 with all effects on (baseline noise band); facetouch/arms unchanged

@@ -59,7 +59,8 @@ class GhostInstance {
     }
     const f = loop.frames[this.frameIdx];
     decodePoseFrame(f, this.world, this.norm);
-    this.retargeter.updateFromPose(this.world, this.norm);
+    // frame time (wrap-safe: velocity estimation skips non-monotonic steps)
+    this.retargeter.updateFromPose(this.world, this.norm, f.t);
   }
 
   tick(dt: number, time: number): void {

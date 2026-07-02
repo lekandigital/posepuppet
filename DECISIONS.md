@@ -132,3 +132,11 @@ in-app fist/open visual verification via the applyHandState dev hook →
 eval (face-touch 100% reach / 0 penetration, arms 9.71°). The roster gap
 this fills came from the Gate-3 finding that both default avatars have
 mitten hands.
+
+## 2026-06-12 — P8 final-eval fixes: velocity gate + frame-time velocities
+The final refresh caught shadowboxing engaging face-touch mid-punch;
+engagement is now velocity-gated (fades out above ~3.5 rad/s forearm
+speed). That fix surfaced wall-clock velocity estimation breaking replay
+determinism — commitTarget now uses frame time (wall for live, loop time
+for ghosts, synthetic in tests), which also corrected ghost coast
+behavior. Both changes verified by the suite and re-run evals.
