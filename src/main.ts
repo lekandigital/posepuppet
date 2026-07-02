@@ -922,6 +922,7 @@ async function boot() {
   let latestNorm: LandmarkPoint[] | null = null;
   const intents = createIntentDetector();
   const director = createDirector({
+    holdingStill: () => intents.holdingStill(),
     startRecording: (maxSec, takeName) => recorder.start(maxSec, takeName),
     stopRecording: () => recorder.stop(),
     ghostOn: async () => {
