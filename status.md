@@ -1,3 +1,10 @@
+## 2026-06-12 ~15:30 (P6 COMPLETE — guidance + boundaries ship)
+Done: first-run onboarding (design-grammar overlay, persisted, palette-reopenable, automation-suppressed), visibility-driven low-nag coach, avatar-card limitation notes; 2 bugs caught (suite-blocking overlay, Enter self-dismiss)
+Sync metric: n/a (no retarget changes)
+FPS: n/a (chrome-only changes)
+Blockers: Gate 4 (async) — finger-capable roster addition decision
+Next: P7 electives (velocity VFX + auto-director camera), then P8 ship
+
 ## 2026-06-12 ~14:45 (P5 COMPLETE — recording director ships)
 Done: gesture/intent seed (1 consumer: hands-free start/stop + stillness), 3 take scripts as data, director (framing check, countdown, serif shot prompts, take-bar progress, space/esc fallback), 16:9 + 9:16 composite presets, packaging (stinger/end card/badge/grade, chrome auto-dim), pose poster, caption helper
 Sync metric: n/a this phase (no retarget changes); director.spec 6/6 green incl. both aspect files nonzero

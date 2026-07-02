@@ -10,6 +10,26 @@ torso/robot at 119.51 fps with everything enabled demonstrates the render
 loop kept its full headroom — the 59.x rows are the display at 60 Hz, not
 load. FLOORS HOLD; nothing becomes opt-in.
 
+## P6 — guidance, roster, boundaries (2026-06-12)
+Onboarding: skippable first-run overlay in the full design grammar (serif
+italic headline, cyan mono step labels, double-border card) covering
+stand/calibrate/hands/record/private; persisted onboardingSeen; reopens
+via ⌘K "help". Auto-show suppressed under automation (navigator.webdriver
+or eval/smoke params) — first rollout attempt blocked every suite click,
+7 tests red, caught immediately. Also found the classic dialog bug: the
+palette's Enter keypress "clicked" the freshly-focused Start button and
+the overlay dismissed itself instantly — focus now defers 120 ms.
+Setup coach became visibility-driven and low-nag: one message at a time,
+problems must persist 2 s, ≥12 s between nags, silent during takes, and
+it clears itself when the framing recovers ("Step back so both shoulders
+are in frame" / "…legs visible — full-body mode needs head to feet" /
+"Keep your hands inside the frame" / hand-mode "Bring your hand back").
+Avatar cards gained one-line limitation notes (robot: "mitt hands;
+face-touch lands at the collar"; astronaut: "mitten gloves; face-touch
+and body fully supported"; woody: "local file only"). Roster stays
+curated at 3 + hand puppets; Gate 4 raised async for a finger-capable
+addition. Suite 55 passed / 5 skipped; screenshots media/board-p6/.
+
 ## P5 — recording director (2026-06-12)
 The app now helps create the clip. GUIDED TAKES are data
 (src/director/scripts.ts): Character (7 shots incl. face-touch, shadowbox,

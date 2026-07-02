@@ -12,14 +12,19 @@ interface CardDef {
   glyph: string;
   chip: string;
   chipClass: 'ok' | 'exp' | 'warn';
+  /** one-line limitation, instrument language */
+  note: string;
 }
 
 const CARDS: CardDef[] = [
   // honest labels (Gate-3 live findings): neither default avatar has
   // movable finger geometry; the robot's face-touch reads reach-to-collar
-  { id: 'robot', label: 'robot', glyph: '◼', chip: 'Fingers not supported', chipClass: 'warn' },
-  { id: 'astronaut', label: 'astronaut', glyph: '▲', chip: 'Fingers not supported', chipClass: 'warn' },
-  { id: 'woody', label: 'woody', glyph: '◆', chip: 'Experimental · local', chipClass: 'exp' },
+  { id: 'robot', label: 'robot', glyph: '◼', chip: 'Fingers not supported', chipClass: 'warn',
+    note: 'mitt hands; face-touch lands at the collar' },
+  { id: 'astronaut', label: 'astronaut', glyph: '▲', chip: 'Fingers not supported', chipClass: 'warn',
+    note: 'mitten gloves; face-touch and body fully supported' },
+  { id: 'woody', label: 'woody', glyph: '◆', chip: 'Experimental · local', chipClass: 'exp',
+    note: 'local file only — never ships with the app' },
 ];
 
 let listenerInstalled = false;
@@ -51,7 +56,11 @@ export function createAvatarCards(): void {
     chip.className = `chip ${def.chipClass}`;
     chip.textContent = def.chip;
 
-    card.append(preview, nm, chip);
+    const note = document.createElement('div');
+    note.className = 'card-note';
+    note.textContent = def.note;
+
+    card.append(preview, nm, chip, note);
     card.onclick = () => setConfig('avatar', def.id);
     host.append(card);
     els.set(def.id, card);
