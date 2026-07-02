@@ -1,3 +1,10 @@
+## 2026-06-12 ~17:00 (P7 COMPLETE — electives ship)
+Done: velocity VFX (impact rings/sparks/ground ripples, pooled, toggleable), auto-director camera (lean/kick/idle-orbit springs, camera-ownership lock, toggleable); eval pins the camera so the sync metric stays valid
+Sync metric: fast 19.87 with all effects on (baseline noise band); facetouch/arms unchanged
+FPS: pose 29.5 / render 117.6+ with everything on — floors hold
+Blockers: none
+Next: P8 ship — full eval refresh, before/after table, README/CHANGELOG/DEMO_SCRIPT/POSTS, screenshot board, GATE 5
+
 ## 2026-06-12 ~16:15 (Gate 4 CLOSED — Erika ships)
 Done: 100Avatars registry screened (6 candidates, finger-node scan via glb JSON chunk), Robert+Erika visually verified (fists close), Erika approved + committed (CC0 embedded meta recorded in ASSETS.md), registry/cards/cycle-test updated
 Sync metric: erika facetouch reach 100% pen 0, arms 9.71 deg, pose 29.3-29.6 fps
