@@ -1,3 +1,10 @@
+## 2026-06-12 ~14:45 (P5 COMPLETE — recording director ships)
+Done: gesture/intent seed (1 consumer: hands-free start/stop + stillness), 3 take scripts as data, director (framing check, countdown, serif shot prompts, take-bar progress, space/esc fallback), 16:9 + 9:16 composite presets, packaging (stinger/end card/badge/grade, chrome auto-dim), pose poster, caption helper
+Sync metric: n/a this phase (no retarget changes); director.spec 6/6 green incl. both aspect files nonzero
+FPS: no hot-path changes (recorder only composites while recording)
+Blockers: none
+Next: P6 guidance+roster (onboarding, visibility coach, card limitations) then P7 electives (velocity VFX + auto-director cam)
+
 ## 2026-06-12 ~13:30 (P4 COMPLETE — Motion Memory ships)
 Done: landmark-stream loops (int16, IndexedDB), always-on 12s rings (pose+hand), ghost duet (violet translucent copy), echo chorus slider (2-4 staggered echoes), instant replay (slow-mo, side angle, trail echoes, auto-restore), re-skin via saved-loop list, palette cmds g/i/save
 Sync metric: round-trip replay-on-second-avatar mean <5deg / max <12deg (memory.spec.ts, passes); quantization sub-mm

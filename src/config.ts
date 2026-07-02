@@ -19,6 +19,10 @@ export interface Config {
   rootMotion: boolean;
   wristGain: number; // wrist rotation amplification, 1.0 = raw, default 1.25
   exaggeration: number; // 1.0 = faithful … 2.0 = cartoon (amplitude scale)
+  recAspect: '16:9' | '9:16';
+  recPackage: boolean; // title stinger + end card
+  recBadge: boolean; // corner mark on the composite
+  recGrade: boolean; // grain/vignette grade on the composite
 }
 
 // One Euro params are for METRIC world landmarks (meters): velocities are
@@ -40,6 +44,10 @@ const DEFAULTS: Config = {
   rootMotion: true,
   wristGain: 1.25,
   exaggeration: 1.0,
+  recAspect: '16:9',
+  recPackage: true,
+  recBadge: true,
+  recGrade: true,
 };
 
 const KEY = 'posepuppet-config-v3';

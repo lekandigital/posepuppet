@@ -18,6 +18,9 @@ import { createHandMode, HAND_PUPPETS, isHandPuppetId } from './hand/mode';
 import { RingBuffer, encodePoseFrame, encodeHandFrame } from './memory/stream';
 import { createGhostPlayer } from './memory/ghost';
 import { saveLoop, listLoops, loadLoop, deleteLoop } from './memory/store';
+import { createIntentDetector } from './gesture/intent';
+import { createDirector } from './director/director';
+import { TAKE_SCRIPTS } from './director/scripts';
 import type { HandPuppetId } from './hand/types';
 import { createPanel } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
@@ -719,6 +722,12 @@ async function boot() {
       updateRecordButton(recording, elapsedSec);
       hud.setRec(recording, elapsedSec);
     },
+    onSaved: () => {
+      coach.set('Saved', 'Clip downloaded — it never left this machine.', {
+        label: 'Copy caption',
+        run: () => void navigator.clipboard.writeText(suggestCaption()),
+      });
+    },
   });
   createRecordButton(recorder);
 
@@ -893,6 +902,136 @@ async function boot() {
     void refreshLoopList();
   }
 
+  // ── recording director: guided takes, hands-free via the gesture seed ──
+  let latestNorm: LandmarkPoint[] | null = null;
+  const intents = createIntentDetector();
+  const director = createDirector({
+    startRecording: (maxSec, takeName) => recorder.start(maxSec, takeName),
+    stopRecording: () => recorder.stop(),
+    ghostOn: async () => {
+      if (!ghosts.active) await toggleGhost();
+    },
+    avatarNext: () => setConfig('avatar', nextAvatarId(config.avatar)),
+    coach: (eyebrow, text) => coach.set(eyebrow, text),
+    latestNorm: () => latestNorm,
+    handTracked: () => performance.now() - handMode.lastDetectionAt() < 1000,
+  });
+
+  // the seed layer's single consumer: raise both arms to start the default
+  // take for the current mode; cross wrists to stop
+  intents.onIntent((intent) => {
+    if (intent === 'take:start' && !director.running && !recorder.recording) {
+      const script = TAKE_SCRIPTS.find((s) => s.mode === config.mode) ?? TAKE_SCRIPTS[0];
+      director.begin(script);
+    } else if (intent === 'take:stop' && director.running) {
+      director.stop();
+    }
+  });
+
+  // keyboard fallback: space advances the shot, escape stops the take
+  window.addEventListener('keydown', (e) => {
+    if (!director.running) return;
+    if (e.code === 'Space') {
+      e.preventDefault();
+      director.advance();
+    } else if (e.key === 'Escape') {
+      director.stop();
+    }
+  });
+
+  // caption helper: after a clip saves, one click copies an honest caption
+  // (local string assembly; nothing is sent anywhere)
+  function suggestCaption(): string {
+    const subject =
+      config.mode === 'hand'
+        ? `a ${handMode.puppetId()} hand puppet`
+        : `the ${getAvatarDef(config.avatar).label}`;
+    return `puppeteering ${subject} live from my webcam — all inference local in the browser, nothing uploaded. posepuppet.`;
+  }
+
+  // pose poster: freeze the moment — slow quarter-orbit, then export a
+  // designed still in the interface frame with mono labels. Local PNG.
+  let posterBusy = false;
+  async function exportPoster(): Promise<void> {
+    if (posterBusy) return;
+    posterBusy = true;
+    const cam = stage.camera;
+    const origPos = cam.position.clone();
+    const origQuat = cam.quaternion.clone();
+    try {
+      // slow orbit to a three-quarter angle
+      const t0 = performance.now();
+      await new Promise<void>((res) => {
+        const step = () => {
+          const t = Math.min((performance.now() - t0) / 900, 1);
+          const e = t * t * (3 - 2 * t);
+          const ang = e * 0.5;
+          const r = config.mode === 'hand' ? 2.1 : 3.2;
+          const y = config.mode === 'hand' ? 1.15 : 1.3;
+          cam.position.set(Math.sin(ang) * r, y, Math.cos(ang) * r);
+          cam.lookAt(0, config.mode === 'hand' ? 1.05 : 1.0, 0);
+          if (t < 1) requestAnimationFrame(step);
+          else res();
+        };
+        requestAnimationFrame(step);
+      });
+
+      const poster = document.createElement('canvas');
+      poster.width = 1080;
+      poster.height = 1350; // 4:5 — poster ratio
+      const g = poster.getContext('2d')!;
+      g.fillStyle = '#07090f';
+      g.fillRect(0, 0, poster.width, poster.height);
+
+      // stage image inside a 1px frame (the interface grammar)
+      const inset = 54;
+      const frameW = poster.width - inset * 2;
+      const frameH = poster.height - inset * 2 - 120;
+      stage.renderer.render(stage.scene, stage.camera);
+      const sw = stageCanvas.width;
+      const sh = stageCanvas.height;
+      const scale = Math.max(frameW / sw, frameH / sh); // cover
+      const dw = sw * scale;
+      const dh = sh * scale;
+      g.save();
+      g.beginPath();
+      g.rect(inset, inset, frameW, frameH);
+      g.clip();
+      g.drawImage(stageCanvas, inset + (frameW - dw) / 2, inset + (frameH - dh) / 2, dw, dh);
+      g.restore();
+      g.strokeStyle = '#2a3650';
+      g.lineWidth = 1;
+      g.strokeRect(inset + 0.5, inset + 0.5, frameW, frameH);
+
+      // mono labels + serif mark
+      const subject = config.mode === 'hand' ? handMode.puppetId() : getAvatarDef(config.avatar).label;
+      g.font = '500 17px "JetBrains Mono Variable", monospace';
+      g.fillStyle = '#66748f';
+      g.textAlign = 'left';
+      g.fillText(`STAGE · ${subject.toUpperCase()}`, inset, inset - 16);
+      g.textAlign = 'right';
+      g.fillText(new Date().toISOString().slice(0, 10), poster.width - inset, inset - 16);
+      g.font = '420 44px "Fraunces Variable", Georgia, serif';
+      g.fillStyle = '#e9f1ff';
+      g.textAlign = 'left';
+      g.fillText('PosePuppet', inset, poster.height - 64);
+      g.font = '500 15px "JetBrains Mono Variable", monospace';
+      g.fillStyle = '#c8ffdf';
+      g.textAlign = 'right';
+      g.fillText('ALL INFERENCE LOCAL', poster.width - inset, poster.height - 68);
+
+      const a = document.createElement('a');
+      a.href = poster.toDataURL('image/png');
+      a.download = `posepuppet-poster-${Date.now().toString(36)}.png`;
+      a.click();
+    } finally {
+      cam.position.copy(origPos);
+      cam.quaternion.copy(origQuat);
+      cam.updateProjectionMatrix();
+      posterBusy = false;
+    }
+  }
+
   // command palette (⌘K) + single-key shortcuts — instrument controls
   const toggleCmd = (key: 'mirror' | 'smoothing' | 'rootMotion') => () => setConfig(key, !config[key]);
   createPalette([
@@ -921,6 +1060,21 @@ async function boot() {
       run: () => void instantReplay() },
     { id: 'save-loop', label: 'memory · save last 8 s as loop',
       run: () => void saveCurrentLoop() },
+    ...TAKE_SCRIPTS.map((s) => ({
+      id: `take-${s.id}`,
+      label: `take · ${s.name.toLowerCase()} (${s.shots.length} shots)`,
+      run: () => {
+        if (s.mode !== config.mode) setConfig('mode', s.mode);
+        // wait a beat for a mode switch to settle, then begin
+        setTimeout(() => director.begin(s), s.mode !== config.mode ? 1200 : 0);
+      },
+    })),
+    { id: 'aspect', label: 'recording · toggle 16:9 / 9:16 vertical',
+      run: () => setConfig('recAspect', config.recAspect === '16:9' ? '9:16' : '16:9') },
+    { id: 'packaging', label: 'recording · toggle stinger/end card',
+      run: () => setConfig('recPackage', !config.recPackage) },
+    { id: 'poster', label: 'poster · export a designed still', key: 'p',
+      run: () => void exportPoster() },
   ]);
   onConfigChange((key) => {
     if (key === 'model') void detector.setModel(config.model);
@@ -954,10 +1108,14 @@ async function boot() {
       const worldSmooth = smoother.apply(world, frame.wallTimeMs);
       retargeter.updateFromPose(worldSmooth, norm);
       poseRing.push(encodePoseFrame(worldSmooth, norm, frame.wallTimeMs));
+      latestNorm = norm;
+      intents.onLandmarks(norm, frame.wallTimeMs);
       evalCollector?.onPoseFrame(norm);
     } else {
       drawSkeleton(overlayCtx, null, overlay.width, overlay.height);
       retargeter.updateFromPose(null, null);
+      latestNorm = null;
+      intents.onLandmarks(null, performance.now());
       evalCollector?.onPoseFrame(null);
     }
   }

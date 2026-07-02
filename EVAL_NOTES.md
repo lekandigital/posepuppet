@@ -10,6 +10,38 @@ torso/robot at 119.51 fps with everything enabled demonstrates the render
 loop kept its full headroom — the 59.x rows are the display at 60 Hz, not
 load. FLOORS HOLD; nothing becomes opt-in.
 
+## P5 — recording director (2026-06-12)
+The app now helps create the clip. GUIDED TAKES are data
+(src/director/scripts.ts): Character (7 shots incl. face-touch, shadowbox,
+mid-take avatar switch), Ghost Duet (perform → duet with your ghost →
+final pose), Talking Puppet (hand mode). The director runs framing check →
+3-2-1 countdown → serif shot prompts over the stage (the type system's
+identity moment) with progress in the take bar; shots auto-advance on
+timers, space skips, esc stops. HANDS-FREE: the gesture/intent SEED layer
+(src/gesture/intent.ts) has exactly one consumer, as chartered — raise
+both arms ~1 s to start the mode's default take, cross wrists at the
+chest to stop; a stillness signal is exposed for future shot-advance;
+found+fixed an init bug where intents were suppressed near t=0
+(lastFired=0 vs -Infinity — caught by the unit test). FRAMING CHECK:
+camera-coach language ("Step back so your legs are visible — this take
+uses your whole body"). ASPECT PRESETS: the composite recorder now takes
+16:9 (1920×1080 side-by-side) and 9:16 (1080×1920 stacked, camera above /
+stage below — how clips actually travel); palette toggles it; vertical
+files carry a -vertical name tag. PACKAGING (all toggleable): 0.55 s
+serif title stinger in, 1.5 s end card out ("ALL INFERENCE LOCAL —
+NOTHING UPLOADED"), corner badge, grain+vignette grade matching the
+interface atmosphere; chrome auto-dims during recording. POSE POSTER
+('p'): slow quarter-orbit then a designed 4:5 still — mono labels, 1px
+frame, serif mark, privacy line — local PNG. CAPTION HELPER: after a clip
+saves, the coach offers one-click copy of an honest caption (local string
+assembly). Verification (tests/director.spec.ts): intent unit tests
+(start/stop/stillness), BOTH aspect presets produce nonzero playable
+files, and the character take runs shot-by-shot to a nonzero recording.
+Suite 55 passed / 5 skipped. Screenshots media/board-p5/. Honest gap: the
+hands-free gestures are unit-tested on synthetic landmarks; no fixture
+clip contains the real gestures — the P8 filming session is the live
+proof.
+
 ## P4 — Motion Memory (2026-06-12)
 One system, four features. Architecture decision (DECISIONS.md): loops
 record the retargeting pipeline's INPUT — mirrored, smoothed landmarks,
