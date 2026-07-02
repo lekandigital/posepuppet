@@ -1,3 +1,9 @@
+## 2026-07-02 (PASS 2 SHIPPED — Gate 5 approved)
+All five user gates honored; all ten goal conjuncts green. Suite 55 passed / 5 skipped at ship; final eval 17x60s clean (detection 100%, pose 28.2-29.9, render 115-123, all sync bars hold, 0 errors, memory flat)
+Deliverables: glass-cockpit UI (both themes), motion core + expressiveness, hand-only creatures (beaky r=0.941/0.986), Motion Memory (round-trip verified), recording director (hands-free start/advance/stop, 16:9+9:16), guidance, Erika (CC0) roster addition, README/CHANGELOG/DEMO_SCRIPT-v2/POSTS with verification table
+Remaining (Lekan's own actions, on his schedule): film DEMO_SCRIPT v2, pick a POSTS variant
+Branch: pass-2-instrument (ready to merge to main whenever he chooses)
+
 ## 2026-06-12 ~18:30 (P8 COMPLETE — awaiting GATE 5)
 Done: final 17-run eval (clean, un-throttled, 0 errors); 2 bugs caught+fixed by the refresh (face-touch velocity gate: punch penetrations 53->5; frame-time velocity estimation: replay determinism); README/CHANGELOG/DEMO_SCRIPT-v2/POSTS.md shipped with verification table; final screenshot board + vision critique
 Sync metric: arms 9.49-10.96 / torso 2.20-2.40 / fast 17.33-23.37 / legs 5.6-6.3; pinch-jaw r=0.941-0.986; face-touch 99.3-100%/0 pen
