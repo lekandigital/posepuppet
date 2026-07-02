@@ -40,6 +40,20 @@ fallbacks.
   itself). Creator: Polygonal Mind.
 - To fetch on a fresh checkout: `curl -L -o public/avatars/astronaut.vrm <URL above>`
 
+### CHOSEN: "Erika" (053, 100Avatars R1) — in use since 2026-06-12 (pass-2 Gate 4)
+- **File:** `public/avatars/erika.vrm` (committed; 1.5 MB, VRM 0.x)
+- **Download URL:** the `model_file_url` for name "Erika", number 053, in
+  `data/avatars/100avatars-r1.json` of
+  [ToxSam/open-source-avatars](https://github.com/ToxSam/open-source-avatars)
+  (arweave-hosted, same registry as the astronaut)
+- **License evidence:** registry lists 100Avatars R1 as `"license": "CC0"`;
+  **the file's own embedded VRM meta reads `licenseName: "CC0"`, title
+  "Erika"** (read from the glb JSON chunk at download). Creator:
+  Polygonal Mind.
+- **Why added:** the Gate-3 live test showed neither default avatar has
+  movable finger geometry; Erika has a real 40-bone articulated hand rig —
+  fist/open/point verified closing correctly in-app before approval.
+
 ### 1. 100Avatars series (Polygonal Mind) — APPROVED
 - **Source:** [open-source-avatars registry](https://github.com/ToxSam/open-source-avatars) / [opensourceavatars.com](https://www.opensourceavatars.com/en/gallery)
 - **License:** CC0 1.0 — registry states "Our own free avatars, no attribution needed"; 300+ VRM avatars

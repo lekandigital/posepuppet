@@ -45,7 +45,12 @@ test('avatar switcher cycles through available avatars and back to robot', async
   const count2 = await page.evaluate(() => window.__PP.detectionCount);
   expect(count2).toBeGreaterThan(count1);
 
-  // --- Step 3: click → woody when its local file exists, else the cycle
+  // --- Step 3: click → erika (CC0, committed — always present) ---
+  await btn.click();
+  await expect(btn).toHaveText('avatar: erika');
+  await page.waitForTimeout(1500);
+
+  // --- Step 4: click → woody when its local file exists, else the cycle
   // skips straight back to robot (auto-hidden, no failed load) ---
   await btn.click();
   if (hasWoody) {
@@ -56,7 +61,7 @@ test('avatar switcher cycles through available avatars and back to robot', async
     const count4 = await page.evaluate(() => window.__PP.detectionCount);
     expect(count4).toBeGreaterThan(count3);
 
-    // --- Step 4: click → back to robot ---
+    // --- Step 5: click → back to robot ---
     await btn.click();
     await page.waitForTimeout(1000);
   }

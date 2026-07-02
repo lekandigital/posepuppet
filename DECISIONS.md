@@ -123,3 +123,12 @@ bake in the recording avatar's rest pose. Replaying landmarks through a
 second Retargeter IS the retargeting layer doing the re-skin, exactly, on
 any roster character, and playback obeys the current expressiveness
 settings. Round-trip tolerance verified in tests/memory.spec.ts.
+
+## 2026-06-12 — Gate 4: Erika (100Avatars R1 #053, CC0) joins the roster
+Chosen over Robert (both verified: 40 finger bones, articulated geometry,
+embedded CC0 meta) for silhouette and contrast beside the astronaut.
+Screening method: registry fetch → glb JSON-chunk finger-node count →
+in-app fist/open visual verification via the applyHandState dev hook →
+eval (face-touch 100% reach / 0 penetration, arms 9.71°). The roster gap
+this fills came from the Gate-3 finding that both default avatars have
+mitten hands.
