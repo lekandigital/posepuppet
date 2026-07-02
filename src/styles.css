@@ -632,6 +632,43 @@ body.perf-lite::before { display: none; } /* grain off */
 }
 #panel input[type="checkbox"] { accent-color: var(--blue); }
 
+/* chrome auto-hides during takes; the stage stays the star */
+body.recording .rail,
+body.recording #topbar .modes,
+body.recording #topbar .kbd,
+body.recording #topbar #net-receipt { opacity: 0.12; pointer-events: none; transition: opacity 0.25s; }
+body.recording #takebar { background: var(--pane); }
+
+/* shot prompts — the serif identity moment over the stage */
+.shot-overlay {
+  position: absolute;
+  left: 50%;
+  top: 7%;
+  transform: translateX(-50%);
+  z-index: 5;
+  text-align: center;
+  pointer-events: none;
+}
+.shot-overlay.hidden { display: none; }
+.shot-overlay .so-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--cyan);
+  text-shadow: var(--halo-cyan);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.shot-overlay .so-line {
+  font-family: var(--serif);
+  font-size: clamp(22px, 2.4vw, 34px);
+  font-weight: 380;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-shadow: 0 2px 18px rgba(2, 4, 10, 0.7);
+}
+[data-theme="light"] .shot-overlay .so-line { color: #e9f1ff; }
+
 /* ── command palette ────────────────────────────────────────────── */
 .palette {
   position: fixed;
