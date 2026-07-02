@@ -24,6 +24,8 @@ export interface Config {
   recBadge: boolean; // corner mark on the composite
   recGrade: boolean; // grain/vignette grade on the composite
   onboardingSeen: boolean;
+  vfx: boolean; // velocity VFX (rings/sparks/ripples), subtle by default
+  autoCam: boolean; // auto-director camera (lean, kicks, idle orbit)
 }
 
 // One Euro params are for METRIC world landmarks (meters): velocities are
@@ -50,6 +52,8 @@ const DEFAULTS: Config = {
   recBadge: true,
   recGrade: true,
   onboardingSeen: false,
+  vfx: true,
+  autoCam: true,
 };
 
 const KEY = 'posepuppet-config-v3';
