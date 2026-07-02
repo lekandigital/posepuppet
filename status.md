@@ -1,3 +1,10 @@
+## 2026-06-12 ~16:15 (Gate 4 CLOSED — Erika ships)
+Done: 100Avatars registry screened (6 candidates, finger-node scan via glb JSON chunk), Robert+Erika visually verified (fists close), Erika approved + committed (CC0 embedded meta recorded in ASSETS.md), registry/cards/cycle-test updated
+Sync metric: erika facetouch reach 100% pen 0, arms 9.71 deg, pose 29.3-29.6 fps
+FPS: unchanged
+Blockers: none
+Next: P7 electives (velocity VFX + auto-director camera), then P8
+
 ## 2026-06-12 ~15:30 (P6 COMPLETE — guidance + boundaries ship)
 Done: first-run onboarding (design-grammar overlay, persisted, palette-reopenable, automation-suppressed), visibility-driven low-nag coach, avatar-card limitation notes; 2 bugs caught (suite-blocking overlay, Enter self-dismiss)
 Sync metric: n/a (no retarget changes)

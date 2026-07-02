@@ -23,6 +23,8 @@ const CARDS: CardDef[] = [
     note: 'mitt hands; face-touch lands at the collar' },
   { id: 'astronaut', label: 'astronaut', glyph: '▲', chip: 'Fingers not supported', chipClass: 'warn',
     note: 'mitten gloves; face-touch and body fully supported' },
+  { id: 'erika', label: 'erika', glyph: '⬟', chip: 'Fully supported', chipClass: 'ok',
+    note: 'articulated fingers — open, fist, and point read' },
   { id: 'woody', label: 'woody', glyph: '◆', chip: 'Experimental · local', chipClass: 'exp',
     note: 'local file only — never ships with the app' },
 ];

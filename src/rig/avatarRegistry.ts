@@ -7,7 +7,7 @@ import { createRobot } from './robot';
 import type { Avatar } from './types';
 
 /** Supported avatar identifiers. */
-export type AvatarId = 'robot' | 'astronaut' | 'woody';
+export type AvatarId = 'robot' | 'astronaut' | 'erika' | 'woody';
 
 interface AvatarDef {
   id: AvatarId;
@@ -23,6 +23,8 @@ interface AvatarDef {
 const REGISTRY: readonly AvatarDef[] = [
   { id: 'robot', label: 'robot', type: 'procedural' },
   { id: 'astronaut', label: 'astronaut', type: 'vrm', url: '/avatars/astronaut.vrm' },
+  // Gate-4 addition: CC0 (100Avatars R1 #053), real articulated fingers
+  { id: 'erika', label: 'erika', type: 'vrm', url: '/avatars/erika.vrm' },
   { id: 'woody', label: 'woody', type: 'vrm', url: '/avatars/woody.vrm', optional: true },
 ] as const;
 
