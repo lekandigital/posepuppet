@@ -23,6 +23,7 @@ export interface Config {
   recPackage: boolean; // title stinger + end card
   recBadge: boolean; // corner mark on the composite
   recGrade: boolean; // grain/vignette grade on the composite
+  onboardingSeen: boolean;
 }
 
 // One Euro params are for METRIC world landmarks (meters): velocities are
@@ -48,6 +49,7 @@ const DEFAULTS: Config = {
   recPackage: true,
   recBadge: true,
   recGrade: true,
+  onboardingSeen: false,
 };
 
 const KEY = 'posepuppet-config-v3';

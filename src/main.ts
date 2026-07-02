@@ -14,6 +14,7 @@ import { createReceipt } from './ui/receipt';
 import { createAvatarCards } from './ui/cards';
 import { createPalette } from './ui/palette';
 import { createCoach } from './ui/coach';
+import { createOnboarding } from './ui/onboarding';
 import { createHandMode, HAND_PUPPETS, isHandPuppetId } from './hand/mode';
 import { RingBuffer, encodePoseFrame, encodeHandFrame } from './memory/stream';
 import { createGhostPlayer } from './memory/ghost';
@@ -26,6 +27,7 @@ import { createPanel } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
 import { createDetector, type ModelVariant } from './pose/detector';
 import { drawSkeleton } from './overlay/skeleton';
+import { LM } from './pose/indices';
 import { mirrorNorm, mirrorWorld } from './pose/mirror';
 import { LandmarkSmoother } from './pose/smoothing';
 import type { LandmarkPoint, PoseFrame } from './pose/types';
@@ -949,6 +951,47 @@ async function boot() {
     return `puppeteering ${subject} live from my webcam — all inference local in the browser, nothing uploaded. posepuppet.`;
   }
 
+  // first-run onboarding (skippable, persisted, reopenable via ⌘K)
+  const onboarding = createOnboarding();
+
+  // visibility-driven setup coach: low-nag — one message at a time, only
+  // when a problem persists ~2 s, ≥12 s between nags, silent during takes
+  let coachProblemSince = 0;
+  let coachLastNag = 0;
+  let coachActiveMsg = '';
+  function visibilityCoach(now: number): void {
+    if (recorder.recording || director.running) return;
+    let msg = '';
+    if (config.mode === 'hand') {
+      if (now - handMode.lastDetectionAt() > 2500 && handMode.detectionCount() > 0) {
+        msg = 'Bring your hand back into frame — palm toward the camera.';
+      }
+    } else if (latestNorm) {
+      const vis = (i: number) => latestNorm![i].visibility > 0.5;
+      if (!vis(LM.leftShoulder) || !vis(LM.rightShoulder)) {
+        msg = 'Step back so both shoulders are in frame.';
+      } else if (config.bodyMode === 'full' && (!vis(LM.leftAnkle) || !vis(LM.rightAnkle))) {
+        msg = 'Step back so your legs are visible — full-body mode needs head to feet.';
+      } else if (!vis(LM.leftWrist) && !vis(LM.rightWrist)) {
+        msg = 'Keep your hands inside the frame.';
+      }
+    }
+    if (!msg) {
+      coachProblemSince = 0;
+      if (coachActiveMsg) {
+        coach.clear();
+        coachActiveMsg = '';
+      }
+      return;
+    }
+    if (!coachProblemSince) coachProblemSince = now;
+    if (now - coachProblemSince > 2000 && msg !== coachActiveMsg && now - coachLastNag > 12000) {
+      coach.set('Framing', msg);
+      coachActiveMsg = msg;
+      coachLastNag = now;
+    }
+  }
+
   // pose poster: freeze the moment — slow quarter-orbit, then export a
   // designed still in the interface frame with mono labels. Local PNG.
   let posterBusy = false;
@@ -1075,6 +1118,8 @@ async function boot() {
       run: () => setConfig('recPackage', !config.recPackage) },
     { id: 'poster', label: 'poster · export a designed still', key: 'p',
       run: () => void exportPoster() },
+    { id: 'help', label: 'help · how to use (onboarding)',
+      run: () => onboarding.show() },
   ]);
   onConfigChange((key) => {
     if (key === 'model') void detector.setModel(config.model);
@@ -1257,6 +1302,7 @@ async function boot() {
       hud.setPoseFps(config.mode === 'hand' ? handMode.handFps() : detector.poseFps());
       hud.setRig(config.mode === 'hand' ? (handMode.lastDetectionAt() > 0 ? 1 : 0) : retargeter.activeBoneCount());
       hud.tick(window.__PP.lastDetectionAt, window.__PP.videoReady);
+      visibilityCoach(performance.now());
 
       const fps = detector.poseFps();
       const live = window.__PP.videoReady && performance.now() - window.__PP.lastDetectionAt < 1500;
