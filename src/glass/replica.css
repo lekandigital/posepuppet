@@ -1,0 +1,204 @@
+/* replica.css — geometry of the reference.png clone (1535×1024 stage).
+   Coordinates measured from glass-assets/reference.png via
+   tools/glass-crop.mjs (2× grid crops). Kit material lives in
+   aero-glass.css; this file is layout only. */
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #0a1628;
+  overflow: hidden;
+}
+.viewport {
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.stage {
+  position: relative;
+  width: 1535px;
+  height: 1024px;
+  overflow: hidden;
+  background: url("/glass-assets/aero-bg.png") 0 0 / cover no-repeat;
+  transform-origin: center;
+}
+
+.ref-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
+  pointer-events: none;
+}
+
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.icon-34 { width: 34px; height: 34px; }
+.icon-26 { width: 26px; height: 26px; }
+.icon-24 { width: 24px; height: 24px; }
+.icon-22 { width: 22px; height: 22px; }
+.icon-20 { width: 20px; height: 20px; }
+.icon-18 { width: 18px; height: 18px; }
+.icon-14 { width: 14px; height: 14px; }
+
+/* ── left nav ────────────────────────────────────────────────────── */
+.p-nav {
+  left: 33px; top: 30px; width: 326px; height: 798px;
+  --ag-radius: 26px;
+  --ag-fill-top: 0.5;
+  --ag-fill-mid: 0.24;
+  --ag-fill-bottom: 0.14;
+  --ag-blur: 9px;
+  --ag-brightness: 1.1;
+}
+
+.nav-bird {
+  position: absolute; left: 37px; top: 25px; width: 80px; height: 80px;
+  color: #fff;
+  filter: drop-shadow(0 3px 7px rgba(25, 90, 180, 0.5));
+}
+.nav-home { left: 17px; top: 92px; width: 292px; height: 45px; justify-content: flex-start; }
+.nav-home .ag-icon { position: absolute; left: 45px; top: 6px; }
+
+.nav-ic {
+  position: absolute; left: 60px; width: 34px; height: 34px;
+  color: #fff;
+  filter: drop-shadow(0 2px 4px rgba(25, 90, 180, 0.55));
+}
+.nav-ic svg, .nav-home svg { stroke-width: 2.4; }
+.nav-ic-1  { top: 159px; }
+.nav-ic-2  { top: 214px; }
+.nav-ic-3  { top: 270px; }
+.nav-ic-4  { top: 325px; }
+.nav-ic-5  { top: 381px; }
+.nav-ic-6  { top: 436px; }
+.nav-ic-7  { top: 491px; }
+.nav-ic-8  { top: 547px; }
+.nav-ic-9  { top: 602px; }
+.nav-ic-10 { top: 657px; }
+.nav-dot { left: 257px; top: 210px; width: 27px; height: 27px; }
+
+.nav-tweet { left: 13px; top: 715px; width: 282px; height: 60px; }
+.nav-tweet .ag-icon { color: #fff; filter: drop-shadow(0 1px 2px rgba(10, 70, 160, 0.6)); }
+
+/* ── account chip ────────────────────────────────────────────────── */
+.p-account {
+  left: 33px; top: 878px; width: 326px; height: 116px;
+  --ag-radius: 24px;
+  --ag-fill-top: 0.58;
+  --ag-fill-mid: 0.34;
+  --ag-blur: 10px;
+  --ag-brightness: 1.18;
+}
+.acct-avatar { left: 33px; top: 25px; width: 54px; height: 54px; }
+.acct-dots {
+  position: absolute; left: 262px; top: 43px; width: 24px; height: 24px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* ── main outer panel (nearly invisible clear shell) ─────────────── */
+.p-main {
+  left: 398px; top: 30px; width: 1082px; height: 970px;
+  --ag-radius: 28px;
+  --ag-fill-top: 0.10;
+  --ag-fill-mid: 0.04;
+  --ag-fill-bottom: 0.06;
+  --ag-bloom-tl: 0.12;
+  --ag-blur: 3px;
+  --ag-inner-depth: 0.04;
+  --ag-brightness: 1.05;
+}
+.p-main > * { position: absolute; }
+
+.main-search { left: 650px; top: 15px; width: 348px; height: 38px; --ag-radius: 19px; }
+.search-ic { position: absolute; left: 21px; top: 6px; }
+.main-gear { left: 1012px; top: 9px; width: 49px; height: 49px; }
+
+/* composer card */
+.p-composer {
+  left: 6px; top: 68px; width: 688px; height: 159px;
+  --ag-radius: 24px;
+  /* sits over darker sky; reference reads bright white-lavender */
+  --ag-tint-bottom: 232, 240, 252;
+  --ag-fill-top: 0.9;
+  --ag-fill-mid: 0.8;
+  --ag-fill-bottom: 0.75;
+  --ag-blur: 20px;
+  --ag-brightness: 1.42;
+  --ag-inner-depth: 0.06;
+}
+.comp-ic {
+  position: absolute; width: 24px; height: 24px; top: 104px;
+  color: #4a7fd9;
+}
+.comp-ic-1 { left: 103px; }
+.comp-ic-2 { left: 153px; }
+.comp-ic-3 { left: 203px; }
+.comp-ic-4 { left: 253px; }
+.comp-ic-5 { left: 303px; }
+.comp-ic-6 { left: 350px; }
+.comp-lang { left: 433px; top: 98px; width: 130px; height: 39px; justify-content: center; gap: 12px; }
+.lang-chevron { opacity: 0.85; }
+.comp-submit { left: 578px; top: 101px; width: 90px; height: 36px; }
+
+/* feed card */
+.p-feed { left: 6px; top: 242px; width: 688px; height: 721px; --ag-radius: 24px; }
+
+.feed-avatar { left: 16px; width: 62px; height: 62px; }
+.feed-dots {
+  position: absolute; left: 642px; width: 22px; height: 22px;
+  color: #7e9cc9;
+}
+.feed-actions { position: absolute; left: 0; right: 0; height: 24px; }
+.feed-actions .ag-icon {
+  position: absolute; width: 22px; height: 22px;
+  color: #7fa3d4;
+}
+.feed-actions .fa-1 { left: 90px; }
+.feed-actions .fa-2 { left: 218px; }
+.feed-actions .fa-3 { left: 349px; }
+.feed-actions .fa-4 { left: 481px; }
+.feed-actions .fa-5 { left: 625px; }
+
+/* right rail */
+.p-rail {
+  left: 712px; top: 70px; width: 352px; height: 727px;
+  --ag-radius: 26px;
+  --ag-tint-mid: 232, 243, 253;
+  --ag-fill-top: 0.75;
+  --ag-fill-mid: 0.55;
+  --ag-fill-bottom: 0.18;
+  --ag-blur: 14px;
+  --ag-brightness: 1.22;
+  --ag-saturate: 1.15;
+}
+.rail-media {
+  left: 22px; top: 77px; width: 315px; height: 128px;
+  --ag-radius: 20px; position: absolute;
+  --ag-fill-top: 0.55;
+  --ag-fill-mid: 0.4;
+  --ag-fill-bottom: 0.3;
+}
+.rail-thumb { left: 8px; top: 13px; width: 107px; height: 105px; --ag-radius: 14px; position: absolute; }
+.rail-dots {
+  position: absolute; left: 303px; width: 22px; height: 22px;
+  color: #7e9cc9;
+}
+.rail-chevron { left: 290px; top: 674px; width: 39px; height: 39px; position: absolute; }
+
+/* bottom-right grass card */
+.p-grasscard {
+  left: 709px; top: 817px; width: 355px; height: 128px;
+  --ag-radius: 24px;
+  --ag-fill-top: 0.5;
+  --ag-fill-mid: 0.3;
+  --ag-fill-bottom: 0.2;
+  --ag-blur: 10px;
+  --ag-brightness: 1.2;
+}

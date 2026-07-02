@@ -130,3 +130,11 @@ Then open: `http://localhost:5173?avatar=woody`
 | Model too large/small | Scale factor; adjust in Blender export settings |
 | Long limbs/proportions | Calibrate in-app or apply per-bone offsets in the settings panel |
 
+
+## Aero glass replica assets (glass-assets/, branch aero-glass-exact)
+- `aero-bg.png`, `reference.png` — sky/grass wallpaper and design
+  reference, copied from the user's own aero-twitter-glass-lab repo
+  (user-generated imagery; confirm provenance at the gate). Used only by
+  the standalone glass-replica.html page, not shipped in the app.
+- The replica icon
+  sprite in glass-replica.html is hand-authored line art (original).
