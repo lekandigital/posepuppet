@@ -140,3 +140,17 @@ speed). That fix surfaced wall-clock velocity estimation breaking replay
 determinism — commitTarget now uses frame time (wall for live, loop time
 for ghosts, synthetic in tests), which also corrected ghost coast
 behavior. Both changes verified by the suite and re-run evals.
+
+## 2026-07-02 — Aero glass exact replica (branch aero-glass-exact)
+User-driven side quest: pixel-clone the Frutiger Aero reference
+(aero-twitter-glass-lab/public/reference.png) as a standalone page
+before restyling any app surface. Material ported from the glass lab's
+composer-2-max Save-76 recipe (computed styles dumped from its showcase
+build), buttons from the vault's glass-button/switcher/7-Aero snippets;
+all values then re-tuned against the reference image, which is milkier
+than any experiment branch. Key technical find: a pane that CONTAINS
+other glass panes must not use backdrop-filter (it becomes the backdrop
+root and children can't blur the wallpaper) — hence .ag-pane--noglass on
+the outer shell. Edge-reflex wallpaper sampling skipped for the static
+replica; revisit only if the live app needs adaptive rims. Kit lives in
+src/glass/aero-glass.css + glass.ts; app rollout waits for the gate.

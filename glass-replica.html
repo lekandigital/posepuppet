@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aero glass replica — reference clone</title>
+  <link rel="stylesheet" href="/src/glass/aero-glass.css" />
+  <link rel="stylesheet" href="/src/glass/replica.css" />
+</head>
+<body>
+  <!-- line-icon sprite (hand-authored, feather-style; no third-party assets) -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-bird" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M22 5.8c-.7.3-1.5.55-2.3.65a4.1 4.1 0 0 0 1.8-2.27c-.8.48-1.68.82-2.6 1a4.07 4.07 0 0 0-7.04 2.78c0 .32.03.63.1.93A11.55 11.55 0 0 1 3.5 4.6a4.07 4.07 0 0 0 1.26 5.43c-.66-.02-1.28-.2-1.83-.5v.05c0 1.97 1.4 3.62 3.27 4-.34.09-.7.14-1.07.14-.26 0-.52-.03-.77-.08a4.08 4.08 0 0 0 3.8 2.83A8.17 8.17 0 0 1 2.1 18.16 11.53 11.53 0 0 0 8.35 20c7.5 0 11.6-6.21 11.6-11.6l-.01-.53A8.3 8.3 0 0 0 22 5.8z"/>
+    </symbol>
+    <symbol id="i-home" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M3.5 10.4 12 3.4l8.5 7v9.1a1.5 1.5 0 0 1-1.5 1.5h-4v-6.5h-6V21H5a1.5 1.5 0 0 1-1.5-1.5z"/>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="10.8" cy="10.8" r="6.8" fill="none" stroke="currentColor" stroke-width="1.9"/>
+      <path d="m16 16 5 5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M18 8.4a6 6 0 1 0-12 0c0 6.6-2.6 7.6-2.6 7.6h17.2S18 15 18 8.4M10.2 20.6a2.1 2.1 0 0 0 3.6 0"/>
+    </symbol>
+    <symbol id="i-bell-fill" viewBox="0 0 24 24">
+      <path fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="M18 8.4a6 6 0 1 0-12 0c0 6.6-2.6 7.6-2.6 7.6h17.2S18 15 18 8.4"/>
+      <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M10.2 20.4a2.1 2.1 0 0 0 3.6 0"/>
+    </symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24">
+      <rect x="2.5" y="4.8" width="19" height="14.4" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.9"/>
+      <path d="m3.5 6.5 8.5 6.7 8.5-6.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.9"/>
+      <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" d="m15.7 8.3-2 5.4-5.4 2 2-5.4z"/>
+    </symbol>
+    <symbol id="i-bookmark" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" d="M6.3 3.5h11.4v17l-5.7-3.9-5.7 3.9z"/>
+    </symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 12.5h6M9 16h6"/>
+    </symbol>
+    <symbol id="i-users" viewBox="0 0 24 24">
+      <circle cx="9" cy="8.4" r="3.6" fill="none" stroke="currentColor" stroke-width="1.9"/>
+      <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" d="M2.6 20c.5-3.4 3.1-5.2 6.4-5.2s5.9 1.8 6.4 5.2M16.2 5.2a3.6 3.6 0 0 1 0 6.5M18.4 15.2c2 .7 3.2 2.2 3.5 4.6"/>
+    </symbol>
+    <symbol id="i-x" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M17.9 3H21l-6.8 7.8L22.2 21h-6.3l-4.9-6.4L5.4 21H2.3l7.3-8.3L1.9 3h6.4l4.4 5.9zm-1.1 16.1h1.7L7.4 4.7H5.6z"/>
+    </symbol>
+    <symbol id="i-user" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.9"/>
+      <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" d="M4.4 20.4c.7-3.7 3.6-5.6 7.6-5.6s6.9 1.9 7.6 5.6"/>
+    </symbol>
+    <symbol id="i-more-o" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.9"/>
+      <circle cx="7.8" cy="12" r="1.1" fill="currentColor"/>
+      <circle cx="12" cy="12" r="1.1" fill="currentColor"/>
+      <circle cx="16.2" cy="12" r="1.1" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24">
+      <circle cx="5" cy="12" r="1.7" fill="currentColor"/>
+      <circle cx="12" cy="12" r="1.7" fill="currentColor"/>
+      <circle cx="19" cy="12" r="1.7" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-feather" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M20.2 3.8a6 6 0 0 0-8.5 0L5 10.5V19h8.5l6.7-6.7a6 6 0 0 0 0-8.5zM16 8 2.5 21.5M17.5 15H9"/>
+    </symbol>
+    <symbol id="i-image" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="18" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"/>
+      <circle cx="8.6" cy="8.6" r="1.7" fill="currentColor"/>
+      <path d="m21 15.2-4.6-4.6L6 21" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-frame" viewBox="0 0 24 24">
+      <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"/>
+    </symbol>
+    <symbol id="i-list" viewBox="0 0 24 24">
+      <circle cx="4.6" cy="6.4" r="1.2" fill="currentColor"/>
+      <circle cx="4.6" cy="12" r="1.2" fill="currentColor"/>
+      <circle cx="4.6" cy="17.6" r="1.2" fill="currentColor"/>
+      <path d="M9 6.4h11M9 12h11M9 17.6h11" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-smile" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.9"/>
+      <path d="M8.3 14.2s1.3 1.9 3.7 1.9 3.7-1.9 3.7-1.9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+      <circle cx="9" cy="9.4" r="1.1" fill="currentColor"/>
+      <circle cx="15" cy="9.4" r="1.1" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24">
+      <rect x="3" y="4.8" width="18" height="16" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.9"/>
+      <path d="M8 2.8v4M16 2.8v4M3 9.8h18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" d="M12 21.5S5 16 5 10.2a7 7 0 0 1 14 0C19 16 12 21.5 12 21.5z"/>
+      <circle cx="12" cy="10.2" r="2.4" fill="none" stroke="currentColor" stroke-width="1.9"/>
+    </symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <ellipse cx="12" cy="12" rx="4" ry="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M3.4 9h17.2M3.4 15h17.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    </symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24">
+      <path d="m6.5 9.3 5.5 5.4 5.5-5.4" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-reply" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M21 11.6a8.4 8.4 0 0 1-8.5 8.3c-1.6 0-3-.35-4.3-1.05L3 20l1.3-4.9A8.15 8.15 0 0 1 3.9 11.6a8.4 8.4 0 0 1 8.6-8.3 8.4 8.4 0 0 1 8.5 8.3z"/>
+    </symbol>
+    <symbol id="i-retweet" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="m16.6 2.6 3.6 3.6-3.6 3.6M20 6.2H8.2a3.7 3.7 0 0 0-3.7 3.7v1.3M7.4 21.4l-3.6-3.6 3.6-3.6M4 17.8h11.8a3.7 3.7 0 0 0 3.7-3.7v-1.3"/>
+    </symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M20.6 6.5a5.2 5.2 0 0 0-7.4 0l-1.2 1.2-1.2-1.2a5.2 5.2 0 1 0-7.4 7.4l8.6 8.6 8.6-8.6a5.2 5.2 0 0 0 0-7.4z"/>
+    </symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24">
+      <path d="M6 20v-6M12 20V4.5M18 20v-10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-share" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 15.5V3.8M7.6 8.2 12 3.8l4.4 4.4M4.5 12.5v6a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-6"/>
+    </symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M19.3 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5v.2a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3h.1a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8v.1a1.6 1.6 0 0 0 1.5 1h.2a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/>
+    </symbol>
+  </svg>
+
+  <div class="viewport">
+    <div class="stage" id="stage">
+      <!-- ══ left nav panel ══ -->
+      <section class="ag-pane ag-pane--clear p-nav" id="p-nav">
+        <span class="ag-icon nav-bird"><svg><use href="#i-bird"/></svg></span>
+        <button class="ag-btn ag-btn--sleeve nav-home"><span class="ag-icon icon-34"><svg><use href="#i-home"/></svg></span></button>
+        <span class="ag-icon nav-ic nav-ic-1"><svg><use href="#i-search"/></svg></span>
+        <span class="ag-icon nav-ic nav-ic-2"><svg><use href="#i-bell-fill"/></svg></span>
+        <span class="ag-dot nav-dot"></span>
+        <span class="ag-icon nav-ic nav-ic-3"><svg><use href="#i-mail"/></svg></span>
+        <span class="ag-icon nav-ic nav-ic-4"><svg><use href="#i-compass"/></svg></span>
+        <span class="ag-icon nav-ic nav-ic-5"><svg><use href="#i-bookmark"/></svg></span>
+        <span class="ag-icon nav-ic nav-ic-6"><svg><use href="#i-doc"/></svg></span>
+        <span class="ag-icon nav-ic nav-ic-7"><svg><use href="#i-users"/></svg></span>
+        <span class="ag-icon nav-ic nav-ic-8"><svg><use href="#i-x"/></svg></span>
+        <span class="ag-icon nav-ic nav-ic-9"><svg><use href="#i-user"/></svg></span>
+        <span class="ag-icon nav-ic nav-ic-10"><svg><use href="#i-more-o"/></svg></span>
+        <button class="ag-btn ag-btn--vivid nav-tweet"><span class="ag-icon icon-26"><svg><use href="#i-feather"/></svg></span></button>
+      </section>
+
+      <!-- ══ account chip panel ══ -->
+      <section class="ag-pane ag-pane--clear p-account" id="p-account">
+        <span class="ag-avatar acct-avatar"></span>
+        <span class="ag-icon acct-dots"><svg><use href="#i-dots"/></svg></span>
+      </section>
+
+      <!-- ══ main outer panel ══ -->
+      <section class="ag-pane ag-pane--clear ag-pane--noglass p-main" id="p-main">
+        <!-- search + gear live inside the outer panel header -->
+        <div class="ag-pill main-search">
+          <span class="ag-icon icon-20 search-ic"><svg><use href="#i-search"/></svg></span>
+        </div>
+        <button class="ag-round main-gear"><span class="ag-icon icon-22"><svg><use href="#i-gear"/></svg></span></button>
+
+        <!-- composer card -->
+        <div class="ag-pane ag-pane--bright ag-pane--nested p-composer" id="p-composer">
+          <span class="ag-icon comp-ic comp-ic-1"><svg><use href="#i-image"/></svg></span>
+          <span class="ag-icon comp-ic comp-ic-2"><svg><use href="#i-frame"/></svg></span>
+          <span class="ag-icon comp-ic comp-ic-3"><svg><use href="#i-list"/></svg></span>
+          <span class="ag-icon comp-ic comp-ic-4"><svg><use href="#i-smile"/></svg></span>
+          <span class="ag-icon comp-ic comp-ic-5"><svg><use href="#i-calendar"/></svg></span>
+          <span class="ag-icon comp-ic comp-ic-6"><svg><use href="#i-pin"/></svg></span>
+          <div class="ag-pill comp-lang">
+            <span class="ag-icon icon-18"><svg><use href="#i-globe"/></svg></span>
+            <span class="ag-icon icon-14 lang-chevron"><svg><use href="#i-chevron"/></svg></span>
+          </div>
+          <button class="ag-btn ag-btn--pale comp-submit"></button>
+        </div>
+
+        <!-- feed card -->
+        <div class="ag-pane ag-pane--bright ag-pane--nested p-feed" id="p-feed">
+          <!-- rows are generated by replica.ts -->
+        </div>
+
+        <!-- right rail card -->
+        <div class="ag-pane ag-pane--nested p-rail" id="p-rail">
+          <div class="ag-pane ag-pane--nested ag-pane--noglass rail-media" id="p-media">
+            <div class="ag-pane ag-pane--nested ag-pane--clear ag-pane--noglass rail-thumb" id="p-thumb"></div>
+          </div>
+          <!-- rail rows generated by replica.ts -->
+          <button class="ag-round rail-chevron"><span class="ag-icon icon-18"><svg><use href="#i-chevron"/></svg></span></button>
+        </div>
+
+        <!-- bottom-right grass card -->
+        <div class="ag-pane ag-pane--clear ag-pane--nested p-grasscard" id="p-grasscard"></div>
+      </section>
+
+      <!-- atmosphere: flare + stars + bubbles injected by replica.ts -->
+      <div class="atmosphere" id="atmosphere"></div>
+
+      <!-- optional reference overlay for pixel comparison (?ref=0.5) -->
+      <img class="ref-overlay" id="ref-overlay" src="/glass-assets/reference.png" alt="" hidden />
+    </div>
+  </div>
+
+  <script type="module" src="/src/glass/replica.ts"></script>
+</body>
+</html>
