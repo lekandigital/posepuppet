@@ -278,8 +278,16 @@ export class Retargeter {
     if (st) st.correction.setFromEuler(new THREE.Euler(euler.x, euler.y, euler.z));
   }
 
-  /** Per pose frame. Pass null when nothing was detected. */
-  updateFromPose(world: LandmarkPoint[] | null, norm: LandmarkPoint[] | null): void {
+  /** frame timestamp for velocity estimation (frame time, not wall time) */
+  private frameMs = 0;
+
+  /** Per pose frame. Pass null when nothing was detected. frameMs is the
+   *  FRAME timestamp — wall time for live capture, loop-local time for
+   *  replay, synthetic clocks in tests. Velocity estimation depends on it
+   *  being frame-consistent (wall-clock here made replayed loops compute
+   *  garbage velocities: found by the Motion Memory round-trip test). */
+  updateFromPose(world: LandmarkPoint[] | null, norm: LandmarkPoint[] | null, frameMs?: number): void {
+    this.frameMs = frameMs ?? this.frameMs + 33.3; // assume ~30fps when untimed
     if (!world || !norm) {
       for (const st of this.states.values()) st.confident = false;
       return;
@@ -403,8 +411,8 @@ export class Retargeter {
    *  the target's angular velocity (used to coast through dropouts) and
    *  stores it as the live target the tick blends toward. */
   private commitTarget(st: BoneState, q: THREE.Quaternion): void {
-    const now = performance.now();
-    if (st.prevTarget) {
+    const now = this.frameMs;
+    if (st.prevTarget && now > st.prevTargetMs) {
       const dtp = Math.max((now - st.prevTargetMs) / 1000, 1e-3);
       // dq = q ⊗ prev⁻¹ — the rotation that advanced the target this frame
       tmpQ3.copy(st.prevTarget).invert().premultiply(q);
@@ -694,6 +702,11 @@ export class Retargeter {
         // cover with the hand forward of the face) to full at 0.6
         const t = THREE.MathUtils.clamp((1.15 - n) / (1.15 - 0.6), 0, 1);
         w = t * t * (3 - 2 * t);
+        // velocity gate: a fist flying past the face is a punch, not a
+        // face touch — final-eval finding: shadowboxing engaged the
+        // magnetism mid-punch (53 penetration frames on fast.mp4)
+        const speed = foreSt.velAngle; // rad/s of the forearm
+        w *= THREE.MathUtils.clamp(1 - (speed - 3.5) / 3, 0, 1);
       }
       const ft = this.faceTouch;
       ft[side] += (w - ft[side]) * 0.3; // contact easing
