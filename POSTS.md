@@ -1,105 +1,114 @@
-# Posts
+# Posts — pass 2 ("the instrument pass")
 
-Drafts below follow the voice contract: lowercase, understated, specific,
-technical. No hashtags, no exclamation marks, no emojis, no banned phrases.
-Links and repo go in the self-reply, never the main post. I (Lekan) post
-manually; nothing is ever posted by tooling. Every number maps to a field in
-the verification table at the bottom.
+Drafts follow the voice contract: lowercase, understated, specific,
+technical. No hashtags, no exclamation marks, no emojis, no banned
+phrases. Exactly one honest flaw in each main post. Links and repo in the
+self-reply, never the parent. I (Lekan) post manually; nothing is ever
+posted by tooling. Every number maps to a row in the verification table.
+
+Media assignments come from DEMO_SCRIPT v2: ghost duet (flagship,
+vertical), talking beaky (voiceover, vertical), exaggeration slider,
+face-touch, instant replay, hands-free take, x-ray, pose poster (still).
 
 ---
 
 ## Main post — variant A (data-led)
+*media: ghost duet vertical*
 
-> webcam → 33 body landmarks → quaternions → a 3d character copying me live
-> in the browser tab. no backend, nothing uploaded.
+> i recorded the motion once. now every character in the roster can
+> perform it.
 >
-> tracking error against my own limbs on screen: 9.5° on slow arm work,
-> 19.2° mid-shadowbox. detection held 100% across six 60-second runs, pose
-> loop pinned at the camera's 30 fps.
+> posepuppet pass 2: the browser puppet got a memory. your last 12 seconds
+> live in a ring buffer — loop them on a translucent ghost and duet with
+> yourself, or fan one ghost into four staggered echoes.
 >
-> the honest flaw: one camera means depth is a guess. it reads my shoulder
-> width and commits.
+> loops are the pipeline's input stream, not baked bones, so a take
+> recorded on one character replays on any other exactly. round-trip
+> replay error against the live take: <5° mean.
 >
-> a motion puppet, not mocap. it just has to look alive — and the gap
-> between alive and haunted turns out to be about ten degrees.
+> the honest flaw: fast punches still land a beat late. smoothing buys
+> stability with latency and i keep paying it.
+>
+> all local. the ghost never leaves the machine either.
 
 ## Main post — variant B (story-led)
+*media: talking beaky with voiceover*
 
-> i gave fable 5 one goal: turn my webcam into a realtime 3d character rig
-> in the browser. ~6 hours of commits, autonomous, all local.
+> the hard part of a hand puppet is not tracking the hand. it's making a
+> triangle with a beak feel alive.
 >
-> first thing it built was its own eyes — a fake-webcam rig that pipes clips
-> of me into chrome so it could screenshot the avatar next to my body and
-> grade itself. baseline limb error: 68.9°. it shipped at 9.5°.
+> beaky: 21 hand landmarks, palm direction aims the head, thumb–index
+> pinch is the jaw. the pinch range auto-fits your hand, the crest rides a
+> spring so it overshoots when you whip the head around, and the beak
+> correlates with your pinch at r=0.941 on the test clip.
 >
-> one camera, no depth — leaning works, walking at the lens is a heuristic.
-> it logged that as a limitation instead of hiding it, which is more than i
-> expected.
+> the flaw i know about: the beak never quite slams shut at speed — the
+> jaw smoothing rounds off fast consonants.
 >
-> the robot moved by lunch. the astronaut moved by mid-afternoon.
+> talk over it with your own voice. nothing you say goes anywhere; the
+> whole thing is a browser tab.
 
 ## Main post — variant C (kicker-led)
+*media: exaggeration slider clip*
 
-> the difference between a puppet and a haunting is about ten degrees.
+> puppets have a dial that people don't: how much of a cartoon to be.
 >
-> posepuppet: webcam in, rigged 3d character out, live in a browser tab.
-> two avatars — a primitive robot and a cc0 vrm astronaut — driven by the
-> same retargeting math: one euro filter on metric landmarks, body-frame
-> limb targeting, parent-local quaternions, slerp on top.
+> pass 2 gave posepuppet an exaggeration slider — 1.0 mirrors you, 2.0
+> doubles your arcs with overshoot and a squash on fast moves, clamped so
+> the rig never folds through itself. the same wave reads polite at one
+> end and looney tunes at the other.
 >
-> 9.5° limb error slow, 19.2° shadowboxing, 30 fps pose loop, zero frames
-> dropped from detection. single-camera depth remains a polite fiction.
+> under it: swing-angle scaling with an 8° dead zone (rest jitter must
+> never be amplified) and a soft knee past 55° (big gestures already fill
+> the pose space).
 >
-> all inference in-page. no frame, landmark, or recording leaves the machine.
+> honest flaw: the torso only takes half the dial — full-rate chest
+> exaggeration read as possession, so i clamped it.
+>
+> the slider is the entire ui. that's the point.
 
 ## Thread version
+*(reply chain under whichever main post wins)*
 
-1. webcam → 3d character, live, in the browser. split screen: me + skeleton
-   overlay left, puppet right. nothing uploaded anywhere.
-   [media: recordings/<demo-take>.webm]
-2. the pipeline: mediapipe pose → mirror → one euro filter (tuned for metric
-   space — beta 8, not the textbook 0.007) → body-frame limb directions →
-   parent-local quaternions → slerp. two-stage smoothing is what separates
-   alive from jittery.
-   [media: media/m2-robot.png]
-3. the agent building this couldn't see my webcam, so it built a fake one:
-   chrome's fake-video-capture fed with clips of me, screenshots of the
-   avatar beside my body, and an angle metric grading every limb per frame.
-   baseline 68.9° → shipped 9.5°.
-   [media: media/m1-detect.png]
-4. same retargeting layer drives a primitives robot and a cc0 vrm astronaut,
-   switchable mid-motion. the one real vrm bug: a default flag that quietly
-   overwrites your bone rotations every frame. the astronaut stood in a
-   perfect t-pose, ignoring me, until one line turned it off.
-   [media: media/m4-vrm.png]
-5. honest limits: one camera so depth is inferred from shoulder width, legs
-   only engage when hips and knees are confidently visible, and the fastest
-   punches land a beat late. it's a puppet, not mocap. it just has to look
-   alive.
-
-## Self-reply (links)
-
-> repo + setup: <REPO_URL_WHEN_PUBLIC>
-> everything runs in-page — no backend, no analytics, no uploads. clips of
-> me used for testing never leave the machine and never enter the repo.
-
----
+1. *[ghost duet vertical]* the memory system: 12-second ring buffer,
+   always on. ghost = replay on a violet copy. echoes = the same loop at
+   300 ms offsets. a motion delay line, basically free once ghosts exist.
+2. *[face-touch clip]* face-touch was the failure mode i cared about —
+   hands through skulls read haunted. proximity magnetizes the arm onto a
+   two-bone ik whose target sits just outside a head collider measured
+   from the avatar's actual skinned vertices. reach 99.3–100%,
+   penetration 0 frames, on the test clip.
+3. *[hands-free take]* i'm meters from the keyboard: raise both arms and
+   the countdown starts, serif prompts walk the shots, cross wrists to
+   stop. the gesture layer has exactly one consumer on purpose — this is
+   a puppet stage, not a game console.
+4. *[x-ray]* sometimes the skeleton is the show. 21 landmarks, additive
+   wireframe, a lagged trail. some people will share this over any
+   character and i respect it.
+5. *[instant replay]* after a take: last 5 seconds, slow motion, side
+   angle, trail echoes. the stage does its own replay booth.
+6. *[pose poster still]* freeze, quarter orbit, designed still with the
+   mono labels. the privacy line is printed on it because it's true:
+   detection 100% across 17 sixty-second runs, pose loop
+   28.2–29.9 fps, render 115–123 fps, zero external
+   requests since load — the ui counts them live.
+7. self-reply with repo + clips.
 
 ## Verification table
 
-| claim | source |
-|---|---|
-| 9.5° slow arm work | eval/results.json → results[fixture=arms, avatar=robot].sync.upperLimbsMean = 9.51 |
-| 19.2° shadowbox | eval/results.json → results[fixture=fast, avatar=robot].sync.upperLimbsMean = 19.18 |
-| astronaut 10.9° / 20.3° | results[arms, vrm].sync.upperLimbsMean = 10.86; results[fast, vrm] = 20.26 |
-| detection 100%, six 60s runs | all six results[].detectionRate = 1, durationSec = 60 |
-| 30 fps pose loop | results[].poseFps = 29.06–29.79 (30 fps fixtures; headed run, Apple M5, GPU delegate) |
-| zero dropped detection frames | results[].detectedFrames = videoFrames on all six |
-| baseline 68.9° → 9.5° | EVAL_NOTES.md M1 entry (static-robot baseline) → current arms result |
-| ~6 hours of commits | git log: M0 scaffold 08:26 → M4 14:24, 2026-06-10 (same-day session) |
-| "about ten degrees" | rhetorical rounding of the 9.42–10.86° range above |
-| two avatars, cc0 | ASSETS.md (astronaut: CC0 in embedded VRM meta) |
+every number above, mapped to its source. all from eval/results.json
+(final pass-2 refresh, headed chromium, apple m5, gpu delegate, 60 s per
+run) or the playwright suite output.
 
-Note: no millisecond latency figure is claimed anywhere — we never measured
-one. If asked: pose cadence is ~33 ms (30 fps) plus smoothing lag; the live
-feel was approved at both user gates, and that's the only claim made.
+| claim | value | source |
+|---|---|---|
+| round-trip replay error (mean) | <5° | tests/memory.spec.ts tolerance assertion (mean <5°, measured pass) |
+| pinch→jaw correlation | r=0.941 | eval/results.json → hand_pinch_point.pinchJaw.r |
+| face-touch reach / penetration | 99.3–100% / 0 frames | eval/results.json → facetouch.faceTouch (per avatar) |
+| detection rate | 100% | eval/results.json → detectionRate, all rows |
+| pose loop fps | 28.2–29.9 | eval/results.json → poseFps (clip-capped at 30) |
+| render fps | 115–123 | eval/results.json → renderFps |
+| sixty-second runs in the final refresh | 17 | eval/results.json → results.length |
+| upper-limb sync error (arms/torso/fast) | 9.5–11.0° / 2.2–2.4° / 17.3–23.4° | eval/results.json → sync.upperLimbsMean |
+| legs sync error (fullbody) | 5.6–6.3° | eval/results.json → sync.legsMean |
+| fast-motion latency flaw | qualitative | EVAL_NOTES.md P2 (smoothing/latency trade) |
