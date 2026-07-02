@@ -9,6 +9,8 @@ import type { LandmarkPoint } from '../pose/types';
 import type { TakeScript } from './scripts';
 
 export interface DirectorDeps {
+  /** true while the performer holds still (the gesture seed's signal) */
+  holdingStill(): boolean;
   startRecording(maxSec: number, takeName: string): void;
   stopRecording(): void;
   ghostOn(): Promise<void>;
@@ -75,6 +77,7 @@ export function createDirector(deps: DirectorDeps): Director {
   function clearTimers(): void {
     clearTimeout(shotTimer);
     clearTimeout(countdownTimer);
+    clearInterval(stillPoll);
   }
 
   function finish(): void {
@@ -87,6 +90,7 @@ export function createDirector(deps: DirectorDeps): Director {
     deps.stopRecording();
   }
 
+  let stillPoll = 0;
   function runShot(i: number): void {
     if (!script) return;
     if (i >= script.shots.length) {
@@ -100,6 +104,17 @@ export function createDirector(deps: DirectorDeps): Director {
     if (shot.action === 'ghost-on') void deps.ghostOn();
     if (shot.action === 'avatar-next') deps.avatarNext();
     shotTimer = window.setTimeout(() => runShot(i + 1), shot.sec * 1000);
+    // hands-free advance: holding the shot's pose still (after a minimum
+    // beat) moves on early — the timer remains the ceiling
+    clearInterval(stillPoll);
+    const shotStart = performance.now();
+    stillPoll = window.setInterval(() => {
+      if (performance.now() - shotStart > 1800 && deps.holdingStill()) {
+        clearInterval(stillPoll);
+        clearTimeout(shotTimer);
+        runShot(i + 1);
+      }
+    }, 250);
   }
 
   function countdown(n: number): void {
