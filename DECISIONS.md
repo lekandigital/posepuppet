@@ -46,3 +46,80 @@ indistinguishable for this use; 30 fps matches typical webcam delivery.
 `public/models/pose_landmarker_full.task` (Apache-2.0, Google) is downloaded
 postinstall if missing. Neither binary lives in git; the app itself serves
 everything same-origin and makes zero runtime network requests.
+
+## 2026-06-12 — P0: generated-avatar load smokes skip when the local VRM is absent
+The five generated-avatar load tests hard-failed because the candidate VRMs
+(public/avatars/generated/, deliberately gitignored, local working binaries
+from the post-pass-1 audit workstream) are no longer on disk. Asserting
+'loaded' on files the repo promises never to ship makes the suite red on any
+fresh checkout, so the load smokes now skip when the .vrm is missing; the
+fallback and UI-isolation tests still always run. Coverage returns
+automatically on machines that have the candidates.
+
+## 2026-06-12 — P0: pass-1 eval results archived before re-baselining
+eval/results.json is overwritten by every run; the pass-1 final numbers are
+copied to eval/results-pass1-final.json so the pass-2 before/after table can
+cite both files directly rather than digging through git history.
+
+## 2026-06-12 — P0: eval can no longer silently measure the fallback avatar
+First baseline attempt mislabeled 3 of 9 rows: woody's VRM load failed
+intermittently, setAvatar's catch only console.warn'd and reverted to the
+robot, and eval recorded robot numbers under a woody run (all VRMs also
+shared the name 'vrm'). Three changes: per-file VRM names ('vrm:woody'),
+failed avatar load is now console.error (eval counts it), and eval/run.mjs
+records avatarRequested + exits non-zero on requested/measured mismatch.
+Baseline re-run under these guards before anything diffs against it.
+
+## 2026-06-12 — Gate 1: woody demoted to local-only; astronaut default again
+Gate-1 decision (structured reply): woody.vrm is a fan rig of a licensed
+character and cannot ship publicly. Untracked + gitignored (remains in git
+history — flagged; a history rewrite was offered and not chosen), registry
+entry marked optional with a boot-time HEAD probe that removes it from the
+avatar cycle when the file is absent, default avatar back to the CC0
+astronaut. Electives locked at the same gate: Tier B1 velocity VFX + B2
+auto-director camera; B3 parallax and both Tier C items skipped.
+
+## 2026-06-12 — Privacy receipt counts EXTERNAL requests in the headline
+The spec sketch says "0 NETWORK REQUESTS"; shipped as "0 EXTERNAL REQUESTS".
+Reason: variable fonts load per-unicode-range subsets lazily, so a same-
+origin font file can arrive after document.fonts.ready and falsely dirty
+the counter — and same-origin static assets are the app serving itself,
+not a privacy event. The enforced claim is "nothing talks to anyone
+else's server": every cross-origin resource/beacon/socket counts from the
+moment boot assets settle. README privacy wording already matches this
+("zero runtime network requests; model and WASM served same-origin").
+
+## 2026-06-12 — No opaque background on the camera-feed layer
+Chromium (headless GL at least) mis-composites an opaque background on
+the promoted layer that contains the accelerated <video>: the bg quad
+paints y-flipped over the WebGL stage as a feed-sized hole. The dark fill
+lives on .camera-pane instead; comment pinned in styles.css.
+
+## 2026-06-12 — P3: true finger tracking ships in hand-only mode ONLY
+HandLandmarker (21 landmarks) drives hand-only mode — that mode IS finger
+tracking. It does not spread to full-body avatars this pass: running both
+models per frame costs pose-loop budget, and the P2 pose-landmark
+open/fist/point approximation already covers character mode's needs.
+Revisit only if a P8 perf margin makes dual-model free.
+
+## 2026-06-12 — Beaky stays center-weighted
+The talking-head puppet follows hand position at half gain, clamped to
+the stage box: full positional mapping walked the puppet off frame on
+real footage. The expressive hand and x-ray keep full positional range —
+their point is literal following.
+
+## 2026-06-12 — Gate-3 fixes: capability labels over forced features
+The astronaut's hands are mittens (no finger geometry); rather than fake
+finger motion, both default avatars now carry "Fingers not supported"
+chips and the roster gap is queued for P6/Gate 4 (Seed-san — VRM1
+reference model, already in public/avatars — or a 100Avatars CC0 pick
+with real fingers). Spec rule applied: "a capability label, not a bug."
+
+## 2026-06-12 — P4: Motion Memory records landmarks, not bone quaternions
+The spec sketches "capture the retargeted bone-quaternion stream"; shipped
+as the pipeline INPUT stream (mirrored+smoothed landmarks, int16). Bone
+quats are rig-specific — re-skin would need per-rig remapping and would
+bake in the recording avatar's rest pose. Replaying landmarks through a
+second Retargeter IS the retargeting layer doing the re-skin, exactly, on
+any roster character, and playback obeys the current expressiveness
+settings. Round-trip tolerance verified in tests/memory.spec.ts.

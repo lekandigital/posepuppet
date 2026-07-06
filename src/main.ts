@@ -1,21 +1,48 @@
 // Boot + the imperative capture → detect → retarget → render pipeline.
 // No framework in the hot path; UI chrome is plain DOM.
 
+import '@fontsource-variable/inter/index.css';
+import '@fontsource-variable/jetbrains-mono/index.css';
+import '@fontsource-variable/fraunces/index.css';
+import './styles.css';
+
 import * as THREE from 'three';
 import { startCamera, startVideoFile, watchLayout, layoutOverlay, setMirrored } from './camera';
 import { createStage } from './stage/scene';
-import { createHud } from './ui/hud';
+import { createChain } from './ui/chain';
+import { createReceipt } from './ui/receipt';
+import { createAvatarCards } from './ui/cards';
+import { createPalette } from './ui/palette';
+import { createCoach } from './ui/coach';
+import { createOnboarding } from './ui/onboarding';
+import { createHandMode, HAND_PUPPETS, isHandPuppetId } from './hand/mode';
+import { RingBuffer, encodePoseFrame, encodeHandFrame } from './memory/stream';
+import { createGhostPlayer } from './memory/ghost';
+import { saveLoop, listLoops, loadLoop, deleteLoop } from './memory/store';
+import { createIntentDetector } from './gesture/intent';
+import { createDirector } from './director/director';
+import { TAKE_SCRIPTS } from './director/scripts';
+import type { HandPuppetId } from './hand/types';
 import { createPanel } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
 import { createDetector, type ModelVariant } from './pose/detector';
 import { drawSkeleton } from './overlay/skeleton';
+import { LM } from './pose/indices';
 import { mirrorNorm, mirrorWorld } from './pose/mirror';
 import { LandmarkSmoother } from './pose/smoothing';
 import type { LandmarkPoint, PoseFrame } from './pose/types';
 import { createRobot } from './rig/robot';
 import { Retargeter } from './rig/retarget';
 import type { Avatar, BoneName } from './rig/types';
-import { type AvatarId, isAvatarId, getAvatarDef, nextAvatarId, loadAvatarById } from './rig/avatarRegistry';
+import {
+  type AvatarId,
+  isAvatarId,
+  isAvatarAvailable,
+  probeOptionalAvatars,
+  getAvatarDef,
+  nextAvatarId,
+  loadAvatarById,
+} from './rig/avatarRegistry';
 import { getGeneratedAvatarDef } from './rig/generatedAvatarRegistry';
 import { EvalCollector } from './eval/runner';
 import { createRecorder, createRecordButton, updateRecordButton } from './record/recorder';
@@ -61,6 +88,7 @@ declare global {
       frameAvatar: () => { framed: boolean; bbox: { center: number[]; size: number[] } | null };
       clearPose: () => void;
       applyPose: (poseName: string) => VisualQaPoseResult;
+      applyHandState: (side: 'left' | 'right', openness: number, point: boolean) => void;
     };
   }
 }
@@ -68,10 +96,18 @@ declare global {
 async function boot() {
   const video = document.getElementById('video') as HTMLVideoElement;
   const overlay = document.getElementById('overlay') as HTMLCanvasElement;
-  const pane = document.getElementById('camera-pane')!;
+  // layout target is the feed box, not the whole camera panel (which now
+  // carries a header/footer); countdown + status overlays land here too
+  const pane = document.getElementById('camera-feed')!;
   const statusEl = document.getElementById('camera-status')!;
   const stageCanvas = document.getElementById('stage') as HTMLCanvasElement;
   const overlayCtx = overlay.getContext('2d')!;
+
+  // theme before anything paints; persisted via the config store
+  document.documentElement.dataset.theme = config.theme;
+  onConfigChange((key) => {
+    if (key === 'theme') document.documentElement.dataset.theme = config.theme;
+  });
 
   // Add test markers for Playwright
   document.body.setAttribute('data-testid', 'posepuppet-app');
@@ -87,17 +123,66 @@ async function boot() {
   const isAvatarVisualReview = smokeMode === 'avatar-visual-review';
   const isGeneratedOnlyMode = isAvatarLoadOnly || isAvatarVisualReview;
   if (params.has('mirror')) config.mirror = params.get('mirror') !== '0';
+  if (params.has('body')) config.bodyMode = params.get('body') === 'full' ? 'full' : 'upper';
+  if (params.has('mode')) config.mode = params.get('mode') === 'hand' ? 'hand' : 'character';
+  if (params.has('puppet')) {
+    const pp = params.get('puppet')!;
+    if (isHandPuppetId(pp)) config.handPuppet = pp;
+  }
   if (params.has('avatar')) {
     const av = params.get('avatar')!;
-    config.avatar = isAvatarId(av) ? av : 'woody';
+    config.avatar = isAvatarId(av) ? av : 'astronaut';
   }
+  // optional avatars (local-only files) leave the cycle when absent; a
+  // persisted/requested choice that's gone falls back to the default
+  await probeOptionalAvatars();
+  if (!isAvatarAvailable(config.avatar)) config.avatar = 'astronaut';
+  createAvatarCards();
+
+  // command-bar mode selector: Character is the only live mode this side
+  // of P3; Setup re-runs neutral-pose calibration
+  document.getElementById('mode-setup')!.addEventListener('click', () => calibrateWithCountdown());
+
+  // exaggeration slider (the expressiveness layer's visible control)
+  const exagSlider = document.getElementById('exag-slider') as HTMLInputElement | null;
+  const exagVal = document.getElementById('exag-val');
+  if (exagSlider && exagVal) {
+    exagSlider.value = String(config.exaggeration);
+    exagVal.textContent = config.exaggeration.toFixed(2).replace(/0$/, '');
+    exagSlider.oninput = () => setConfig('exaggeration', Number(exagSlider.value));
+    onConfigChange((key) => {
+      if (key === 'exaggeration') {
+        exagVal.textContent = config.exaggeration.toFixed(2).replace(/0$/, '');
+        if (exagSlider.value !== String(config.exaggeration)) exagSlider.value = String(config.exaggeration);
+      }
+    });
+  }
+
+  // theme toggle (persisted)
+  const themeBtn = document.createElement('button');
+  themeBtn.id = 'theme-btn';
+  themeBtn.textContent = '◐';
+  themeBtn.title = 'toggle light/dark theme (t)';
+  themeBtn.onclick = () => setConfig('theme', config.theme === 'dark' ? 'light' : 'dark');
+  document.getElementById('controls')!.append(themeBtn);
   // ?src=file plays the fixture mp4 directly (manual eval without fake cam)
   const videoSrc =
     params.get('video') ?? (evalFixture && params.get('src') === 'file' ? `/fixtures/${evalFixture}.mp4` : null);
 
   const els = { video, overlay, pane };
-  const hud = createHud();
+  const hud = createChain();
+  const coach = createCoach();
+  const receipt = createReceipt();
   const stage = createStage(stageCanvas);
+  const handMode = createHandMode();
+  stage.scene.add(handMode.object);
+  handMode.object.visible = false;
+
+  // Motion Memory: always-on ring buffers (last 12 s) + ghost player
+  const poseRing = new RingBuffer('pose', 12);
+  const handRing = new RingBuffer('hand', 12);
+  const ghosts = createGhostPlayer();
+  stage.scene.add(ghosts.object);
 
   let avatar: Avatar = createRobot();
   stage.scene.add(avatar.object);
@@ -384,6 +469,7 @@ async function boot() {
       frameAvatar: frameVisualQaAvatar,
       clearPose: clearVisualQaPose,
       applyPose: applyVisualQaPose,
+      applyHandState: (side, openness, point) => avatar.applyHandState?.(side, openness, point),
     };
   }
   installVisualQaHook();
@@ -421,23 +507,73 @@ async function boot() {
     setCorrectionEuler: (b, e) => retargeter.setCorrectionEuler(b, e),
   });
 
-  // live avatar switcher: robot → astronaut → woody → robot (see ASSETS.md)
+  // live avatar switcher with crossfade: both avatars share the stage for a
+  // beat while opacity swaps; the retargeter's re-acquisition blend ramps
+  // the new rig from rest onto the live pose — the switch never pops
   let avatarLoading = false;
   let currentAvatarId: AvatarId = 'robot';
+
+  function setTreeOpacity(obj: THREE.Object3D, opacity: number): void {
+    obj.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        const mat = m as THREE.Material & { opacity: number };
+        if (opacity < 1 && !mat.userData.ppWasTransparent) {
+          mat.userData.ppWasTransparent = mat.transparent;
+          mat.transparent = true;
+        }
+        mat.opacity = opacity;
+        if (opacity >= 1 && mat.userData.ppWasTransparent !== undefined) {
+          mat.transparent = mat.userData.ppWasTransparent as boolean;
+          delete mat.userData.ppWasTransparent;
+        }
+      }
+    });
+  }
+
+  function crossfadeAvatars(prev: Avatar, sec = 0.4): void {
+    // fade the OLD avatar out over the new one; the new one stays opaque
+    // from frame one. Fading both let the old avatar's far side show
+    // through the new body (transparent depth sorting) — Gate-3 finding.
+    prev.object.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      mesh.renderOrder = 999; // draw last, blended over the new avatar
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        const mat = m as THREE.Material;
+        mat.transparent = true;
+        mat.depthWrite = false; // don't punch holes…
+        mat.depthTest = true; // …but stay hidden behind the new body
+      }
+    });
+    const t0 = performance.now();
+    const step = () => {
+      const t = Math.min((performance.now() - t0) / (sec * 1000), 1);
+      setTreeOpacity(prev.object, 1 - t);
+      if (t < 1) requestAnimationFrame(step);
+      else prev.dispose();
+    };
+    requestAnimationFrame(step);
+  }
+
   async function setAvatar(id: AvatarId): Promise<void> {
     if (avatarLoading || currentAvatarId === id) return;
     avatarLoading = true;
     try {
       const next = await loadAvatarById(id);
       stage.scene.add(next.object);
-      avatar.dispose();
+      const prev = avatar;
       avatar = next;
       retargeter.bind(avatar);
       installVisualQaHook();
       currentAvatarId = id;
+      crossfadeAvatars(prev);
     } catch (err) {
       const def = getAvatarDef(id);
-      console.warn(
+      // error, not warn: eval counts console errors, so a failed load can
+      // never again silently measure the fallback avatar as if it were `id`
+      console.error(
         `Failed to load avatar "${id}" from ${def.url ?? '(procedural)'}. ` +
         `Is the licensed VRM file present?`,
         err,
@@ -563,9 +699,12 @@ async function boot() {
   try {
     if (videoSrc) {
       await startVideoFile(video, videoSrc);
+      hud.setLive(false);
+      hud.setCam(`FILE ${video.videoWidth}×${video.videoHeight}`);
     } else {
       await startCamera(video);
       hud.setLive(true);
+      hud.setCam(`LIVE ${video.videoWidth}×${video.videoHeight}`);
     }
     statusEl.classList.add('hidden');
     window.__PP.videoReady = true;
@@ -581,7 +720,16 @@ async function boot() {
     video,
     overlay,
     stage: stageCanvas,
-    onState: updateRecordButton,
+    onState: (recording, elapsedSec) => {
+      updateRecordButton(recording, elapsedSec);
+      hud.setRec(recording, elapsedSec);
+    },
+    onSaved: () => {
+      coach.set('Saved', 'Clip downloaded — it never left this machine.', {
+        label: 'Copy caption',
+        run: () => void navigator.clipboard.writeText(suggestCaption()),
+      });
+    },
   });
   createRecordButton(recorder);
 
@@ -601,6 +749,7 @@ async function boot() {
         fileMode = false;
         fileBtn.textContent = 'load video';
         hud.setLive(true);
+        hud.setCam(`LIVE ${video.videoWidth}×${video.videoHeight}`);
         smoother.reset();
         layoutOverlay(els);
       });
@@ -615,6 +764,7 @@ async function boot() {
       fileMode = true;
       fileBtn.textContent = '↩ camera';
       hud.setLive(false);
+      hud.setCam(`FILE ${video.videoWidth}×${video.videoHeight}`);
       smoother.reset();
       layoutOverlay(els);
     });
@@ -630,6 +780,347 @@ async function boot() {
   const detector = await createDetector(modelVariant);
   statusEl.classList.add('hidden');
   window.__PP.poseFps = () => detector.poseFps();
+
+  // every boot asset (model, wasm, fonts, avatar) is now in — from here on
+  // the privacy receipt counts every network request, truthfully
+  void document.fonts.ready.then(() => receipt.arm());
+
+  // ── Motion Memory UI: ghost duet, echo chorus, instant replay, loops ──
+  const ghostBtn = document.getElementById('ghost-btn') as HTMLButtonElement;
+  const replayBtn = document.getElementById('replay-btn') as HTMLButtonElement;
+  const echoSlider = document.getElementById('echo-slider') as HTMLInputElement;
+  const echoVal = document.getElementById('echo-val');
+  let echoes = 1;
+  let replayActive = false;
+
+  async function toggleGhost(): Promise<void> {
+    if (ghosts.active) {
+      ghosts.stop();
+      ghostBtn.classList.remove('on');
+      return;
+    }
+    const loop = poseRing.snapshot(8, 'last take');
+    if (!loop) {
+      coach.set('Memory', 'Perform for a few seconds first — the ghost replays your last 8 seconds.');
+      return;
+    }
+    await ghosts.start(loop, config.avatar, { echoes, echoOffsetMs: 300 });
+    ghostBtn.classList.add('on');
+  }
+
+  async function instantReplay(): Promise<void> {
+    if (replayActive) return;
+    const loop = poseRing.snapshot(5, 'replay');
+    if (!loop) {
+      coach.set('Memory', 'Perform for a few seconds first — replay shows your last 5 seconds.');
+      return;
+    }
+    replayActive = true;
+    replayBtn.classList.add('on');
+    const wasGhosting = ghosts.active;
+    ghosts.stop();
+    // stage flips to replay framing IMMEDIATELY (the ghost build awaits
+    // VRM loads); slow-mo from a side angle, trails via tight echoes
+    avatar.object.visible = false;
+    stage.camera.position.set(2.6, 1.45, 1.6);
+    stage.camera.lookAt(0, 1.0, 0);
+    await ghosts.start(loop, config.avatar, {
+      echoes: 3,
+      echoOffsetMs: 120,
+      rate: 0.4,
+      placement: 'center',
+      baseOpacity: 0.75,
+    });
+    const replayMs = (loop.durationMs / 0.4) + 400;
+    setTimeout(() => {
+      ghosts.stop();
+      avatar.object.visible = config.mode !== 'hand';
+      stage.setTreatment(config.mode === 'hand' ? 'hand' : 'character');
+      replayBtn.classList.remove('on');
+      replayActive = false;
+      if (wasGhosting) void toggleGhost();
+    }, replayMs);
+  }
+
+  ghostBtn.onclick = () => void toggleGhost();
+  replayBtn.onclick = () => void instantReplay();
+  echoSlider.oninput = () => {
+    echoes = Number(echoSlider.value);
+    if (echoVal) echoVal.textContent = `×${echoes}`;
+    if (ghosts.active) ghosts.setEchoes(echoes);
+  };
+
+  // saved loops: tiny local list — save the last 8 s, play any loop on the
+  // CURRENT avatar (re-skin), delete. IndexedDB, fully local.
+  const loopList = document.getElementById('loop-list');
+  async function refreshLoopList(): Promise<void> {
+    if (!loopList) return;
+    const metas = await listLoops();
+    loopList.innerHTML = '';
+    if (!metas.length) {
+      const empty = document.createElement('div');
+      empty.className = 'loop-empty';
+      empty.textContent = 'no saved loops — ⌘K "save loop"';
+      loopList.append(empty);
+      return;
+    }
+    for (const m of metas.slice(0, 6)) {
+      const row = document.createElement('div');
+      row.className = 'loop-row';
+      const nm = document.createElement('span');
+      nm.className = 'nm';
+      nm.textContent = `${m.name} · ${(m.durationMs / 1000).toFixed(1)}s`;
+      const play = document.createElement('button');
+      play.className = 'play';
+      play.textContent = '▸';
+      play.title = 'play on the current avatar (re-skin)';
+      play.onclick = async () => {
+        const loop = await loadLoop(m.id);
+        if (loop && loop.kind === 'pose') {
+          await ghosts.start(loop, config.avatar, { echoes, echoOffsetMs: 300 });
+          ghostBtn.classList.add('on');
+        }
+      };
+      const del = document.createElement('button');
+      del.textContent = '×';
+      del.title = 'delete loop';
+      del.onclick = async () => {
+        await deleteLoop(m.id);
+        void refreshLoopList();
+      };
+      row.append(nm, play, del);
+      loopList.append(row);
+    }
+  }
+  void refreshLoopList();
+
+  async function saveCurrentLoop(): Promise<void> {
+    const loop = poseRing.snapshot(8, `take ${new Date().toLocaleTimeString()}`);
+    if (!loop) {
+      coach.set('Memory', 'Perform for a few seconds first, then save.');
+      return;
+    }
+    await saveLoop(loop);
+    void refreshLoopList();
+  }
+
+  // ── recording director: guided takes, hands-free via the gesture seed ──
+  let latestNorm: LandmarkPoint[] | null = null;
+  const intents = createIntentDetector();
+  const director = createDirector({
+    startRecording: (maxSec, takeName) => recorder.start(maxSec, takeName),
+    stopRecording: () => recorder.stop(),
+    ghostOn: async () => {
+      if (!ghosts.active) await toggleGhost();
+    },
+    avatarNext: () => setConfig('avatar', nextAvatarId(config.avatar)),
+    coach: (eyebrow, text) => coach.set(eyebrow, text),
+    latestNorm: () => latestNorm,
+    handTracked: () => performance.now() - handMode.lastDetectionAt() < 1000,
+  });
+
+  // the seed layer's single consumer: raise both arms to start the default
+  // take for the current mode; cross wrists to stop
+  intents.onIntent((intent) => {
+    if (intent === 'take:start' && !director.running && !recorder.recording) {
+      const script = TAKE_SCRIPTS.find((s) => s.mode === config.mode) ?? TAKE_SCRIPTS[0];
+      director.begin(script);
+    } else if (intent === 'take:stop' && director.running) {
+      director.stop();
+    }
+  });
+
+  // keyboard fallback: space advances the shot, escape stops the take
+  window.addEventListener('keydown', (e) => {
+    if (!director.running) return;
+    if (e.code === 'Space') {
+      e.preventDefault();
+      director.advance();
+    } else if (e.key === 'Escape') {
+      director.stop();
+    }
+  });
+
+  // caption helper: after a clip saves, one click copies an honest caption
+  // (local string assembly; nothing is sent anywhere)
+  function suggestCaption(): string {
+    const subject =
+      config.mode === 'hand'
+        ? `a ${handMode.puppetId()} hand puppet`
+        : `the ${getAvatarDef(config.avatar).label}`;
+    return `puppeteering ${subject} live from my webcam — all inference local in the browser, nothing uploaded. posepuppet.`;
+  }
+
+  // first-run onboarding (skippable, persisted, reopenable via ⌘K)
+  const onboarding = createOnboarding();
+
+  // visibility-driven setup coach: low-nag — one message at a time, only
+  // when a problem persists ~2 s, ≥12 s between nags, silent during takes
+  let coachProblemSince = 0;
+  let coachLastNag = 0;
+  let coachActiveMsg = '';
+  function visibilityCoach(now: number): void {
+    if (recorder.recording || director.running) return;
+    let msg = '';
+    if (config.mode === 'hand') {
+      if (now - handMode.lastDetectionAt() > 2500 && handMode.detectionCount() > 0) {
+        msg = 'Bring your hand back into frame — palm toward the camera.';
+      }
+    } else if (latestNorm) {
+      const vis = (i: number) => latestNorm![i].visibility > 0.5;
+      if (!vis(LM.leftShoulder) || !vis(LM.rightShoulder)) {
+        msg = 'Step back so both shoulders are in frame.';
+      } else if (config.bodyMode === 'full' && (!vis(LM.leftAnkle) || !vis(LM.rightAnkle))) {
+        msg = 'Step back so your legs are visible — full-body mode needs head to feet.';
+      } else if (!vis(LM.leftWrist) && !vis(LM.rightWrist)) {
+        msg = 'Keep your hands inside the frame.';
+      }
+    }
+    if (!msg) {
+      coachProblemSince = 0;
+      if (coachActiveMsg) {
+        coach.clear();
+        coachActiveMsg = '';
+      }
+      return;
+    }
+    if (!coachProblemSince) coachProblemSince = now;
+    if (now - coachProblemSince > 2000 && msg !== coachActiveMsg && now - coachLastNag > 12000) {
+      coach.set('Framing', msg);
+      coachActiveMsg = msg;
+      coachLastNag = now;
+    }
+  }
+
+  // pose poster: freeze the moment — slow quarter-orbit, then export a
+  // designed still in the interface frame with mono labels. Local PNG.
+  let posterBusy = false;
+  async function exportPoster(): Promise<void> {
+    if (posterBusy) return;
+    posterBusy = true;
+    const cam = stage.camera;
+    const origPos = cam.position.clone();
+    const origQuat = cam.quaternion.clone();
+    try {
+      // slow orbit to a three-quarter angle
+      const t0 = performance.now();
+      await new Promise<void>((res) => {
+        const step = () => {
+          const t = Math.min((performance.now() - t0) / 900, 1);
+          const e = t * t * (3 - 2 * t);
+          const ang = e * 0.5;
+          const r = config.mode === 'hand' ? 2.1 : 3.2;
+          const y = config.mode === 'hand' ? 1.15 : 1.3;
+          cam.position.set(Math.sin(ang) * r, y, Math.cos(ang) * r);
+          cam.lookAt(0, config.mode === 'hand' ? 1.05 : 1.0, 0);
+          if (t < 1) requestAnimationFrame(step);
+          else res();
+        };
+        requestAnimationFrame(step);
+      });
+
+      const poster = document.createElement('canvas');
+      poster.width = 1080;
+      poster.height = 1350; // 4:5 — poster ratio
+      const g = poster.getContext('2d')!;
+      g.fillStyle = '#07090f';
+      g.fillRect(0, 0, poster.width, poster.height);
+
+      // stage image inside a 1px frame (the interface grammar)
+      const inset = 54;
+      const frameW = poster.width - inset * 2;
+      const frameH = poster.height - inset * 2 - 120;
+      stage.renderer.render(stage.scene, stage.camera);
+      const sw = stageCanvas.width;
+      const sh = stageCanvas.height;
+      const scale = Math.max(frameW / sw, frameH / sh); // cover
+      const dw = sw * scale;
+      const dh = sh * scale;
+      g.save();
+      g.beginPath();
+      g.rect(inset, inset, frameW, frameH);
+      g.clip();
+      g.drawImage(stageCanvas, inset + (frameW - dw) / 2, inset + (frameH - dh) / 2, dw, dh);
+      g.restore();
+      g.strokeStyle = '#2a3650';
+      g.lineWidth = 1;
+      g.strokeRect(inset + 0.5, inset + 0.5, frameW, frameH);
+
+      // mono labels + serif mark
+      const subject = config.mode === 'hand' ? handMode.puppetId() : getAvatarDef(config.avatar).label;
+      g.font = '500 17px "JetBrains Mono Variable", monospace';
+      g.fillStyle = '#66748f';
+      g.textAlign = 'left';
+      g.fillText(`STAGE · ${subject.toUpperCase()}`, inset, inset - 16);
+      g.textAlign = 'right';
+      g.fillText(new Date().toISOString().slice(0, 10), poster.width - inset, inset - 16);
+      g.font = '420 44px "Fraunces Variable", Georgia, serif';
+      g.fillStyle = '#e9f1ff';
+      g.textAlign = 'left';
+      g.fillText('PosePuppet', inset, poster.height - 64);
+      g.font = '500 15px "JetBrains Mono Variable", monospace';
+      g.fillStyle = '#c8ffdf';
+      g.textAlign = 'right';
+      g.fillText('ALL INFERENCE LOCAL', poster.width - inset, poster.height - 68);
+
+      const a = document.createElement('a');
+      a.href = poster.toDataURL('image/png');
+      a.download = `posepuppet-poster-${Date.now().toString(36)}.png`;
+      a.click();
+    } finally {
+      cam.position.copy(origPos);
+      cam.quaternion.copy(origQuat);
+      cam.updateProjectionMatrix();
+      posterBusy = false;
+    }
+  }
+
+  // command palette (⌘K) + single-key shortcuts — instrument controls
+  const toggleCmd = (key: 'mirror' | 'smoothing' | 'rootMotion') => () => setConfig(key, !config[key]);
+  createPalette([
+    { id: 'record', label: 'record · start / stop take', key: 'r',
+      run: () => (recorder.recording ? recorder.stop() : recorder.start(15)) },
+    { id: 'calibrate', label: 'calibrate · capture neutral pose (3-2-1)', key: 'c',
+      run: calibrateWithCountdown },
+    { id: 'avatar-next', label: 'avatar · next', key: 'a',
+      run: () => setConfig('avatar', nextAvatarId(config.avatar)) },
+    { id: 'theme', label: 'theme · toggle light / dark', key: 't',
+      run: () => setConfig('theme', config.theme === 'dark' ? 'light' : 'dark') },
+    { id: 'engineering', label: 'engineering view · toggle', key: 'd',
+      run: () => document.getElementById('panel')!.classList.toggle('hidden') },
+    { id: 'mirror', label: 'mirror · toggle', key: 'm', run: toggleCmd('mirror') },
+    { id: 'smoothing', label: 'smoothing · toggle', run: toggleCmd('smoothing') },
+    { id: 'legs', label: 'full body (legs) · toggle', key: 'f',
+      run: () => setConfig('bodyMode', config.bodyMode === 'full' ? 'upper' : 'full') },
+    { id: 'root', label: 'root motion · toggle', run: toggleCmd('rootMotion') },
+    { id: 'video', label: 'input · load video file / back to camera', key: 'v',
+      run: () => fileBtn.click() },
+    { id: 'model', label: 'pose model · toggle full / lite',
+      run: () => setConfig('model', config.model === 'full' ? 'lite' : 'full') },
+    { id: 'ghost', label: 'memory · ghost duet on/off (last 8 s)', key: 'g',
+      run: () => void toggleGhost() },
+    { id: 'replay', label: 'memory · instant replay (last 5 s, slow)', key: 'i',
+      run: () => void instantReplay() },
+    { id: 'save-loop', label: 'memory · save last 8 s as loop',
+      run: () => void saveCurrentLoop() },
+    ...TAKE_SCRIPTS.map((s) => ({
+      id: `take-${s.id}`,
+      label: `take · ${s.name.toLowerCase()} (${s.shots.length} shots)`,
+      run: () => {
+        if (s.mode !== config.mode) setConfig('mode', s.mode);
+        // wait a beat for a mode switch to settle, then begin
+        setTimeout(() => director.begin(s), s.mode !== config.mode ? 1200 : 0);
+      },
+    })),
+    { id: 'aspect', label: 'recording · toggle 16:9 / 9:16 vertical',
+      run: () => setConfig('recAspect', config.recAspect === '16:9' ? '9:16' : '16:9') },
+    { id: 'packaging', label: 'recording · toggle stinger/end card',
+      run: () => setConfig('recPackage', !config.recPackage) },
+    { id: 'poster', label: 'poster · export a designed still', key: 'p',
+      run: () => void exportPoster() },
+    { id: 'help', label: 'help · how to use (onboarding)',
+      run: () => onboarding.show() },
+  ]);
   onConfigChange((key) => {
     if (key === 'model') void detector.setModel(config.model);
   });
@@ -640,6 +1131,9 @@ async function boot() {
         detector,
         video,
         getAvatar: () => avatar,
+        getHeadRadius: () => retargeter.faceTouchDebug.left.headR,
+        getFaceTouch: () => retargeter.faceTouchDebug,
+        getDetectionFps: () => (config.mode === 'hand' ? handMode.handFps() : detector.poseFps()),
       })
     : null;
   evalCollector?.start();
@@ -658,25 +1152,173 @@ async function boot() {
       const world = config.mirror ? mirrorWorld(frame.world, mWorld) : frame.world;
       const worldSmooth = smoother.apply(world, frame.wallTimeMs);
       retargeter.updateFromPose(worldSmooth, norm);
+      poseRing.push(encodePoseFrame(worldSmooth, norm, frame.wallTimeMs));
+      latestNorm = norm;
+      intents.onLandmarks(norm, frame.wallTimeMs);
       evalCollector?.onPoseFrame(norm);
     } else {
       drawSkeleton(overlayCtx, null, overlay.width, overlay.height);
       retargeter.updateFromPose(null, null);
+      latestNorm = null;
+      intents.onLandmarks(null, performance.now());
       evalCollector?.onPoseFrame(null);
     }
   }
 
-  detector.start(video, onPoseFrame);
+  // in hand mode the pose detector never starts (it would hallucinate a
+  // body from the hand and pollute eval sync rows); switching back to
+  // character mode starts it via applyMode
+  if (config.mode !== 'hand') detector.start(video, onPoseFrame);
+
+  // ── hand-only mode: a first-class mode beside Character ─────────────
+  const stageLabel = document.getElementById('stage-label');
+  const stageAvatarEl = document.getElementById('stage-avatar');
+  const modeCharBtn = document.getElementById('mode-character') as HTMLButtonElement;
+  const modeHandBtn = document.getElementById('mode-hand') as HTMLButtonElement;
+  modeHandBtn.disabled = false;
+  modeHandBtn.title = 'one-hand puppets: expressive hand, beaky, x-ray';
+
+  function syncStageLabel(): void {
+    if (!stageLabel || !stageAvatarEl) return;
+    const name = config.mode === 'hand' ? handMode.puppetId() : getAvatarDef(config.avatar).label;
+    const suffix = config.mode === 'hand' ? 'HAND-ONLY' : 'CHARACTER MODE';
+    stageLabel.innerHTML = '';
+    stageLabel.append('STAGE · ');
+    stageAvatarEl.textContent = name.toUpperCase();
+    stageLabel.append(stageAvatarEl);
+    stageLabel.append(` · ${suffix}`);
+  }
+
+  async function applyMode(): Promise<void> {
+    const hand = config.mode === 'hand';
+    modeCharBtn.setAttribute('aria-pressed', String(!hand));
+    modeHandBtn.setAttribute('aria-pressed', String(hand));
+    document.body.classList.toggle('hand-mode', hand);
+    if (hand) {
+      detector.stop();
+      avatar.object.visible = false;
+      handMode.object.visible = true;
+      stage.setTreatment('hand');
+      handMode.setPuppet(config.handPuppet);
+      await handMode.start(video);
+      hud.setSource('hand');
+    } else {
+      handMode.stop();
+      handMode.object.visible = false;
+      avatar.object.visible = true;
+      stage.setTreatment('character');
+      drawSkeleton(overlayCtx, null, overlay.width, overlay.height);
+      detector.start(video, onPoseFrame);
+      hud.setSource('pose');
+    }
+    syncStageLabel();
+    rebuildCards();
+  }
+
+  modeCharBtn.onclick = () => setConfig('mode', 'character');
+  modeHandBtn.onclick = () => setConfig('mode', 'hand');
+  onConfigChange((key) => {
+    if (key === 'mode') void applyMode();
+    if (key === 'handPuppet' && config.mode === 'hand') {
+      handMode.setPuppet(config.handPuppet);
+      syncStageLabel();
+      rebuildCards();
+    }
+    if (key === 'avatar') syncStageLabel();
+  });
+
+  // hand-mode overlay drawing + puppet card roster
+  handMode.onFrameHook = (frame) => {
+    if (config.mode !== 'hand') return;
+    if (frame) {
+      window.__PP.lastDetectionAt = frame.wallTimeMs;
+      window.__PP.detectionCount++;
+      handRing.push(encodeHandFrame(frame.norm, frame.wallTimeMs));
+    }
+    handMode.drawOverlay(overlayCtx, overlay.width, overlay.height);
+    evalCollector?.onHandFrame(Boolean(frame), handMode.beakySignals());
+  };
+
+  function rebuildCards(): void {
+    const host = document.getElementById('avatar-cards');
+    const count = document.getElementById('avatar-count');
+    if (!host) return;
+    if (config.mode === 'hand') {
+      host.innerHTML = '';
+      if (count) count.textContent = String(HAND_PUPPETS.length).padStart(2, '0');
+      for (const def of HAND_PUPPETS) {
+        const card = document.createElement('button');
+        card.className = 'card' + (def.id === config.handPuppet ? ' on' : '');
+        card.dataset.puppet = def.id;
+        const preview = document.createElement('div');
+        preview.className = 'preview';
+        preview.textContent = def.glyph;
+        const nm = document.createElement('div');
+        nm.className = 'nm';
+        nm.textContent = def.label;
+        const chip = document.createElement('span');
+        chip.className = 'chip exp';
+        chip.textContent = def.chip;
+        const note = document.createElement('div');
+        note.className = 'card-note';
+        note.textContent = def.note;
+        card.append(preview, nm, chip, note);
+        card.onclick = () => setConfig('handPuppet', def.id as HandPuppetId);
+        host.append(card);
+      }
+    } else {
+      host.innerHTML = '';
+      createAvatarCards();
+    }
+  }
+
+  if (config.mode === 'hand') await applyMode();
+  else syncStageLabel();
+
+  // performance auto-tuner: sustained low pose FPS on the full model →
+  // the coach offers the lite model + reduced effects, one click. Suggested
+  // at most once per session; applying flips model and adds a perf-lite
+  // class that drops backdrop blur and halo shadows.
+  let lowFpsSec = 0;
+  let tunerOffered = false;
+  function applyPerfLite(): void {
+    setConfig('model', 'lite');
+    document.body.classList.add('perf-lite');
+  }
 
   let hudAccum = 0;
   stage.onTick((dt, time) => {
-    retargeter.tick(dt);
-    avatar.update(dt, time);
+    if (config.mode === 'hand') {
+      handMode.tick(dt, time);
+    } else {
+      retargeter.tick(dt);
+      avatar.update(dt, time);
+    }
+    ghosts.tick(dt, time);
     hudAccum += dt;
     if (hudAccum > 0.25) {
       hudAccum = 0;
       hud.setRenderFps(stage.renderFps());
-      hud.setPoseFps(detector.poseFps());
+      hud.setPoseFps(config.mode === 'hand' ? handMode.handFps() : detector.poseFps());
+      hud.setRig(config.mode === 'hand' ? (handMode.lastDetectionAt() > 0 ? 1 : 0) : retargeter.activeBoneCount());
+      hud.tick(window.__PP.lastDetectionAt, window.__PP.videoReady);
+      visibilityCoach(performance.now());
+
+      const fps = detector.poseFps();
+      const live = window.__PP.videoReady && performance.now() - window.__PP.lastDetectionAt < 1500;
+      if (!tunerOffered && config.model === 'full' && live && fps > 0 && fps < 22) {
+        lowFpsSec += 0.25;
+        if (lowFpsSec >= 5) {
+          tunerOffered = true;
+          coach.set(
+            'Performance',
+            'Tracking is running slow on this machine. The lite model keeps motion smooth.',
+            { label: 'Switch to lite', run: applyPerfLite },
+          );
+        }
+      } else if (fps >= 24) {
+        lowFpsSec = 0;
+      }
     }
   });
 }

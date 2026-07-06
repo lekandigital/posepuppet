@@ -3,12 +3,20 @@
 // mode. They do NOT require a real camera or MediaPipe — avatar-load-only
 // mode skips both.
 import { test, expect } from '@playwright/test';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const acceptedGeneratedAvatars = ['woody', 'darth-vader', 'fortnite-batman', 'iron-man', 'shrek'];
+
+// Generated candidate VRMs are local-only working binaries (gitignored,
+// never committed); the load smoke only applies on machines that have them.
+const generatedVrmPath = (slug: string) =>
+  resolve(import.meta.dirname, '..', 'public', 'avatars', 'generated', `${slug}.vrm`);
 
 test.describe('generated avatar smoke tests', () => {
   for (const slug of acceptedGeneratedAvatars) {
     test(`generated ${slug} candidate loads without crash`, async ({ page }) => {
+      test.skip(!existsSync(generatedVrmPath(slug)), `local candidate VRM not present: ${slug}.vrm`);
       const errors: string[] = [];
       page.on('pageerror', (e) => errors.push(String(e)));
 

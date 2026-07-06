@@ -13,7 +13,11 @@ export type LimbName =
   | 'leftForearm'
   | 'rightUpperArm'
   | 'rightForearm'
-  | 'torso';
+  | 'torso'
+  | 'leftThigh'
+  | 'leftShin'
+  | 'rightThigh'
+  | 'rightShin';
 
 const LIMBS: Record<LimbName, { joints: [JointName, JointName]; lm: [number, number] }> = {
   leftUpperArm: { joints: ['leftShoulder', 'leftElbow'], lm: [LM.leftShoulder, LM.leftElbow] },
@@ -21,7 +25,15 @@ const LIMBS: Record<LimbName, { joints: [JointName, JointName]; lm: [number, num
   rightUpperArm: { joints: ['rightShoulder', 'rightElbow'], lm: [LM.rightShoulder, LM.rightElbow] },
   rightForearm: { joints: ['rightElbow', 'rightWrist'], lm: [LM.rightElbow, LM.rightWrist] },
   torso: { joints: ['hipCenter', 'shoulderCenter'], lm: [-1, -1] }, // lm computed from hip/shoulder centers
+  // legs: only sampled when hips/knees/ankles are confidently visible —
+  // desk-framed fixtures simply contribute no leg samples
+  leftThigh: { joints: ['leftHip', 'leftKnee'], lm: [LM.leftHip, LM.leftKnee] },
+  leftShin: { joints: ['leftKnee', 'leftAnkle'], lm: [LM.leftKnee, LM.leftAnkle] },
+  rightThigh: { joints: ['rightHip', 'rightKnee'], lm: [LM.rightHip, LM.rightKnee] },
+  rightShin: { joints: ['rightKnee', 'rightAnkle'], lm: [LM.rightKnee, LM.rightAnkle] },
 };
+
+export const LEG_LIMBS: LimbName[] = ['leftThigh', 'leftShin', 'rightThigh', 'rightShin'];
 
 export const UPPER_LIMBS: LimbName[] = [
   'leftUpperArm',
@@ -117,14 +129,18 @@ export class SyncAccumulator {
     }
   }
 
-  means(): Partial<Record<LimbName | 'upperLimbsMean', number>> {
-    const out: Partial<Record<LimbName | 'upperLimbsMean', number>> = {};
+  means(): Partial<Record<LimbName | 'upperLimbsMean' | 'legsMean', number>> {
+    const out: Partial<Record<LimbName | 'upperLimbsMean' | 'legsMean', number>> = {};
     for (const [limb, sum] of this.sums) {
       out[limb] = sum / this.counts.get(limb)!;
     }
     const upper = UPPER_LIMBS.map((l) => out[l]).filter((v): v is number => v !== undefined);
     if (upper.length > 0) {
       out.upperLimbsMean = upper.reduce((a, b) => a + b, 0) / upper.length;
+    }
+    const legs = LEG_LIMBS.map((l) => out[l]).filter((v): v is number => v !== undefined);
+    if (legs.length > 0) {
+      out.legsMean = legs.reduce((a, b) => a + b, 0) / legs.length;
     }
     return out;
   }

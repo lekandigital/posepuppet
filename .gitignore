@@ -66,3 +66,10 @@ media/
 .DS_Store
 *.local
 .vercel
+
+# woody.vrm: fan-made rig of a licensed character — local-only, never
+# redistributed (Gate 1 decision, 2026-06-12). Registry hides it when absent.
+public/avatars/woody.vrm
+
+# Design-gate mockup screenshots: synthetic content only, no personal footage
+!design/mockups/*.png
