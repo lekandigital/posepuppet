@@ -1,38 +1,110 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PosePuppet</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body>
     <header id="topbar">
       <div class="brand">
-        <span class="brand-name">PosePuppet</span>
-        <span id="live-badge" class="live-badge hidden">LIVE</span>
+        <span class="brand-name">Pose<em>Puppet</em></span>
+        <button class="kbd" id="palette-btn" title="command palette">⌘K</button>
       </div>
-      <div id="hud" class="hud">
-        <span id="hud-pose">pose — fps</span>
-        <span id="hud-render">render — fps</span>
-      </div>
+      <nav class="modes" id="mode-select" aria-label="mode">
+        <button id="mode-character" aria-pressed="true">Character</button>
+        <button id="mode-hand" disabled title="hand-only mode lands later this pass">Hand-only</button>
+        <button id="mode-setup" title="recalibrate your neutral pose">Setup</button>
+      </nav>
+      <div id="net-receipt" title="live counter of network requests made after load — this app makes none">LOCAL · —</div>
       <div id="controls" class="controls"></div>
     </header>
+
     <main id="split" class="split">
-      <section class="pane camera-pane" id="camera-pane">
-        <video id="video" autoplay playsinline muted></video>
-        <canvas id="overlay"></canvas>
-        <div id="camera-status" class="camera-status">waiting for camera…</div>
-      </section>
-      <section class="pane stage-pane" id="stage-pane">
-        <canvas id="stage"></canvas>
-      </section>
+      <div class="stagewrap">
+        <section class="pane stage-pane" id="stage-pane">
+          <canvas id="stage"></canvas>
+          <i class="tick tl"></i><i class="tick tr"></i><i class="tick bl"></i><i class="tick br"></i>
+          <div class="stage-label" id="stage-label">STAGE · <b id="stage-avatar">—</b></div>
+
+          <section class="pane camera-pane" id="camera-pane">
+            <div class="camera-hdr">
+              <span>Input signal</span>
+              <span id="live-badge" class="live-badge hidden">LIVE</span>
+            </div>
+            <div class="camera-feed" id="camera-feed">
+              <video id="video" autoplay playsinline muted></video>
+              <canvas id="overlay"></canvas>
+              <div id="camera-status" class="camera-status">waiting for camera…</div>
+            </div>
+            <div class="camera-ftr">
+              <span id="track-status">—</span>
+              <span id="cam-meta">CAM —</span>
+            </div>
+          </section>
+        </section>
+      </div>
+
+      <aside class="rail" id="rail">
+        <section class="rail-sec">
+          <div class="rail-hdr"><span>Avatars</span><span id="avatar-count"></span></div>
+          <div class="cards" id="avatar-cards"></div>
+        </section>
+        <section class="rail-sec">
+          <div class="rail-hdr"><span>Expression</span><span id="exag-val" class="rail-val">1.0</span></div>
+          <div class="rail-slider">
+            <input type="range" id="exag-slider" min="1" max="2" step="0.05" value="1"
+              aria-label="exaggeration: 1.0 faithful to 2.0 cartoon" />
+            <div class="rail-slider-marks"><span>faithful</span><span>cartoon</span></div>
+          </div>
+        </section>
+        <section class="rail-sec">
+          <div class="rail-hdr"><span>Memory</span><span id="echo-val" class="rail-val mem">×1</span></div>
+          <div class="rail-slider">
+            <input type="range" id="echo-slider" min="1" max="4" step="1" value="1"
+              aria-label="echo chorus: 1 ghost to 4 staggered echoes" />
+            <div class="rail-slider-marks"><span>ghost</span><span>echo chorus</span></div>
+          </div>
+          <div id="loop-list" class="loop-list"></div>
+        </section>
+        <section class="rail-sec">
+          <div class="rail-hdr"><span>Coach</span></div>
+          <div class="coach-card" id="coach-card">
+            <div class="coach-eyebrow" id="coach-eyebrow">Setup</div>
+            <p id="coach-line">Stand back so your shoulders and hips are in frame, then calibrate.</p>
+          </div>
+        </section>
+        <div class="privacy-line">
+          all inference runs in your browser — no frame, landmark, or recording
+          ever leaves this machine
+        </div>
+      </aside>
     </main>
-    <footer id="footer">
-      all inference runs in your browser — no frame, landmark, or recording ever
-      leaves this machine
+
+    <footer id="takebar">
+      <div class="tb-cell" id="tb-transport">
+        <button id="ghost-btn" class="tb-btn ghost" title="loop your last 8 s on a ghost (g)">⬡ ghost</button>
+        <button id="replay-btn" class="tb-btn" title="instant replay — last 5 s, slow, side angle (i)">↺ replay</button>
+      </div>
+      <div class="chain" id="chain">
+        <span class="node dim" id="chain-cam"><b>CAM</b> <span>—</span></span>
+        <span class="sep">▸</span>
+        <span class="node dim" id="chain-pose"><b>POSE</b> <span id="hud-pose">—</span></span>
+        <span class="sep">▸</span>
+        <span class="node dim" id="chain-smooth"><b>SMOOTH</b></span>
+        <span class="sep">▸</span>
+        <span class="node dim" id="chain-rig"><b>RIG</b></span>
+        <span class="sep">▸</span>
+        <span class="node dim" id="chain-render"><b>RENDER</b> <span id="hud-render">—</span></span>
+        <span class="sep">▸</span>
+        <span class="node dim" id="chain-rec"><b>REC</b> <span id="chain-rec-val">—</span></span>
+      </div>
+      <div class="tb-cell tb-right" id="tb-status">
+        <span id="shot-status">READY</span>
+      </div>
     </footer>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

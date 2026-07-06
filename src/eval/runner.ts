@@ -3,6 +3,7 @@
 // metric, then publishes window.__EVAL_RESULT for the node runner
 // (eval/run.mjs) to collect — or renders it as JSON for a human.
 
+import * as THREE from 'three';
 import type { Stage } from '../stage/scene';
 import type { Avatar } from '../rig/types';
 import type { PoseDetector } from '../pose/detector';
@@ -21,7 +22,20 @@ export interface EvalResult {
   droppedFrames: number;
   delegate: 'GPU' | 'CPU';
   memoryMB: Record<string, number> | null;
-  sync: Partial<Record<LimbName | 'upperLimbsMean', number>>;
+  sync: Partial<Record<LimbName | 'upperLimbsMean' | 'legsMean', number>>;
+  /** hand-only mode: pinch→jaw tracking quality (Pearson r between the
+   *  normalized pinch input and the enacted jaw angle, per frame) */
+  pinchJaw?: { r: number; samples: number };
+  /** face-touch reach check (frames where the person's wrist was at their
+   *  head): does the avatar's wrist reach its own head region without
+   *  passing through it? */
+  faceTouch?: {
+    engagedFrames: number;
+    reachFrames: number;
+    penetrationFrames: number;
+    reachRate: number;
+    penetrationRate: number;
+  };
   finishedAt: string;
 }
 
@@ -36,6 +50,12 @@ interface Deps {
   detector: PoseDetector;
   video: HTMLVideoElement;
   getAvatar: () => Avatar;
+  /** avatar head-collider radius (m), from the retargeter's bind pass */
+  getHeadRadius?: () => number;
+  /** live face-touch engagement weights from the retargeter */
+  getFaceTouch?: () => { left: { w: number }; right: { w: number } };
+  /** detection-loop FPS override (hand mode reports the hand detector) */
+  getDetectionFps?: () => number;
 }
 
 export class EvalCollector {
@@ -47,6 +67,13 @@ export class EvalCollector {
   private memory: Record<string, number> = {};
   private startTime = 0;
   private done = false;
+  private ftEngaged = 0;
+  private ftReach = 0;
+  private ftPenetration = 0;
+  private ftWrist = new THREE.Vector3();
+  private ftHead = new THREE.Vector3();
+  private pjPinch: number[] = [];
+  private pjJaw: number[] = [];
 
   constructor(
     private fixture: string,
@@ -67,10 +94,23 @@ export class EvalCollector {
         return;
       }
       const rf = this.deps.stage.renderFps();
-      const pf = this.deps.detector.poseFps();
+      const pf = this.deps.getDetectionFps?.() ?? this.deps.detector.poseFps();
       if (rf > 0) this.renderFpsSamples.push(rf);
       if (pf > 0) this.poseFpsSamples.push(pf);
     }, 1000);
+  }
+
+  /** Hand-only mode frames: detection bookkeeping + the pinch→jaw pair
+   *  for the correlation metric (only when the beaky puppet is live). */
+  onHandFrame(detected: boolean, signals: { pinch: number; jaw: number } | null): void {
+    if (this.done || this.startTime === 0) return;
+    this.videoFrames++;
+    if (!detected) return;
+    this.detectedFrames++;
+    if (signals) {
+      this.pjPinch.push(signals.pinch);
+      this.pjJaw.push(signals.jaw);
+    }
   }
 
   /** Called once per processed video frame, with mirrored landmarks (the
@@ -83,9 +123,32 @@ export class EvalCollector {
 
     const { stage, video, getAvatar } = this.deps;
     const aspect = stage.canvas.clientWidth / Math.max(1, stage.canvas.clientHeight);
+    const avatar = getAvatar();
     this.sync.add(
-      sampleLimbAngles(mirroredNorm, video.videoWidth, video.videoHeight, getAvatar(), stage.camera, aspect),
+      sampleLimbAngles(mirroredNorm, video.videoWidth, video.videoHeight, avatar, stage.camera, aspect),
     );
+
+    // face-touch reach check: frames where a wrist sits at the head
+    // (normalized space, shoulder-width units) → the avatar's wrist must
+    // land at its own head surface, never inside it
+    const headR = this.deps.getHeadRadius?.() ?? 0.12;
+    const ft = this.deps.getFaceTouch?.();
+    if (ft) {
+      for (const side of ['left', 'right'] as const) {
+        // engaged = the retargeter itself says the magnetism is active —
+        // the metric measures what the system claims to do
+        if (ft[side].w < 0.6) continue;
+        const wristJ = avatar.joints[`${side}Wrist`];
+        const headB = avatar.bones.head;
+        if (!wristJ || !headB) continue;
+        this.ftEngaged++;
+        wristJ.getWorldPosition(this.ftWrist);
+        headB.getWorldPosition(this.ftHead);
+        const d = this.ftWrist.distanceTo(this.ftHead);
+        if (d <= headR * 2.0) this.ftReach++;
+        if (d < headR * 0.7) this.ftPenetration++;
+      }
+    }
   }
 
   private sampleMemory(label: string): void {
@@ -108,6 +171,37 @@ export class EvalCollector {
       sync[k as LimbName] = round(v as number);
     }
 
+    let pinchJaw: EvalResult['pinchJaw'];
+    if (this.pjPinch.length > 30) {
+      const n = this.pjPinch.length;
+      const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
+      const mp = mean(this.pjPinch);
+      const mj = mean(this.pjJaw);
+      let num = 0;
+      let dp = 0;
+      let dj = 0;
+      for (let i = 0; i < n; i++) {
+        const a = this.pjPinch[i] - mp;
+        const b = this.pjJaw[i] - mj;
+        num += a * b;
+        dp += a * a;
+        dj += b * b;
+      }
+      const denom = Math.sqrt(dp * dj);
+      pinchJaw = { r: denom > 1e-9 ? Math.round((num / denom) * 1000) / 1000 : 0, samples: n };
+    }
+
+    const faceTouch =
+      this.ftEngaged > 0
+        ? {
+            engagedFrames: this.ftEngaged,
+            reachFrames: this.ftReach,
+            penetrationFrames: this.ftPenetration,
+            reachRate: Math.round((this.ftReach / this.ftEngaged) * 1000) / 1000,
+            penetrationRate: Math.round((this.ftPenetration / this.ftEngaged) * 1000) / 1000,
+          }
+        : undefined;
+
     const result: EvalResult = {
       fixture: this.fixture,
       avatar: this.deps.getAvatar().name, // actual, not requested
@@ -121,6 +215,8 @@ export class EvalCollector {
       delegate: this.deps.detector.delegate(),
       memoryMB: Object.keys(this.memory).length ? this.memory : null,
       sync,
+      pinchJaw,
+      faceTouch,
       finishedAt: new Date().toISOString(),
     };
     window.__EVAL_RESULT = result;

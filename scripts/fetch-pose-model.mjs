@@ -9,9 +9,13 @@ const dir = join(root, 'public', 'models');
 mkdirSync(dir, { recursive: true });
 
 const BASE = 'https://storage.googleapis.com/mediapipe-models/pose_landmarker';
+const HAND_BASE = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker';
 const MODELS = [
   ['pose_landmarker_full.task', `${BASE}/pose_landmarker_full/float16/latest/pose_landmarker_full.task`],
   ['pose_landmarker_lite.task', `${BASE}/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task`],
+  // hand-only mode (pass 2 P3): 21-landmark hand tracking, same Apache-2.0
+  // Google family as the pose models — recorded in ASSETS.md
+  ['hand_landmarker.task', `${HAND_BASE}/hand_landmarker/float16/latest/hand_landmarker.task`],
 ];
 
 for (const [name, url] of MODELS) {

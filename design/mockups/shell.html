@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-state="idle">
+<head>
+<meta charset="utf-8">
+<title>PosePuppet — shell mockup (Gate 2)</title>
+<style>
+/* Mockup-only font stacks; production self-hosts Inter / JetBrains Mono /
+   Fraunces (OFL). */
+:root, [data-theme="dark"] {
+  --base: #07090f; --pane: #0d1119; --pane-2: #131826;
+  --glass: rgba(13,17,25,.72);
+  --ink: #e9f1ff; --ink-2: #aebdd6; --ink-3: #66748f;
+  --rule: #1d2536; --rule-2: #2a3650;
+  --blue: #2f6bff; --cyan: #3fe0ff; --violet: #9d7bff; --glow: #c8ffdf;
+  --warn: #ffb454; --danger: #ff4d6a;
+  --grain-1: rgba(220,235,255,.03); --grain-2: rgba(220,235,255,.02);
+  --grain-blend: screen; --vignette: rgba(2,4,10,.6);
+  --halo-cyan: 0 0 12px rgba(63,224,255,.35);
+  --halo-glow: 0 0 10px rgba(200,255,223,.30);
+  --halo-blue: 0 0 14px rgba(47,107,255,.40);
+}
+[data-theme="light"] {
+  --base: #eef2f8; --pane: #f7fafd; --pane-2: #e7edf6;
+  --glass: rgba(247,250,253,.78);
+  --ink: #0b1018; --ink-2: #2c3648; --ink-3: #5a6880;
+  --rule: #c5d0e0; --rule-2: #a9b8cd;
+  --blue: #1f56e0; --cyan: #0096b8; --violet: #6d3fd6; --glow: #0f8a52;
+  --warn: #9a5b00; --danger: #c41f3e;
+  --grain-1: rgba(20,30,50,.04); --grain-2: rgba(20,30,50,.025);
+  --grain-blend: multiply; --vignette: rgba(20,30,50,.10);
+  --halo-cyan: none; --halo-glow: none; --halo-blue: none;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--base); color: var(--ink); overflow: hidden; }
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  display: flex; flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+.mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+.serif { font-family: 'Fraunces', Georgia, 'Times New Roman', serif; }
+
+/* atmosphere: grain + vignette live UNDER the stage/camera panes */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  background-image:
+    radial-gradient(var(--grain-1) 1px, transparent 1px),
+    radial-gradient(var(--grain-2) 1px, transparent 1px);
+  background-size: 3px 3px, 7px 7px; background-position: 0 0, 1px 2px;
+  mix-blend-mode: var(--grain-blend); opacity: .4;
+}
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  background: radial-gradient(ellipse at 50% 20%, transparent 45%, var(--vignette) 100%);
+}
+
+/* ── command bar ─────────────────────────────────────────────── */
+.cmdbar {
+  position: relative; z-index: 10;
+  display: flex; align-items: center; gap: 20px;
+  padding: 10px 18px;
+  background: var(--glass); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  flex: 0 0 auto;
+}
+.brand { display: flex; align-items: baseline; gap: 10px; }
+.brand .wordmark {
+  font-family: 'Fraunces', Georgia, serif; font-weight: 400;
+  font-size: 17px; letter-spacing: -0.01em;
+}
+.brand .wordmark em { font-style: italic; font-weight: 300; color: var(--ink-2); }
+.kbd {
+  font-family: ui-monospace, Menlo, monospace; font-size: 9.5px;
+  border: 1px solid var(--rule-2); color: var(--ink-3);
+  padding: 2px 5px; letter-spacing: .05em;
+}
+.modes { display: flex; border: 1px solid var(--rule-2); }
+.mode {
+  font-family: ui-monospace, Menlo, monospace; font-size: 10.5px;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 7px 14px; color: var(--ink-3); cursor: pointer;
+  border-right: 1px solid var(--rule-2); background: transparent;
+}
+.mode:last-child { border-right: 0; }
+.mode.on { background: var(--blue); color: #fff; box-shadow: var(--halo-blue); }
+.receipt {
+  margin-left: auto;
+  font-family: ui-monospace, Menlo, monospace; font-size: 10px;
+  letter-spacing: .1em; color: var(--glow); text-shadow: var(--halo-glow);
+  display: flex; align-items: center; gap: 8px;
+}
+.receipt::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--glow); box-shadow: var(--halo-glow); }
+.rec-btn {
+  font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: .1em;
+  padding: 8px 16px; border: 1px solid var(--danger); color: var(--danger);
+  background: transparent; cursor: pointer; display: flex; align-items: center; gap: 8px;
+}
+.rec-btn::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
+.theme-btn { width: 30px; height: 30px; border: 1px solid var(--rule-2); background: transparent; color: var(--ink-3); cursor: pointer; font-size: 13px; }
+
+/* ── main: stage + rail ──────────────────────────────────────── */
+.main { display: flex; flex: 1; min-height: 0; position: relative; z-index: 5; }
+.stagewrap { flex: 1; position: relative; padding: 16px; min-width: 0; }
+.stage {
+  position: relative; width: 100%; height: 100%;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(47,107,255,.10), transparent 55%),
+    radial-gradient(ellipse at 50% 95%, rgba(63,224,255,.07), transparent 45%),
+    linear-gradient(180deg, #0a0d15 0%, #070910 100%);
+  border: 1px solid var(--rule-2);
+  overflow: hidden;
+}
+/* light theme keeps a deep stage (like an NLE viewer): the live scene must
+   never wash out, and the 3D scene owns its own background anyway */
+[data-theme="light"] .stage {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(47,107,255,.12), transparent 55%),
+    radial-gradient(ellipse at 50% 95%, rgba(63,224,255,.08), transparent 45%),
+    linear-gradient(180deg, #11151f 0%, #0c0f17 100%);
+}
+[data-theme="light"] .stage .stage-label { color: #8fa1c0; }
+[data-theme="light"] .stage .stage-label b { color: #3fe0ff; }
+[data-theme="light"] .bot div { background: linear-gradient(180deg, #2a3650, #1d2536); border-color: #3b4a6b; }
+[data-theme="light"] .bot .eye, [data-theme="light"] .bot .core { border: 0; }
+[data-theme="light"] .bot .eye { background: #3fe0ff; box-shadow: 0 0 10px #3fe0ff; }
+[data-theme="light"] .bot .core { background: #2f6bff; box-shadow: 0 0 16px #2f6bff; }
+/* corner ticks — viewfinder registration */
+.tick { position: absolute; width: 18px; height: 18px; z-index: 3; }
+.tick::before, .tick::after { content: ""; position: absolute; background: var(--cyan); box-shadow: var(--halo-cyan); }
+.tick::before { width: 18px; height: 1px; } .tick::after { width: 1px; height: 18px; }
+.tick.tl { top: 10px; left: 10px; } .tick.tr { top: 10px; right: 10px; transform: scaleX(-1); }
+.tick.bl { bottom: 10px; left: 10px; transform: scaleY(-1); } .tick.br { bottom: 10px; right: 10px; transform: scale(-1); }
+.stage-label {
+  position: absolute; top: 14px; left: 40px;
+  font-family: ui-monospace, Menlo, monospace; font-size: 10px;
+  letter-spacing: .14em; color: var(--ink-3); text-transform: uppercase;
+}
+.stage-label b { color: var(--cyan); font-weight: 500; text-shadow: var(--halo-cyan); }
+/* fake avatar: simple geometric robot, glowing */
+.bot { position: absolute; left: 50%; bottom: 12%; transform: translateX(-50%); width: 180px; height: 320px; }
+.bot div { position: absolute; background: linear-gradient(180deg, #2a3650, #1d2536); border: 1px solid #3b4a6b; }
+[data-theme="light"] .bot div { background: linear-gradient(180deg, #b9c6dd, #9fb0cd); border-color: #8294b3; }
+.bot .head { width: 64px; height: 54px; left: 58px; top: 0; border-radius: 6px; }
+.bot .eye { width: 10px; height: 10px; background: var(--cyan); border: 0; border-radius: 50%; top: 22px; box-shadow: 0 0 10px var(--cyan); }
+.bot .eye.l { left: 74px; } .bot .eye.r { left: 96px; }
+.bot .torso { width: 90px; height: 110px; left: 45px; top: 64px; border-radius: 8px; }
+.bot .core { width: 16px; height: 16px; left: 82px; top: 105px; background: var(--blue); border: 0; border-radius: 50%; box-shadow: 0 0 16px var(--blue); }
+.bot .arm.l { width: 22px; height: 95px; left: 12px; top: 70px; border-radius: 10px; transform: rotate(14deg); }
+.bot .arm.r { width: 22px; height: 95px; right: 12px; top: 70px; border-radius: 10px; transform: rotate(-26deg); }
+.bot .leg.l { width: 26px; height: 120px; left: 52px; top: 180px; border-radius: 10px; }
+.bot .leg.r { width: 26px; height: 120px; left: 100px; top: 180px; border-radius: 10px; }
+.ground { position: absolute; left: 10%; right: 10%; bottom: 8%; height: 1px; background: linear-gradient(90deg, transparent, var(--rule-2), transparent); }
+/* camera signal panel (inside stage area, bottom-left) */
+.camera {
+  position: absolute; left: 28px; bottom: 28px; z-index: 4;
+  width: 264px; border: 1px solid var(--rule-2); background: #05070b;
+}
+[data-theme="light"] .camera { background: #1a2230; }
+.camera .hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 10px; border-bottom: 1px solid var(--rule-2);
+  font-family: ui-monospace, Menlo, monospace; font-size: 9.5px;
+  letter-spacing: .12em; color: var(--ink-3); text-transform: uppercase;
+  background: var(--glass);
+}
+.camera .hdr .live { color: var(--cyan); display: flex; gap: 6px; align-items: center; text-shadow: var(--halo-cyan); }
+.camera .hdr .live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: var(--halo-cyan); }
+.camera .feed { position: relative; height: 148px; overflow: hidden; }
+/* synthetic person silhouette + skeleton — no real footage in mockups */
+.sil { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); }
+.sil .s-head { width: 34px; height: 34px; border-radius: 50%; background: #232b3d; margin: 0 auto; }
+.sil .s-body { width: 70px; height: 80px; border-radius: 14px 14px 4px 4px; background: #232b3d; margin: 4px auto 0; }
+svg.skel { position: absolute; inset: 0; }
+svg.skel line, svg.skel circle { stroke: var(--cyan); stroke-width: 1.4; filter: drop-shadow(0 0 3px rgba(63,224,255,.6)); }
+svg.skel circle { fill: var(--cyan); }
+.camera .ftr {
+  display: flex; justify-content: space-between;
+  padding: 5px 10px; border-top: 1px solid var(--rule-2);
+  font-family: ui-monospace, Menlo, monospace; font-size: 9px;
+  letter-spacing: .1em; color: var(--ink-3); text-transform: uppercase;
+}
+.camera .ftr .ok { color: var(--cyan); }
+
+/* ── right rail ──────────────────────────────────────────────── */
+.rail {
+  width: 320px; flex: 0 0 auto; overflow-y: auto;
+  border-left: 1px solid var(--rule);
+  background: var(--glass); backdrop-filter: blur(8px);
+  position: relative; z-index: 6;
+}
+.rail-sec { border-bottom: 1px solid var(--rule); }
+.rail-hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px 8px;
+  font-family: ui-monospace, Menlo, monospace; font-size: 10px;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3);
+}
+.rail-hdr .n { color: var(--ink-3); }
+.cards { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--rule); }
+.card {
+  border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  padding: 12px; min-height: 108px; position: relative; cursor: pointer;
+  background: transparent;
+}
+.card:nth-child(2n) { border-right: 0; }
+.card.on { background: linear-gradient(180deg, rgba(47,107,255,.16), rgba(47,107,255,.05)); box-shadow: inset 0 0 0 1px var(--blue); }
+.card .preview { height: 44px; display: flex; align-items: center; justify-content: center; color: var(--ink-3); font-size: 22px; }
+.card.on .preview { color: var(--cyan); text-shadow: var(--halo-cyan); }
+.card .nm { font-size: 12px; color: var(--ink); margin: 6px 0 4px; font-weight: 500; }
+.chip {
+  display: inline-block;
+  font-family: ui-monospace, Menlo, monospace; font-size: 8px;
+  letter-spacing: .1em; text-transform: uppercase;
+  border: 1px solid var(--rule-2); color: var(--ink-3);
+  padding: 2px 5px;
+}
+.chip.full { border-color: var(--cyan); color: var(--cyan); }
+.chip.exp { border-color: var(--violet); color: var(--violet); }
+.coach { padding: 4px 14px 14px; }
+.coach .eyebrow {
+  font-family: ui-monospace, Menlo, monospace; font-size: 9px;
+  letter-spacing: .14em; color: var(--warn); text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+.coach .eyebrow::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+.coach p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.tune { padding: 4px 14px 16px; }
+.tune .row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.tune .lbl { font-family: ui-monospace, Menlo, monospace; font-size: 9.5px; letter-spacing: .1em; color: var(--ink-3); text-transform: uppercase; width: 110px; }
+.tune .track { flex: 1; height: 2px; background: var(--rule-2); position: relative; }
+.tune .track i { position: absolute; left: 55%; top: -4px; width: 10px; height: 10px; background: var(--ink); border-radius: 50%; }
+.tune .val { font-family: ui-monospace, Menlo, monospace; font-size: 10px; color: var(--ink-2); width: 34px; text-align: right; }
+
+/* ── take bar — the instrument strip (signature) ─────────────── */
+.takebar {
+  position: relative; z-index: 10;
+  display: flex; align-items: stretch;
+  border-top: 1px solid var(--rule);
+  background: var(--glass); backdrop-filter: blur(8px);
+  font-family: ui-monospace, Menlo, monospace;
+  flex: 0 0 auto; height: 46px;
+}
+.tb-cell { display: flex; align-items: center; gap: 8px; padding: 0 16px; border-right: 1px solid var(--rule); font-size: 10.5px; letter-spacing: .1em; color: var(--ink-3); text-transform: uppercase; }
+.tb-transport { gap: 14px; }
+.tb-transport span { cursor: pointer; }
+.tb-transport .rec { color: var(--danger); }
+.tb-transport .ghost { color: var(--violet); }
+.chain { display: flex; align-items: center; flex: 1; padding: 0 8px; }
+.chain .node {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; letter-spacing: .08em; padding: 4px 10px;
+  color: var(--cyan); text-shadow: var(--halo-cyan);
+}
+.chain .node b { font-weight: 500; }
+.chain .node.dim { color: var(--ink-3); text-shadow: none; }
+.chain .sep { color: var(--rule-2); font-size: 9px; }
+.tb-right { margin-left: auto; border-right: 0; border-left: 1px solid var(--rule); gap: 12px; }
+.dots { display: flex; gap: 4px; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--ink-3); }
+.dots i.done { background: var(--cyan); border-color: var(--cyan); box-shadow: var(--halo-cyan); }
+
+/* ── take state: chrome recedes, prompts come forward ────────── */
+[data-state="take"] .rail, [data-state="take"] .cmdbar .modes,
+[data-state="take"] .cmdbar .kbd, [data-state="take"] .tune, [data-state="take"] .coach { opacity: .25; pointer-events: none; }
+[data-state="take"] .takebar { background: var(--pane); }
+.shot-overlay { display: none; }
+[data-state="take"] .shot-overlay {
+  display: block; position: absolute; left: 50%; top: 7%; transform: translateX(-50%); z-index: 5;
+  text-align: center;
+}
+.shot-overlay .so-eyebrow { font-family: ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: .2em; color: var(--cyan); text-shadow: var(--halo-cyan); text-transform: uppercase; margin-bottom: 6px; }
+.shot-overlay .so-line { font-family: 'Fraunces', Georgia, serif; font-size: 30px; font-weight: 350; letter-spacing: -.01em; color: var(--ink); }
+.rec-badge { display: none; }
+[data-state="take"] .rec-badge {
+  display: flex; position: absolute; top: 14px; right: 40px; z-index: 5;
+  align-items: center; gap: 8px;
+  font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; letter-spacing: .12em; color: var(--danger);
+}
+.rec-badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+</style>
+</head>
+<body>
+  <header class="cmdbar">
+    <div class="brand">
+      <span class="wordmark">Pose<em>Puppet</em></span>
+      <span class="kbd">⌘K</span>
+    </div>
+    <nav class="modes">
+      <button class="mode on">Character</button>
+      <button class="mode">Hand-only</button>
+      <button class="mode">Setup</button>
+    </nav>
+    <div class="receipt">LOCAL · 0 NETWORK REQUESTS SINCE LOAD</div>
+    <button class="rec-btn">REC</button>
+    <button class="theme-btn">◐</button>
+  </header>
+
+  <div class="main">
+    <div class="stagewrap">
+      <div class="stage">
+        <i class="tick tl"></i><i class="tick tr"></i><i class="tick bl"></i><i class="tick br"></i>
+        <div class="stage-label">STAGE · <b>ASTRONAUT</b> · CHARACTER MODE</div>
+        <div class="rec-badge">REC 00:12</div>
+        <div class="shot-overlay">
+          <div class="so-eyebrow">Shot 3 of 7</div>
+          <div class="so-line">Touch your cheek, hold it</div>
+        </div>
+        <div class="bot">
+          <div class="arm l"></div><div class="arm r"></div>
+          <div class="leg l"></div><div class="leg r"></div>
+          <div class="torso"></div><div class="core"></div>
+          <div class="head"></div><div class="eye l"></div><div class="eye r"></div>
+        </div>
+        <div class="ground"></div>
+        <div class="camera">
+          <div class="hdr"><span>Input signal</span><span class="live">LIVE</span></div>
+          <div class="feed">
+            <div class="sil"><div class="s-head"></div><div class="s-body"></div></div>
+            <svg class="skel" viewBox="0 0 264 148">
+              <line x1="132" y1="42" x2="132" y2="86"/>
+              <line x1="104" y1="56" x2="160" y2="56"/>
+              <line x1="104" y1="56" x2="84"  y2="92"/>
+              <line x1="160" y1="56" x2="184" y2="88"/>
+              <line x1="118" y1="86" x2="146" y2="86"/>
+              <circle cx="132" cy="30" r="4"/>
+              <circle cx="104" cy="56" r="2.5"/><circle cx="160" cy="56" r="2.5"/>
+              <circle cx="84" cy="92" r="2.5"/><circle cx="184" cy="88" r="2.5"/>
+              <circle cx="118" cy="86" r="2.5"/><circle cx="146" cy="86" r="2.5"/>
+            </svg>
+          </div>
+          <div class="ftr"><span class="ok">TRACKING</span><span>CAM 30 · POSE 29.7</span></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="rail">
+      <section class="rail-sec">
+        <div class="rail-hdr"><span>Avatars</span><span class="n">02</span></div>
+        <div class="cards">
+          <div class="card on">
+            <div class="preview">▲</div>
+            <div class="nm">astronaut</div>
+            <span class="chip full">Fully supported</span>
+          </div>
+          <div class="card">
+            <div class="preview">◼</div>
+            <div class="nm">robot</div>
+            <span class="chip full">Fully supported</span>
+          </div>
+          <div class="card">
+            <div class="preview">◇</div>
+            <div class="nm">x-ray</div>
+            <span class="chip exp">Hand-only</span>
+          </div>
+          <div class="card">
+            <div class="preview">◗</div>
+            <div class="nm">beaky</div>
+            <span class="chip exp">Hand-only</span>
+          </div>
+        </div>
+      </section>
+      <section class="rail-sec">
+        <div class="rail-hdr"><span>Coach</span></div>
+        <div class="coach">
+          <div class="eyebrow">Framing</div>
+          <p>Step back so your legs are visible — full-body mode needs you head to feet.</p>
+        </div>
+      </section>
+      <section class="rail-sec">
+        <div class="rail-hdr"><span>Performance</span></div>
+        <div class="tune">
+          <div class="row"><span class="lbl">Exaggeration</span><div class="track"><i></i></div><span class="val">1.4</span></div>
+          <div class="row"><span class="lbl">Smoothing</span><div class="track"><i style="left:38%"></i></div><span class="val">1.2</span></div>
+          <div class="row"><span class="lbl">Wrist gain</span><div class="track"><i style="left:62%"></i></div><span class="val">1.25</span></div>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <footer class="takebar">
+    <div class="tb-cell tb-transport">
+      <span class="rec">⏺ take</span>
+      <span class="ghost">⬡ ghost</span>
+      <span>↺ replay</span>
+    </div>
+    <div class="chain">
+      <span class="node"><b>CAM</b> 30</span><span class="sep">▸</span>
+      <span class="node"><b>POSE</b> 29.7</span><span class="sep">▸</span>
+      <span class="node"><b>SMOOTH</b></span><span class="sep">▸</span>
+      <span class="node"><b>RIG</b></span><span class="sep">▸</span>
+      <span class="node"><b>RENDER</b> 117</span><span class="sep">▸</span>
+      <span class="node dim"><b>REC</b> —</span>
+    </div>
+    <div class="tb-cell tb-right">
+      <span>SHOT 3/7 · FACE-TOUCH</span>
+      <div class="dots"><i class="done"></i><i class="done"></i><i class="done"></i><i></i><i></i><i></i><i></i></div>
+    </div>
+  </footer>
+
+<script>
+  const q = new URLSearchParams(location.search);
+  if (q.get('theme')) document.documentElement.dataset.theme = q.get('theme');
+  if (q.get('state')) document.documentElement.dataset.state = q.get('state');
+</script>
+</body>
+</html>

@@ -11,6 +11,8 @@ export interface Stage {
   onTick: (cb: (dt: number, time: number) => void) => void;
   renderFps: () => number;
   canvas: HTMLCanvasElement;
+  /** hand-only mode gets its own stage atmosphere (violet, closer camera) */
+  setTreatment(t: 'character' | 'hand'): void;
 }
 
 export function createStage(canvas: HTMLCanvasElement): Stage {
@@ -90,6 +92,25 @@ export function createStage(canvas: HTMLCanvasElement): Stage {
   }
   requestAnimationFrame(loop);
 
+  function setTreatment(t: 'character' | 'hand'): void {
+    if (t === 'hand') {
+      scene.background = new THREE.Color(0x0c0916);
+      scene.fog = new THREE.Fog(0x0c0916, 4, 10);
+      rim.color.set(0x9d7bff);
+      rim.intensity = 1.9;
+      camera.position.set(0, 1.15, 2.1);
+      camera.lookAt(0, 1.05, 0);
+    } else {
+      scene.background = new THREE.Color(0x0e0f13);
+      scene.fog = new THREE.Fog(0x0e0f13, 6, 14);
+      rim.color.set(0x4cc2ff);
+      rim.intensity = 1.4;
+      camera.position.set(0, 1.3, 3.2);
+      camera.lookAt(0, 1.0, 0);
+    }
+    camera.updateProjectionMatrix();
+  }
+
   return {
     scene,
     camera,
@@ -97,5 +118,6 @@ export function createStage(canvas: HTMLCanvasElement): Stage {
     canvas,
     onTick: (cb) => tickCbs.push(cb),
     renderFps: () => fps,
+    setTreatment,
   };
 }

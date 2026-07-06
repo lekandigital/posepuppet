@@ -4,6 +4,9 @@
 import type { AvatarId } from './rig/avatarRegistry';
 
 export interface Config {
+  theme: 'dark' | 'light';
+  mode: 'character' | 'hand'; // future game modes exist as types only
+  handPuppet: 'hand' | 'beaky' | 'xray';
   mirror: boolean;
   smoothing: boolean;
   minCutoff: number;
@@ -15,12 +18,21 @@ export interface Config {
   bodyMode: 'upper' | 'full';
   rootMotion: boolean;
   wristGain: number; // wrist rotation amplification, 1.0 = raw, default 1.25
+  exaggeration: number; // 1.0 = faithful … 2.0 = cartoon (amplitude scale)
+  recAspect: '16:9' | '9:16';
+  recPackage: boolean; // title stinger + end card
+  recBadge: boolean; // corner mark on the composite
+  recGrade: boolean; // grain/vignette grade on the composite
+  onboardingSeen: boolean;
 }
 
 // One Euro params are for METRIC world landmarks (meters): velocities are
 // ~100x smaller than the pixel-space classics, so beta is ~100x larger than
 // the textbook 0.007 to get the same speed-adaptive behavior.
 const DEFAULTS: Config = {
+  theme: 'dark',
+  mode: 'character',
+  handPuppet: 'beaky',
   mirror: true,
   smoothing: true,
   minCutoff: 1.2,
@@ -28,10 +40,16 @@ const DEFAULTS: Config = {
   slerpRate: 28,
   relaxSec: 0.7,
   model: 'full',
-  avatar: 'woody',
+  avatar: 'astronaut', // CC0, redistributable — woody is local-only (Gate 1)
   bodyMode: 'upper',
   rootMotion: true,
   wristGain: 1.25,
+  exaggeration: 1.0,
+  recAspect: '16:9',
+  recPackage: true,
+  recBadge: true,
+  recGrade: true,
+  onboardingSeen: false,
 };
 
 const KEY = 'posepuppet-config-v3';

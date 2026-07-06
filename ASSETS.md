@@ -7,6 +7,14 @@
 | Procedural robot | built from three.js primitives in `src/rig/robot.ts` | ours | yes (code only) |
 | MediaPipe `pose_landmarker_full.task` | Google, fetched postinstall | Apache-2.0 | no (downloaded to `public/models/`) |
 | MediaPipe tasks-vision WASM | Google, copied from node_modules postinstall | Apache-2.0 | no (copied to `public/mediapipe-wasm/`) |
+| Inter (variable) | `@fontsource-variable/inter` npm package, bundled at build | SIL OFL 1.1 | no (node_modules → dist assets) |
+| JetBrains Mono (variable) | `@fontsource-variable/jetbrains-mono`, bundled at build | SIL OFL 1.1 | no (node_modules → dist assets) |
+| Fraunces (variable) | `@fontsource-variable/fraunces`, bundled at build | SIL OFL 1.1 | no (node_modules → dist assets) |
+| MediaPipe `hand_landmarker.task` | Google, fetched postinstall | Apache-2.0 | no (downloaded to `public/models/`) |
+| Hand puppets (hand / beaky / x-ray) | procedural, built from three.js primitives in `src/hand/` | ours | yes (code only) |
+
+Fonts are self-hosted and served same-origin so the privacy receipt's
+"0 external requests" stays literally true — no Google Fonts at runtime.
 
 Fixture videos are personal camera footage and are never committed (gitignored
 from commit 1).
@@ -67,9 +75,15 @@ records the approval + exact license text alongside the download URL).
 - **Reference GLB:** `/Users/lekan/Downloads/woody/woody_toy_story_rig_free_download.glb`
 - **Runtime VRM path:** `public/avatars/woody.vrm`
 - **Rig type:** Mixamo (`mixamorig:Hips`, `mixamorig:LeftArm`, etc. — 64 bones)
-- **Status:** user-provided licensed asset — **not committed to git** by default.
-  License terms must be recorded before any public redistribution.
-  The app only expects the final VRM file to exist locally at the runtime path above.
+- **Status: LOCAL-ONLY, NOT REDISTRIBUTABLE (Gate 1 decision, 2026-06-12).**
+  This is a fan-made rig of a licensed Disney/Pixar character; it cannot ship
+  in a public repo or deploy. It was committed and deployed for a period
+  after pass 1 — that commit was reverted at pass-2 Gate 1: the file is
+  untracked + gitignored again (note: it still exists in git history), the
+  registry marks it `optional` and removes it from the avatar cycle when the
+  file is absent, and the default avatar is the CC0 astronaut. Woody never
+  appears in screenshots, demo clips, or POSTS.md claims for pass 2. The app
+  only expects the final VRM file to exist locally at the runtime path above.
 
 #### Local usage
 
