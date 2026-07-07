@@ -1,5 +1,36 @@
 # Eval notes
 
+### PPC P4: body-input flags + flight contract honored (2026-07-07)
+body-input gains an OPTIONAL additive `tracking` block (six per-limb
+continuity states) — schema v1 exact-shape validation extended with a
+closed sub-shape, canonical serializer appends it last, old signals and
+recorded tapes stay valid; PosePuppet passes `continuity.states()`
+through the adapter. New spec proves: absent-valid, present-validated,
+wrong keys/states rejected, pipeline pass-through verbatim
+(bodyinput.spec 17 passed).
+
+Flight confidence contract, measured then enforced
+(tests/continuity-contract.spec.ts, deterministic node): full dropout →
+autopilot engagement (confidence < 0.35) at **legacy 300 ms, PPC
+367 ms — shift +67 ms**, bound ≤ +100 ms asserted by the test; plus
+confidence monotone-nonincreasing through any dropout, both paths. The
+first measurement came in at +167 ms — fixed by shortening the CORE
+(torso/head) horizon 250 → 150 ms with relax 150 → 100 ms, i.e. tuned
+at my layer per plan, zero Flight code touched. Core landmarks barely
+move during the face-cross use case, so the masked facetouch numbers
+held (−27 % vs hold after the retune).
+
+Final published matrix (eval/ppc-results.json, 60 s headed):
+arms −5.9 % / facetouch −27 % posErr vs hold with better p95 everywhere;
+fullbody +1.2 % and fast +2.2 % (parity within the ±3–4 % run noise, by
+design — reversals defeat extrapolation, so PPC converges to hold);
+masked puppet sync ≤ legacy on arms/facetouch/fast and 6.13° vs 5.97°
+on fullbody legs (parity, ±0.2° across runs); re-entry ≤ 0.06 m/frame,
+horizon ≤ 400 ms, zero NaN on every run. Suites: PosePuppet **86
+passed / 5 skipped** (baseline 73 + 13 PPC/contract/schema specs);
+Flight **17 passed / 2 skipped**, unmodified, with the tracking block
+live on the BroadcastChannel.
+
 ### PPC P3: masked-fixture eval — legacy vs PPC published (2026-07-07)
 Harness: deterministic visibility masks over real fixtures
 (src/eval/masks.ts, windows keyed on videoTimeMs % clip length so every

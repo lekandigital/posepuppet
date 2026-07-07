@@ -20,6 +20,25 @@ export interface BodyInputFrame {
   world: LandmarkPoint[] | null;
   /** normalized image-space landmarks (y down, 0..1-ish), or null */
   norm: LandmarkPoint[] | null;
+  /** optional per-limb continuity states from the host's tracking layer
+   *  (Predictive Pose Continuity) — passed through to the signal */
+  tracking?: BodyTracking;
+}
+
+/** Per-limb tracking continuity state (schema v1 additive, optional).
+ *  'predicted' = short-horizon continuity (≤ ~400 ms, decaying
+ *  confidence); 'relaxed' = past the horizon, data is easing to rest.
+ *  Consumers that ignore this field lose nothing — the confidence field
+ *  already reflects the same decay. */
+export type TrackingState = 'visible' | 'predicted' | 'relaxed';
+
+export interface BodyTracking {
+  torso: TrackingState;
+  head: TrackingState;
+  leftArm: TrackingState;
+  rightArm: TrackingState;
+  leftLeg: TrackingState;
+  rightLeg: TrackingState;
 }
 
 export type BodyEvent = 'recenter' | 'action'; // closed set in schema v1
@@ -58,6 +77,9 @@ export interface BodySignal {
   axes: BodyAxes;
   /** events fired on THIS frame (transition-triggered, usually empty) */
   events: BodyEvent[];
+  /** optional per-limb continuity states (additive; absent when the host
+   *  tracking layer doesn't provide them) */
+  tracking?: BodyTracking;
 }
 
 export type AxisName = keyof BodyAxes;

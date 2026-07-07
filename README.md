@@ -65,8 +65,12 @@ Architecture in `ARCHITECTURE.md`; asset manifest in `ASSETS.md`.
   legs and feet when you stand back and enable it). Improved wrists and
   palms; open/fist/point read on rigs with fingers; believable
   face-touch via proximity-magnetized IK that never puts a hand through
-  the skull; occlusion recovery that coasts, relaxes, and blends back in
-  ~0.5 s without ever snapping.
+  the skull; occlusion handled by **Predictive Pose Continuity** — a
+  short constrained prediction (≤ 400 ms) with visibly decaying
+  confidence, then relax-to-rest, with re-entry always blended, never
+  snapped. It is NOT invisible-limb tracking: past ~⅓ s the system
+  honestly gives up (docs/PPC.md states the limits; the masked-fixture
+  eval publishes prediction error next to the legacy hold).
 - **Hand-only mode** — one hand, 21-landmark finger tracking, its own
   violet stage. Roster: an expressive robot-glove hand, **beaky** (a
   talking bird — palm aims the head, thumb–index pinch is the jaw; talk
@@ -111,7 +115,7 @@ ASSETS.md).
 
 1. `getUserMedia` → `<video>`; `requestVideoFrameCallback` drives detection once per video frame.
 2. MediaPipe PoseLandmarker (GPU delegate, WASM fallback) returns 33 normalized + 33 metric world landmarks; HandLandmarker returns 21 in hand-only mode.
-3. Landmarks are mirrored in landmark space, then smoothed by a One Euro bank tuned for metric space.
+3. Landmarks are mirrored, run through Predictive Pose Continuity (per-limb VISIBLE→PREDICTED→RELAXED state machines: regression velocity under bone-length/drift constraints, decaying confidence, blended re-entry — every consumer inherits it), then smoothed by a One Euro bank tuned for metric space.
 4. A body frame (hips/shoulders, with a shoulders-only fallback) gives torso orientation; limb directions are expressed in that frame so torso turns don't corrupt arms.
 5. Per bone: quaternion from rest direction → target direction, converted to parent-local space, exaggeration applied to the swing, clamped by per-bone limits.
 6. Face-touch: wrist-near-head proximity magnetizes the arm onto a two-bone IK whose target sits just outside a per-avatar head collider measured from real geometry.
@@ -162,6 +166,11 @@ eval caught it at 53 penetration frames; now 5).
   far from its shoulders; labeled, not hidden.
 - Full-body loops replay wherever the recording had leg tracking;
   desk-framed recordings replay upper-body only.
+- Occlusion prediction is short and honest: it helps deliberate motion
+  (~6–19 % lower error than holding, measured), converges to
+  hold-quality on fast reversing motion (punches defeat extrapolation),
+  and legs hand straight back to the relax behavior (stride reversals
+  defeat it too). Nothing here claims occlusion-proof tracking.
 
 ## Deliberately skipped
 
