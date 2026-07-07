@@ -27,13 +27,14 @@ import { openFlight } from './bodyinput/flightBridge';
 import { createDirector } from './director/director';
 import { TAKE_SCRIPTS } from './director/scripts';
 import type { HandPuppetId } from './hand/types';
-import { createPanel } from './ui/panel';
+import { createPanel, updatePpcStates } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
 import { createDetector, type ModelVariant } from './pose/detector';
 import { drawSkeleton } from './overlay/skeleton';
 import { LM } from './pose/indices';
 import { mirrorNorm, mirrorWorld } from './pose/mirror';
 import { LandmarkSmoother } from './pose/smoothing';
+import { PoseContinuity } from './pose/continuity';
 import type { LandmarkPoint, PoseFrame } from './pose/types';
 import { createRobot } from './rig/robot';
 import { Retargeter } from './rig/retarget';
@@ -131,6 +132,7 @@ async function boot() {
   const isAvatarVisualReview = smokeMode === 'avatar-visual-review';
   const isGeneratedOnlyMode = isAvatarLoadOnly || isAvatarVisualReview;
   if (params.has('mirror')) config.mirror = params.get('mirror') !== '0';
+  if (params.has('ppc')) config.ppc = params.get('ppc') !== '0'; // eval A/B, not persisted
   if (params.has('body')) config.bodyMode = params.get('body') === 'full' ? 'full' : 'upper';
   if (params.has('mode')) config.mode = params.get('mode') === 'hand' ? 'hand' : 'character';
   if (params.has('puppet')) {
@@ -616,12 +618,22 @@ async function boot() {
   smoother.setParams(config.minCutoff, config.beta);
   smoother.enabled = config.smoothing;
 
+  // Predictive Pose Continuity: sits at the fork so puppeteering AND
+  // body-input inherit it; exact pass-through while landmarks are visible
+  const continuity = new PoseContinuity();
+  continuity.enabled = config.ppc;
+
   onConfigChange((key) => {
     if (key === 'minCutoff' || key === 'beta') smoother.setParams(config.minCutoff, config.beta);
     if (key === 'smoothing') smoother.enabled = config.smoothing;
+    if (key === 'ppc') {
+      continuity.enabled = config.ppc;
+      continuity.reset();
+    }
     if (key === 'mirror') {
       setMirrored(els, config.mirror);
       smoother.reset();
+      continuity.reset();
       retargeter.bind(avatar);
     }
   });
@@ -765,6 +777,7 @@ async function boot() {
         hud.setLive(true);
         hud.setCam(`LIVE ${video.videoWidth}×${video.videoHeight}`);
         smoother.reset();
+        continuity.reset();
         layoutOverlay(els);
       });
     } else {
@@ -780,6 +793,7 @@ async function boot() {
       hud.setLive(false);
       hud.setCam(`FILE ${video.videoWidth}×${video.videoHeight}`);
       smoother.reset();
+      continuity.reset();
       layoutOverlay(els);
     });
   };
@@ -1199,26 +1213,40 @@ async function boot() {
   const mWorld: LandmarkPoint[] = [];
 
   function onPoseFrame(frame: PoseFrame | null) {
+    // the camera overlay always draws the RAW detection — predicted
+    // landmarks never appear over the real video (honesty line)
+    drawSkeleton(overlayCtx, frame ? frame.norm : null, overlay.width, overlay.height);
+
+    const tMs = frame ? frame.wallTimeMs : performance.now();
+    let world: LandmarkPoint[] | null = null;
+    let norm: LandmarkPoint[] | null = null;
     if (frame) {
       window.__PP.lastDetectionAt = frame.wallTimeMs;
       window.__PP.detectionCount++;
-      drawSkeleton(overlayCtx, frame.norm, overlay.width, overlay.height);
+      norm = config.mirror ? mirrorNorm(frame.norm, mNorm) : frame.norm;
+      world = config.mirror ? mirrorWorld(frame.world, mWorld) : frame.world;
+    }
 
-      const norm = config.mirror ? mirrorNorm(frame.norm, mNorm) : frame.norm;
-      const world = config.mirror ? mirrorWorld(frame.world, mWorld) : frame.world;
-      const worldSmooth = smoother.apply(world, frame.wallTimeMs);
-      retargeter.updateFromPose(worldSmooth, norm, frame.wallTimeMs);
-      poseRing.push(encodePoseFrame(worldSmooth, norm, frame.wallTimeMs));
-      latestNorm = norm;
-      intents.onLandmarks(norm, frame.wallTimeMs);
-      bodyInput.onPoseFrame(world, norm, frame.wallTimeMs);
-      evalCollector?.onPoseFrame(norm);
+    // Predictive Pose Continuity: may briefly carry the stream through an
+    // occlusion (≤ 400 ms, decaying confidence) or synthesize through a
+    // short full dropout; null once faded — every consumer inherits it
+    const cont = continuity.apply(world, norm, tMs);
+
+    if (cont) {
+      const worldSmooth = smoother.apply(cont.world, tMs);
+      retargeter.updateFromPose(worldSmooth, cont.norm, tMs);
+      poseRing.push(encodePoseFrame(worldSmooth, cont.norm, tMs));
+      latestNorm = cont.norm;
+      intents.onLandmarks(cont.norm, tMs);
+      bodyInput.onPoseFrame(cont.world, cont.norm, tMs);
+      // detection honesty: a synthesized dropout frame is NOT a detection —
+      // eval only sees frames the detector actually produced
+      evalCollector?.onPoseFrame(frame ? cont.norm : null);
     } else {
-      drawSkeleton(overlayCtx, null, overlay.width, overlay.height);
       retargeter.updateFromPose(null, null);
       latestNorm = null;
-      intents.onLandmarks(null, performance.now());
-      bodyInput.onPoseFrame(null, null, performance.now());
+      intents.onLandmarks(null, tMs);
+      bodyInput.onPoseFrame(null, null, tMs);
       evalCollector?.onPoseFrame(null);
     }
   }
@@ -1367,6 +1395,7 @@ async function boot() {
       hud.setPoseFps(config.mode === 'hand' ? handMode.handFps() : detector.poseFps());
       hud.setRig(config.mode === 'hand' ? (handMode.lastDetectionAt() > 0 ? 1 : 0) : retargeter.activeBoneCount());
       hud.tick(window.__PP.lastDetectionAt, window.__PP.videoReady);
+      updatePpcStates(continuity.states());
       visibilityCoach(performance.now());
 
       const fps = detector.poseFps();

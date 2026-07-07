@@ -621,6 +621,19 @@ body.perf-lite::before { display: none; } /* grain off */
 .panel-slider { display: flex; align-items: center; gap: 6px; }
 .panel-slider input { width: 104px; accent-color: var(--blue); }
 .panel-slider em { font-style: normal; min-width: 34px; text-align: right; color: var(--ink-2); }
+
+/* Predictive Pose Continuity chips: per-limb tracking state */
+#ppc-states { display: flex; flex-wrap: wrap; gap: 3px; max-width: 200px; justify-content: flex-end; }
+.ppc-chip {
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  padding: 1px 4px;
+  border: 1px solid var(--rule-2);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.ppc-chip.pred { color: var(--cyan); border-color: var(--cyan); }
+.ppc-chip.relax { color: var(--ink-2); border-color: var(--rule-2); opacity: 0.55; }
 #panel button { padding: 4px 8px; font-size: 9.5px; }
 #panel select {
   font-family: var(--mono);
