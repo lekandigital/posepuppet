@@ -1,3 +1,10 @@
+## 2026-07-07 (BodyArcade Flight P0 — rights + recon complete, awaiting GATE 1b)
+Done: permission record verified (private, gitignored, sufficient for faithful public fork w/ credit); TinySkies forked into apps/flight (284 files, analytics stripped, deploy glue excluded, builds green); STUDY_NOTES.md architecture map; PLAN.md rewritten for Flight; ASSETS.md fork manifest; .gitignore negations so global binary ignores don't swallow flight assets
+Key findings: ControlState.turnRate already continuous (body axes drop in w/o touching flight math); offline = 1 mandatory intercept + 4 no-ops; plane/boat/carpet all real behind a capabilities table; loop is variable-dt clamped 50ms (replay tape records dt); upstream README control table is stale vs code
+Baseline: PosePuppet suite green 72/5 skipped (1 known headless boundary flake passed on rerun); perf baseline stands in eval/results.json
+Blockers: USER GATE 1b — PLAN.md approval + 4 folded questions (layout, asset provenance, skip PWM crutch, stale-README reading)
+Next: on approval → P1 offline parity (LocalWorldProvider, keyboard feel identical, flight perf baseline)
+
 ## 2026-07-07 (@bodyarcade/body-input P3 — fixture evals ALL GREEN, package complete)
 Done: fixture eval suite (episode/window-structural, eval/bodyinput-results.json) green on all six flight clips; example consumer page + cross-page BroadcastChannel spec; README complete with measured-limitations section
 Real-footage fixes the eval forced: seated classifier rebuilt on leg-fold + ankle-forward (crouch was misread as seated; MediaPipe z compression flickered the thigh-angle cue); mid-motion fallback neutral now upgraded by first stillness dwell (pegged leanX on seated.mp4); armLength 1.5×sw floor removed (inflated armLength, capped armsOut at 0.8)

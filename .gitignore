@@ -85,3 +85,12 @@ fixtures/flight/*.mov
 LICENSE_NOTES.local.md
 PERMISSION.local.md
 permissions.local.md
+
+# BodyArcade Flight (apps/flight): forked TinySkies assets are tracked —
+# the global binary-extension ignores above must not swallow them
+!apps/flight/**/*.png
+!apps/flight/**/*.jpg
+!apps/flight/**/*.jpeg
+!apps/flight/**/*.webp
+!apps/flight/**/*.glb
+!apps/flight/**/*.gltf
