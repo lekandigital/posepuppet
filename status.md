@@ -1,3 +1,10 @@
+## 2026-07-07 (PPC P2 — wired live, engineering chips)
+PPC live at the main.ts fork (all five consumers inherit); ?ppc=0 / panel toggle for legacy A/B; per-limb state chips in engineering view; resets on mirror/file/camera switches
+Honesty: overlay draws raw detection only; synthesized frames never count as detections in eval
+Suite 82 passed / 5 skipped; same-conditions A/B (arms, 30s headed): upper Δ 0.02°, legs Δ 0.74° (within ±1.0°)
+Blockers: none
+Next: P3 — mask harness (eval/masks/*.json, ?mask=), legacy-vs-PPC metrics into a dedicated results file
+
 ## 2026-07-07 (PPC P1 — continuity core, GATE 1 APPROVED)
 Gate 1 approved in-session (architecture, metrics, thresholds, plan — proceed)
 src/pose/continuity.ts: ring buffers + regression velocity + 6 per-limb state machines + constraints + confidence decay + converging no-snap re-entry, all Gate-1 constants in one table

@@ -3,6 +3,7 @@
 
 import { config, setConfig, resetConfig, type Config } from '../config';
 import type { BoneName } from '../rig/types';
+import type { PpcGroupInfo } from '../pose/continuity';
 
 /** Calibration hooks the panel drives; implemented by main over the live
  *  retargeter so avatar swaps keep working. */
@@ -11,6 +12,32 @@ export interface PanelRigApi {
   clearCalibration(): void;
   getCorrectionEuler(bone: BoneName): { x: number; y: number; z: number };
   setCorrectionEuler(bone: BoneName, e: { x: number; y: number; z: number }): void;
+}
+
+/** Refresh the per-limb PPC chips (VISIBLE dim / PREDICTED cyan-ish /
+ *  RELAXED warn). Cheap: reuses spans, skips when the panel is hidden. */
+export function updatePpcStates(states: readonly PpcGroupInfo[]): void {
+  const host = document.getElementById('ppc-states');
+  if (!host || document.getElementById('panel')?.classList.contains('hidden')) return;
+  while (host.children.length < states.length) {
+    const chip = document.createElement('span');
+    chip.className = 'ppc-chip';
+    host.append(chip);
+  }
+  for (let i = 0; i < states.length; i++) {
+    const s = states[i];
+    const chip = host.children[i] as HTMLElement;
+    const label =
+      s.state === 'VISIBLE'
+        ? s.blending
+          ? 'REACQ'
+          : 'OK'
+        : `${s.state === 'PREDICTED' ? 'PRED' : 'RELAX'} ${s.ageMs}ms·${s.confidence.toFixed(2)}`;
+    const text = `${s.name} ${label}`;
+    if (chip.textContent !== text) chip.textContent = text;
+    chip.classList.toggle('pred', s.state === 'PREDICTED' || s.blending);
+    chip.classList.toggle('relax', s.state === 'RELAXED');
+  }
 }
 
 const OFFSET_BONES: BoneName[] = [
@@ -54,7 +81,7 @@ function slider(
   return wrap;
 }
 
-function toggle(key: keyof Config & ('mirror' | 'smoothing' | 'rootMotion')): HTMLElement {
+function toggle(key: keyof Config & ('mirror' | 'smoothing' | 'rootMotion' | 'ppc')): HTMLElement {
   const input = document.createElement('input');
   input.type = 'checkbox';
   input.checked = config[key] as boolean;
@@ -73,11 +100,18 @@ export function createPanel(rig?: PanelRigApi): void {
   fullBody.checked = config.bodyMode === 'full';
   fullBody.onchange = () => setConfig('bodyMode', fullBody.checked ? 'full' : 'upper');
 
+  // Predictive Pose Continuity: per-limb tracking state, updated from the
+  // render loop at HUD cadence while the panel is open
+  const ppcStates = document.createElement('div');
+  ppcStates.id = 'ppc-states';
+
   host.append(
     row('mirror', toggle('mirror')),
     row('full body (legs)', fullBody),
     row('smoothing', toggle('smoothing')),
+    row('continuity (ppc)', toggle('ppc')),
     row('root motion', toggle('rootMotion')),
+    row('limb tracking', ppcStates),
     row('minCutoff', slider('minCutoff', 0.1, 3, 0.05)),
     row('beta', slider('beta', 0, 30, 0.5)),
     row('slerp rate', slider('slerpRate', 5, 40, 1)),

@@ -1,5 +1,26 @@
 # Eval notes
 
+### PPC P2: wired at the fork, engineering chips, A/B pass-through (2026-07-07)
+PPC now processes the mirrored streams at the single main.ts fork —
+retargeter (via One Euro), Motion Memory ring, gesture intents,
+body-input, and eval all inherit it. `?ppc=0` gives the legacy path
+(config toggle in the engineering panel too); per-limb chips (state,
+age, confidence) render in the engineering view at HUD cadence. Two
+honesty details: the camera overlay always draws RAW detection
+(predicted landmarks never appear over real video), and synthesized
+dropout frames are never counted as detections in eval. Suite: 82
+passed / 5 skipped. Headed same-conditions A/B on arms.mp4 (30 s):
+upperLimbsMean 10.39° (ppc=1) vs 10.37° (ppc=0) — Δ 0.02°, pass-through
+confirmed end-to-end; legsMean 2.97 vs 2.23 (Δ 0.74°, inside the ±1.0°
+tolerance; arms.mp4 legs are desk-framed marginal visibility — the
+flicker regime PPC intentionally smooths, and both readings sit below
+the 3.01° baseline). Absolute numbers this session ran at a 60 Hz
+render cadence vs the 118 fps baseline environment — the P3 refresh
+re-measures the full matrix at matched 60 s headed conditions. Gotcha
+logged: `node eval/run.mjs <fixture>` OVERWRITES eval/results.json —
+baseline restored from git both times; P3 must write masked-run results
+to a separate file.
+
 ### PPC P1: continuity core + unit coverage (2026-07-07)
 `src/pose/continuity.ts` shipped (not yet wired into the app — that's
 P2): per-landmark 16-frame ring buffers, least-squares velocity over the
