@@ -23,6 +23,7 @@ import { createGhostPlayer } from './memory/ghost';
 import { saveLoop, listLoops, loadLoop, deleteLoop } from './memory/store';
 import { createIntentDetector } from './gesture/intent';
 import { createBodyInputAdapter, type BodyInputAdapter } from './bodyinput/adapter';
+import type { BodyTracking, TrackingState } from '@bodyarcade/body-input';
 import { openFlight } from './bodyinput/flightBridge';
 import { createDirector } from './director/director';
 import { TAKE_SCRIPTS } from './director/scripts';
@@ -1213,6 +1214,19 @@ async function boot() {
   const mNorm: LandmarkPoint[] = [];
   const mWorld: LandmarkPoint[] = [];
 
+  // per-limb PPC states → body-input signal (additive tracking block);
+  // reused object, refreshed per pose frame
+  const ppcTracking: BodyTracking = {
+    torso: 'visible', head: 'visible', leftArm: 'visible',
+    rightArm: 'visible', leftLeg: 'visible', rightLeg: 'visible',
+  };
+  function currentTracking(): BodyTracking {
+    for (const s of continuity.states()) {
+      ppcTracking[s.name] = s.state.toLowerCase() as TrackingState;
+    }
+    return ppcTracking;
+  }
+
   // PPC eval harness: ?mask=<spec> applies deterministic synthetic occlusion
   // windows (keyed on video time) between mirroring and continuity — the
   // same frame provides ground truth for the masked-run metrics
@@ -1258,12 +1272,12 @@ async function boot() {
       poseRing.push(encodePoseFrame(worldSmooth, cont.norm, tMs));
       latestNorm = cont.norm;
       intents.onLandmarks(cont.norm, tMs);
-      bodyInput.onPoseFrame(cont.world, cont.norm, tMs);
+      bodyInput.onPoseFrame(cont.world, cont.norm, tMs, config.ppc ? currentTracking() : undefined);
     } else {
       retargeter.updateFromPose(null, null);
       latestNorm = null;
       intents.onLandmarks(null, tMs);
-      bodyInput.onPoseFrame(null, null, tMs);
+      bodyInput.onPoseFrame(null, null, tMs, config.ppc ? currentTracking() : undefined);
     }
 
     // detection honesty: a synthesized dropout frame is NOT a detection.

@@ -1,3 +1,11 @@
+## 2026-07-07 (PPC P4 — body-input flags, flight contract, docs — GATE 2 RAISED)
+body-input `tracking` block (additive, optional, closed sub-shape, canonical order; old tapes valid); states flow PosePuppet → signal → games
+Flight contract measured then test-enforced: autopilot engagement legacy 300 ms vs PPC 367 ms (+67 ms, bound +100); core horizon retuned 250→150 ms at MY layer, zero Flight changes; Flight suite 17 passed / 2 skipped unmodified
+Final matrix re-published post-retune (facetouch −27%, arms −5.9%, reversals parity by design); README/CHANGELOG/docs/PPC.md name it Predictive Pose Continuity and state limits plainly
+Suites: PosePuppet 86 passed / 5 skipped; Flight 17 passed / 2 skipped
+Blockers: USER GATE 2 — live occlusion test (script: docs/PPC_GATE2.md)
+Next: Lekan's live test; fix what he reports
+
 ## 2026-07-07 (PPC P3 — masked-fixture eval, legacy vs PPC published)
 Mask harness (4 specs over real fixtures, loop-repeating, same-frame truth) + run-ppc.mjs → eval/ppc-results.json
 End-to-end masked puppet sync: PPC ≤ legacy on all 4 fixtures; landmark posErr −19%/−6.5% where prediction informs, parity-in-noise on reversal footage (convergence-to-hold is the measured design goal there)

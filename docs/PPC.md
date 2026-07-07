@@ -53,10 +53,11 @@ VISIBLE ──vis < 0.45──▶ PREDICTED ──age > horizon──▶ RELAXED
 
 ## Constraints on prediction
 
-- **Horizon cap**: 400 ms for limbs, 250 ms for torso/head (if the core
-  is gone, the person is gone — and Flight's autopilot timing must not
-  drift). Enforced by tests; a PREDICTED sample older than the cap is a
-  bug.
+- **Horizon cap**: 400 ms for limbs, 150 ms for torso/head (if the core
+  is gone, the person is gone — and Flight's autopilot must engage on
+  the legacy schedule: the contract test measures the shift at +67 ms,
+  bound +100 ms). Enforced by tests; a PREDICTED sample older than the
+  cap is a bug.
 - **Velocity trust** (all deterministic, measured on the masked-fixture
   eval): the regression's own residual (bad line fit ⇒ oscillating or
   noisy ⇒ less trust), a deceleration factor (recent 3-sample velocity

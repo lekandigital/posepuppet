@@ -5,7 +5,7 @@
 // so puppeteering AND body-input inherit it.
 //
 // This is explicitly NOT invisible-limb tracking: the horizon is hard-capped
-// (400 ms limbs / 250 ms torso+head), output visibility decays every frame a
+// (400 ms limbs / 150 ms torso+head), output visibility decays every frame a
 // limb is predicted, and downstream consumers see that decayed confidence —
 // games decide their own autopilot; this layer never fakes certainty.
 //
@@ -22,8 +22,9 @@ export const PPC = {
   /** hard prediction cap for arm/leg groups (ms) */
   horizonLimbMs: 400,
   /** torso + head predict shorter: if the core is gone, the person is gone —
-   *  and Flight's autopilot-engagement timing must stay within +100 ms */
-  horizonCoreMs: 250,
+   *  and Flight's autopilot must engage on the legacy schedule (the
+   *  contract test measures the shift; 150/100 measures +67 ms) */
+  horizonCoreMs: 150,
   /** visibility hysteresis, matching the retargeter's gates */
   visOn: 0.55,
   visOff: 0.45,
@@ -74,7 +75,7 @@ export const PPC = {
   visFloorAtHorizon: 0.35,
   /** … then → 0 over this long in RELAXED */
   relaxVisMsLimb: 250,
-  relaxVisMsCore: 150,
+  relaxVisMsCore: 100,
   /** neighbor-agreement multiplier floor */
   agreementFloor: 0.6,
   /** low-trust prediction decays confidence faster: effective horizon =
