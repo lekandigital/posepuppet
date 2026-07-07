@@ -85,6 +85,23 @@ export const PPC = {
    *  driving bones with hold-quality predictions made masked leg/fast sync
    *  WORSE than legacy; high-trust arm exits made it better) */
   trustHorizonFloor: 0.35,
+  /** chain plausibility: a measured child whose distance to its measured
+   *  parent leaves [lo, hi] × learned length is DETECTOR GARBAGE — segment
+   *  lengths are physically constant. Traced on fast.mp4: behind-torso
+   *  punches collapse the forearm to 0.2–0.6× median at vis 0.5–0.99 while
+   *  real fast swings stay within 0.7–1.25×. Implausible samples are held
+   *  instead of passed through, emitted at ≤ this vis, and never buffered. */
+  chainGateLo: 0.55,
+  chainGateHi: 1.55,
+  implausibleVis: 0.4,
+  /** velocity capture requires this fresh a run of buffered samples —
+   *  gate flapping leaves sparse/stale buffers that must read as unknown */
+  velFreshRunMs: 170,
+  /** in-group pass-through catch-up cap (× maxCorrWorld per frame): a
+   *  still-measured member of a lost group re-approaches measurement in
+   *  bounded steps instead of teleporting. 1 = the same no-snap bound as
+   *  re-entry — the old raw copy was an invisible first-frame snap. */
+  regainStepScale: 1,
 } as const;
 
 export type PpcState = 'VISIBLE' | 'PREDICTED' | 'RELAXED';
@@ -118,6 +135,15 @@ interface GroupSpec {
    *  the bone-level hold; positions still flow (body-input crouch/stature
    *  continuity) but the puppet hands legs back to hold almost at once. */
   visTrust: number;
+  /** rigid groups (torso, head) predict as ONE translating body: a single
+   *  group velocity moves the shape captured at loss — per-landmark
+   *  prediction let the quad shear, and the retargeter read that shear as
+   *  the torso bending/spinning (Gate-2 live finding). Rotation continuity
+   *  stays where it always lived: the bone layer's clamped coast. */
+  rigid?: boolean;
+  /** pairs with physically constant distance, used only for plausibility
+   *  (both members' vis capped when the pair's learned length breaks) */
+  plausPairs?: Array<[number, number]>;
 }
 
 // Group layout mirrors how the retargeter consumes landmarks: torso first
@@ -130,6 +156,11 @@ const GROUPS: GroupSpec[] = [
     chain: [],
     core: true,
     visTrust: 1,
+    rigid: true,
+    plausPairs: [
+      [LM.leftShoulder, LM.rightShoulder],
+      [LM.leftHip, LM.rightHip],
+    ],
   },
   {
     name: 'head',
@@ -138,6 +169,8 @@ const GROUPS: GroupSpec[] = [
     chain: [],
     core: true,
     visTrust: 1,
+    rigid: true,
+    plausPairs: [[LM.leftEar, LM.rightEar]],
   },
   {
     name: 'leftArm',
@@ -277,6 +310,9 @@ class Track {
     const win = Math.min(PPC.velWindow, this.count);
     if (win < 3) return 0;
     if (nowMs - this.latestT() > PPC.velMaxAgeMs) return 0;
+    // freshness: the newest 3 samples must be a continuous recent run —
+    // gate flapping leaves sparse buffers whose "velocity" is fiction
+    if (this.t[this.idx(0)] - this.t[this.idx(2)] > PPC.velFreshRunMs) return 0;
     // means
     let mt = 0;
     const mean = [0, 0, 0];
@@ -382,6 +418,10 @@ interface GroupState {
   blendErr: number;
   horizonMs: number;
   relaxVisMs: number;
+  /** rigid groups: one shared translation (world xyz + norm xyz) applied to
+   *  the shape captured at loss, and its damped velocity */
+  offset: Float64Array;
+  groupVel: Float64Array;
 }
 
 interface LmState {
@@ -444,6 +484,8 @@ export class PoseContinuity {
         blendErr: 0,
         horizonMs: spec.core ? PPC.horizonCoreMs : PPC.horizonLimbMs,
         relaxVisMs: spec.core ? PPC.relaxVisMsCore : PPC.relaxVisMsLimb,
+        offset: new Float64Array(6),
+        groupVel: new Float64Array(6),
       };
       this.groups.push(g);
       for (const m of spec.members) this.owner[m] = g;
@@ -520,6 +562,9 @@ export class PoseContinuity {
           g.state = 'PREDICTED';
           g.ageMs = 0;
           g.blending = false;
+          g.offset.fill(0);
+          g.groupVel.fill(0);
+          let velN = 0;
           for (const m of g.spec.members) {
             const s = this.lm[m];
             const track = this.tracks[m];
@@ -534,18 +579,24 @@ export class PoseContinuity {
             const gapMs = frameMs - track.latestT();
             if (gapMs <= PPC.velMaxAgeMs && track.latestInto(ow, on)) {
               s.visEnter = track.latestVis();
-              // dead-reckon the hysteresis gap: the buffered sample is 2–3
-              // frames old; advance it on the trusted velocity so prediction
-              // starts where the limb plausibly IS, not where it last was
-              const gap = gapMs / 1000;
-              ow.x += s.vel[0] * gap;
-              ow.y += s.vel[1] * gap;
-              ow.z += s.vel[2] * gap;
-              on.x += s.vel[3] * gap;
-              on.y += s.vel[4] * gap;
-              on.z += s.vel[5] * gap;
+              if (!g.spec.rigid) {
+                // dead-reckon the hysteresis gap: the buffered sample is 2–3
+                // frames old; advance it on the trusted velocity so prediction
+                // starts where the limb plausibly IS, not where it last was
+                const gap = gapMs / 1000;
+                ow.x += s.vel[0] * gap;
+                ow.y += s.vel[1] * gap;
+                ow.z += s.vel[2] * gap;
+                on.x += s.vel[3] * gap;
+                on.y += s.vel[4] * gap;
+                on.z += s.vel[5] * gap;
+              }
             } else {
               s.visEnter = ow.visibility;
+            }
+            if (g.spec.rigid && s.trust > 0) {
+              for (let j = 0; j < 6; j++) g.groupVel[j] += s.vel[j];
+              velN++;
             }
             s.agreement = 1;
             // last-seen anchor: offset from the parent (which usually stays
@@ -560,6 +611,11 @@ export class PoseContinuity {
               s.entry[0] = ow.x; s.entry[1] = ow.y; s.entry[2] = ow.z;
               s.entry[3] = on.x; s.entry[4] = on.y; s.entry[5] = on.z;
             }
+          }
+          if (g.spec.rigid && velN > 0) {
+            for (let j = 0; j < 6; j++) g.groupVel[j] /= velN;
+            capLen3(g.groupVel, 0, PPC.maxPredSpeed);
+            capLen3(g.groupVel, 3, PPC.maxPredSpeedNorm);
           }
         } else if (g.blending) {
           g.reentryMs += dtMs;
@@ -596,6 +652,20 @@ export class PoseContinuity {
           g.state = 'RELAXED'; // horizon cap: prediction never exceeds it
         }
       }
+    }
+
+    // ---- rigid group offsets: one shared translation per frame -------------
+    for (const g of this.groups) {
+      if (!g.spec.rigid || g.state !== 'PREDICTED') continue;
+      const damp = Math.exp(-dtMs / PPC.dampTauMs);
+      for (let j = 0; j < 6; j++) g.groupVel[j] *= damp;
+      for (let j = 0; j < 6; j++) g.offset[j] += g.groupVel[j] * dt;
+      // entry-pull: the shared offset retracts toward zero with age
+      const age = Math.min(g.ageMs / g.horizonMs, 1) ** PPC.entryPullExp;
+      const kPull = age * (1 - Math.exp(-dtMs / PPC.entryPullTauMs));
+      for (let j = 0; j < 6; j++) g.offset[j] -= g.offset[j] * kPull;
+      capLen3(g.offset, 0, PPC.maxDriftM);
+      capLen3(g.offset, 3, PPC.maxDriftNorm);
     }
 
     // ---- per-landmark output ------------------------------------------------
@@ -639,12 +709,25 @@ export class PoseContinuity {
     const on = this.outNorm[m];
     const s = this.lm[m];
     const measured = world !== null;
+    // chain plausibility: a measured sample that breaks its (physically
+    // constant) segment length is detector garbage no matter what its
+    // visibility claims — behind-torso punches collapse the forearm onto
+    // the elbow at vis 0.5–0.99 (Gate-2 live finding, confirmed on the
+    // fast.mp4 trace). Garbage is held instead of enacted, emitted at low
+    // confidence, and never enters the ring buffer.
+    const plausible = !measured || this.chainPlausible(g, m, world!);
 
     if (g.state === 'VISIBLE') {
       if (!measured) return; // gate said open but frame missing: hold, next frame decides
       const w = world![m];
       const n = norm![m];
-      if (w.visibility >= PPC.visPush) this.tracks[m].push(frameMs, w, n);
+      if (!plausible) {
+        // hold the last output; confidence capped below every gate
+        ow.visibility = on.visibility = Math.min(w.visibility, PPC.implausibleVis);
+        return;
+      }
+      const pairOk = this.pairPlausible(g, m, world!);
+      if (pairOk && w.visibility >= PPC.visPush) this.tracks[m].push(frameMs, w, n);
 
       if (g.blending && g.reentryDurMs > 0) {
         // re-entry: smoothstep from the held pose toward measured, with a
@@ -658,49 +741,68 @@ export class PoseContinuity {
         // exact pass-through: fully-visible behavior is byte-identical
         copyLm(w, ow);
         copyLm(n, on);
+        // …except when a rigid pair's constant width broke: which member is
+        // garbage is ambiguous, so neither is trusted (confidence only)
+        if (!pairOk) {
+          ow.visibility = on.visibility = Math.min(ow.visibility, PPC.implausibleVis);
+        }
       }
       return;
     }
 
     // PREDICTED / RELAXED: advance the held output
     if (g.state === 'PREDICTED') {
-      const damp = Math.exp(-dtMs / PPC.dampTauMs);
-      for (let j = 0; j < 6; j++) s.vel[j] *= damp;
-      ow.x += s.vel[0] * dt;
-      ow.y += s.vel[1] * dt;
-      ow.z += s.vel[2] * dt;
-      on.x += s.vel[3] * dt;
-      on.y += s.vel[4] * dt;
-      on.z += s.vel[5] * dt;
-      // entry-pull: retract toward the last-seen pose (parent-anchored) as
-      // age grows — reversals punish flying away; last-seen is the honest
-      // uncertainty center. The hanging-rest pull belongs to RELAXED.
-      const age = Math.min(g.ageMs / g.horizonMs, 1) ** PPC.entryPullExp;
-      const kPull = age * (1 - Math.exp(-dtMs / PPC.entryPullTauMs));
-      const parent = this.parentOf(g, m);
-      const pw = parent >= 0 ? this.outWorld[parent] : null;
-      const pn = parent >= 0 ? this.outNorm[parent] : null;
-      const ax = s.entry[0] + (pw?.x ?? 0); // last-seen anchor, riding the parent
-      const ay = s.entry[1] + (pw?.y ?? 0);
-      const az = s.entry[2] + (pw?.z ?? 0);
-      const anx = s.entry[3] + (pn?.x ?? 0);
-      const any_ = s.entry[4] + (pn?.y ?? 0);
-      const anz = s.entry[5] + (pn?.z ?? 0);
-      if (kPull > 0) {
-        ow.x += (ax - ow.x) * kPull;
-        ow.y += (ay - ow.y) * kPull;
-        ow.z += (az - ow.z) * kPull;
-        on.x += (anx - on.x) * kPull;
-        on.y += (any_ - on.y) * kPull;
-        on.z += (anz - on.z) * kPull;
+      if (g.spec.rigid) {
+        // rigid groups translate as one body: shape at loss + group offset.
+        // Per-landmark prediction sheared the torso quad and the retargeter
+        // read the shear as bending/spinning — rotation continuity belongs
+        // to the bone layer's clamped coast, not to landmark extrapolation.
+        ow.x = s.entry[0] + g.offset[0];
+        ow.y = s.entry[1] + g.offset[1];
+        ow.z = s.entry[2] + g.offset[2];
+        on.x = s.entry[3] + g.offset[3];
+        on.y = s.entry[4] + g.offset[4];
+        on.z = s.entry[5] + g.offset[5];
+      } else {
+        const damp = Math.exp(-dtMs / PPC.dampTauMs);
+        for (let j = 0; j < 6; j++) s.vel[j] *= damp;
+        ow.x += s.vel[0] * dt;
+        ow.y += s.vel[1] * dt;
+        ow.z += s.vel[2] * dt;
+        on.x += s.vel[3] * dt;
+        on.y += s.vel[4] * dt;
+        on.z += s.vel[5] * dt;
+        // entry-pull: retract toward the last-seen pose (parent-anchored) as
+        // age grows — reversals punish flying away; last-seen is the honest
+        // uncertainty center. The hanging-rest pull belongs to RELAXED.
+        const age = Math.min(g.ageMs / g.horizonMs, 1) ** PPC.entryPullExp;
+        const kPull = age * (1 - Math.exp(-dtMs / PPC.entryPullTauMs));
+        const parent = this.parentOf(g, m);
+        const pw = parent >= 0 ? this.outWorld[parent] : null;
+        const pn = parent >= 0 ? this.outNorm[parent] : null;
+        const ax = s.entry[0] + (pw?.x ?? 0); // last-seen anchor, riding the parent
+        const ay = s.entry[1] + (pw?.y ?? 0);
+        const az = s.entry[2] + (pw?.z ?? 0);
+        const anx = s.entry[3] + (pn?.x ?? 0);
+        const any_ = s.entry[4] + (pn?.y ?? 0);
+        const anz = s.entry[5] + (pn?.z ?? 0);
+        if (kPull > 0) {
+          ow.x += (ax - ow.x) * kPull;
+          ow.y += (ay - ow.y) * kPull;
+          ow.z += (az - ow.z) * kPull;
+          on.x += (anx - on.x) * kPull;
+          on.y += (any_ - on.y) * kPull;
+          on.z += (anz - on.z) * kPull;
+        }
+        // hard drift cap: prediction never strays far from the last-seen pose
+        capDrift(ow, ax, ay, az, PPC.maxDriftM);
+        capDrift(on, anx, any_, anz, PPC.maxDriftNorm);
+        // bone-length projection against the (already emitted) parent
+        this.projectToParent(g, m, ow, s);
       }
-      // hard drift cap: prediction never strays far from the last-seen pose
-      capDrift(ow, ax, ay, az, PPC.maxDriftM);
-      capDrift(on, anx, any_, anz, PPC.maxDriftNorm);
-      // bone-length projection against the (already emitted) parent
-      this.projectToParent(g, m, ow, s);
-    } else {
-      // RELAXED: ease toward rest, no more ballistic motion
+    } else if (!g.spec.rigid) {
+      // RELAXED: ease toward rest, no more ballistic motion (rigid groups
+      // hold their shape where it settled; vis is already fading to 0)
       this.pullToRest(g, m, ow, 1 - Math.exp(-dtMs / PPC.restTauMs));
     }
 
@@ -726,12 +828,70 @@ export class PoseContinuity {
     ow.visibility = on.visibility = Math.max(0, Math.min(vis, 1));
 
     // a landmark inside a lost group that is itself still well-measured
-    // passes through measured data (e.g. one shoulder occluded, not both)
-    if (measured && world![m].visibility >= PPC.visPush) {
-      copyLm(world![m], ow);
-      copyLm(norm![m], on);
-      this.tracks[m].push(frameMs, world![m], norm![m]);
+    // re-approaches its measurement in BOUNDED steps (a mid-occlusion
+    // teleport must not reinject raw), and only plausible samples count.
+    // Confidence honesty: until the emitted position has actually caught
+    // up, it must not claim measured confidence — flapping desk-framed
+    // legs spent whole runs in unconverged catch-up at claimed-high vis
+    // and poisoned the sync metric (fully-visible refresh caught it).
+    if (measured && plausible && world![m].visibility >= PPC.visPush) {
+      const w = world![m];
+      const n = norm![m];
+      if (this.tracks[m].count === 0) {
+        // first sighting ever: nothing to preserve continuity of — a
+        // catch-up walk from the zeroed origin would be pure invention
+        copyLm(w, ow);
+        copyLm(n, on);
+      } else {
+        stepCap(ow, w, PPC.maxCorrWorld * PPC.regainStepScale);
+        stepCap(on, n, PPC.maxCorrNorm * PPC.regainStepScale);
+        // trusted confidence only once BOTH streams have converged — the
+        // sync eval reads norm, and a converged world with a lagging norm
+        // paired garbage angles with measured confidence (caught by the
+        // fully-visible refresh: facetouch legsMean exploded)
+        const gapW = Math.hypot(w.x - ow.x, w.y - ow.y, w.z - ow.z);
+        const gapN = Math.hypot(n.x - on.x, n.y - on.y, n.z - on.z);
+        if (gapW > PPC.maxCorrWorld || gapN > PPC.maxCorrNorm) {
+          ow.visibility = on.visibility = Math.min(w.visibility, PPC.implausibleVis);
+          this.tracks[m].push(frameMs, w, n);
+          return;
+        }
+      }
+      ow.visibility = on.visibility = w.visibility;
+      this.tracks[m].push(frameMs, w, n);
     }
+  }
+
+  /** True when the measured child keeps a physically possible distance to
+   *  its measured parent (or no judgement is possible). Side-effect free. */
+  private chainPlausible(g: GroupState, m: number, world: LandmarkPoint[]): boolean {
+    const parent = this.parentOf(g, m);
+    if (parent < 0) return true;
+    const c = world[m];
+    const p = world[parent];
+    if (c.visibility < PPC.visPush || p.visibility < PPC.visPush) return true;
+    const L = this.segLen.get(m * N + parent);
+    if (L === undefined || L < 1e-3) return true;
+    const len = Math.hypot(c.x - p.x, c.y - p.y, c.z - p.z);
+    return len >= L * PPC.chainGateLo && len <= L * PPC.chainGateHi;
+  }
+
+  /** Rigid groups' plausibility pairs (shoulder/hip/ear width): false when
+   *  a measured pair containing m has broken its constant distance. */
+  private pairPlausible(g: GroupState, m: number, world: LandmarkPoint[]): boolean {
+    const pairs = g.spec.plausPairs;
+    if (!pairs) return true;
+    for (const [a, b] of pairs) {
+      if (m !== a && m !== b) continue;
+      const pa = world[a];
+      const pb = world[b];
+      if (Math.min(pa.visibility, pb.visibility) < PPC.visPush) continue;
+      const L = this.segLen.get(a * N + b);
+      if (L === undefined || L < 1e-3) continue;
+      const len = Math.hypot(pa.x - pb.x, pa.y - pb.y, pa.z - pb.z);
+      if (len < L * PPC.chainGateLo || len > L * PPC.chainGateHi) return false;
+    }
+    return true;
   }
 
   /** Pull a predicted world landmark toward its rest target by k (0..1).
@@ -783,20 +943,40 @@ export class PoseContinuity {
     return -1;
   }
 
-  /** Slow EMA of segment lengths while both endpoints are well-measured. */
+  /** Slow EMA of segment lengths while both endpoints are well-measured
+   *  (chains AND the rigid groups' plausibility pairs). */
   private learnSegments(world: LandmarkPoint[], dt: number): void {
     const k = 1 - Math.exp(-dt / (PPC.segTauMs / 1000));
+    const learn = (child: number, parent: number): void => {
+      const c = world[child];
+      const p = world[parent];
+      if (Math.min(c.visibility, p.visibility) < PPC.visPush) return;
+      const len = Math.hypot(c.x - p.x, c.y - p.y, c.z - p.z);
+      const prev = this.segLen.get(child * N + parent);
+      this.segLen.set(child * N + parent, prev === undefined ? len : prev + (len - prev) * k);
+    };
     for (const g of this.groups) {
-      for (const [child, parent] of g.spec.chain) {
-        const c = world[child];
-        const p = world[parent];
-        if (Math.min(c.visibility, p.visibility) < PPC.visPush) continue;
-        const len = Math.hypot(c.x - p.x, c.y - p.y, c.z - p.z);
-        const prev = this.segLen.get(child * N + parent);
-        this.segLen.set(child * N + parent, prev === undefined ? len : prev + (len - prev) * k);
-      }
+      for (const [child, parent] of g.spec.chain) learn(child, parent);
+      if (g.spec.plausPairs) for (const [a, b] of g.spec.plausPairs) learn(a, b);
     }
   }
+}
+
+/** Move `out` toward `target`, at most `maxStep` per call. */
+function stepCap(out: LandmarkPoint, target: LandmarkPoint, maxStep: number): void {
+  let dx = target.x - out.x;
+  let dy = target.y - out.y;
+  let dz = target.z - out.z;
+  const d = Math.hypot(dx, dy, dz);
+  if (d > maxStep) {
+    const sc = maxStep / d;
+    dx *= sc;
+    dy *= sc;
+    dz *= sc;
+  }
+  out.x += dx;
+  out.y += dy;
+  out.z += dz;
 }
 
 /** Clamp p onto a sphere of radius max around the anchor (ax, ay, az). */

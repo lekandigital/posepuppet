@@ -36,12 +36,28 @@ VISIBLE ──vis < 0.45──▶ PREDICTED ──age > horizon──▶ RELAXED
 ```
 
 - **VISIBLE** — exact pass-through; well-measured samples (vis ≥ 0.5)
-  feed a 16-frame ring buffer per landmark.
+  feed a 16-frame ring buffer per landmark. One exception, added after
+  the Gate-2 live test: a measured sample that breaks its **physically
+  constant segment length** (>±45–55 % of the learned length) is
+  detector garbage no matter what visibility it claims — behind-torso
+  punches collapse the wrist onto the elbow at vis 0.5–0.99. Such
+  samples are held instead of enacted, emitted at confidence ≤ 0.4
+  (below every downstream gate), and never enter the ring buffer. The
+  torso/head equivalents (shoulder, hip, ear widths) cap both members'
+  confidence when their constant width breaks.
 - **PREDICTED** — position advances on a least-squares velocity from the
   last 5 buffered samples, under constraints (below). Entry re-anchors
   on the last well-measured sample (MediaPipe hallucinates positions
   during occlusion; the 2–3 hysteresis frames of low-vis data are never
   trusted), dead-reckoned across the gap on the trusted velocity.
+  **Torso and head predict as one rigid translating body** — a single
+  group velocity moves the shape captured at loss. Per-landmark
+  prediction let the torso quad shear, and the retargeter read that
+  shear as the body bending and spinning after a full dropout (Gate-2
+  live finding). Rotation continuity stays where it always lived: the
+  bone layer's clamped angular coast. A member of a lost group that is
+  still well-measured re-approaches its measurement in no-snap-bounded
+  steps rather than teleporting back in.
 - **RELAXED** — past the horizon the position eases toward a hanging
   rest chain and confidence completes its fall to 0. Downstream, the
   retargeter's existing relax-to-rest owns the look (unchanged from the

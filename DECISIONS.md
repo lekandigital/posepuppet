@@ -1,5 +1,27 @@
 # Decisions
 
+## 2026-07-07 — PPC Gate-2 fixes: rigid core + physics gate, not more smoothing
+Lekan's live test failed on (a) full-dropout torso bend/spin and (b)
+behind-torso punch glitch. Tracing fast.mp4 showed the detector emits
+teleporting positions at CONFIDENT visibility during behind-torso
+passages (up to 12.8 m/s single-frame jumps at vis 0.49–0.99, wrist
+collapsing onto the elbow at 0.2–0.6× the forearm length) — visibility
+alone is an insufficient gate, and a speed gate can't work because real
+swings measured up to 10.8 m/s on the same clip. Two principled fixes
+instead of blanket smoothing: (1) segment lengths are physically
+constant, so breaking one is proof of garbage — the chain gate holds
+such samples, caps their emitted confidence at 0.4, and keeps them out
+of the ring buffer (zero false positives by construction); (2) torso and
+head predict as ONE rigid translating shape — per-landmark prediction
+sheared the quad and the retargeter enacted the shear as bend/spin;
+rotation extrapolation for the core is now explicitly nobody's job at
+the landmark level (the bone layer's clamped coast owns it). Also: the
+in-group pass-through for still-measured members of a lost group now
+steps under the same 0.06 m/frame no-snap cap — the old raw copy was an
+invisible first-frame snap that the re-entry test couldn't see; and
+velocity capture requires a fresh continuous 3-sample run (flapping
+gates leave sparse buffers whose "velocity" is fiction).
+
 ## 2026-07-07 — PPC: in-PREDICTED bias targets last-seen, not hanging rest
 The brief sketched an "optional gravity/rest bias that grows with age".
 Measured on the masked fixtures, pulling a predicted limb toward a

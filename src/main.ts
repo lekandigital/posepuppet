@@ -1233,6 +1233,8 @@ async function boot() {
   const maskName = params.get('mask');
   const masker = maskName && MASKS[maskName] ? createMasker(MASKS[maskName]) : null;
   if (maskName && !masker) console.warn(`unknown mask spec: ${maskName}`);
+  const lmTrace: object[] | null = params.has('lmtrace') ? [] : null;
+  if (lmTrace) (window as unknown as { __LMTRACE: object[] }).__LMTRACE = lmTrace;
 
   function onPoseFrame(frame: PoseFrame | null) {
     // the camera overlay always draws the RAW detection — predicted
@@ -1247,6 +1249,21 @@ async function boot() {
       window.__PP.detectionCount++;
       norm = config.mirror ? mirrorNorm(frame.norm, mNorm) : frame.norm;
       world = config.mirror ? mirrorWorld(frame.world, mWorld) : frame.world;
+    }
+
+    // diagnostic trace (?lmtrace=1): raw pre-PPC landmark behavior for the
+    // wrists/elbows — used to characterize what the detector really emits
+    // during behind-torso occlusion (bounded; eval/debug only)
+    if (lmTrace && world && frame) {
+      const g = (i: number) => ({
+        v: Math.round(world![i].visibility * 100) / 100,
+        x: Math.round(world![i].x * 1000) / 1000,
+        y: Math.round(world![i].y * 1000) / 1000,
+        z: Math.round(world![i].z * 1000) / 1000,
+      });
+      if (lmTrace.length < 6000) {
+        lmTrace.push({ t: Math.round(frame.videoTimeMs), lw: g(15), rw: g(16), le: g(13), re: g(14) });
+      }
     }
 
     const truthWorld = world;

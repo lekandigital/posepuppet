@@ -1,5 +1,52 @@
 # Eval notes
 
+### PPC Gate-2 fixes: rigid core, physics gate, honest catch-up (2026-07-07)
+Lekan's live report: full-dropout torso bend/spin, behind-torso punch
+glitch. Root causes found by tracing fast.mp4 (?lmtrace=1): the detector
+emits TELEPORTS AT CONFIDENT VISIBILITY during behind-torso passages
+(12.8 m/s single-frame jumps at vis 0.49–0.99; wrist collapsing onto the
+elbow at 0.2–0.6× forearm length) — the wrists dropped below the gates
+for exactly one 38 ms window in the whole clip, so a visibility-driven
+state machine never even fired; and per-landmark core prediction let the
+torso quad shear, which the retargeter enacted as bend/spin.
+
+Fixes (src/pose/continuity.ts): torso/head predict as ONE rigid
+translating shape; chain-length physics gate (segment lengths are
+constant — breaking one proves garbage: held, vis ≤ 0.4, never
+buffered; shoulder/hip/ear width pairs likewise); velocity capture
+requires a fresh continuous 3-sample run; in-group pass-through steps
+under the 0.06 m/frame no-snap cap (the old raw copy was an invisible
+first-frame snap) and claims measured confidence only after BOTH world
+and norm streams have converged — the first version of that catch-up
+claimed measured vis while unconverged, and the fully-visible refresh
+caught it as facetouch legsMean exploding to 79° (fixed same day; a
+never-seen landmark initializes directly instead of walking in from the
+zeroed origin).
+
+Evidence: 6 new regression specs (tests/continuity-gate2.spec.ts) —
+behind-torso collapse held at low conf with clean buffers; punch dropout
+bounded; a dying side cannot shear the torso; full-dropout synthesis is
+exactly rigid (pairwise distances and shoulder-line direction preserved
+to 1e-9); chest deviation < 0.6 rad and < 6°/tick through dropout at the
+retargeter level; five dropout/re-entry cycles accumulate no rotational
+drift. Masked matrix re-published post-fix (arms −3%, facetouch −24% vs
+hold; masked puppet sync ≤ legacy on arms/facetouch/fast, legs parity;
+all guarantees hold; masked runs are structurally unaffected by the
+catch-up vis change since masked members never pass the vis≥0.5 gate).
+Screenshot A/B bursts on the fast.mp4 garbage windows and the masked
+full dropout: no gross artifact in either mode; the dropout frame shows
+the robot upright mid-blackout — no bend, no spin. Fully-visible
+refresh, all five fixtures vs the 2026-07-02 baseline: upper deltas
+−0.14…+0.24°, legs −1.40…+0.88° (fast legs IMPROVED 1.4° — the chain
+gate suppresses hallucinated leg samples); detection 1.0, pose ~29.9,
+render ~120 — floors intact. Flight contract still +67 ms (≤ +100).
+Suites: PosePuppet 92 passed / 5 skipped; Flight 16+1 first run — the
+replay-tolerance test (live wall-clock tape recording, imports nothing
+PPC touched) failed under suite contention, passed isolated at 2.4e-6
+with margin, and the full rerun came back 17 passed / 2 skipped clean.
+Second different-test contention flake today; both documented, neither
+reproducible in isolation, zero dependency on changed code.
+
 ### PPC P4: body-input flags + flight contract honored (2026-07-07)
 body-input gains an OPTIONAL additive `tracking` block (six per-limb
 continuity states) — schema v1 exact-shape validation extended with a

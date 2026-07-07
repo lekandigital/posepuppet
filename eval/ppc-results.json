@@ -1,6 +1,6 @@
 {
   "meta": {
-    "date": "2026-07-07T15:35:12.056Z",
+    "date": "2026-07-07T17:59:37.675Z",
     "machine": "darwin arm64",
     "mode": "headed",
     "durationSecPerRun": 60,
@@ -11,53 +11,53 @@
       "fixture": "arms",
       "avatar": "robot",
       "durationSec": 60,
-      "videoFrames": 1794,
-      "detectedFrames": 1794,
+      "videoFrames": 1783,
+      "detectedFrames": 1783,
       "detectionRate": 1,
-      "poseFps": 29.91,
-      "renderFps": 119.75,
-      "droppedFrames": 5,
+      "poseFps": 29.73,
+      "renderFps": 59.71,
+      "droppedFrames": 17,
       "delegate": "GPU",
       "memoryMB": {
-        "t0": 55,
-        "t30": 35,
-        "t60": 30
+        "t0": 31,
+        "t30": 29,
+        "t60": 29
       },
       "sync": {
-        "leftUpperArm": 9.63,
-        "leftForearm": 12.02,
-        "rightUpperArm": 8.48,
-        "rightForearm": 15.77,
-        "torso": 0.68,
-        "leftThigh": 2.71,
-        "rightThigh": 3.34,
-        "upperLimbsMean": 11.48,
-        "legsMean": 3.02
+        "leftUpperArm": 9.56,
+        "leftForearm": 13.94,
+        "rightUpperArm": 8.51,
+        "rightForearm": 16.06,
+        "torso": 0.48,
+        "leftThigh": 2.7,
+        "rightThigh": 3.44,
+        "upperLimbsMean": 12.02,
+        "legsMean": 3.07
       },
       "ppc": {
         "enabled": true,
         "mask": "arms_hand_exit",
-        "maskedFrames": 268,
-        "predictedSamples": 950,
+        "maskedFrames": 267,
+        "predictedSamples": 940,
         "posErr": {
-          "ppcMean": 0.1202,
-          "ppcP95": 0.3141,
-          "holdMean": 0.1277,
-          "holdP95": 0.3311
+          "ppcMean": 0.124,
+          "ppcP95": 0.296,
+          "holdMean": 0.1278,
+          "holdP95": 0.3209
         },
         "posErrBreakdown": {
           "arm": {
-            "ppc": 0.1202,
-            "hold": 0.1277,
-            "n": 950
+            "ppc": 0.124,
+            "hold": 0.1278,
+            "n": 940
           },
           "early": {
-            "ppc": 0.0793,
-            "hold": 0.086,
-            "n": 500
+            "ppc": 0.0819,
+            "hold": 0.0854,
+            "n": 490
           },
           "late": {
-            "ppc": 0.1657,
+            "ppc": 0.1698,
             "hold": 0.1741,
             "n": 450
           }
@@ -66,104 +66,102 @@
         "horizonMaxMs": 400,
         "nanCount": 0,
         "syncMasked": {
-          "leftUpperArm": 14.08,
-          "leftForearm": 11.72,
-          "rightUpperArm": 10.96,
-          "rightForearm": 29.88,
-          "torso": 0.53,
-          "leftThigh": 2.98,
-          "rightThigh": 3.13,
-          "upperLimbsMean": 16.66,
-          "legsMean": 3.05
+          "leftUpperArm": 12.54,
+          "leftForearm": 12.31,
+          "rightUpperArm": 10.99,
+          "rightForearm": 30.26,
+          "torso": 0.38,
+          "leftThigh": 2.91,
+          "rightThigh": 3,
+          "upperLimbsMean": 16.52,
+          "legsMean": 2.96
         }
       },
-      "finishedAt": "2026-07-07T15:28:00.954Z",
+      "finishedAt": "2026-07-07T17:52:24.292Z",
       "consoleErrors": []
     },
     {
       "fixture": "arms",
       "avatar": "robot",
       "durationSec": 60,
-      "videoFrames": 1793,
-      "detectedFrames": 1793,
+      "videoFrames": 1782,
+      "detectedFrames": 1782,
       "detectionRate": 1,
-      "poseFps": 29.88,
-      "renderFps": 119.78,
-      "droppedFrames": 7,
+      "poseFps": 29.69,
+      "renderFps": 119.23,
+      "droppedFrames": 18,
       "delegate": "GPU",
       "memoryMB": {
         "t0": 31,
-        "t30": 26,
-        "t60": 29
+        "t30": 27,
+        "t60": 32
       },
       "sync": {
-        "leftUpperArm": 8.69,
-        "leftForearm": 17.1,
-        "rightUpperArm": 8.68,
-        "rightForearm": 15.97,
-        "torso": 0.68,
-        "leftThigh": 2.74,
-        "leftShin": 0.99,
-        "rightThigh": 3.35,
-        "rightShin": 1.95,
-        "upperLimbsMean": 12.61,
-        "legsMean": 2.26
+        "leftUpperArm": 8.28,
+        "leftForearm": 17.18,
+        "rightUpperArm": 8.69,
+        "rightForearm": 16.38,
+        "torso": 0.69,
+        "leftThigh": 2.76,
+        "rightThigh": 3.32,
+        "upperLimbsMean": 12.63,
+        "legsMean": 3.04
       },
       "ppc": {
         "enabled": false,
         "mask": "arms_hand_exit",
-        "maskedFrames": 274,
+        "maskedFrames": 270,
         "predictedSamples": 0,
         "reentryMaxDelta": 0,
         "horizonMaxMs": 0,
         "nanCount": 0,
         "syncMasked": {
-          "leftUpperArm": 7.25,
-          "leftForearm": 23.72,
-          "rightUpperArm": 11.26,
-          "rightForearm": 30.53,
-          "torso": 0.53,
-          "leftThigh": 2.99,
-          "rightThigh": 3.2,
+          "leftUpperArm": 7.29,
+          "leftForearm": 21.95,
+          "rightUpperArm": 10.95,
+          "rightForearm": 32.57,
+          "torso": 0.52,
+          "leftThigh": 2.89,
+          "rightThigh": 2.92,
           "upperLimbsMean": 18.19,
-          "legsMean": 3.09
+          "legsMean": 2.9
         }
       },
-      "finishedAt": "2026-07-07T15:29:02.340Z",
+      "finishedAt": "2026-07-07T17:53:26.103Z",
       "consoleErrors": []
     },
     {
       "fixture": "facetouch",
       "avatar": "robot",
       "durationSec": 60,
-      "videoFrames": 1792,
-      "detectedFrames": 1792,
+      "videoFrames": 1789,
+      "detectedFrames": 1789,
       "detectionRate": 1,
-      "poseFps": 29.76,
-      "renderFps": 119.74,
-      "droppedFrames": 7,
+      "poseFps": 29.82,
+      "renderFps": 59.83,
+      "droppedFrames": 11,
       "delegate": "GPU",
       "memoryMB": {
         "t0": 31,
-        "t30": 32,
-        "t60": 28
+        "t30": 31,
+        "t60": 27
       },
       "sync": {
-        "leftUpperArm": 3.36,
-        "leftForearm": 8.16,
-        "rightUpperArm": 12.03,
-        "rightForearm": 5.7,
-        "torso": 0.71,
-        "rightThigh": 0.42,
-        "leftThigh": 3.92,
-        "upperLimbsMean": 7.31,
-        "legsMean": 2.17
+        "leftUpperArm": 3.48,
+        "leftForearm": 7.39,
+        "rightUpperArm": 13.02,
+        "rightForearm": 5.54,
+        "torso": 0.58,
+        "rightThigh": 0.38,
+        "leftThigh": 3.91,
+        "upperLimbsMean": 7.36,
+        "legsMean": 2.14
       },
       "faceTouch": {
-        "engagedFrames": 474,
-        "reachFrames": 466,
+        "engagedFrames": 494,
+        "reachFrames": 484,
         "penetrationFrames": 0,
-        "reachRate": 0.983,
+        "reachRate": 0.98,
         "penetrationRate": 0
       },
       "ppc": {
@@ -172,80 +170,80 @@
         "maskedFrames": 72,
         "predictedSamples": 340,
         "posErr": {
-          "ppcMean": 0.0249,
-          "ppcP95": 0.1855,
-          "holdMean": 0.0343,
-          "holdP95": 0.2757
+          "ppcMean": 0.0261,
+          "ppcP95": 0.1831,
+          "holdMean": 0.0345,
+          "holdP95": 0.2778
         },
         "posErrBreakdown": {
           "core": {
-            "ppc": 0.0049,
-            "hold": 0.0049,
+            "ppc": 0.0048,
+            "hold": 0.0048,
             "n": 165
           },
           "early": {
-            "ppc": 0.0154,
-            "hold": 0.0219,
+            "ppc": 0.0165,
+            "hold": 0.0221,
             "n": 265
           },
           "arm": {
-            "ppc": 0.0438,
-            "hold": 0.062,
+            "ppc": 0.0462,
+            "hold": 0.0625,
             "n": 175
           },
           "late": {
-            "ppc": 0.0588,
-            "hold": 0.0779,
+            "ppc": 0.0601,
+            "hold": 0.0784,
             "n": 75
           }
         },
-        "reentryMaxDelta": 0.0114,
-        "horizonMaxMs": 375,
+        "reentryMaxDelta": 0.06,
+        "horizonMaxMs": 400,
         "nanCount": 0,
         "syncMasked": {
-          "leftUpperArm": 2.78,
-          "leftForearm": 6.8,
-          "rightUpperArm": 10.98,
-          "rightForearm": 3.93,
-          "torso": 0.62,
-          "upperLimbsMean": 6.12
+          "leftUpperArm": 3.6,
+          "leftForearm": 5.78,
+          "rightUpperArm": 11.13,
+          "rightForearm": 3.56,
+          "torso": 0.63,
+          "upperLimbsMean": 6.02
         }
       },
-      "finishedAt": "2026-07-07T15:30:03.478Z",
+      "finishedAt": "2026-07-07T17:54:27.946Z",
       "consoleErrors": []
     },
     {
       "fixture": "facetouch",
       "avatar": "robot",
       "durationSec": 60,
-      "videoFrames": 1793,
-      "detectedFrames": 1793,
+      "videoFrames": 1790,
+      "detectedFrames": 1790,
       "detectionRate": 1,
-      "poseFps": 29.89,
-      "renderFps": 119.62,
-      "droppedFrames": 7,
+      "poseFps": 29.84,
+      "renderFps": 119.47,
+      "droppedFrames": 10,
       "delegate": "GPU",
       "memoryMB": {
         "t0": 31,
-        "t30": 27,
-        "t60": 26
+        "t30": 29,
+        "t60": 31
       },
       "sync": {
-        "leftUpperArm": 3.45,
-        "leftForearm": 8.72,
-        "rightUpperArm": 11.82,
-        "rightForearm": 5.87,
+        "leftUpperArm": 3.4,
+        "leftForearm": 8.7,
+        "rightUpperArm": 11.87,
+        "rightForearm": 5.93,
         "torso": 0.71,
-        "rightThigh": 0.27,
-        "leftThigh": 3.92,
+        "rightThigh": 0.29,
+        "leftThigh": 3.99,
         "upperLimbsMean": 7.47,
-        "legsMean": 2.09
+        "legsMean": 2.14
       },
       "faceTouch": {
-        "engagedFrames": 472,
-        "reachFrames": 451,
+        "engagedFrames": 476,
+        "reachFrames": 454,
         "penetrationFrames": 0,
-        "reachRate": 0.956,
+        "reachRate": 0.954,
         "penetrationRate": 0
       },
       "ppc": {
@@ -257,45 +255,45 @@
         "horizonMaxMs": 0,
         "nanCount": 0,
         "syncMasked": {
-          "leftUpperArm": 2.91,
-          "leftForearm": 10.13,
-          "rightUpperArm": 8.8,
-          "rightForearm": 4.9,
-          "torso": 0.64,
-          "upperLimbsMean": 6.69
+          "leftUpperArm": 2.74,
+          "leftForearm": 9.84,
+          "rightUpperArm": 8.87,
+          "rightForearm": 4.86,
+          "torso": 0.6,
+          "upperLimbsMean": 6.58
         }
       },
-      "finishedAt": "2026-07-07T15:31:05.233Z",
+      "finishedAt": "2026-07-07T17:55:29.682Z",
       "consoleErrors": []
     },
     {
       "fixture": "fullbody",
       "avatar": "robot",
       "durationSec": 60,
-      "videoFrames": 1792,
-      "detectedFrames": 1792,
+      "videoFrames": 1790,
+      "detectedFrames": 1790,
       "detectionRate": 1,
-      "poseFps": 29.87,
-      "renderFps": 119.6,
-      "droppedFrames": 8,
+      "poseFps": 29.84,
+      "renderFps": 119.79,
+      "droppedFrames": 9,
       "delegate": "GPU",
       "memoryMB": {
         "t0": 31,
-        "t30": 32,
-        "t60": 30
+        "t30": 25,
+        "t60": 29
       },
       "sync": {
-        "leftUpperArm": 2.64,
-        "leftForearm": 5.67,
-        "rightUpperArm": 2.36,
-        "rightForearm": 12.36,
-        "torso": 1.93,
-        "leftThigh": 5.65,
-        "leftShin": 6.17,
-        "rightThigh": 4.9,
-        "rightShin": 5.73,
+        "leftUpperArm": 3.03,
+        "leftForearm": 5.86,
+        "rightUpperArm": 2.46,
+        "rightForearm": 11.68,
+        "torso": 2.29,
+        "leftThigh": 6.14,
+        "leftShin": 8.27,
+        "rightThigh": 5.83,
+        "rightShin": 7.86,
         "upperLimbsMean": 5.76,
-        "legsMean": 5.61
+        "legsMean": 7.03
       },
       "faceTouch": {
         "engagedFrames": 8,
@@ -308,82 +306,82 @@
         "enabled": true,
         "mask": "fullbody_foot_out",
         "maskedFrames": 106,
-        "predictedSamples": 328,
+        "predictedSamples": 324,
         "posErr": {
-          "ppcMean": 0.161,
-          "ppcP95": 0.4318,
-          "holdMean": 0.1591,
-          "holdP95": 0.4736
+          "ppcMean": 0.1615,
+          "ppcP95": 0.4336,
+          "holdMean": 0.1593,
+          "holdP95": 0.4764
         },
         "posErrBreakdown": {
           "leg": {
-            "ppc": 0.161,
-            "hold": 0.1591,
-            "n": 328
+            "ppc": 0.1615,
+            "hold": 0.1593,
+            "n": 324
           },
           "early": {
-            "ppc": 0.1253,
-            "hold": 0.1171,
+            "ppc": 0.1268,
+            "hold": 0.1184,
             "n": 180
           },
           "late": {
-            "ppc": 0.2045,
-            "hold": 0.2102,
-            "n": 148
+            "ppc": 0.2048,
+            "hold": 0.2104,
+            "n": 144
           }
         },
         "reentryMaxDelta": 0.06,
-        "horizonMaxMs": 400,
+        "horizonMaxMs": 368,
         "nanCount": 0,
         "syncMasked": {
-          "leftUpperArm": 3.77,
-          "leftForearm": 2.83,
-          "rightUpperArm": 2.46,
-          "rightForearm": 8.07,
-          "torso": 1.61,
-          "leftThigh": 4.84,
-          "leftShin": 5.19,
-          "rightThigh": 9.18,
-          "rightShin": 5.33,
-          "upperLimbsMean": 4.28,
-          "legsMean": 6.13
+          "leftUpperArm": 4.05,
+          "leftForearm": 2.4,
+          "rightUpperArm": 2.53,
+          "rightForearm": 7.41,
+          "torso": 1.92,
+          "leftThigh": 5.37,
+          "leftShin": 6.88,
+          "rightThigh": 7.54,
+          "rightShin": 6.2,
+          "upperLimbsMean": 4.1,
+          "legsMean": 6.5
         }
       },
-      "finishedAt": "2026-07-07T15:32:07.105Z",
+      "finishedAt": "2026-07-07T17:56:31.766Z",
       "consoleErrors": []
     },
     {
       "fixture": "fullbody",
       "avatar": "robot",
       "durationSec": 60,
-      "videoFrames": 1793,
-      "detectedFrames": 1793,
+      "videoFrames": 1792,
+      "detectedFrames": 1792,
       "detectionRate": 1,
       "poseFps": 29.88,
-      "renderFps": 119.74,
-      "droppedFrames": 7,
+      "renderFps": 119.5,
+      "droppedFrames": 8,
       "delegate": "GPU",
       "memoryMB": {
         "t0": 31,
-        "t30": 32,
-        "t60": 32
+        "t30": 30,
+        "t60": 27
       },
       "sync": {
-        "leftUpperArm": 2.64,
-        "leftForearm": 5.69,
+        "leftUpperArm": 2.63,
+        "leftForearm": 5.65,
         "rightUpperArm": 2.36,
-        "rightForearm": 12.53,
+        "rightForearm": 12.41,
         "torso": 1.93,
-        "leftThigh": 5.57,
-        "leftShin": 6.18,
-        "rightThigh": 4.82,
-        "rightShin": 5.79,
-        "upperLimbsMean": 5.8,
-        "legsMean": 5.59
+        "leftThigh": 5.64,
+        "leftShin": 6.01,
+        "rightThigh": 4.83,
+        "rightShin": 5.78,
+        "upperLimbsMean": 5.76,
+        "legsMean": 5.57
       },
       "faceTouch": {
-        "engagedFrames": 9,
-        "reachFrames": 9,
+        "engagedFrames": 8,
+        "reachFrames": 8,
         "penetrationFrames": 0,
         "reachRate": 1,
         "penetrationRate": 0
@@ -391,143 +389,143 @@
       "ppc": {
         "enabled": false,
         "mask": "fullbody_foot_out",
-        "maskedFrames": 105,
+        "maskedFrames": 107,
         "predictedSamples": 0,
         "reentryMaxDelta": 0,
         "horizonMaxMs": 0,
         "nanCount": 0,
         "syncMasked": {
-          "leftUpperArm": 3.78,
-          "leftForearm": 2.83,
-          "rightUpperArm": 2.48,
-          "rightForearm": 8.06,
-          "torso": 1.59,
-          "leftThigh": 4.8,
-          "leftShin": 5.4,
-          "rightThigh": 8.34,
+          "leftUpperArm": 3.74,
+          "leftForearm": 2.79,
+          "rightUpperArm": 2.44,
+          "rightForearm": 7.95,
+          "torso": 1.61,
+          "leftThigh": 4.76,
+          "leftShin": 5.09,
+          "rightThigh": 8.38,
           "rightShin": 5.34,
-          "upperLimbsMean": 4.29,
-          "legsMean": 5.97
+          "upperLimbsMean": 4.23,
+          "legsMean": 5.89
         }
       },
-      "finishedAt": "2026-07-07T15:33:08.969Z",
+      "finishedAt": "2026-07-07T17:57:33.739Z",
       "consoleErrors": []
     },
     {
       "fixture": "fast",
       "avatar": "robot",
       "durationSec": 60,
-      "videoFrames": 1793,
-      "detectedFrames": 1793,
+      "videoFrames": 1789,
+      "detectedFrames": 1789,
       "detectionRate": 1,
-      "poseFps": 29.88,
-      "renderFps": 119.54,
-      "droppedFrames": 7,
+      "poseFps": 29.82,
+      "renderFps": 119.61,
+      "droppedFrames": 11,
       "delegate": "GPU",
       "memoryMB": {
         "t0": 31,
-        "t30": 29,
-        "t60": 32
+        "t30": 32,
+        "t60": 27
       },
       "sync": {
-        "leftUpperArm": 18.83,
-        "leftForearm": 25.58,
-        "rightUpperArm": 18.6,
-        "rightForearm": 23.88,
-        "torso": 2.43,
-        "leftThigh": 4.19,
-        "rightThigh": 4.7,
-        "upperLimbsMean": 21.72,
-        "legsMean": 4.44
+        "leftUpperArm": 18.65,
+        "leftForearm": 26.79,
+        "rightUpperArm": 19.47,
+        "rightForearm": 23.82,
+        "torso": 2.26,
+        "leftThigh": 3.9,
+        "rightThigh": 4.17,
+        "upperLimbsMean": 22.19,
+        "legsMean": 4.04
       },
       "faceTouch": {
-        "engagedFrames": 24,
-        "reachFrames": 24,
+        "engagedFrames": 46,
+        "reachFrames": 38,
         "penetrationFrames": 0,
-        "reachRate": 1,
+        "reachRate": 0.826,
         "penetrationRate": 0
       },
       "ppc": {
         "enabled": true,
         "mask": "fast_dropout",
-        "maskedFrames": 135,
-        "predictedSamples": 722,
+        "maskedFrames": 136,
+        "predictedSamples": 732,
         "posErr": {
-          "ppcMean": 0.1742,
-          "ppcP95": 0.4951,
-          "holdMean": 0.1704,
-          "holdP95": 0.4905
+          "ppcMean": 0.1757,
+          "ppcP95": 0.5095,
+          "holdMean": 0.1736,
+          "holdP95": 0.4988
         },
         "posErrBreakdown": {
           "arm": {
-            "ppc": 0.242,
-            "hold": 0.2382,
-            "n": 472
+            "ppc": 0.2444,
+            "hold": 0.2412,
+            "n": 482
           },
           "early": {
-            "ppc": 0.1361,
-            "hold": 0.1324,
+            "ppc": 0.1337,
+            "hold": 0.1322,
             "n": 575
           },
           "core": {
-            "ppc": 0.0462,
-            "hold": 0.0424,
+            "ppc": 0.0434,
+            "hold": 0.0432,
             "n": 250
           },
           "late": {
-            "ppc": 0.3231,
-            "hold": 0.3194,
-            "n": 147
+            "ppc": 0.3296,
+            "hold": 0.3252,
+            "n": 157
           }
         },
         "reentryMaxDelta": 0.06,
-        "horizonMaxMs": 400,
+        "horizonMaxMs": 392,
         "nanCount": 0,
         "syncMasked": {
-          "leftUpperArm": 37.34,
-          "leftForearm": 34.53,
-          "rightUpperArm": 21.77,
-          "rightForearm": 13.93,
-          "torso": 4.54,
-          "leftThigh": 2.59,
-          "rightThigh": 3.63,
-          "upperLimbsMean": 26.89,
-          "legsMean": 3.11
+          "leftUpperArm": 38.69,
+          "leftForearm": 35.88,
+          "rightUpperArm": 21.82,
+          "rightForearm": 13.43,
+          "torso": 4.51,
+          "leftThigh": 2.43,
+          "rightThigh": 3.75,
+          "upperLimbsMean": 27.45,
+          "legsMean": 3.09
         }
       },
-      "finishedAt": "2026-07-07T15:34:10.761Z",
+      "finishedAt": "2026-07-07T17:58:35.688Z",
       "consoleErrors": []
     },
     {
       "fixture": "fast",
       "avatar": "robot",
       "durationSec": 60,
-      "videoFrames": 1792,
-      "detectedFrames": 1792,
+      "videoFrames": 1789,
+      "detectedFrames": 1789,
       "detectionRate": 1,
-      "poseFps": 29.87,
-      "renderFps": 119.72,
-      "droppedFrames": 8,
+      "poseFps": 29.68,
+      "renderFps": 118.67,
+      "droppedFrames": 11,
       "delegate": "GPU",
       "memoryMB": {
         "t0": 31,
-        "t30": 32,
-        "t60": 32
+        "t30": 28,
+        "t60": 28
       },
       "sync": {
-        "leftUpperArm": 18.96,
-        "leftForearm": 25.85,
-        "rightUpperArm": 17.95,
-        "rightForearm": 23.04,
-        "torso": 2.47,
-        "leftThigh": 4.03,
-        "rightThigh": 4.54,
-        "upperLimbsMean": 21.45,
-        "legsMean": 4.28
+        "leftUpperArm": 18.99,
+        "leftForearm": 26.18,
+        "rightUpperArm": 18.15,
+        "rightForearm": 23.2,
+        "torso": 2.51,
+        "rightThigh": 4.45,
+        "leftThigh": 4,
+        "upperLimbsMean": 21.63,
+        "legsMean": 4.22
       },
       "faceTouch": {
-        "engagedFrames": 7,
-        "reachFrames": 7,
+        "engagedFrames": 10,
+        "reachFrames": 10,
         "penetrationFrames": 0,
         "reachRate": 1,
         "penetrationRate": 0
@@ -535,24 +533,24 @@
       "ppc": {
         "enabled": false,
         "mask": "fast_dropout",
-        "maskedFrames": 135,
+        "maskedFrames": 138,
         "predictedSamples": 0,
         "reentryMaxDelta": 0,
         "horizonMaxMs": 0,
         "nanCount": 0,
         "syncMasked": {
-          "leftUpperArm": 36.85,
-          "leftForearm": 35.44,
-          "rightUpperArm": 20.14,
-          "rightForearm": 18.89,
-          "torso": 4.88,
-          "leftThigh": 2.52,
-          "rightThigh": 3.98,
-          "upperLimbsMean": 27.83,
-          "legsMean": 3.25
+          "leftUpperArm": 37.17,
+          "leftForearm": 36.55,
+          "rightUpperArm": 20.04,
+          "rightForearm": 19.25,
+          "torso": 5.05,
+          "leftThigh": 2.69,
+          "rightThigh": 3.61,
+          "upperLimbsMean": 28.25,
+          "legsMean": 3.15
         }
       },
-      "finishedAt": "2026-07-07T15:35:11.922Z",
+      "finishedAt": "2026-07-07T17:59:37.552Z",
       "consoleErrors": []
     }
   ]
