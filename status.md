@@ -56,3 +56,11 @@ All acceptance items closed: private permission retained (gitignored); in-app+RE
 Final suites: re-running for the acceptance commit (results in the commit message)
 Blockers: none — awaiting Lekan's merge decision (not merged/pushed per instruction)
 Next: Lekan merges bodyarcade-flight-fable when ready; provenance one-liner to Danny before the repo goes public
+
+## 2026-07-07 (Rowing P0 — plan raised)
+BodyArcade Rowing P0 on `bodyarcade-rowing-fable` (renamed unused water-worlds placeholder at main 940d31c; Flight + PPC preserved, merged in main): boat/water seams studied — TinySkies boat is a complete tuned vehicle, body input already steers it, propulsion is the missing path
+Gate-1 recommendations in PLAN.md: adapt the boat (not build), rowing inside apps/flight (no apps/rowing), stroke detection producer-side in body-input as schema-v1-additive `stroke` block; deviations logged (no rivers on globe → Waterway seam + open-water course; keyboard fallback = upstream boat keys)
+Rowing fixtures missing — exact recording specs in PLAN.md (rowing_slow 12 strokes, rowing_fast 24, rowing_left_bias 15, rowing_seated 15, still reused)
+Baselines: PosePuppet suite 92 passed / 5 skipped; Flight suite result in the Gate-1 commit message
+Blockers: USER GATE 1 — build-vs-adapt + plan approval + fixture recording
+Next: on approval + fixtures, P1 stroke detection in the package
