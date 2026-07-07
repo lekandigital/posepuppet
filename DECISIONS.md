@@ -173,3 +173,16 @@ included woody, its load failed on HTML-as-glTF, and the error path
 reverted config back to erika forever. The probe now treats text/html as
 absent. Diagnosed with a scripted click-through (avatar-debug) after the
 failure reproduced on a clean checkout.
+
+## 2026-07-07 — body-input P2: the jitter tool caught an extraction bias
+First jitter-floor run on still.mp4 reported handsForward "noise" of 0.37
+mean / 0.39 p95 — hanging wrists sit ~0.4 arm-lengths forward of the
+shoulder plane in MediaPipe z (armsOut showed 0.13 the same way). That is
+bias, not jitter, so instead of shipping a 0.2 dead zone to mask it, arm
+axes are now rest-relative: neutral capture records the hanging-arm rest
+(gated so a T-pose recenter can't poison it) and axes report the excess,
+renormalized so full extension still reads ≈1. Re-measured floors:
+armsOut/handsForward ≈ 0.003 p95 (pure noise), leanY 0.10 p95 (the honest
+MediaPipe z-noise story), rest ≤ 0.07. Dead zones in defaults.ts now
+carry provenance and a do-not-hand-tune marker; the tool re-runs headed
+(headless pose runs ~8 Hz and was rejected by its own sample-count gate).

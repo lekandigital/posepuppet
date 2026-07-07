@@ -237,6 +237,11 @@ export interface NeutralState {
   noseLocalZ: number | null;
   armLength: number;
   shoulderWidth: number;
+  /** hanging-arm resting values (armLength units) — arm axes measure the
+   *  EXCESS over these. Hanging wrists sit measurably forward of the
+   *  shoulder plane (~0.37 arm lengths in MediaPipe z) and slightly
+   *  outside it; the jitter-floor tool exposed that as bias, not noise. */
+  armRest: { lat: number; raise: number; fwd: number };
 }
 
 /** Stature references while seated (captured on the seated flip). */
@@ -252,6 +257,16 @@ export function captureNeutral(
   const sw = m.shoulderWidth;
   let armLength = m.armLenMeasured ?? prev?.armLength ?? 2.2 * sw;
   armLength = Math.min(Math.max(armLength, 1.5 * sw), 2.6 * sw);
+
+  // arm rests: only trust them when the arms LOOK at rest — a T-pose
+  // recenter must not poison the rest reference (armsOut would die)
+  let armRest = prev?.armRest ?? { lat: 0, raise: 0, fwd: 0 };
+  if (m.left.visOk && m.right.visOk) {
+    const rest = armGeometry(m, armLength);
+    // real hanging arms measure up to ~0.4 fwd (MediaPipe z bias); a genuine
+    // T-pose (~0.9 lat) or thrust (~0.9 fwd) stays well above these gates
+    if (rest.lat < 0.4 && rest.fwd < 0.55) armRest = rest;
+  }
   return {
     kind,
     basis: { vx: { ...m.basis.vx }, vy: { ...m.basis.vy }, vz: { ...m.basis.vz } },
@@ -261,7 +276,22 @@ export function captureNeutral(
     noseLocalZ: m.noseLocalZ ?? prev?.noseLocalZ ?? null,
     armLength,
     shoulderWidth: sw,
+    armRest,
   };
+}
+
+/** Mean absolute arm extension (lat/raise/fwd) over visible arms, in
+ *  armLength units — shared by extraction and rest capture. */
+function armGeometry(m: Measure, armLen: number): { lat: number; raise: number; fwd: number } {
+  let lat = 0, raise = 0, fwd = 0, n = 0;
+  for (const arm of [m.left, m.right]) {
+    if (!arm.visOk) continue;
+    lat += Math.max(0, Math.abs(arm.rLocal.x) - Math.abs(arm.oLocal.x)) / armLen;
+    raise += Math.max(0, arm.rLocal.y - arm.oLocal.y) / armLen;
+    fwd += Math.max(0, arm.rLocal.z - arm.oLocal.z) / armLen;
+    n++;
+  }
+  return n > 0 ? { lat: lat / n, raise: raise / n, fwd: fwd / n } : { lat: 0, raise: 0, fwd: 0 };
 }
 
 const clamp = (v: number, lo: number, hi: number): number => Math.min(Math.max(v, lo), hi);
@@ -321,21 +351,19 @@ export function computeRawAxes(
     }
   }
 
-  // --- arm axes: available pre-neutral via the shoulder-width arm estimate
+  // --- arm axes: available pre-neutral via the shoulder-width arm estimate.
+  // Values are the EXCESS over the hanging-arm rest, renormalized so full
+  // extension still reads ≈ 1 (0 = at rest, honestly zero on still footage).
   const armLen = neutral?.armLength ?? 2.2 * m.shoulderWidth;
   if (armLen > 1e-3) {
-    let outSum = 0, raisedSum = 0, fwdSum = 0, n = 0;
-    for (const arm of [m.left, m.right]) {
-      if (!arm.visOk) continue;
-      outSum += Math.max(0, Math.abs(arm.rLocal.x) - Math.abs(arm.oLocal.x)) / armLen;
-      raisedSum += Math.max(0, arm.rLocal.y - arm.oLocal.y) / armLen;
-      fwdSum += Math.max(0, arm.rLocal.z - arm.oLocal.z) / armLen;
-      n++;
-    }
-    if (n > 0) {
-      out.armsOut = clamp(outSum / n, 0, 1);
-      out.armsRaised = clamp(raisedSum / n, 0, 1);
-      out.handsForward = clamp(fwdSum / n, 0, 1);
+    if (m.left.visOk || m.right.visOk) {
+      const g = armGeometry(m, armLen);
+      const rest = neutral?.armRest ?? { lat: 0, raise: 0, fwd: 0 };
+      const relative = (v: number, r: number): number =>
+        clamp((v - r) / Math.max(1 - r, 0.2), 0, 1);
+      out.armsOut = relative(g.lat, rest.lat);
+      out.armsRaised = relative(g.raise, rest.raise);
+      out.handsForward = relative(g.fwd, rest.fwd);
     }
     if (m.left.visOk && m.right.visOk) {
       // distance of each wrist from its synthesized rest (hanging below the

@@ -1,3 +1,10 @@
+## 2026-07-07 (@bodyarcade/body-input P2 — tuner + measured jitter floors)
+Done: tuner overlay mounts in PosePuppet ('b' / palette; raw→shaped bars, sliders writing core.setConfig, chips, latency readout); adapter feeds mirrored pre-smoothing landmarks into the core and publishes on both transports; jitter-floor tool measures still.mp4 → dead-zone defaults with provenance; prepare-fixtures now converts fixtures/flight/
+Finding: first jitter run exposed a 0.37 resting bias in handsForward (MediaPipe z) — arm axes are now rest-relative; re-measured floors are pure noise (≤0.01) except leanY (0.123, honest z-noise)
+Tests: 15 protocol + 1 in-app spec (live signals, landmark-free broadcast wire, tuner mount)
+Blockers: none
+Next: P3 — fixture eval suite (per-clip assertions into eval/results.json) + example consumer page + docs
+
 ## 2026-07-06 (@bodyarcade/body-input P1 — core + transports + tapes)
 Done: schema-v1 RFC gated+approved (packages/body-input/PLAN.md); deterministic core (calibration-relative extraction, One Euro→dead zone→expo→slew per axis, hysteresis/debounce events, confidence decay); in-page + BroadcastChannel transports with runtime shape-guarding; input/signal tape recorder-replayer; vite/tsconfig alias, no workspace churn
 Tests: 15/15 new protocol tests (byte-identical replay, landmark-absence boundary, sign conventions, dropout decay curves, upper-body/too-close/mid-gesture/seated failure modes, both transports)

@@ -4,10 +4,26 @@
 
 import type { AxisName, AxisShapingConfig, BodyInputConfig, DeepPartial } from './types';
 
-function axis(over: Partial<AxisShapingConfig> = {}): AxisShapingConfig {
+// [jitter-floor:begin] measured from fixtures/flight/still.mp4 by
+// tools/jitter-floor.mjs on 2026-07-07 (450 samples over 15s,
+// p95 |raw| noise × 1.2, clamped to [0.01, 0.2]). Do not hand-tune —
+// re-run the tool instead.
+export const MEASURED_DEAD_ZONES: Record<AxisName, number> = {
+  leanX: 0.024,
+  leanY: 0.123,
+  crouch: 0.017,
+  tallness: 0.01,
+  armsOut: 0.01,
+  armsRaised: 0.01,
+  handsForward: 0.01,
+  handPoint: 0.068,
+};
+// [jitter-floor:end]
+
+function axis(name: AxisName, over: Partial<AxisShapingConfig> = {}): AxisShapingConfig {
   return {
     oneEuro: { minCutoff: 1.2, beta: 0.02 },
-    deadZone: 0.06,
+    deadZone: MEASURED_DEAD_ZONES[name],
     expo: 0,
     slewPerSec: 5,
     decayTauMs: 500,
@@ -19,14 +35,14 @@ function axis(over: Partial<AxisShapingConfig> = {}): AxisShapingConfig {
 export function defaultConfig(): BodyInputConfig {
   return {
     axes: {
-      leanX: axis({ expo: 0.3, slewPerSec: 6 }),
-      leanY: axis({ expo: 0.3, slewPerSec: 6 }),
-      crouch: axis({ slewPerSec: 3 }),
-      tallness: axis({ slewPerSec: 3 }),
-      armsOut: axis(),
-      armsRaised: axis(),
-      handsForward: axis({ slewPerSec: 6 }),
-      handPoint: axis(),
+      leanX: axis('leanX', { expo: 0.3, slewPerSec: 6 }),
+      leanY: axis('leanY', { expo: 0.3, slewPerSec: 6 }),
+      crouch: axis('crouch', { slewPerSec: 3 }),
+      tallness: axis('tallness', { slewPerSec: 3 }),
+      armsOut: axis('armsOut'),
+      armsRaised: axis('armsRaised'),
+      handsForward: axis('handsForward', { slewPerSec: 6 }),
+      handPoint: axis('handPoint'),
     },
     extraction: {
       maxLeanXDeg: 15,
