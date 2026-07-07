@@ -457,3 +457,25 @@ banner + toast, all transport/topology/diagnostic/test/doc work. Gains
 store bumped v2 → v3 so his diagnostic 0.6 slider value can't mask the
 restored defaults. All 9 synthetic control specs pass on the restored
 baseline.
+
+## 2026-07-07 — Rowing P0: branch, build-vs-adapt, placement, schema route
+Branch: renamed the unused placeholder `bodyarcade-water-worlds-fable`
+(zero unique commits, exactly at main 940d31c = Flight + PPC accepted)
+to `bodyarcade-rowing-fable`; no preservation branch touched. Gate-1
+recommendations (PLAN.md has the full reasoning): (1) ADAPT the
+TinySkies boat — it is a complete tuned vehicle (physics, wake, camera,
+ocean audio, land collision); building fresh would duplicate all of it
+and need its own feel pass. (2) Rowing lives in apps/flight as a boat
+body-mode, not apps/rowing — every needed system is there, and body
+input already steers the boat via the existing merge point; rowing adds
+the missing propulsion path. (3) Stroke detection goes in
+@bodyarcade/body-input producer-side (landmarks never cross the
+transport, so the game cannot compute it) as a schema-v1-ADDITIVE
+optional `stroke` block, the pattern PPC's `tracking` block established
+— not the v2 bump FUTURES.md sketched; no version churn, old tapes stay
+valid. (4) Prompt deviations logged: the globe has no rivers (land/
+ocean field only), so the "river run" becomes an open-water course
+behind a `Waterway` seam interface the future open-data pipeline fills;
+keyboard fallback keeps upstream boat semantics (W hold = accelerate)
+instead of the sketched "W = stroke" — accepted Flight rule is keyboard
+identical to upstream, and it already serves the fallback purpose.

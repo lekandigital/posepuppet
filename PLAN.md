@@ -1,245 +1,283 @@
-# PLAN.md — Predictive Pose Continuity (PPC)
+# PLAN.md — BodyArcade Rowing
 
-Status: **COMPLETE — Gate 1 approved in-session; Gate 2 (live occlusion
-test) approved 2026-07-07 after one fix round** (first live test failed
-on full-dropout torso bend/spin and behind-torso punch glitch; fixed by
-rigid core prediction + the chain-length physics gate, focused retest
-passed — see EVAL_NOTES and DECISIONS). Thresholds below are as
-approved; measured revisions (core horizon 250→150 ms for the Flight
-contract, legs visTrust 0.25, velocity-trust stack) are documented in
-DECISIONS.md with their measurements.
-Branch `predictive-pose-continuity-fable`. The BodyArcade Flight plan
-(accepted 2026-07-07) lives in git history at this path.
+Status: **P0 complete — awaiting USER GATE 1** (build-vs-adapt decision +
+plan approval + rowing fixtures). Branch `bodyarcade-rowing-fable`,
+renamed from the unused placeholder `bodyarcade-water-worlds-fable` at
+main `940d31c` (Flight + Predictive Pose Continuity both accepted and
+merged; no preservation branch touched). Previous passes' plans (PPC,
+Flight, Instrument Pass) live in git history at this path.
 
-Scope guard, restated from the brief: this pass lives at the PosePuppet
-tracking layer. No per-game prediction, no Flight control-mapping or
-feel changes, no ML, no long-horizon prediction, no claim of
-occlusion-proof tracking anywhere. PPC is explicitly NOT invisible-limb
-tracking and the docs will say so.
+## P0 — what the code actually says
 
-## 0. What the P0 audit found
+**The boat is real, tuned, and already half-wired for body input.**
+`apps/flight/client/src/game/Boat.ts` is a complete player vehicle:
+accel/brake/coast physics (`COAST_DECAY = 0.07/s` — slow glide is
+already the resting behavior), smoothed turn input (same
+`TURN_INPUT_SMOOTH = 8/s` idiom as the plane), ocean spawn via
+`isMainOcean`, land-collision gating, bob animation, `speedBoost()`,
+upgrade multipliers. It has a `WakeTrail`, per-vehicle camera tuning
+(`shared/vehicleCapabilities.ts`: tilt 0.28, height 0.95, FOV boost 10),
+NPC boat fleets, ocean audio, and the fishing minigame. `Boat.update(dt,
+turnRate, forward, brake, …)` has the same shape as `Plane.update`.
 
-### Baselines (regression gates)
+**Body input already reaches the boat — for steering only.** Game.tick
+merges `BodyFlightControls` output into the shared `ControlState` and
+calls `this.localPlayer.update(...)` regardless of vehicle
+(Game.ts:3488–3576). So body lean can steer the boat today; but the
+continuous `speedAxis`/`elevateAxis` are consumed only by `Plane`
+(`localPlayer.analog`, Game.ts:3555). Rowing is exactly the missing
+propulsion path — a new input mapping onto an existing vehicle, which is
+what FUTURES.md predicted and what Flight itself was.
 
-- PosePuppet suite: **73 passed / 5 skipped** — matches the stated
-  baseline (3.5 m, this machine, 2026-07-07).
-- Flight suite, first run: **16 passed / 1 failed / 2 skipped** — the
-  failure was `feel.spec.ts › superman arms: arms down stabilizes, arms
-  out flies`, on a tree with zero changes. Rerun in isolation: **passed
-  (19.6 s)**. This matches the suite-order/contention flake already
-  documented in EVAL_NOTES.md ("passed alone and in the next two full
-  runs; watching it"). Full-suite rerun result recorded below. Treated
-  as flake, not regression — but it will be watched at every later
-  phase, and any repeat gets investigated as a regression, never fixed
-  by retuning Flight.
-- Flight suite, full rerun: **17 passed / 2 skipped** (11.4 m) — clean
-  baseline reproduced.
-- Fully-visible sync/perf baseline: eval/results.json (2026-07-02
-  refresh, headed, Apple M5): upperLimbsMean per fixture×avatar ranges
-  2.2°–23.4° (fast is the honest worst case); detectionRate 1.0
-  everywhere; pose ~29–30 fps, render ~116–123 fps. That table is the
-  non-regression reference (§3).
+**Landmarks never cross the transport — so stroke detection must run
+producer-side, in the package.** `BodySignal` is a closed-key schema of
+derived axes (`packages/body-input/src/schema.ts` enforces exact shape
+and scans for landmark-shaped payloads). The consumer (flight app) never
+sees wrists. Therefore `strokeRate/strokePhase/strokeAmplitude` cannot
+be computed in the game; they are new derived fields computed in
+`@bodyarcade/body-input` where the landmarks live. The schema already
+has the additive-optional pattern for this (the PPC `tracking` block):
+an optional top-level key keeps `v: 1`, old tapes stay valid, the
+canonical serializer gains a fixed-order tail. That is the "v1.x"
+mechanism.
 
-### The current occlusion path ("legacy hold/decay"), precisely
+**The extraction layer already measures what strokes need.**
+`extract.ts` computes per-arm `wristLocal` (wrist relative to shoulder
+center, in the torso basis) with the fore-aft component along `vz` — the
+same measured quantity behind `handsForward`, which was reliable enough
+for Flight's boost gesture. Stroke axis = oscillation of `wristLocal.z`
+per arm. The pipeline is a pure state machine over frame timestamps
+(replay-deterministic by construction), and the `AxisShaper`/One-Euro/
+hysteresis idioms to build on are all in place.
 
-There is no landmark-level continuity today. Three layers each cope
-separately:
+**The globe has no rivers.** Terrain is a continuous land/ocean field
+(`SimplexNoise.ts`) with an "ocean backbone" mask guaranteeing one
+connected main ocean, plus smaller disconnected water components. There
+is no waterway graph, no centerline, nothing river-shaped. This forces a
+deviation from the prompt's "river run" language — see Deviations.
 
-1. **Landmark smoothing** (`src/pose/smoothing.ts`): One Euro per axis
-   + visibility EMA (0.7/0.3). During occlusion MediaPipe still emits
-   low-visibility garbage positions; the filter keeps filtering them;
-   consumers are expected to gate on visibility.
-2. **Retargeter** (`src/rig/retarget.ts`): per-bone visibility
-   hysteresis (VIS_ON 0.55 / VIS_OFF 0.45) → `confident` flag. On loss:
-   angular-velocity coast (τ 0.25 s) → relax-to-rest (τ 0.7 s,
-   `config.relaxSec`) → idle micro-sway after 1.5 s; 120° joint limit.
-   On re-acquisition: smoothstep blend from the held pose over
-   `clamp(0.8 × lostSec, 0.08 s, 0.5 s)`, half-rate slerp while
-   settling. Bone/rotation space only — positions are never predicted,
-   and body-input never benefits (it runs on raw landmarks).
-3. **body-input** (`packages/body-input`): receives the
-   **pre-smoothing** mirrored landmarks (`main.ts` `onPoseFrame`), runs
-   its own filter bank. Axes go null below `visGate` → shaper decays to
-   neutral. Confidence = 0.6·shoulders + 0.2·hips + 0.2·nose
-   visibility; EMA τ 150 ms up, exponential decay τ 300 ms on dropout.
-4. **Flight** (`apps/flight … bodyControls.ts`, Gate-3-frozen): body
-   source counts as lost below confidence 0.35 or signal older than
-   350 ms → autopilot decays intent to neutral (τ 0.25 s); re-entry
-   slew-bounded at 2.0 intent/s. **This contract is consumed, not
-   touched.**
+**Fixture/eval rig** — mp4 → y4m via `scripts/prepare-fixtures.mjs`
+(720p/30 for Chrome's fake webcam), per-clip BodySignal assertions in
+`packages/body-input/tools/fixture-eval.mjs` (episode-structural, no
+hardcoded timestamps) → `eval/bodyinput-results.json`, closed-loop
+headed Playwright specs in `apps/flight/tests/` (headless WebGL gets
+compositor-throttled; project convention is documented there). Flight
+fixtures are portrait 1080×1920@30, 40–80 s. Rowing fixtures do not
+exist yet — **USER ACTION below.**
 
-### The insertion point
+**Baseline**: PosePuppet root suite green at P0 (92 passed, 5 skipped);
+Flight suite result recorded in the Gate-1 commit message. Perf floors
+for rowing = Flight's existing floors (`eval/flight-perf.json`: 60 fps
+render / floor 45, pose ≥ 15 Hz).
 
-`main.ts` `onPoseFrame` is a single fork: mirrored landmarks go to (a)
-smoother → retargeter, (b) body-input adapter, (c) eval collector. PPC
-inserts **at that fork, after mirroring, before everything** — one
-continuity stage whose output every consumer inherits (puppeteering AND
-body-input, as the brief requires). Timestamps: frame time already
-flows through here, and the retargeter already learned the hard way
-(Motion Memory round-trip) to use frame-consistent clocks — PPC uses
-frame timestamps only, no wall clocks, no randomness → determinism is
-testable.
+## Gate-1 decision material
 
-Key structural guarantee: **PPC is an exact pass-through for landmarks
-above the visibility gate.** It only writes positions/visibility during
-PREDICTED / RELAXED / re-entry. Fully-visible non-regression is then
-structural; the eval tolerance in §3 is belt-and-braces.
+### Build vs adapt: ADAPT the TinySkies boat
 
-## 1. Design (P1–P2)
+The Track-F fork revealed a real, fully-tuned boat (FUTURES.md called
+this the load-bearing discovery). Building a fresh boat would duplicate
+spherical math, camera, wake, audio, land collision, and would need its
+own feel pass. Adapting means rowing inherits a boat that already feels
+right under keyboard, and the work concentrates where the prompt wants
+it: stroke detection and the impulse-glide connection. Permission
+covers it. **Recommendation: adapt.**
 
-New `src/pose/continuity.ts` (~350 lines + node unit tests), named in
-code and docs: **Predictive Pose Continuity**.
+### Where rowing lives: `apps/flight` gains a boat body-mode (no `apps/rowing`)
 
-- **Ring buffer**: last 16 frames of (t, x, y, z, visibility) per
-  landmark, world + norm streams (one shared state machine; world
-  drives states, norm gets the same-state 2D treatment so eval and
-  root motion stay consistent).
-- **Velocity**: least-squares linear regression over the last 5
-  visible frames (~165 ms @ 30 fps) — noise-robust, no ML.
-- **Per-limb state machine** (groups: leftArm, rightArm, leftLeg,
-  rightLeg, head, torso — driven by their landmarks' smoothed
-  visibility with the existing 0.55/0.45 hysteresis):
-  - `VISIBLE → PREDICTED`: visibility < 0.45 (or full-frame dropout).
-  - `PREDICTED`: position advances on the regressed velocity with
-    exponential damping (τ 180 ms), under constraints: bone-length
-    projection onto the parent landmark (median segment length from
-    the buffer, ±10%), per-frame displacement cap (§2), and a
-    rest-pose bias whose weight grows with age² (0 at entry → 0.3 at
-    horizon). "Gravity" ships only as this rest bias — honest, cheap.
-  - `PREDICTED → RELAXED`: age > horizon (§2). Position eases toward
-    the rest-posture estimate; confidence continues to 0.
-  - `→ VISIBLE` (from either): re-entry blend — measured data ramps in
-    over §2's window with a max per-frame correction. Never snaps.
-- **Confidence output** (written into the visibility field downstream
-  consumers already read): `vis_out = vis_enter × ageDecay ×
-  agreement`, where ageDecay is linear 1.0 → 0.35 across the horizon
-  and agreement ∈ [0.6, 1.0] penalizes prediction that violates
-  bone-length against visible neighbors. Consequence: the retargeter's
-  own VIS_OFF gate hands bones from prediction to the existing relax at
-  ~⅘ of the horizon — the layers compose instead of double-predicting;
-  games see honestly decaying confidence and decide their own
-  autopilot.
-- **Engineering view**: per-limb state chip (state, age ms, conf) in
-  the existing mono engineering surface.
-- Deliberately NOT: visibility ever above the input's, prediction past
-  the horizon, per-game behavior, any learned model.
+Everything rowing needs — globe, water, boat, camera, effects, HUD,
+tuner, same-origin `/flight/` topology, the body-input merge point, the
+eval handle — lives in apps/flight. A separate app would either fork the
+30k-line client or import across app boundaries; both are worse than the
+Flight precedent: one game, vehicles as modes, per-vehicle body
+profiles. The lobby already treats vehicles as a roster.
+**Recommendation: apps/flight.**
 
-## 2. Proposed numeric thresholds (Gate-1 approval items)
+## Design
 
-| Threshold | Proposed value | Rationale |
-|---|---|---|
-| Prediction horizon | **400 ms hard cap** (spec range 300–500) | ~12 pose frames; long enough for hand-past-face / step transit, short enough to stay honest. Test-enforced: no PREDICTED sample older than 400 ms, ever. |
-| Confidence decay | **linear, vis×1.0 → vis×0.35 over the 400 ms horizon**, then → 0 within 250 ms in RELAXED; agreement multiplier 0.6–1.0 | crosses retarget VIS_OFF 0.45 at ≈ 330 ms (clean handoff to the existing relax); crosses Flight's 0.35 at ≈ the horizon; visible in the HUD; never fakes certainty |
-| Re-entry duration | **0.8 × outage, clamped [0.1 s, 0.4 s]** | mirrors the gate-approved bone-level rule; flickers recover fast, real occlusions take the full beat; inside the 0.3–0.5 s spec for real occlusions |
-| Max correction per frame | **0.06 m per landmark per pose frame** (~1.8 m/s at 30 fps) during re-entry; existing bone bound (< 10°/render-tick) retained | below fast-gesture speeds on the fixtures, so corrections hide inside motion; a visible snap would need ~0.3 m |
-| Acceptable masked-fixture error | **PPC ≤ legacy on every masked fixture (mandatory); target ≥ 20 % lower on moving-limb masks; provisional absolute bound mean ≤ 0.12 m, p95 ≤ 0.25 m** during PREDICTED (masked landmark vs same-frame truth, masks ≤ 400 ms) | the relative bound is the honest core claim; absolutes are provisional until legacy is measured at P3 — both get published in results.json, and if the absolutes move, DECISIONS.md says why |
-| Fully-visible non-regression | **\|Δ upperLimbsMean\| and \|Δ legsMean\| ≤ 1.0° per fixture×avatar** vs the 2026-07-02 table; detectionRate unchanged; pinch→jaw r ≥ 0.8 held; **zero NaN**; plus the structural pass-through unit test (byte-equal output when fully visible) | 1.0° covers run-to-run jitter on a metric whose means run 2°–23°; the pass-through test is the real guarantee |
+### P1 — stroke detection in `@bodyarcade/body-input` (v1.x additive)
 
-Also fixed by test rather than threshold: determinism (same recorded
-stream → identical PPC output twice), joint limits never exceeded, no
-exploding values on any fixture.
+New `StrokeDetector` in the package (`src/stroke.ts`), fed from the
+existing per-arm measures inside the pipeline:
 
-## 3. Legacy vs PPC, side by side
+- **Signal**: per-arm wrist fore-aft position in the torso basis
+  (`wristLocal.z / armLen`, the handsForward substrate), One-Euro
+  smoothed; differentiate to velocity on frame timestamps.
+- **Detection**: zero-crossings of smoothed fore-aft wrist velocity with
+  hysteresis (velocity must exceed a floor derived from still.mp4's
+  measured jitter, same discipline as the flight dead zones) and a
+  minimum half-period (rejects tremor; the implied max detectable rate
+  is far above any sane rowing cadence).
+- **Phase state machine**: catch (front reversal) → drive (pull back) →
+  recovery (return forward). `strokePhase` ∈ [0,1) continuous within the
+  cycle; a stroke event fires once per drive.
+- **Outputs** (schema-additive optional `stroke` block, `v` stays 1):
+  `rate` (Hz, EMA over recent periods, decays to 0 when strokes stop),
+  `phase` (0..1), `ampL`/`ampR` (0..1, per-arm normalized stroke
+  amplitude over the last cycle), `active` (rhythmic motion currently
+  detected). Quantized like everything else; canonical JSON extended
+  with a fixed-order tail; `assertSignalShape` validates the block when
+  present. Old tapes and consumers unaffected.
+- **Seated**: the torso basis and wrist measures are all
+  shoulder-relative — seated rowing is arm-dominant and needs no special
+  casing; the seated fixture verifies rather than assumes.
+- **Dolphin reuse**: the detector is a generic periodic-limb-oscillation
+  primitive parameterized by axis (fore-aft here; vertical later). It
+  ships in the package, not the game.
 
-| Aspect | Legacy (today) | PPC (proposed) |
-|---|---|---|
-| Landmarks during occlusion | low-vis garbage passes through; gated out downstream | short constrained prediction, decaying confidence |
-| Prediction horizon | none (bone coast τ 0.25 s, rotation only) | 400 ms hard cap, positions + everything downstream inherits |
-| Confidence during loss | binary per-bone flag; body-input decay τ 300 ms | per-landmark decay (linear → 0.35 over 400 ms) + per-limb state flags |
-| Re-entry | bone-space blend clamp(0.8·lost, 0.08–0.5 s) | landmark-space blend clamp(0.8·outage, 0.1–0.4 s) + 0.06 m/frame cap; bone layer unchanged on top |
-| body-input during a hand dropout | axis → null instantly; shaper decays to neutral | axis continues ≤ 400 ms on decaying confidence, then the identical decay |
-| Measured by | occlusion.spec bone angles only | + masked position error, re-entry no-snap delta, horizon cap, determinism, flight-contract timing |
+Fixture eval extends the package tool: stroke count ±1 vs known truth
+per clip, rate slow < fast, left-bias amplitude asymmetry with the
+documented sign, still => `active` never true, zero strokes.
 
-Legacy numbers published alongside PPC at P3 (same masked fixtures,
-both systems): hold-last-visible position error during masks,
-masked-run sync means, autopilot engagement time on full dropout.
+### P2 — boat feel: impulse-and-glide + assists
 
-## 4. Verification plan (P3; flight contract at P4)
+- **`RowingControls`** (`apps/flight/client/src/input/rowControls.ts`),
+  sibling of `BodyFlightControls`, sharing its transport/staleness/
+  keyboard-priority machinery (extract the common core rather than
+  copy). Consumes the `stroke` block; emits per-tick rowing intent.
+- **Propulsion**: each detected stroke (drive phase) applies an impulse
+  scaled by mean amplitude; between strokes the boat's existing
+  `COAST_DECAY` does the gliding. Implemented as an additive path on
+  Boat (an `impulse()`/analog-style hook, the same pattern `Plane.analog`
+  used) — **zero changes to the keyboard constants or upstream feel.**
+  A short attack envelope makes the per-stroke surge visible: the boat
+  visibly lunges on each drive. That surge read is the demo.
+- **Steering, both profiles as data** (`ROW_PROFILES`, same shape as
+  `BODY_PROFILES`): `row-asym` — turnRate from (ampL − ampR); `row-lean`
+  — turnRate from leanX. Pick the default at Gate 2. Flight's
+  boost/action gestures are **disabled in rowing profiles** (hands
+  thrust forward every stroke — they would constantly misfire the
+  fishing action / boost).
+- **Assist ladder** (same `ASSIST_LEVELS` pattern): Full Assist softly
+  steers toward the course centerline (see Waterway seam) and holds a
+  gentle speed floor while strokes continue; Standard/Expert relax caps.
+- **Cruise**: after N steady strokes (rate variance under threshold),
+  cruise latches — momentum holds near the recent average so the user
+  can rest; resumes manual on the next stroke or posture change.
+  Fatigue is a design constraint: target effort is conversational
+  motion (hands travel ~30 cm), not gym form.
+- **Autopilot on tracking loss**: reuse Flight's decay pattern — thrust
+  intent decays, boat drifts straight and slows; slew-bounded blend on
+  re-entry (never snaps). T-pose recenter: already a package event,
+  reused as-is.
+- **Keyboard fallback**: upstream boat keys keep working exactly as
+  upstream (W hold = accelerate, S brake, A/D turn), with Flight's
+  keyboard-priority rule (keys win for 1.5 s). See Deviations.
+- **Entry**: a direct-entry URL param (`?vehicle=boat` / `?row`) that
+  starts the boat for rowing/demo/eval (progression untouched otherwise
+  — the boat's normal unlock celebration stays), plus a minimal "Row"
+  card in PosePuppet next to "Fly" reusing `openFlight()` with the row
+  URL. Tuner ("b") gains a stroke readout row (rate/phase/ampL/ampR/
+  cruise state).
 
-**Masked-fixture harness** — reuses the fixture → y4m → fake-webcam
-rig; no new recordings needed before Gate 1:
+>> **USER GATE 2** — live row: both steering profiles, seated, a
+2-minute run; Lekan judges rhythm, connection, fatigue. Iterate.
+(Gate-approved Flight feel is frozen; nothing in P2 touches plane
+controls or gains.)
 
-- Mask specs are data (`eval/masks/*.json`): named landmark groups +
-  windows keyed on **videoTimeMs** (deterministic across runs). Planned
-  specs map to the brief's use cases: hand leaves frame (arms), hand
-  crosses face (facetouch), foot disappears (fullbody), brief full
-  dropout + motion blur (fast).
-- Injection is eval-only (`?mask=<name>`), applied at the fork. The
-  **same frame** provides ground truth: record pre-mask landmarks →
-  zero the group's visibility → PPC → record output + state. Truth and
-  output live in one run — no cross-run frame-alignment problem — and
-  the masked-run sync metric samples against the truth stream, so it
-  directly measures "did the puppet keep matching the person while
-  blind", comparable PPC-on vs legacy (`?ppc=0`).
-- New results.json fields: `ppc.maskedPositionError` (mean/p95 m,
-  PREDICTED only, per fixture, PPC and legacy), `ppc.reentryMaxDelta`
-  (m/frame), `ppc.horizonMaxMs`, `ppc.maskedSync` (vs truth, PPC and
-  legacy), `ppc.nanCount`.
-- Existing occlusion.spec stays green unchanged (relax < 0.25 rad,
-  < 4°/tick relaxing, < 10°/tick re-entry, settle ≤ 1.2 s, joint
-  limit) — it then exercises the composed PPC+relax path.
+### P3 — polish + ship
 
-**Flight confidence contract (P4)** — additive only:
+Coach messages via the existing toast/HUD surface ("Bigger strokes read
+better", "Sit back to rest — momentum will hold"), README rowing
+section, EVAL_NOTES, FUTURES.md waterway-data seam notes, DECISIONS.md.
 
-- body-input schema gains an optional per-limb `tracking` state block
-  (additive field, protocol stays v1-compatible; Flight ignores it
-  today). No Flight gain/assist/mapping/timing code is touched.
-- Full-frame dropout: PPC's core-landmark (shoulders/hips/nose) decay
-  is tuned so Flight's autopilot engagement time shifts **≤ +100 ms**
-  vs legacy, measured by the existing injected-dropout closed-loop eval
-  (altitude in band, no terrain contact, smooth re-entry — unchanged).
-  The shift is documented in results, not silent. If ≤ +100 ms proves
-  unreachable without dishonest confidence, the fallback is
-  pass-through-on-full-dropout (PPC acts only on partial occlusion) —
-  decided by measurement, logged in DECISIONS.md.
-- Flight suite (17) runs unmodified at every phase; any failure is
-  investigated as a regression of my layer, never fixed by retuning
-  Flight.
+### The waterway seam (design only — no open-data work)
 
-**Determinism**: unit test drives a synthetic recorded stream through
-PPC twice in node → identical outputs. PPC has no wall clocks and no
-randomness by construction.
+Interface in apps/flight: `Waterway` — `sample(posQ): { onWater:
+boolean, centerlineHeading: number, crossTrack: number }`. v1
+implementation is procedural from the existing globe: a generated
+open-water course (waypoints sampled on `isMainOcean` cells, smoothed
+into a loop that hugs the coast where possible). Full Assist and the
+closed-loop eval consume only the interface, so the future open-data
+pipeline swaps in real waterway geometry without touching rowing logic.
+Documented in FUTURES.md at P3.
 
-## 5. Phases and effort
+## Deviations from the prompt (and why)
 
-- **P1** — ring buffers, velocity regression, state machine,
-  constraints (`continuity.ts` + unit tests). ~½ day. Each phase ends:
-  suite green, commit, EVAL_NOTES + status entries.
-- **P2** — re-entry blending, confidence model, engineering-view
-  chips, main.ts wiring behind `?ppc=` flag (default on). ~½ day.
-- **P3** — mask harness, metrics, legacy-vs-PPC measurement, publish
-  results + threshold check. ~1 day; biggest phase. §2's provisional
-  numbers get confirmed or honestly revised here.
-- **P4** — body-input additive flags, flight-contract measurement,
-  docs (docs/PPC.md: states, constraints, limits, the "not
-  invisible-limb tracking" line; README note; DECISIONS; CHANGELOG).
-  ~½ day.
-- **>> USER GATE 2** — live test: hide a hand mid-gesture, cross the
-  face, step a foot out of frame; the puppet should look intentional,
-  not haunted. Fix what's reported.
+1. **"Rivers/lakes" → open-water course.** The globe has no rivers —
+   terrain is a land/ocean field with a connected main ocean and
+   incidental lakes. Building procedural rivers would mean reworking
+   accepted Globe terrain (risk + perf) for geometry the open-data
+   pipeline will replace anyway. Instead: the 2-minute run is a coastal/
+   open-water course behind the `Waterway` seam; "stays on the waterway"
+   = stays on water and within a cross-track band of the course.
+2. **Keyboard fallback keeps upstream semantics.** The prompt sketches
+   "W hold = stroke"; upstream boat W is hold-to-accelerate, and
+   Flight's accepted, non-negotiable rule is keyboard identical to
+   upstream. W hold already delivers the fallback's purpose (propel the
+   boat without a body); re-mapping it to synthetic strokes would change
+   accepted feel for no capability gain.
+3. **Stroke fields stay schema v1 (additive optional block), not a v2
+   bump.** FUTURES.md sketched "v2"; the PPC `tracking` block
+   established the additive-optional pattern that keeps every existing
+   consumer and recorded tape valid. Same measured-floor discipline,
+   no version churn.
 
-## 6. Risks
+## Verification
 
-1. **Decay-shape ↔ VIS-gate coupling**: how long bones ride prediction
-   is set by where the decay crosses 0.45. One constants table, masked
-   evals as the feedback loop, live gate as the final judge.
-2. **Autopilot timing shift** on full dropout — bounded and measured
-   (§4); fallback defined in advance.
-3. **Face-touch interplay**: a predicted wrist keeps face-touch
-   engaged briefly (that IS the hand-crosses-face use case working);
-   the penetration guard runs downstream and the masked facetouch eval
-   watches it.
-4. **Handoff double-motion** (PPC deceleration, then bone coast):
-   velocities at handoff are already damped so coast energy is small;
-   the extended occlusion spec asserts no second-phase kick.
-5. **Flight feel flake** (superman-arms) recurring in contended runs —
-   pre-existing, documented; watched every phase, investigated if it
-   repeats in isolation.
+- **Fixture evals** (package tool → `eval/bodyinput-results.json` or a
+  rowing sibling): stroke count within ±1 of known truth per clip; rate
+  ordering slow < fast (values stated); left-bias clip: ampL − ampR
+  positive and stable; still.mp4: zero strokes, `active` false
+  throughout; seated clip: detection parity with standing.
+- **Closed-loop** (`apps/flight/tests/row.spec.ts`, headed like the
+  rest): fixture-driven 2-minute run stays on water / in the cross-track
+  band under Full Assist; speed correlates with stroke rate (Pearson r
+  stated in eval output); injected dropout → drift straight + slow, no
+  snap on recovery; replay determinism — recorded signal tape (with
+  stroke block) replays byte-identically through the package per the
+  canonical-JSON check.
+- **Perf**: Flight's floors (60/45 fps, pose ≥ 15 Hz) re-measured with
+  rowing active.
+- **Suites**: PosePuppet root + Flight suites stay green at every
+  commit.
 
-## 7. Explicitly out / unchanged
+## Fixtures — USER ACTION (exact recording specs)
 
-Flight profile gains, assist ladder, autopilot constants, input
-mappings (all Gate-3-frozen); TinySkies provenance matters;
-LICENSE_NOTES.local.md; fixture videos (gitignored, none committed,
-none re-recorded for Gate 1 — synthetic masks over existing footage
-cover every listed use case); no merge, no push.
+Same setup as the flight fixtures: **portrait 1080×1920 @ 30 fps**,
+camera at chest height ~2.5–3 m back, full torso + arms in frame
+through full stroke extension (hands never leave frame at full reach),
+front lighting, plain background if possible. Start each clip with ~3 s
+standing/sitting still (neutral capture), end with ~2 s still. Drop the
+files in `fixtures/rowing/` as `.mp4`; `npm run prepare-fixtures`
+converts them.
+
+The stroke motion: both hands reach forward toward the camera at chest
+height, then pull back to the ribs — a relaxed sculling motion, elbows
+soft. Amplitude target ~30 cm of hand travel; this should feel like a
+gesture, not a workout.
+
+| clip | posture | content | true count |
+|---|---|---|---|
+| `rowing_slow.mp4` (~60 s) | standing | exactly **12 strokes** at a relaxed ~18–20 strokes/min, symmetric | 12 |
+| `rowing_fast.mp4` (~45 s) | standing | exactly **24 strokes** at ~35–40 strokes/min, symmetric | 24 |
+| `rowing_left_bias.mp4` (~45 s) | standing | exactly **15 strokes**, left arm full range, right arm ~half range | 15 |
+| `rowing_seated.mp4` (~60 s) | seated on a chair | exactly **15 strokes** at ~20–25 strokes/min, symmetric | 15 |
+| still | — | **reuse** `fixtures/flight/still.mp4` | 0 |
+
+Counting the strokes while recording is the hand-labeled truth the
+±1 eval checks against — if a take ends up with a different count,
+just tell me the actual number instead of re-recording.
+
+## Effort estimates
+
+- P1 stroke detection + schema + fixture eval: ~1 day.
+- P2 boat propulsion/steering/assists/cruise/autopilot/entry/tuner:
+  ~1.5 days to Gate 2, plus iteration from the live gate.
+- P3 polish/docs/seam notes: ~0.5 day.
+
+## Risks
+
+- **Depth noise on the fore-aft stroke axis** — MediaPipe z is the
+  noisiest coordinate. Mitigations: One-Euro + velocity-floor hysteresis
+  + min half-period; the handsForward axis proved z workable in Flight.
+  If fixtures show it's still marginal, fall back to a hybrid axis
+  (fore-aft + vertical wrist arc, which real rowing has anyway). This is
+  exactly what the fixture gate is for.
+- **Gesture collisions**: every stroke passes through "hands forward" —
+  Flight's boost/action triggers are disabled in rowing profiles from
+  the start.
+- **Fatigue**: 2 minutes at 24 SPM must stay conversational — cruise
+  mode, modest amplitude normalization, and "sit back to rest" coaching
+  are load-bearing, not polish.
+- **Boat unlock progression**: direct-entry param must not corrupt the
+  saved progression state (entry bypasses selection, not unlocks).
