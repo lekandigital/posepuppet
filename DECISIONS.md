@@ -367,3 +367,23 @@ directory, every quotable number file-backed — and this note is the
 paper trail. (3) apps/flight/README.md keeps the upstream README intact
 below a BodyArcade header that states the credit, the offline default,
 and the real keyboard controls (upstream's own table was stale).
+
+## 2026-07-07 — Gate-3 retest: post-Gate-2 tuning REVERTED to the approved baseline
+Lekan's Gate-3 flight: current controls worse than what he approved at
+Gate 2; live tuner gain 0.6 helped (diagnostic that defaults got too
+aggressive, not a solution). Lesson recorded: his Gate-2 "optionally
+investigate slightly greater responsiveness / smoother transitions" asks
+were treated as change orders and stacked five feel changes onto an
+approved baseline — approved feel is a baseline to protect, not a
+starting point for drift. Restored to EXACT Gate-2 values: autopilot
+τ 0.25 s, re-entry slew 2.0 intent/s, Superman turnGain 1.2 /
+climbGain 1.5, arming = single 0.35/0.5 threshold, disarm = instant
+neutral + instant re-arm (no decay, no slewed pickup — the smoothed
+variant plus slower slew was the likely "mushy" culprit: it added lag
+after every confidence dip and arming cycle). KEPT per his instruction:
+Head Pilot climbGain 3.0 / descendGain 2.0 (his explicit Gate-2 request,
+rated "very good" at the retest), Superman as default profile, recenter
+banner + toast, all transport/topology/diagnostic/test/doc work. Gains
+store bumped v2 → v3 so his diagnostic 0.6 slider value can't mask the
+restored defaults. All 9 synthetic control specs pass on the restored
+baseline.

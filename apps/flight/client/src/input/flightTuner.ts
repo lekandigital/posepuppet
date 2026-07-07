@@ -17,9 +17,10 @@ export interface PlaneResponse {
   bankDeg: number;
 }
 
-// v2: fresh defaults after the Gate-2 tuning pass (old saved gains would
-// silently mask the new per-profile values).
-const GAIN_STORE_KEY = "bodyarcade_flight_gains_v2";
+// v3: Gate-2 baseline gains restored at the Gate-3 retest — bumping the
+// key discards saved slider values (incl. the diagnostic 0.6 turn gain)
+// so old workarounds don't silently mask the restored defaults.
+const GAIN_STORE_KEY = "bodyarcade_flight_gains_v3";
 
 const RAW_AXES = ["leanX", "leanY", "crouch", "tallness", "armsOut", "handsForward"] as const;
 const INTENT_AXES = ["turnRate", "speedAxis", "elevateAxis"] as const;
