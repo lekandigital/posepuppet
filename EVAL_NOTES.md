@@ -1,5 +1,22 @@
 # Eval notes
 
+### body-input P2: tuner + jitter floors (2026-07-07)
+Vision check of the mounted tuner over the live app (lean_lr as camera):
+mono/1px language matches the interface, bars track the lean live
+(leanX 0.95 signed correctly, stillness 0.96, CONF 1.00), measured dead
+zones visible in the sliders; panel opacity raised 0.92→0.96 after the
+coach text ghosted through. Honest findings from the jitter-floor run
+(449–450 samples × 15 s, headed): the first pass measured handsForward
+"noise" at 0.37 mean — actually resting bias (hanging wrists sit forward
+of the shoulder plane in MediaPipe z), fixed by rest-relative arm axes
+rather than a masking dead zone; re-measured floors: leanX 0.02 p95,
+leanY 0.10 p95 (real z-noise — the weakest axis, documented), crouch
+0.014, arms ≈0.003, handPoint 0.057. Known cross-talk observed in the
+tuner: a hard lean bleeds into tallness (~0.5 momentarily); P3's
+cross-axis isolation assertions will quantify it. Latency readout showed
+~120 ms in the headless screenshot environment (pose interval dominates;
+headed live is the number that matters and lands in P3 eval).
+
 ### body-input P1 protocol verification (2026-07-06)
 No UI surface yet (tuner lands in P2), so no screenshots — this entry is
 the protocol evidence. 15/15 tests in tests/bodyinput.spec.ts, node-side,

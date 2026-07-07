@@ -6,7 +6,19 @@ breaking changes bump `v` and the package major. Consumers pin the package
 version and check `v` at runtime; the BroadcastChannel source drops
 mismatched majors with a one-time console warning.
 
-## 1.0.0 — unreleased (P1 in progress)
+## 1.0.0 — unreleased (P2 in progress)
+
+- Tuner overlay (`mountTuner`): per-axis raw→shaped bars, live shaping
+  sliders, status chips, event blips, latency readout; mounted in
+  PosePuppet behind the `b` shortcut / command palette.
+- Jitter-floor tool (`tools/jitter-floor.mjs`): measures still.mp4 raw
+  noise and rewrites dead-zone defaults with provenance.
+- Arm axes are rest-relative: hanging-arm rest captured at neutral
+  (T-pose-safe gate), axes report the excess renormalized to ≈1 at full
+  extension. Fixes a ~0.37 resting bias in handsForward the jitter tool
+  exposed.
+
+## 1.0.0 — unreleased (P1)
 
 - Schema v1: `{ v, ts, confidence, seated, stillness, neutralConfidence,
   axes { leanX, leanY, crouch, tallness, armsOut, armsRaised,

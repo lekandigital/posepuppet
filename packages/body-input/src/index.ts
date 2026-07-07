@@ -26,6 +26,9 @@ export {
 } from './tape';
 export type { InputTape, SignalTape } from './tape';
 
+export { mountTuner } from './tuner';
+export type { TunerDeps } from './tuner';
+
 export { AxisShaper, deadZone, expo } from './stages';
 export { HoldToFire, ImpulseDetector } from './events';
 export { OneEuro } from './oneEuro';

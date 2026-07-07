@@ -22,6 +22,7 @@ import { RingBuffer, encodePoseFrame, encodeHandFrame } from './memory/stream';
 import { createGhostPlayer } from './memory/ghost';
 import { saveLoop, listLoops, loadLoop, deleteLoop } from './memory/store';
 import { createIntentDetector } from './gesture/intent';
+import { createBodyInputAdapter, type BodyInputAdapter } from './bodyinput/adapter';
 import { createDirector } from './director/director';
 import { TAKE_SCRIPTS } from './director/scripts';
 import type { HandPuppetId } from './hand/types';
@@ -918,6 +919,11 @@ async function boot() {
     void refreshLoopList();
   }
 
+  // ── body-input protocol: derived signals for BodyArcade consumers ──
+  // (landmarks go in here and only here; transports carry BodySignal only)
+  const bodyInput = createBodyInputAdapter();
+  (window as unknown as { __BI: BodyInputAdapter }).__BI = bodyInput;
+
   // ── recording director: guided takes, hands-free via the gesture seed ──
   let latestNorm: LandmarkPoint[] | null = null;
   const intents = createIntentDetector();
@@ -1140,6 +1146,17 @@ async function boot() {
       run: () => onboarding.show() },
     { id: 'vfx', label: 'velocity vfx · toggle', run: toggleCmd2('vfx') },
     { id: 'autocam', label: 'auto-director camera · toggle', run: toggleCmd2('autoCam') },
+    { id: 'body-tuner', label: 'body input · tuner overlay', key: 'b',
+      run: () => {
+        let host = document.getElementById('bi-tuner-host');
+        if (!host) {
+          host = document.createElement('div');
+          host.id = 'bi-tuner-host';
+          host.style.cssText = 'position:fixed;right:12px;bottom:64px;z-index:40;';
+          document.body.append(host);
+        }
+        bodyInput.toggleTuner(host);
+      } },
   ]);
   onConfigChange((key) => {
     if (key === 'model') void detector.setModel(config.model);
@@ -1175,12 +1192,14 @@ async function boot() {
       poseRing.push(encodePoseFrame(worldSmooth, norm, frame.wallTimeMs));
       latestNorm = norm;
       intents.onLandmarks(norm, frame.wallTimeMs);
+      bodyInput.onPoseFrame(world, norm, frame.wallTimeMs);
       evalCollector?.onPoseFrame(norm);
     } else {
       drawSkeleton(overlayCtx, null, overlay.width, overlay.height);
       retargeter.updateFromPose(null, null);
       latestNorm = null;
       intents.onLandmarks(null, performance.now());
+      bodyInput.onPoseFrame(null, null, performance.now());
       evalCollector?.onPoseFrame(null);
     }
   }
