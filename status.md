@@ -1,3 +1,10 @@
+## 2026-07-07 (GATE 2 APPROVED — Predictive Pose Continuity accepted)
+Gate: focused live retest passed all five items — slow hand exit predicted and returned smoothly; head stable through face crossings; behind-torso punch no longer whips or collapses; full dropout settles upright with no bend/spin; re-entries clean. Lekan: "the result now feels acceptable for Predictive Pose Continuity — I approve USER GATE 2"
+WebM observation resolved: hands-free take gesture (both wrists overhead ~1 s) started a take; finished takes auto-download locally by design (pass-2 feature, not a PPC bug; nothing leaves the machine)
+Final suites: re-run for the acceptance commit (results in the commit message)
+Blockers: none — awaiting Lekan's merge decision (not merged/pushed per instruction)
+Next: Lekan merges predictive-pose-continuity-fable when ready; then the combined Rowing → Dolphin → world-data → Walking World pass on a fresh branch
+
 ## 2026-07-07 (PPC Gate-2 fixes — rigid core + physics gate; GATE 2 RETEST RAISED)
 Live failures root-caused on real footage: confident-visibility teleports/collapses behind the torso (state machine never fired), per-landmark core prediction shearing the torso quad into bend/spin
 Fixed: rigid torso/head prediction, chain-length physics gate (impossible segment = garbage: held, low conf, never buffered), fresh-run velocity capture, no-snap capped catch-up with converged-only confidence

@@ -1,5 +1,32 @@
 # Eval notes
 
+### GATE 2 APPROVED — Predictive Pose Continuity accepted (2026-07-07)
+Lekan's focused retest, all five items passed: the arm's exit motion
+was understood and predicted with a smooth return (no snap/fling); head
+stable through mouth-cover and cheek crossings; the behind-torso punch
+— the previous major glitch — now works without whipping or collapse;
+full-body dropout settles upright with no forward bend and no axis
+spin; re-entry recovery clean across all cases. His words: "the
+specific failures from my first Gate 2 test appear to be resolved …
+I approve USER GATE 2." One observation resolved as expected behavior:
+a WebM downloaded during the test — the hands-free director's
+take:start gesture is both wrists overhead ~1 s (his test motions
+match), and finished takes auto-download locally by design (pass-2
+recording feature; local-only, nothing uploaded).
+
+Final acceptance suites on the approved code (f56974f): PosePuppet
+**92 passed / 5 skipped**; Flight **17 passed / 2 skipped** clean.
+Honest note on Flight suite stability today: across six full runs,
+three different tests each failed once under back-to-back suite
+contention (feel superman-arms, replay tolerance, body keyboard-wins +
+one clipped from a truncated log) — every one passed immediately in
+isolation (body.spec 3/3 including the closed-loop
+PosePuppet→BroadcastChannel→plane test that exercises the changed
+code), and the same commit produced two fully clean 17/2 runs. Pattern
+consistent with the suite-order/contention flake documented since the
+Flight pass; zero failures reproduce in isolation and none import PPC
+code paths.
+
 ### PPC Gate-2 fixes: rigid core, physics gate, honest catch-up (2026-07-07)
 Lekan's live report: full-dropout torso bend/spin, behind-torso punch
 glitch. Root causes found by tracing fast.mp4 (?lmtrace=1): the detector
