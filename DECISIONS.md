@@ -186,3 +186,20 @@ armsOut/handsForward ≈ 0.003 p95 (pure noise), leanY 0.10 p95 (the honest
 MediaPipe z-noise story), rest ≤ 0.07. Dead zones in defaults.ts now
 carry provenance and a do-not-hand-tune marker; the tool re-runs headed
 (headless pose runs ~8 Hz and was rejected by its own sample-count gate).
+
+## 2026-07-07 — body-input P3: real-footage findings drove three extraction fixes
+The fixture eval (episode-structural assertions, no hardcoded timestamps)
+caught what synthetic tests could not: (1) a deep crouch classified as
+seated — seated now requires leg-fold 0.55–0.85 AND ankles forward of
+hips, both y-dominated cues measured on the clips (crouch folds to
+0.45–0.51 with heels behind; seated 0.63–0.70 with feet forward; MediaPipe
+z compression made the original thigh-angle test flicker); (2) the 4s
+fallback neutral captured mid-sit-down and pegged leanX — fallback
+captures are now flagged and replaced by the first completed stillness
+dwell; (3) a 1.5×shoulder-width arm-length floor silently inflated
+armLength ~15% (real straight arm ≈ 1.3 sw in MediaPipe world) and capped
+armsOut at ~0.8 — floor lowered to a sanity-only 1.1×. Two quantities are
+recorded metrics rather than pass/fail: leanY cross-bleed during hard
+lateral leans (0.5–0.66 p95, systematic depth error) and action events in
+arms_tpose (the clip contains genuine forward reaches; still.mp4's zero
+events is the false-positive bar). Both documented in the package README.

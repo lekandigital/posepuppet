@@ -80,6 +80,53 @@ Recording/replay: `createInputRecorder` / `runTape` (input tapes contain
 landmark traces — local dev/eval artifacts only, gitignored like
 fixtures), `createSignalRecorder` / `replayInto` for signal tapes.
 
+A minimal working consumer lives at `examples/consumer.html` — open
+`http://localhost:5173/packages/body-input/examples/consumer.html` in a
+second tab while PosePuppet runs and the bars move with your body.
+
+## Tuner
+
+`mountTuner(host, { core, source, getLatencyMs })` drops a self-contained
+overlay into any consumer: raw → shaped bars per axis, live shaping
+sliders (writes `core.setConfig`), confidence/neutral/seated/stillness
+chips, event blips, latency readout. In PosePuppet: press `b` (or the
+command palette).
+
+## Verification
+
+- `tests/bodyinput.spec.ts` — protocol tests: byte-identical replay,
+  landmark-absence guard, sign conventions, decay curves, failure modes.
+- `tests/bodyinput-app.spec.ts` / `bodyinput-consumer.spec.ts` — live app
+  emission, landmark-free broadcast wire, tuner mount, cross-page
+  consumer.
+- `tools/fixture-eval.mjs` — per-fixture assertions on the six
+  fixtures/flight clips (episode-structural: signed lean episodes,
+  T-pose → recenter, seated flag, still-clip noise floor), plus measured
+  pose-frame → signal latency, written to `eval/bodyinput-results.json`.
+- `tools/jitter-floor.mjs` — measures the dead-zone defaults (provenance
+  in `src/defaults.ts`).
+
+## Measured limitations (v1, honest numbers from the fixture eval)
+
+- **leanY is the weakest axis.** MediaPipe depth noise gives it a measured
+  jitter floor of ~0.10 p95 (dead zone 0.123), and hard *lateral* leans
+  bleed systematically into it — 0.5–0.66 p95 across eval runs. Flight
+  profiles should widen the leanY dead zone or lower its gain rather than
+  expect isolation during aggressive banking.
+- **Arm rests need a calm start.** Arm axes are measured relative to a
+  hanging-arm rest captured at neutral; if tracking starts mid-T-pose the
+  rest reference stays at zero until a calm-arms capture happens
+  (`handsForward` then reads its ~0.3 resting bias). Stand at rest for a
+  second when starting, or recenter after settling.
+- **`action` fires on any fast two-hand forward reach**, including raising
+  arms into a T-pose through the front. still.mp4 shows zero false events
+  at rest; disambiguating reach-through vs deliberate thrust is a
+  consumer-side tuning question (Flight's feel lab).
+- **Seated detection needs legs.** Full-leg framing classifies on leg fold
+  + ankle-forward (measured: crouch 0.45–0.51/negative, seated
+  0.63–0.70/positive); with feet hidden it falls back to thigh angle, and
+  with knees hidden to an image-space shoulder-drop heuristic.
+
 ## Versioning policy
 
 `BodySignal.v` is the schema major. Additive fields (Rowing/Dolphin) bump

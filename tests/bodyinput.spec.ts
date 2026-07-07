@@ -25,6 +25,8 @@ interface PoseOpts {
   armsFwd?: number;
   pointLeft?: boolean;
   seated?: boolean;
+  /** thighs horizontal like a sit, but heels under the hips */
+  crouchDeep?: boolean;
   legsVis?: number;
   hipsVis?: number;
   armsVis?: number;
@@ -79,7 +81,18 @@ function makeFrame(tsMs: number, o: PoseOpts = {}): BodyInputFrame {
   world[LM.rightHip] = lm(-0.1, drop, 0, hipsVis);
 
   // legs
-  if (o.seated) {
+  if (o.crouchDeep) {
+    // hips dropped, thighs horizontal, ankles staying under the hips
+    world[LM.leftHip] = lm(0.1, 0.35, 0, hipsVis);
+    world[LM.rightHip] = lm(-0.1, 0.35, 0, hipsVis);
+    world[LM.leftShoulder] = lm(sh[0][0], sh[0][1] + 0.35, sh[0][2]);
+    world[LM.rightShoulder] = lm(sh[1][0], sh[1][1] + 0.35, sh[1][2]);
+    world[LM.leftKnee] = lm(0.1, 0.38, -0.35, legsVis);
+    world[LM.rightKnee] = lm(-0.1, 0.38, -0.35, legsVis);
+    // heels slightly BEHIND the hips, as the real crouch fixture measures
+    world[LM.leftAnkle] = lm(0.1, 0.9, 0.1, legsVis);
+    world[LM.rightAnkle] = lm(-0.1, 0.9, 0.1, legsVis);
+  } else if (o.seated) {
     world[LM.leftKnee] = lm(0.1, 0.05, -0.4, legsVis);
     world[LM.rightKnee] = lm(-0.1, 0.05, -0.4, legsVis);
     world[LM.leftAnkle] = lm(0.1, 0.5, -0.4, legsVis);
@@ -305,6 +318,14 @@ test('sitting down mid-session: seated flips once, neutral trust drops until rec
   const s2 = run(frames);
   expect(last(s2).neutralConfidence).toBe(1);
   expect(last(s2).seated).toBe(true);
+});
+
+test('deep crouch is NOT seated (heels under hips), and crouch survives it', () => {
+  const frames = after(neutralLeadIn(), (t) => seq(t, 75, { crouchDeep: true })); // 2.5 s hold
+  const signals = run(frames);
+  expect(signals.every((s) => !s.seated)).toBe(true);
+  // the crouch axis reads the drop instead of being re-referenced away
+  expect(last(signals).axes.crouch).toBeGreaterThan(0.5);
 });
 
 test('too close (huge, hips barely tracked): confidence-gated, finite, sane', () => {
