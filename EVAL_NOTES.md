@@ -1,5 +1,24 @@
 # Eval notes
 
+### body-input P3: fixture evals ALL GREEN (2026-07-07)
+eval/bodyinput-results.json, six clips, headed, ~30 Hz signal rate:
+lean_lr 2+2 sustained signed leanX windows (10.8 s / 9.3 s beyond ±0.45),
+returns to dead zone between; lean_fb signed leanY windows both
+directions (31.0 s fwd / 10.1 s back beyond ±0.35 — magnitude threshold
+3.5× the axis' noise floor; window-time assertions replaced episode
+counts, which flapped purely on the clip's loop phase); crouch_stand
+sustained crouch > 0.45 with clean release; arms_tpose 2 T-pose episodes
+(armsOut p95 0.94) + 4 recenter events; seated 84% detected, ≤2 flips;
+still zero events, stillness p50 0.90, shaped noise p99 ≤ 0.078. Latency
+pose-frame → emitted signal: p50 10–12 ms, p95 ≤ 20 ms on every clip.
+Recorded (documented, not asserted): leanY cross-bleed 0.55–0.66 p95
+during hard lateral leans (systematic depth error); 1 action event in
+arms_tpose (clip contains genuine fast forward reaches). The eval forced
+three extraction fixes — seated-vs-crouch on leg-fold + ankle-forward,
+stillness-upgrade of mid-motion fallback neutrals, armLength floor
+1.5→1.1 sw — each verified against the probe data before thresholds were
+touched, and each cross-checked by the 16 synthetic protocol tests.
+
 ### body-input P2: tuner + jitter floors (2026-07-07)
 Vision check of the mounted tuner over the live app (lean_lr as camera):
 mono/1px language matches the interface, bars track the lean live

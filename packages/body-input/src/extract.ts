@@ -42,6 +42,14 @@ export interface Measure {
   right: ArmMeasure;
   /** both thighs within seatedThighDeg of horizontal (null = knees unseen) */
   thighsHorizontal: boolean | null;
+  /** ankle forward-of-hip offset / thigh length (null = legs unseen).
+   *  Sitting puts the feet forward (~1 thigh length); a deep crouch keeps
+   *  the heels under the hips (~0) — this is what separates the two. */
+  anklesForwardRatio: number | null;
+  /** |ankle−hip| / (|hip−knee| + |knee−ankle|): a folded leg (crouch)
+   *  reads low, a seated leg (shin vertical under the knee) reads high.
+   *  y-dominated, so it survives MediaPipe's z compression. */
+  legFoldRatio: number | null;
   kneesVisible: boolean;
   anklesVisible: boolean;
   hipsVisible: boolean;
@@ -71,7 +79,8 @@ export class Extractor {
     statureWorld: null, shoulderNormY: null, shoulderWidthNorm: null,
     noseLocalZ: null, armLenMeasured: null,
     left: emptyArm(), right: emptyArm(),
-    thighsHorizontal: null, kneesVisible: false, anklesVisible: false, hipsVisible: false,
+    thighsHorizontal: null, anklesForwardRatio: null, legFoldRatio: null,
+    kneesVisible: false, anklesVisible: false, hipsVisible: false,
     speed: null, confidenceTarget: 0,
   };
 
@@ -94,6 +103,8 @@ export class Extractor {
     m.left.visOk = false;
     m.right.visOk = false;
     m.thighsHorizontal = null;
+    m.anklesForwardRatio = null;
+    m.legFoldRatio = null;
     m.speed = null;
     m.confidenceTarget = 0;
     m.hipsValid = false;
@@ -169,6 +180,26 @@ export class Extractor {
       m.thighsHorizontal =
         this.thighHorizontal(w, LM.leftHip, LM.leftKnee, cfg) &&
         this.thighHorizontal(w, LM.rightHip, LM.rightKnee, cfg);
+      if (m.anklesVisible) {
+        mpToInternal(w[LM.leftHip], this.scratch.p);
+        mpToInternal(w[LM.rightHip], this.scratch.q);
+        const hipZ = (this.scratch.p.z + this.scratch.q.z) / 2;
+        mpToInternal(w[LM.leftKnee], this.scratch.p);
+        mpToInternal(w[LM.rightKnee], this.scratch.q);
+        mpToInternal(w[LM.leftHip], this.scratch.r);
+        const thighLen = Math.max(dist(this.scratch.r, this.scratch.p), 1e-3);
+        mpToInternal(w[LM.leftAnkle], this.scratch.p);
+        mpToInternal(w[LM.rightAnkle], this.scratch.q);
+        const ankleZ = (this.scratch.p.z + this.scratch.q.z) / 2;
+        m.anklesForwardRatio = (ankleZ - hipZ) / thighLen;
+
+        // leg fold, left leg (y-dominated — robust to z compression)
+        mpToInternal(w[LM.leftHip], this.scratch.p);
+        mpToInternal(w[LM.leftKnee], this.scratch.q);
+        mpToInternal(w[LM.leftAnkle], this.scratch.r);
+        const legLen = dist(this.scratch.p, this.scratch.q) + dist(this.scratch.q, this.scratch.r);
+        if (legLen > 1e-3) m.legFoldRatio = dist(this.scratch.p, this.scratch.r) / legLen;
+      }
     }
 
     this.updateSpeed(w, frame.tsMs);
@@ -256,7 +287,11 @@ export function captureNeutral(
   if (!m.ok) return null;
   const sw = m.shoulderWidth;
   let armLength = m.armLenMeasured ?? prev?.armLength ?? 2.2 * sw;
-  armLength = Math.min(Math.max(armLength, 1.5 * sw), 2.6 * sw);
+  // sanity-only bounds: measured on the fixtures, a real straight arm reads
+  // ~1.3 shoulder-widths in MediaPipe world space — a 1.5× floor silently
+  // inflated armLength and capped armsOut at ~0.8. Underestimates are safe
+  // (axes clamp at 1); overestimates starve every threshold.
+  armLength = Math.min(Math.max(armLength, 1.1 * sw), 2.6 * sw);
 
   // arm rests: only trust them when the arms LOOK at rest — a T-pose
   // recenter must not poison the rest reference (armsOut would die)

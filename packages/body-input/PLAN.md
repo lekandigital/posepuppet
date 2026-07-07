@@ -1,6 +1,10 @@
 # @bodyarcade/body-input — design doc + schema v1 RFC
 
-Status: **P0 — awaiting USER GATE (schema approval)**
+Status: **COMPLETE — schema gate approved 2026-07-06; P1–P3 shipped
+2026-07-07; fixture evals ALL GREEN (eval/bodyinput-results.json).**
+Deviations from this RFC are logged in the repo DECISIONS.md (runner
+convention, rest-relative arm axes, seated classifier cues, defaults.ts
+instead of shaping.json).
 Date: 2026-07-06
 
 This package converts PosePuppet tracking into derived control signals

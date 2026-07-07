@@ -1,0 +1,185 @@
+{
+  "generatedAt": "2026-07-07T03:41:40.738Z",
+  "headless": false,
+  "fixtures": {
+    "lean_lr": {
+      "signals": 1199,
+      "hz": 29.98,
+      "latencyMsP50": 11.5,
+      "latencyMsP95": 14.1,
+      "checks": {
+        "leanX+windows": {
+          "pass": true,
+          "detail": "2 sustained, 29.2s > +0.45 (need ≥1 ep, ≥2 s)"
+        },
+        "leanX-windows": {
+          "pass": true,
+          "detail": "2 sustained, 7.0s < -0.45 (need ≥1 ep, ≥2 s)"
+        },
+        "crossAxisBleed": {
+          "pass": true,
+          "detail": "leanY p95=0.565 during episodes (recorded metric)"
+        },
+        "returnsToDeadZone": {
+          "pass": true,
+          "detail": "re-centers below 0.15 between episodes: true"
+        },
+        "schemaShape": {
+          "pass": true,
+          "detail": "every signal schema-clean"
+        },
+        "confident": {
+          "pass": true,
+          "detail": "confidence p50=1.000 (≥0.6)"
+        }
+      }
+    },
+    "lean_fb": {
+      "signals": 1791,
+      "hz": 29.85,
+      "latencyMsP50": 11,
+      "latencyMsP95": 14.5,
+      "checks": {
+        "leanY+windows": {
+          "pass": true,
+          "detail": "1 sustained, 12.4s > +0.35 (need ≥1 ep, ≥2 s)"
+        },
+        "leanY-windows": {
+          "pass": true,
+          "detail": "3 sustained, 29.3s < -0.35 (need ≥1 ep, ≥2 s)"
+        },
+        "crossAxisBleed": {
+          "pass": true,
+          "detail": "leanX p95=0.138 during episodes (recorded metric)"
+        },
+        "returnsToDeadZone": {
+          "pass": true,
+          "detail": "re-centers below 0.15 between episodes: true"
+        },
+        "schemaShape": {
+          "pass": true,
+          "detail": "every signal schema-clean"
+        },
+        "confident": {
+          "pass": true,
+          "detail": "confidence p50=1.000 (≥0.6)"
+        }
+      }
+    },
+    "crouch_stand": {
+      "signals": 1350,
+      "hz": 30,
+      "latencyMsP50": 11.5,
+      "latencyMsP95": 13.8,
+      "checks": {
+        "crouchWindows": {
+          "pass": true,
+          "detail": "1 sustained, 4.1s > 0.45 (need ≥1 ep, ≥2 s)"
+        },
+        "standsBackUp": {
+          "pass": true,
+          "detail": "returns below 0.15 between crouches: true"
+        },
+        "schemaShape": {
+          "pass": true,
+          "detail": "every signal schema-clean"
+        },
+        "confident": {
+          "pass": true,
+          "detail": "confidence p50=1.000 (≥0.6)"
+        }
+      }
+    },
+    "arms_tpose": {
+      "signals": 1260,
+      "hz": 30,
+      "latencyMsP50": 11.4,
+      "latencyMsP95": 13.9,
+      "checks": {
+        "tposeEpisodes": {
+          "pass": true,
+          "detail": "2 sustained armsOut > 0.75"
+        },
+        "recenterFires": {
+          "pass": true,
+          "detail": "4 recenter events (need ≥1)"
+        },
+        "actionEvents": {
+          "pass": true,
+          "detail": "1 action events (recorded metric)"
+        },
+        "schemaShape": {
+          "pass": true,
+          "detail": "every signal schema-clean"
+        },
+        "confident": {
+          "pass": true,
+          "detail": "confidence p50=0.999 (≥0.6)"
+        }
+      }
+    },
+    "seated": {
+      "signals": 1200,
+      "hz": 30,
+      "latencyMsP50": 11.7,
+      "latencyMsP95": 14.2,
+      "checks": {
+        "seatedDetected": {
+          "pass": true,
+          "detail": "seated 84.3% after 5 s (≥80%)"
+        },
+        "noFlapping": {
+          "pass": true,
+          "detail": "2 flips (≤2)"
+        },
+        "schemaShape": {
+          "pass": true,
+          "detail": "every signal schema-clean"
+        },
+        "confident": {
+          "pass": true,
+          "detail": "confidence p50=1.000 (≥0.6)"
+        }
+      }
+    },
+    "still": {
+      "signals": 600,
+      "hz": 30,
+      "latencyMsP50": 11.7,
+      "latencyMsP95": 13.9,
+      "checks": {
+        "noEvents": {
+          "pass": true,
+          "detail": "0 event frames (need 0)"
+        },
+        "stillnessHigh": {
+          "pass": true,
+          "detail": "stillness p50=0.903 (≥0.75)"
+        },
+        "shapedNoiseFloor": {
+          "pass": true,
+          "detail": "worst shaped p99=0.0453 (≤0.08)",
+          "floors": {
+            "leanX": 0.0126,
+            "leanY": 0,
+            "crouch": 0,
+            "tallness": 0.0008,
+            "armsOut": 0.0081,
+            "armsRaised": 0,
+            "handsForward": 0.0453,
+            "handPoint": 0
+          }
+        },
+        "schemaShape": {
+          "pass": true,
+          "detail": "every signal schema-clean"
+        },
+        "confident": {
+          "pass": true,
+          "detail": "confidence p50=1.000 (≥0.6)"
+        }
+      }
+    }
+  },
+  "allPass": true
+}

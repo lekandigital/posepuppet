@@ -1,0 +1,72 @@
+<!doctype html>
+<!-- Minimal cross-page consumer: subscribes to the body-input protocol
+     over BroadcastChannel and renders the axes. Run PosePuppet in another
+     tab (same origin) and this page moves with your body — no landmarks
+     ever reach it, only BodySignal. Open via the vite dev server:
+     http://localhost:5173/packages/body-input/examples/consumer.html -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>body-input · example consumer</title>
+  <style>
+    body { font: 13px/1.5 ui-monospace, Menlo, monospace; background: #0a0e16;
+      color: #e8f0ff; padding: 24px; }
+    h1 { font-size: 13px; letter-spacing: 0.1em; border-bottom: 1px solid #3a4a66;
+      padding-bottom: 8px; }
+    .row { display: grid; grid-template-columns: 120px 240px 60px; gap: 8px;
+      align-items: center; margin: 4px 0; }
+    .bar { height: 10px; border: 1px solid #3a4a66; position: relative; }
+    .fill { position: absolute; top: 0; bottom: 0; background: #4da3ff; }
+    #meta { margin: 12px 0; color: #8fa3c4; }
+    #events { color: #9fe8c8; min-height: 20px; }
+  </style>
+</head>
+<body>
+  <h1>BODY INPUT · EXAMPLE CONSUMER (cross-page)</h1>
+  <div id="meta">waiting for signals — run PosePuppet in another tab…</div>
+  <div id="axes"></div>
+  <div id="events"></div>
+  <script type="module">
+    import { createBroadcastSource, AXIS_NAMES } from '../src/index.ts';
+
+    const axesEl = document.getElementById('axes');
+    const rows = {};
+    for (const name of AXIS_NAMES) {
+      const row = document.createElement('div');
+      row.className = 'row';
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      const fill = document.createElement('div');
+      fill.className = 'fill';
+      bar.append(fill);
+      const val = document.createElement('span');
+      row.append(Object.assign(document.createElement('span'), { textContent: name }), bar, val);
+      axesEl.append(row);
+      rows[name] = { fill, val };
+    }
+
+    const meta = document.getElementById('meta');
+    const events = document.getElementById('events');
+    let count = 0;
+
+    const source = createBroadcastSource();
+    source.subscribe((s) => {
+      count++;
+      for (const name of AXIS_NAMES) {
+        const v = s.axes[name];
+        const bipolar = name === 'leanX' || name === 'leanY';
+        const pct = Math.min(Math.abs(v), 1) * (bipolar ? 50 : 100);
+        rows[name].fill.style.left = bipolar ? (v < 0 ? `${50 - pct}%` : '50%') : '0';
+        rows[name].fill.style.width = `${pct}%`;
+        rows[name].val.textContent = v.toFixed(2);
+      }
+      meta.textContent =
+        `v=${s.v} · ts=${Math.round(s.ts)} · conf=${s.confidence.toFixed(2)} ` +
+        `· seated=${s.seated} · signals=${count}`;
+      if (s.events.length) events.textContent = `» ${s.events.join(', ')} @ ${Math.round(s.ts)}`;
+      // expose for the cross-page transport test
+      window.__CONSUMER = { count, last: s };
+    });
+  </script>
+</body>
+</html>

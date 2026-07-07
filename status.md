@@ -1,3 +1,10 @@
+## 2026-07-07 (@bodyarcade/body-input P3 — fixture evals ALL GREEN, package complete)
+Done: fixture eval suite (episode/window-structural, eval/bodyinput-results.json) green on all six flight clips; example consumer page + cross-page BroadcastChannel spec; README complete with measured-limitations section
+Real-footage fixes the eval forced: seated classifier rebuilt on leg-fold + ankle-forward (crouch was misread as seated; MediaPipe z compression flickered the thigh-angle cue); mid-motion fallback neutral now upgraded by first stillness dwell (pegged leanX on seated.mp4); armLength 1.5×sw floor removed (inflated armLength, capped armsOut at 0.8)
+Numbers: latency p50 10–12 ms every clip; seated 84%; still noise floor p99 ≤ 0.078 shaped; leanY cross-bleed 0.55–0.66 p95 recorded as a documented limitation
+Blockers: none — acceptance items all met pending final suite run
+Next: hand off to BodyArcade Flight (Prompt 3) as the protocol consumer
+
 ## 2026-07-07 (@bodyarcade/body-input P2 — tuner + measured jitter floors)
 Done: tuner overlay mounts in PosePuppet ('b' / palette; raw→shaped bars, sliders writing core.setConfig, chips, latency readout); adapter feeds mirrored pre-smoothing landmarks into the core and publishes on both transports; jitter-floor tool measures still.mp4 → dead-zone defaults with provenance; prepare-fixtures now converts fixtures/flight/
 Finding: first jitter run exposed a 0.37 resting bias in handsForward (MediaPipe z) — arm axes are now rest-relative; re-measured floors are pure noise (≤0.01) except leanY (0.123, honest z-noise)

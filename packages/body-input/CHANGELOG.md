@@ -6,7 +6,21 @@ breaking changes bump `v` and the package major. Consumers pin the package
 version and check `v` at runtime; the BroadcastChannel source drops
 mismatched majors with a one-time console warning.
 
-## 1.0.0 — unreleased (P2 in progress)
+## 1.0.0 — 2026-07-07
+
+- Fixture eval suite (`tools/fixture-eval.mjs`): per-clip structural
+  assertions on all six flight fixtures, ALL GREEN; results in
+  `eval/bodyinput-results.json`. Latency p50 10–12 ms.
+- Example cross-page consumer (`examples/consumer.html`) + spec.
+- Extraction fixes forced by real footage: seated detection rebuilt on
+  leg-fold + ankle-forward cues (deep crouch no longer misreads as
+  seated); mid-motion fallback neutrals are replaced by the first
+  stillness dwell; armLength floor lowered 1.5→1.1 shoulder-widths
+  (was inflating armLength and capping armsOut at ~0.8).
+- Measured limitations documented in README (leanY cross-bleed, arm-rest
+  capture, action-on-forward-reach, seated framing requirements).
+
+## 1.0.0 — unreleased (P2)
 
 - Tuner overlay (`mountTuner`): per-axis raw→shaped bars, live shaping
   sliders, status chips, event blips, latency readout; mounted in

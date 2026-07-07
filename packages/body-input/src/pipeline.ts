@@ -33,6 +33,19 @@ export interface BodyInputCore {
   getDebug(): Record<AxisName, AxisDebug>;
   /** null until a provisional or explicit neutral exists */
   getNeutral(): NeutralState | null;
+  /** scalar extraction internals (no landmarks) — eval/tuner diagnostics */
+  getMeasure(): {
+    ok: boolean;
+    thighsHorizontal: boolean | null;
+    anklesForwardRatio: number | null;
+    legFoldRatio: number | null;
+    kneesVisible: boolean;
+    anklesVisible: boolean;
+    hipsVisible: boolean;
+    statureWorld: number | null;
+    armLenMeasured: number | null;
+    shoulderWidth: number;
+  } | null;
 }
 
 const clamp01 = (v: number): number => Math.min(Math.max(v, 0), 1);
@@ -59,6 +72,8 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
   let lastTs: number | null = null;
   let lastMeasure: Measure | null = null;
   let provisionalSince: number | null = null;
+  let confidentMs = 0; // cumulative, for the never-still fallback capture
+  let neutralByFallback = false; // fallback capture upgrades on first stillness
 
   const raw: Record<AxisName, number | null> = {
     leanX: null, leanY: null, crouch: null, tallness: null,
@@ -107,13 +122,30 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
         neutralConfidence = Math.min(neutralConfidence, 0.3);
       }
 
-      // provisional neutral: first confident, still dwell auto-captures
-      if (!neutral && m.ok && confidence > 0.6 &&
-          (m.speed === null || m.speed < cfg.extraction.motionScale * 0.15)) {
-        if (provisionalSince === null) provisionalSince = frame.tsMs;
-        if (frame.tsMs - provisionalSince >= cfg.provisionalNeutralMs) {
-          captureFrom(m, 'provisional');
+      // provisional neutral: first confident, still dwell auto-captures.
+      // If the stream starts mid-motion (walking into frame, sitting down),
+      // a best-effort fallback captures once settled (4 s confident +
+      // sub-walking speed; unconditionally at 8 s), and the FIRST completed
+      // stillness dwell afterwards replaces it — a mid-motion capture must
+      // not become a permanent reference (it pegged leanX on seated.mp4).
+      if (m.ok && confidence > 0.6) {
+        confidentMs += dt * 1000;
+        const still = m.speed === null || m.speed < cfg.extraction.motionScale * 0.15;
+        if (still && (!neutral || neutralByFallback)) {
+          if (provisionalSince === null) provisionalSince = frame.tsMs;
+          if (frame.tsMs - provisionalSince >= cfg.provisionalNeutralMs) {
+            captureFrom(m, 'provisional');
+            neutralByFallback = false;
+            provisionalSince = null;
+          }
+        } else if (!still) {
           provisionalSince = null;
+        }
+        if (!neutral) {
+          const settled = m.speed === null || m.speed < cfg.extraction.motionScale * 0.5;
+          if ((confidentMs >= 4000 && settled) || confidentMs >= 8000) {
+            if (captureFrom(m, 'provisional')) neutralByFallback = true;
+          }
         }
       } else if (!neutral) {
         provisionalSince = null;
@@ -139,7 +171,10 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
         shaped.armsOut > cfg.events.recenter.armsOutMin &&
         shaped.armsRaised < cfg.events.recenter.armsRaisedMax;
       if (recenterMachine.step(tpose, frame.tsMs)) {
-        if (captureFrom(m, 'explicit')) events.push('recenter');
+        if (captureFrom(m, 'explicit')) {
+          neutralByFallback = false;
+          events.push('recenter');
+        }
       }
       if (actionMachine.step(eventsOk ? shaped.handsForward : 0, frame.tsMs)) {
         events.push('action');
@@ -187,6 +222,8 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
       lastTs = null;
       lastMeasure = null;
       provisionalSince = null;
+      confidentMs = 0;
+      neutralByFallback = false;
     },
 
     setConfig(overNew: DeepPartial<BodyInputConfig>): void {
@@ -208,6 +245,23 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
 
     getNeutral(): NeutralState | null {
       return neutral;
+    },
+
+    getMeasure() {
+      const m = lastMeasure;
+      if (!m) return null;
+      return {
+        ok: m.ok,
+        thighsHorizontal: m.thighsHorizontal,
+        anklesForwardRatio: m.anklesForwardRatio,
+        legFoldRatio: m.legFoldRatio,
+        kneesVisible: m.kneesVisible,
+        anklesVisible: m.anklesVisible,
+        hipsVisible: m.hipsVisible,
+        statureWorld: m.statureWorld,
+        armLenMeasured: m.armLenMeasured,
+        shoulderWidth: m.shoulderWidth,
+      };
     },
   };
 }
