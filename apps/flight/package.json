@@ -16,9 +16,11 @@
     "deploy": "railway up --detach && npx vercel@latest deploy --prod --yes",
     "deploy:server": "railway up --detach",
     "deploy:client": "npx vercel@latest deploy --prod --yes",
-    "deploy:preview": "npx vercel@latest deploy --yes"
+    "deploy:preview": "npx vercel@latest deploy --yes",
+    "test": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "concurrently": "^9.1.2",
     "typescript": "^5.7.3"
   }

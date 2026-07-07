@@ -41,6 +41,7 @@ import { TouchControls } from "./TouchControls";
 import { CameraRig } from "./CameraRig";
 import { SocketClient } from "../network/SocketClient";
 import { resolveServerUrl } from "../runtime/resolveServerUrl";
+import { isLocalMode, localAutoJoin, localLanternAdd } from "../runtime/localWorlds";
 import { isMobile } from "../utils/isMobile";
 import { StateSync } from "../network/StateSync";
 import { RemotePlaneManager } from "./RemotePlane";
@@ -674,22 +675,31 @@ export class Game {
     this.showLoadingOverlay();
     const loadingOverlayT0 = performance.now();
 
-    this.serverUrlCache = await resolveServerUrl();
-    const serverUrl = this.getServerUrl();
+    if (isLocalMode()) {
+      // BodyArcade local mode: world minted/persisted client-side; no
+      // server, no sockets, zero network. Remote path intact below.
+      const world = localAutoJoin();
+      this.worldSlug = world.slug;
+      this.reservationId = undefined;
+      this.worldConfig = world;
+    } else {
+      this.serverUrlCache = await resolveServerUrl();
+      const serverUrl = this.getServerUrl();
 
-    try {
-      const joinRes = await fetch(`${serverUrl}/api/worlds/auto-join`, {
-        method: "POST",
-      });
-      if (!joinRes.ok) throw new Error("Failed to auto-join world");
-      const data = await joinRes.json();
-      this.worldSlug = data.slug;
-      this.reservationId = data.reservationId;
-      this.worldConfig = data;
-    } catch (err) {
-      console.error("Server error:", err);
-      this.showLoadingError();
-      return;
+      try {
+        const joinRes = await fetch(`${serverUrl}/api/worlds/auto-join`, {
+          method: "POST",
+        });
+        if (!joinRes.ok) throw new Error("Failed to auto-join world");
+        const data = await joinRes.json();
+        this.worldSlug = data.slug;
+        this.reservationId = data.reservationId;
+        this.worldConfig = data;
+      } catch (err) {
+        console.error("Server error:", err);
+        this.showLoadingError();
+        return;
+      }
     }
 
     this.dayNightCycle = new DayNightCycle(this.worldConfig?.seed ?? 42);
@@ -813,7 +823,8 @@ export class Game {
 
   private mountLobby(opts?: { deferUnlockModalsUntilMenuReveal?: boolean }) {
     this.lobby = new Lobby(this.container, {
-      serverUrl: this.getServerUrl(),
+      // Empty in local mode → Lobby skips its save-feed fetch entirely.
+      serverUrl: isLocalMode() ? "" : this.getServerUrl(),
       playerName: this.playerName,
       mobile: this.mobile,
       deferUnlockModalsUntilMenuReveal: opts?.deferUnlockModalsUntilMenuReveal ?? false,
@@ -2801,6 +2812,16 @@ export class Game {
     this.flagSystem?.dispose();
     this.flagSystem = null;
 
+    if (isLocalMode()) {
+      // Local single-player: no socket, no StateSync, no flag system —
+      // multiplayer code stays compiled but dormant. Engine audio still
+      // belongs to this step (upstream starts it at the end of networking
+      // setup), so fall through to the loop start below.
+      this.hud.setPlayerCount(1);
+      this.startVehicleAudioLoops();
+      return;
+    }
+
     const serverUrl = this.getServerUrl();
     this.socketClient = new SocketClient(serverUrl);
 
@@ -2866,6 +2887,10 @@ export class Game {
     });
     this.stateSync.start();
 
+    this.startVehicleAudioLoops();
+  }
+
+  private startVehicleAudioLoops() {
     if (this.playerVehicle === "plane") {
       this.audioManager.startLoop("engine_biplane", 0);
     } else if (this.playerVehicle === "carpet") {
@@ -3573,13 +3598,17 @@ export class Game {
           }
           this.hud.showLanternCelebrate(litCount);
 
-          const srvUrl = this.getServerUrl();
-          fetch(`${srvUrl}/api/lanterns/add`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ count: litCount, worldSlug: this.worldSlug }),
-          })
-            .catch(() => {});
+          if (isLocalMode()) {
+            localLanternAdd(litCount, this.worldSlug);
+          } else {
+            const srvUrl = this.getServerUrl();
+            fetch(`${srvUrl}/api/lanterns/add`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ count: litCount, worldSlug: this.worldSlug }),
+            })
+              .catch(() => {});
+          }
 
           this.awardXP("lantern", LANTERN_XP);
           this.vehicleFlashTimer = 0.35;
@@ -6444,6 +6473,7 @@ export class Game {
    * stopped the moon (all five braziers lit with eternal flame). Throttled to limit abuse.
    */
   private maybeReportSaveFeed() {
+    if (isLocalMode()) return; // local mode: no feed, no posts
     if (!this.worldSlug || !this.worldConfig?.name) return;
     const ws = ProgressionManager.loadPlayerWorldState();
     if (!ws.moonFrozenByEternalFlames) return;
@@ -6498,6 +6528,7 @@ export class Game {
     metadata: Record<string, unknown> = {},
     overrides?: { runDurationSec?: number; level?: number },
   ) {
+    if (isLocalMode()) return; // local mode: milestone history stays on-device
     if (!this.worldSlug || !this.worldConfig?.name) return;
     const name = (this.playerName || "Pilot").trim() || "Pilot";
     const body = {

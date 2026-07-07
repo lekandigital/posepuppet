@@ -1,5 +1,23 @@
 # Eval notes
 
+### Flight P1: offline parity green, keyboard untouched (2026-07-07)
+apps/flight runs the full TinySkies experience single-player with no
+server and no Postgres. New flight suite (apps/flight, own Playwright
+config, port 5199): 3/3 green — (1) lobby loads with a LocalWorldProvider
+world minted+persisted (same 8-field WorldConfig the server created,
+seed-random), zero off-origin requests; (2) full session GO → intro →
+HUD → 3 s of keyboard flight, still zero off-origin requests, no real
+console errors; (3) world slug persists across reload. Off-origin fetches
+removed at the source: Google Fonts Inter → @fontsource self-host,
+vibej.am jam widget dropped, @vercel/analytics was already stripped at
+fork. Keyboard parity is by construction: FlightControls/Plane/
+SphericalMath/CameraRig/TouchControls are byte-identical to upstream
+(diff-verified). Server workspace still typechecks after prisma generate
+(multiplayer dormant, docker-compose path intact). Perf baseline
+(eval/flight-perf.json, headed, M5): 119 render fps flying with W held,
+0.1% frames over 25 ms, 56 MB JS heap — pre-body-input reference for the
+60/45 floor with pose >= 15 Hz coming in P2/P4.
+
 ### body-input P3: fixture evals ALL GREEN (2026-07-07)
 eval/bodyinput-results.json, six clips, headed, ~30 Hz signal rate:
 lean_lr 2+2 sustained signed leanX windows (10.8 s / 9.3 s beyond ±0.45),
