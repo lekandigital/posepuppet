@@ -1,5 +1,25 @@
 # Eval notes
 
+### body-input P1 protocol verification (2026-07-06)
+No UI surface yet (tuner lands in P2), so no screenshots — this entry is
+the protocol evidence. 15/15 tests in tests/bodyinput.spec.ts, node-side,
+synthetic-landmark driven: replay determinism holds byte-for-byte over a
+mixed tape (lean + dropout + T-pose + thrust, canonical JSON compared);
+the privacy boundary is enforced live (sink shape-guards every publish;
+negative tests prove 33-length arrays, x/y/z objects, and foreign keys
+all throw); confidence follows the documented exp(−t/300ms) during a 1 s
+dropout (asserted at 3 sample points), axes decay to neutral with
+τ=500 ms and recover slew-bounded (≤0.2/frame); recenter fires exactly
+once per held T-pose and action once per thrust; seated flips once with
+1.5 s hysteresis and drops neutralConfidence to 0.3 until recenter.
+Flight-fixture evals (lean_lr → signed leanX episodes etc.) land in P3
+via the fake-webcam rig. Fixture ground truth measured at P0: five
+portrait 1080×1920@30 clips + landscape arms_tpose (knees cropped),
+22.8–82.3 s, all correctly oriented, full body visible where expected.
+Suite after P1: 70 passed / 5 skipped (includes the previously
+failing-environment avatar test — optional-VRM probe now rejects the
+dev server's SPA-fallback 200 text/html for absent woody.vrm).
+
 ### P2/P3 FPS floor verdict (2026-06-12, display awake)
 Deferred floor check completed (results-p3-motion.json, envThrottled=false,
 6×60 s headed, all P2+P3 features on): pose 29.35–29.73 fps on every run

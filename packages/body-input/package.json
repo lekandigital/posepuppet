@@ -1,0 +1,11 @@
+{
+  "name": "@bodyarcade/body-input",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Body-signal protocol: PosePuppet tracking in, derived control signals out. Landmarks never cross the boundary.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "sideEffects": false
+}
