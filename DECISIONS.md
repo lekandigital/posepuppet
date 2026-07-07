@@ -346,3 +346,24 @@ headroom is ~2× the target. (5) Faithful-experience sweep: boat + carpet
 unlock and fly offline (spec seeds progression past both gates); the
 rest of the upstream feature set is exercised passively by the offline
 suite's zero-console-error assertions.
+
+## 2026-07-07 — Flight P5: replay design and where flight numbers live
+(1) Replay check reuses the REAL Plane class: a ?record-intents=1 tape
+captures per-frame dt + the final merged inputs (post keyboard/body
+merge, post twister/level-up overrides) + a full kinematic snapshot
+(including private smoothing state, exposed via getReplayState — the
+whole point is that a fresh Plane + snapshot + tape must reproduce the
+live path, and it does: max divergence 2.6e-6 world units over 1,681
+frames at dt 5.2–50 ms, heading/altitude/speed exactly 0; documented
+ceiling 0.02 units / 0.5°). Known honest limit: events that mutate the
+plane outside update() (ring-collect boosts, gremlin hits) are not in
+the tape — the eval flight avoids them and the spec says so. (2) Flight
+eval numbers live in eval/flight-perf.json and eval/flight-results.json
+rather than eval/results.json: the PosePuppet eval runner owns and
+OVERWRITES results.json wholesale, so merging flight keys there would
+silently lose them on the next posepuppet eval refresh. The prompt's
+"everything into eval/results.json" is honored in spirit — one eval/
+directory, every quotable number file-backed — and this note is the
+paper trail. (3) apps/flight/README.md keeps the upstream README intact
+below a BodyArcade header that states the credit, the offline default,
+and the real keyboard controls (upstream's own table was stale).
