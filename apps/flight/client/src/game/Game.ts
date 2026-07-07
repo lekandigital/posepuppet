@@ -846,6 +846,7 @@ export class Game {
       },
       body: () => this.bodyControls?.debugState() ?? null,
       setProfile: (id: string) => this.bodyControls?.setProfile(id) ?? false,
+      setAssist: (id: string) => this.bodyControls?.setAssist(id) ?? false,
     };
   }
 
@@ -3407,7 +3408,16 @@ export class Game {
     // Body input merges here — the single point it enters the intent layer.
     // Keyboard/touch activity always wins (see BodyFlightControls.merge).
     if (this.bodyControls && this.controls.enabled) {
-      inputState = this.bodyControls.merge(inputState);
+      const merged = this.bodyControls.merge(inputState);
+      // Profile boost gesture (hands forward, hysteresis + refractory in
+      // BodyFlightControls) rides the same boost path as ring pickups.
+      if (merged.boost && this.localPlayer instanceof Plane && this.gamePhase === "flying") {
+        this.localPlayer.speedBoost();
+        const boostPick =
+          SPEED_BOOST_SFX_IDS[Math.floor(Math.random() * SPEED_BOOST_SFX_IDS.length)]!;
+        this.audioManager.playSFX(boostPick, SPEED_BOOST_SFX_VOLUME);
+      }
+      inputState = merged;
     }
     let { turnRate, forward, brake, elevate, descend, paintball, specialAction, interact } =
       inputState;

@@ -23,6 +23,7 @@ import { createGhostPlayer } from './memory/ghost';
 import { saveLoop, listLoops, loadLoop, deleteLoop } from './memory/store';
 import { createIntentDetector } from './gesture/intent';
 import { createBodyInputAdapter, type BodyInputAdapter } from './bodyinput/adapter';
+import { openFlight } from './bodyinput/flightBridge';
 import { createDirector } from './director/director';
 import { TAKE_SCRIPTS } from './director/scripts';
 import type { HandPuppetId } from './hand/types';
@@ -1146,6 +1147,8 @@ async function boot() {
       run: () => onboarding.show() },
     { id: 'vfx', label: 'velocity vfx · toggle', run: toggleCmd2('vfx') },
     { id: 'autocam', label: 'auto-director camera · toggle', run: toggleCmd2('autoCam') },
+    { id: 'fly', label: 'fly · bodyarcade flight (body streams into the game)',
+      run: () => openFlight(bodyInput) },
     { id: 'body-tuner', label: 'body input · tuner overlay', key: 'b',
       run: () => {
         let host = document.getElementById('bi-tuner-host');

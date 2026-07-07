@@ -1,7 +1,7 @@
-## 2026-07-07 (BodyArcade Flight P2 — body input in, native axes)
-Done: ControlState speedAxis/elevateAxis + Plane analog consumption (keyboard path untouched); BodyFlightControls (BroadcastChannel + shape-guarded postMessage envelope, PILOT LEAN mapping as data, 1.5 s keyboard-priority merge at the single getState() site); tuner overlay 'b' (raw→intent→plane response, gain sliders persisted, profile switcher, rate/age); ?autostart + __FLIGHT eval handles
-Tests: flight suite 6/6 — synthetic axis/override specs + REAL closed loop (lean_lr.y4m → tracker → relay → sustained signed turns both directions on the actual plane); landmarks never cross
-Finding: mediastream-less WebGL pages throttle to 1 rAF/s in new headless Chrome — body specs run headed (matches PosePuppet eval convention)
-Blockers: none
-Next: P3 Feel Lab — per-axis shaping + assist ladder + autopilot-on-loss + SUPERMAN/HEAD PILOT profiles, fixture iteration, then GATE 2 live-flight script
+## 2026-07-07 (BodyArcade Flight P3 — Feel Lab, awaiting GATE 2 live flight)
+Done: 3 profiles as data (PILOT LEAN / SUPERMAN w/ arms-out arming gate / HEAD PILOT seated w/ automated cruise); assist ladder (Full default / Standard / Expert) applied as intent caps; tracking-loss autopilot (decay tau=0.25s to straight-and-level, slew-bounded re-entry, no snap); hands-forward boost (hysteresis 0.75/0.55, 6-frame hold, 3s refractory) riding the ring-boost path w/ SFX; tuner v2 (assist switcher, profile notes, boost/recenter/autopilot status); Gate-2 launch path: PosePuppet palette "fly" -> flightBridge postMessage relay (origin-pinned)
+Tests: feel suite 8/8 headed — drift law, dropout->autopilot->slewed re-entry, boost+refractory, superman arming, head-pilot automated cruise+climb, assist caps (full<58°/s, expert >8°/s more), recenter surfaced, crouch_stand.y4m closed loop (>=2 descend/recover cycles, baseline-relative over 2 clip loops)
+Findings: crouch_stand's "stand" is neutral, not stretch — closed-loop law is descend+recover, climb asserted synthetically; no shoulder-roll axis in schema v1 — SUPERMAN banks via leanX with armsOut as arming gate; loop-phase can hand neutral-capture a bad frame — specs sample >=2 loops baseline-relative
+Blockers: USER GATE 2 — live flight (script in GATE2_LIVE_SCRIPT.md); default profile pick + feel report
+Next: iterate on gate feedback until sign-off, then P4 faithful-experience sweep + Fly card + perf targets
 

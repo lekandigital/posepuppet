@@ -1,5 +1,29 @@
 # Eval notes
 
+### Flight P3: Feel Lab — profiles, assist ladder, autopilot (2026-07-07)
+Feel suite 8/8 (headed; 7 synthetic + 1 real closed loop):
+(1) neutral drift law — |mean heading rate| < 2°/s, |bank| < 3°, altitude
+never sags toward terrain over 8 s of neutral signal; (2) dropout mid-turn
+→ status AUTOPILOT, heading rate decays to |mean| < 3°/s, altitude in
+band, and re-entry is slew-bounded — max heading-rate step < 30°/s per
+100 ms sample against a would-be snap of ~55°/s, ending back in the turn;
+(3) hands-forward boost fires once past cruise max (speed > 0.9 vs 0.8)
+and the 3 s refractory blocks an immediate retrigger; (4) SUPERMAN arming
+gate — leaning hard with arms down stays stabilized (|rate| < 3°/s),
+arms out flies (< −15°/s); (5) HEAD PILOT — speed automated to ~0.65
+with zero body input, lean back climbs +0.08 alt; (6) assist ladder —
+Full Assist caps measured turn authority under 58°/s and Expert exceeds
+it by > 8°/s at identical full lean; (7) T-pose recenter event surfaces
+(tuner flash). Real closed loop: crouch_stand.y4m through the tracker —
+crouch depth > 0.1 below the observed cruise baseline with ≥ 2 full
+descend→recover cycles over 70 s (≥ 2 clip loops; baseline-relative
+because the looping fake webcam can hand the neutral-capture an awkward
+phase — first 40 s run caught exactly that, documented in DECISIONS).
+One suite-order flake seen once (head-pilot cruise read low during a
+contended headed run) — passed alone and in the next two full runs;
+watching it. Gate-2 launch path shipped: PosePuppet palette "fly" opens
+the game and relays signals cross-origin (origin-pinned postMessage).
+
 ### Flight P2: the body flies the actual plane (2026-07-07)
 Native continuous axes, no key-emulation crutch (Gate-1b approved skip).
 ControlState gained optional speedAxis/elevateAxis; Plane consumes them
