@@ -152,8 +152,8 @@ gains a note here as it changes); **original** = written for BodyArcade.
 | `apps/flight/shared/**`, `apps/flight/server/**` | copied | server kept optional (docker-compose) |
 | `apps/flight/docker-compose.yml`, `README.md`, `docs/**`, `package.json`, `package-lock.json` | copied | upstream root files |
 | `apps/flight/client/public/fonts/*` | copied | Domine, Darumadrop One — Google Fonts, SIL OFL 1.1 |
-| `apps/flight/client/public/audio/**` (~66 SFX + music) | copied — **provenance unverified** | upstream ships no license notes; grant covers author-owned work only. Verify with author before the repo goes public (PLAN.md §5 Q2) |
-| `apps/flight/client/public/3D/*.glb` (10 models) | copied — **provenance unverified** | same as audio |
+| `apps/flight/client/public/audio/**` (~66 SFX + music) | copied — AI-generated for upstream | upstream's own lobby attribution: "Music by Suno, SFX by ElevenLabs" — generated works commissioned by the author, within his grant. Lekan confirms commercial-output tiers with Danny before the repo goes public |
+| `apps/flight/client/public/3D/*.glb` (10 models) | copied — AI-generated for upstream | upstream attribution: "3D Assets by Tripo3D" — same footing as audio |
 | `apps/flight/client/public/2D/**`, `npc/**`, `social-card.png` | copied | game art, presumed author-made; same verification sweep |
 | excluded from fork | — | `.git`, `node_modules`, `dist`, `vercel.json`, `railway.toml`, `.github/`, `api/`, `patch*.js`, `.env` (deploy/codemod glue) |
 

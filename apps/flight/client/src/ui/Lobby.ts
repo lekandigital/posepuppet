@@ -27,10 +27,9 @@ const VEHICLE_ICON_SRC: Record<Vehicle, string> = {
 
 const LOBBY_DISPLAY_TITLE = "Tiny Skies";
 
-const VIBEJAM_PORTAL_BASE = "https://vibejam.cc/portal/2026";
-/** Rough cruise speed (m/s) for webring query continuity. */
-const VIBEJAM_PORTAL_SPEED = "1.6";
-const PORTAL_ICON_SRC = "/2D/icon_portal.svg";
+/** BodyArcade: the corner pill links to the original project (credit). */
+const VIBEJAM_PORTAL_BASE = "https://github.com/dannylimanseta/tinyskies";
+const PORTAL_ICON_SRC = "/2D/icon_biplane.svg";
 
 /** Last per-letter animation index (non-space chars); drives tagline entrance delay. */
 const LOBBY_TITLE_LAST_CHAR_I = Math.max(
@@ -139,19 +138,10 @@ export class Lobby {
     return `#${pal[0]!.toString(16).padStart(6, "0")}`;
   }
 
+  // BodyArcade: upstream's jam-webring portal pill is repurposed as the
+  // TinySkies credit link (no query params, no external chrome).
   private vibejamPortalHref(): string {
-    const params = new URLSearchParams();
-    const name = this.options.playerName.trim();
-    if (name.length > 0) params.set("username", name);
-    params.set("color", this.vehicleColorHexForSelectedVehicle());
-    params.set("speed", VIBEJAM_PORTAL_SPEED);
-    try {
-      params.set("ref", window.location.href.split("#")[0] ?? "");
-    } catch {
-      /* ignore */
-    }
-    const q = params.toString();
-    return q.length > 0 ? `${VIBEJAM_PORTAL_BASE}?${q}` : VIBEJAM_PORTAL_BASE;
+    return VIBEJAM_PORTAL_BASE;
   }
 
   private updateVibejamPortalLink(): void {
@@ -246,12 +236,12 @@ export class Lobby {
           href="${VIBEJAM_PORTAL_BASE}"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Vibe Jam 2026 — continue to the next game in the webring"
+          aria-label="TinySkies / GlobeFly by Danny Limanseta is used with permission — original repository"
         >
           <img src="${PORTAL_ICON_SRC}" alt="" width="26" height="26" decoding="async" />
-          <span class="lobby-vibejam-portal__label" aria-hidden="true">Vibejam Portal</span>
+          <span class="lobby-vibejam-portal__label" aria-hidden="true">TinySkies</span>
         </a>
-        <p class="lobby-attribution">Built with <strong class="lobby-attribution__brand">Cursor</strong>, Music by <strong class="lobby-attribution__brand">Suno</strong>, SFX by <strong class="lobby-attribution__brand">ElevenLabs</strong>, 3D Assets by <strong class="lobby-attribution__brand">Tripo3D</strong></p>
+        <p class="lobby-attribution"><a class="lobby-attribution__brand" href="https://github.com/dannylimanseta/tinyskies" target="_blank" rel="noopener noreferrer">TinySkies / GlobeFly</a> by <strong class="lobby-attribution__brand">Danny Limanseta</strong> is used with permission · Built with <strong class="lobby-attribution__brand">Cursor</strong>, Music by <strong class="lobby-attribution__brand">Suno</strong>, SFX by <strong class="lobby-attribution__brand">ElevenLabs</strong>, 3D Assets by <strong class="lobby-attribution__brand">Tripo3D</strong></p>
       </div>
     `;
 

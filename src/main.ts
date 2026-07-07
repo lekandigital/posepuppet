@@ -925,6 +925,22 @@ async function boot() {
   const bodyInput = createBodyInputAdapter();
   (window as unknown as { __BI: BodyInputAdapter }).__BI = bodyInput;
 
+  // BodyArcade Flight entry: opens the game (same-origin /flight/) with
+  // body signals streaming; PosePuppet drops to the lite model and pauses
+  // its stage renderer while the game window is open (perf budget).
+  const startFlight = () =>
+    openFlight(bodyInput, {
+      setStageSuspended: (v) => stage.setSuspended(v),
+      useLiteModel: () => {
+        const prev = config.model;
+        if (prev !== 'lite') setConfig('model', 'lite');
+        return () => {
+          if (prev !== 'lite' && config.model === 'lite') setConfig('model', prev);
+        };
+      },
+    });
+  document.getElementById('fly-btn')?.addEventListener('click', startFlight);
+
   // ── recording director: guided takes, hands-free via the gesture seed ──
   let latestNorm: LandmarkPoint[] | null = null;
   const intents = createIntentDetector();
@@ -1148,7 +1164,7 @@ async function boot() {
     { id: 'vfx', label: 'velocity vfx · toggle', run: toggleCmd2('vfx') },
     { id: 'autocam', label: 'auto-director camera · toggle', run: toggleCmd2('autoCam') },
     { id: 'fly', label: 'fly · bodyarcade flight (body streams into the game)',
-      run: () => openFlight(bodyInput) },
+      run: () => startFlight() },
     { id: 'body-tuner', label: 'body input · tuner overlay', key: 'b',
       run: () => {
         let host = document.getElementById('bi-tuner-host');

@@ -1,5 +1,21 @@
 # Eval notes
 
+### Flight P4: faithful experience, companion mode, combined perf (2026-07-07)
+Combined two-window measurement (eval/flight-perf.json, headed, M5,
+entered through the production Fly card): flight render 111.1 fps
+(target 60, floor 45), 0.8% long frames, pose loop 30 Hz (target >= 15),
+body-signal rate 30 Hz, producer confirmed switched to the lite model —
+roughly 2x headroom on every axis. Keyboard-only baseline re-measured
+118.1 fps (was 119 at P1 — body plumbing cost is noise). Vehicle roster
+verified offline: a spec seeds progression past both unlock gates and
+flies boat and carpet to the HUD with zero off-origin requests and no
+real console errors (plane covered since P1). In-game credit shipped:
+lobby corner pill -> original repo; attribution line leads with the
+approved permission credit. Provenance: upstream's own attribution
+credits Suno (music), ElevenLabs (SFX), Tripo3D (3D) — the flagged
+assets are AI-generated works commissioned by the author; ASSETS.md
+updated accordingly.
+
 ### Gate-2 blocker: NO-SIGNAL — topology fixed, verified (2026-07-07)
 Live gate attempt failed: tuner showed src NO-SIGNAL · 0Hz, all axes
 zero, while PosePuppet tracked correctly. Root cause (verified by

@@ -323,3 +323,26 @@ moderate lean) is the Full Assist turn cap working as designed at 0.95
 — left alone per his own "don't add behavior beyond the design" note.
 Specs pinned to pilot-lean where they test that mapping (the default
 changed under them).
+
+## 2026-07-07 — Flight P4: credit placement, companion mode, provenance find
+(1) In-game credit: upstream's jam-webring corner pill (vibejam.cc +
+player-name query params) is repurposed as the TinySkies credit link —
+same visual chrome, now pointing at the original repo with the approved
+line as aria-label; the lobby attribution paragraph now leads with
+"TinySkies / GlobeFly by Danny Limanseta is used with permission". The
+jam portal was upstream-event chrome, not game content — replacing it
+also removes the last external URL with query-param outflow. (2) Asset
+provenance largely resolved by upstream's own attribution line: music by
+Suno, SFX by ElevenLabs, 3D by Tripo3D — AI-generated works commissioned
+by the author, i.e. rights he controls under the grant; ASSETS.md updated
+(Lekan still confirms commercial-output tiers before going public). (3)
+Fly entry: rail card + palette command share one startFlight() path —
+opens same-origin /flight/, relays signals, and drops PosePuppet into
+companion mode (lite pose model + stage.setSuspended(true)), restored by
+a 1 s window-closed poll. (4) Measured (eval/flight-perf.json): combined
+two-window session 111.1 fps flight render (floor 45, target 60), pose
+30 Hz (target ≥15), signal rate 30 Hz, producer confirmed on lite —
+headroom is ~2× the target. (5) Faithful-experience sweep: boat + carpet
+unlock and fly offline (spec seeds progression past both gates); the
+rest of the upstream feature set is exercised passively by the offline
+suite's zero-console-error assertions.

@@ -1,7 +1,7 @@
-## 2026-07-07 (GATE 2 APPROVED — Superman default; five feel refinements landed)
-Gate: Lekan flew all three profiles, full lap, dropout recovery, T-pose recenter; report: fun, responsive, no drift/fatigue/nausea. Default standing = SUPERMAN, seated = HEAD PILOT
-Tuning landed: head-pilot climbGain 3.0 (gentle backward lean climbs); superman disarm decays via autopilot path + arming hysteresis (no lurch); autopilot tau 0.3s / re-entry slew 1.2 (smoother both ways); RECENTERED = high-contrast tuner banner 4s + in-game toast; superman turnGain 1.35; gains store v2
-Tests: specs pinned to pilot-lean where they test that mapping; full flight suite re-running with the tuning
-Blockers: none — Gate 2 signed off
-Next: P4 — faithful-experience sweep, in-game TinySkies credit, Fly-card polish, 60/45fps with pose >=15Hz measured
+## 2026-07-07 (BodyArcade Flight P4 — faithful experience complete, perf 2x target)
+Done: Fly card in PosePuppet rail (+palette) -> same-origin /flight/ w/ companion mode (lite model + suspended stage, auto-restore on window close); in-game TinySkies credit (corner pill -> repo, attribution line leads with the permission credit); boat+carpet fly offline (unlock-gate seeded spec); asset provenance resolved via upstream's own Suno/ElevenLabs/Tripo3D attribution
+Numbers: combined session 111.1 fps flight render + pose 30 Hz + signals 30 Hz (targets 60/45 + 15) — eval/flight-perf.json; keyboard baseline 118.1 fps (P1: 119, delta = noise)
+Tests: vehicles spec green 3.7m; both suites re-running for the commit
+Blockers: none
+Next: P5 ship — README/ARCHITECTURE/FUTURES/replay tolerance/results.json flight section -> GATE 3 final acceptance
 
