@@ -103,6 +103,13 @@ export class Plane {
   private elevateBlend = 0;
   private prevAltitude = ALTITUDE;
 
+  /**
+   * BodyArcade: continuous inputs from the body-input source. When null
+   * (keyboard/touch) the boolean paths below run exactly as upstream.
+   * speed: -1 (min) … +1 (max cruise); elevate: -1 (descend) … +1 (climb).
+   */
+  analog: { speed?: number; elevate?: number } | null = null;
+
   /** Damped sin — paintball hit rolls the mesh left/right briefly (visual only). */
   private paintballWobbleAmp = 0;
   private paintballWobblePhase = 0;
@@ -237,7 +244,17 @@ export class Plane {
         ((Math.PI * 2 * BOOST_BARREL_ROLL_TURNS) / Math.max(boostDur, 0.08)) * dt;
     } else {
       this.rollAngle = 0;
-      if (forward) {
+      if (this.analog?.speed != null) {
+        // Continuous throttle: target between MIN_SPEED and cruise max,
+        // approached with the same accel/brake rates the keys use.
+        const a = Math.max(-1, Math.min(1, this.analog.speed));
+        const target = MIN_SPEED + (effMaxSpeed - MIN_SPEED) * ((a + 1) / 2);
+        if (this.speed < target) {
+          this.speed = Math.min(target, this.speed + effAccel * dt);
+        } else {
+          this.speed = Math.max(target, this.speed - effBrakeDecel * dt);
+        }
+      } else if (forward) {
         if (this.speed < effMaxSpeed) {
           this.speed = Math.min(effMaxSpeed, this.speed + effAccel * dt);
         } else {
@@ -263,7 +280,14 @@ export class Plane {
     this.heading += this.turnInputSmoothed * dt;
     this.heading = ((this.heading % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
 
-    const elevateTarget = elevate ? 1 : descend ? -1 : 0;
+    const elevateTarget =
+      this.analog?.elevate != null
+        ? Math.max(-1, Math.min(1, this.analog.elevate))
+        : elevate
+          ? 1
+          : descend
+            ? -1
+            : 0;
     this.elevateBlend += (elevateTarget - this.elevateBlend) * (1 - Math.exp(-ELEVATE_INPUT_SMOOTH * dt));
 
     const up = tangentFrame(this.qPosition).up;

@@ -12,7 +12,10 @@
     "noEmit": true,
     "jsx": "preserve",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "paths": {
+      "@bodyarcade/body-input": ["../../../packages/body-input/src/index.ts"]
+    }
   },
-  "include": ["src", "../shared"]
+  "include": ["src", "../shared", "../../../packages/body-input/src"]
 }

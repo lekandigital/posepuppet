@@ -11,6 +11,14 @@ export interface ControlState {
   /** One-shot: vehicle special — carpet portal placement (Space); consumed each frame read. */
   specialAction: boolean;
   interact: boolean;
+  /**
+   * BodyArcade analog extensions. Keyboard/touch leave these undefined and
+   * behave exactly as upstream; the body-input source fills them.
+   * speedAxis: -1 (brake to min) … +1 (full cruise). elevateAxis: -1
+   * (descend) … +1 (climb) — continuous version of elevate/descend.
+   */
+  speedAxis?: number;
+  elevateAxis?: number;
 }
 
 export class FlightControls {
