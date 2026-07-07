@@ -54,3 +54,24 @@ lands in downloads.
 
 After each export the coach offers "Copy caption" — an honest, locally
 assembled line. Edit to taste; numbers only from eval/results.json.
+
+---
+
+## Flight money shot (BodyArcade Flight)
+
+One take, ~25 s, two windows side-by-side (PosePuppet left, game right):
+
+1. Stand neutral — plane cruises straight. Say nothing; let the tuner's
+   `src OK · bc v1 · 30Hz` line read on camera. (3 s)
+2. Superman: arms out — lean hard right into a banking turn around the
+   volcano. (6 s)
+3. Both hands forward — boost barrel roll. (3 s)
+4. Walk OUT of frame mid-turn — the plane levels itself (autopilot); walk
+   back in — control blends back, no snap. This is the shot that sells
+   the safety story. (8 s)
+5. T-pose — the "Recentered" toast pops — drop arms, plane stabilizes,
+   end on the glide. (5 s)
+
+Vertical variant: game full-frame, PosePuppet camera panel as a corner
+inset. Caption numbers only from eval/flight-perf.json /
+eval/flight-results.json.

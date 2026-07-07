@@ -27,14 +27,50 @@ npm run dev   # → http://localhost:5173, allow camera
 
 Press `⌘K` for the command palette. First run shows a short onboarding.
 
+## BodyArcade Flight — your body flies a plane
+
+[TinySkies / GlobeFly](https://github.com/dannylimanseta/tinyskies) by
+**Danny Limanseta** is used with permission as the foundation of Flight
+mode: a whimsical globe-flight game (plane, boat, magic carpet, landmarks,
+quests), forked faithfully into `apps/flight` and adapted to run fully
+offline with the body as a first-class input source alongside the
+keyboard.
+
+```sh
+cd apps/flight && npm install && cd ../..   # once
+npm run arcade   # builds the game + starts everything on :5173
+```
+
+Open PosePuppet, let it track you, then click the **Fly** card (or
+`⌘K → fly`). The game opens at `/flight/` with your body streaming in —
+lean to bank, and in the default **Superman** profile: arms out to fly,
+arms high to climb, both hands forward to dive/boost, drop your arms to
+stabilize. **Head Pilot** flies seated. Keyboard always wins the moment
+you touch it; a T-pose recaptures your neutral. Press `B` in the game for
+the control tuner (profiles, assist levels, live signal chain). Tracking
+loss auto-levels the plane and control blends back smoothly.
+
+Everything stays local: no server, no analytics, zero network requests —
+the flight suite literally asserts it. Derived control signals are the
+only thing that crosses from PosePuppet to the game; landmarks never
+leave the tracker (`packages/body-input` enforces the boundary at
+runtime). Measured on this machine: 111 fps game render with the pose
+loop at 30 Hz (`eval/flight-perf.json`); intent-tape replay reproduces
+the flight path to 2.6e-6 world units (`eval/flight-results.json`).
+Architecture in `ARCHITECTURE.md`; asset manifest in `ASSETS.md`.
+
 ## What it does
 
 - **Character mode** — the avatar mirrors your upper body (full body with
   legs and feet when you stand back and enable it). Improved wrists and
   palms; open/fist/point read on rigs with fingers; believable
   face-touch via proximity-magnetized IK that never puts a hand through
-  the skull; occlusion recovery that coasts, relaxes, and blends back in
-  ~0.5 s without ever snapping.
+  the skull; occlusion handled by **Predictive Pose Continuity** — a
+  short constrained prediction (≤ 400 ms) with visibly decaying
+  confidence, then relax-to-rest, with re-entry always blended, never
+  snapped. It is NOT invisible-limb tracking: past ~⅓ s the system
+  honestly gives up (docs/PPC.md states the limits; the masked-fixture
+  eval publishes prediction error next to the legacy hold).
 - **Hand-only mode** — one hand, 21-landmark finger tracking, its own
   violet stage. Roster: an expressive robot-glove hand, **beaky** (a
   talking bird — palm aims the head, thumb–index pinch is the jaw; talk
@@ -79,7 +115,7 @@ ASSETS.md).
 
 1. `getUserMedia` → `<video>`; `requestVideoFrameCallback` drives detection once per video frame.
 2. MediaPipe PoseLandmarker (GPU delegate, WASM fallback) returns 33 normalized + 33 metric world landmarks; HandLandmarker returns 21 in hand-only mode.
-3. Landmarks are mirrored in landmark space, then smoothed by a One Euro bank tuned for metric space.
+3. Landmarks are mirrored, run through Predictive Pose Continuity (per-limb VISIBLE→PREDICTED→RELAXED state machines: regression velocity under bone-length/drift constraints, decaying confidence, blended re-entry — every consumer inherits it), then smoothed by a One Euro bank tuned for metric space.
 4. A body frame (hips/shoulders, with a shoulders-only fallback) gives torso orientation; limb directions are expressed in that frame so torso turns don't corrupt arms.
 5. Per bone: quaternion from rest direction → target direction, converted to parent-local space, exaggeration applied to the swing, clamped by per-bone limits.
 6. Face-touch: wrist-near-head proximity magnetizes the arm onto a two-bone IK whose target sits just outside a per-avatar head collider measured from real geometry.
@@ -130,6 +166,11 @@ eval caught it at 53 penetration frames; now 5).
   far from its shoulders; labeled, not hidden.
 - Full-body loops replay wherever the recording had leg tracking;
   desk-framed recordings replay upper-body only.
+- Occlusion prediction is short and honest: it helps deliberate motion
+  (~6–19 % lower error than holding, measured), converges to
+  hold-quality on fast reversing motion (punches defeat extrapolation),
+  and legs hand straight back to the relax behavior (stride reversals
+  defeat it too). Nothing here claims occlusion-proof tracking.
 
 ## Deliberately skipped
 

@@ -9,6 +9,7 @@ export interface Config {
   handPuppet: 'hand' | 'beaky' | 'xray';
   mirror: boolean;
   smoothing: boolean;
+  ppc: boolean; // Predictive Pose Continuity (short-horizon occlusion prediction)
   minCutoff: number;
   beta: number;
   slerpRate: number; // 1/s — render-tick slerp toward bone targets
@@ -37,6 +38,7 @@ const DEFAULTS: Config = {
   handPuppet: 'beaky',
   mirror: true,
   smoothing: true,
+  ppc: true,
   minCutoff: 1.2,
   beta: 8,
   slerpRate: 28,

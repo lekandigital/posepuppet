@@ -199,6 +199,9 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
           handPoint: quantize(shaped.handPoint),
         },
         events,
+        // per-limb continuity states pass straight through when the host
+        // tracking layer provides them (additive, optional)
+        ...(frame.tracking ? { tracking: frame.tracking } : {}),
       };
     },
 

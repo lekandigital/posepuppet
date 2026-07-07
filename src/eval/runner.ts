@@ -9,6 +9,8 @@ import type { Avatar } from '../rig/types';
 import type { PoseDetector } from '../pose/detector';
 import type { LandmarkPoint } from '../pose/types';
 import { sampleLimbAngles, SyncAccumulator, type LimbName } from './sync';
+import { PPC_GROUP_OF, type PpcGroupInfo } from '../pose/continuity';
+import { LM } from '../pose/indices';
 
 export interface EvalResult {
   fixture: string;
@@ -36,6 +38,30 @@ export interface EvalResult {
     reachRate: number;
     penetrationRate: number;
   };
+  /** Predictive Pose Continuity masked-run metrics. posErr compares the
+   *  PPC output against same-frame ground truth during PREDICTED, next to
+   *  the legacy comparator (hold-last-visible), in meters. Present only
+   *  when a ?mask= spec was active; posErr only when PPC was enabled. */
+  ppc?: {
+    enabled: boolean;
+    mask: string;
+    maskedFrames: number;
+    predictedSamples: number;
+    posErr?: {
+      ppcMean: number;
+      ppcP95: number;
+      holdMean: number;
+      holdP95: number;
+    };
+    /** diagnostics: error split by limb kind and by prediction age */
+    posErrBreakdown?: Record<string, { ppc: number; hold: number; n: number }>;
+    reentryMaxDelta: number;
+    horizonMaxMs: number;
+    nanCount: number;
+    /** sync vs the truth stream over MASKED frames only — the end-to-end
+     *  "did the puppet keep matching the person while blind" number */
+    syncMasked: Partial<Record<LimbName | 'upperLimbsMean' | 'legsMean', number>>;
+  };
   finishedAt: string;
 }
 
@@ -58,6 +84,14 @@ interface Deps {
   getDetectionFps?: () => number;
 }
 
+/** During whole-frame dropouts, error is measured on this key subset so
+ *  eleven face landmarks don't drown the limbs. */
+const PPC_KEY_LMS: number[] = [
+  LM.nose, LM.leftShoulder, LM.rightShoulder, LM.leftElbow, LM.rightElbow,
+  LM.leftWrist, LM.rightWrist, LM.leftHip, LM.rightHip,
+  LM.leftKnee, LM.rightKnee, LM.leftAnkle, LM.rightAnkle,
+];
+
 export class EvalCollector {
   private videoFrames = 0;
   private detectedFrames = 0;
@@ -75,11 +109,119 @@ export class EvalCollector {
   private pjPinch: number[] = [];
   private pjJaw: number[] = [];
 
+  // --- PPC masked-run state ---
+  private ppcMask: string | null = null;
+  private ppcEnabled = false;
+  private ppcSyncMasked = new SyncAccumulator();
+  private ppcMaskedFrames = 0;
+  private ppcErrs: number[] = [];
+  private ppcHoldErrs: number[] = [];
+  /** parallel tags: `${kind}` and `${ageBucket}` per sample */
+  private ppcTags: string[] = [];
+  private ppcReentryMax = 0;
+  private ppcHorizonMax = 0;
+  private ppcNaN = 0;
+  /** last truth position per landmark while unmasked (the legacy hold) */
+  private ppcHold: Float64Array | null = null;
+  /** previous PPC output per landmark, for re-entry step measurement */
+  private ppcPrev: Float64Array | null = null;
+  private ppcPrevSet: boolean[] = [];
+
   constructor(
     private fixture: string,
     private durationSec: number,
     private deps: Deps,
   ) {}
+
+  /** Masked-run frames: same-frame ground truth vs the PPC output.
+   *  truthWorld = pre-mask mirrored world; contWorld = what the pipeline
+   *  actually consumed (null once PPC faded or when PPC is off during a
+   *  whole-frame dropout). */
+  onPpcFrame(
+    mask: string,
+    enabled: boolean,
+    truthWorld: LandmarkPoint[],
+    truthNorm: LandmarkPoint[],
+    contWorld: LandmarkPoint[] | null,
+    masked: number[],
+    dropped: boolean,
+    states: readonly PpcGroupInfo[],
+  ): void {
+    if (this.done || this.startTime === 0) return;
+    this.ppcMask = mask;
+    this.ppcEnabled = enabled;
+
+    // masked-frames-only sync vs truth: the whole-run mean dilutes ~10%
+    // masked frames beyond visibility — this is the during-blackout number
+    if (masked.length > 0) {
+      const { stage, video, getAvatar } = this.deps;
+      const aspect = stage.canvas.clientWidth / Math.max(1, stage.canvas.clientHeight);
+      this.ppcSyncMasked.add(
+        sampleLimbAngles(truthNorm, video.videoWidth, video.videoHeight, getAvatar(), stage.camera, aspect),
+      );
+    }
+    if (!this.ppcHold) {
+      this.ppcHold = new Float64Array(33 * 3);
+      this.ppcPrev = new Float64Array(33 * 3);
+      this.ppcPrevSet = Array.from({ length: 33 }, () => false);
+    }
+    if (masked.length > 0) this.ppcMaskedFrames++;
+
+    const stateOf = new Map<string, PpcGroupInfo>();
+    for (const s of states) stateOf.set(s.name, s);
+    for (const s of states) {
+      if (s.state === 'PREDICTED') this.ppcHorizonMax = Math.max(this.ppcHorizonMax, s.ageMs);
+    }
+
+    const maskedSet = new Set(masked);
+    for (let i = 0; i < 33; i++) {
+      const t = truthWorld[i];
+      // legacy hold reference: freeze at the last unmasked frame
+      if (!maskedSet.has(i)) {
+        this.ppcHold[i * 3] = t.x;
+        this.ppcHold[i * 3 + 1] = t.y;
+        this.ppcHold[i * 3 + 2] = t.z;
+      }
+      const group = PPC_GROUP_OF[i];
+      const g = group ? stateOf.get(group) : undefined;
+      const o = contWorld?.[i];
+
+      if (o && !(Number.isFinite(o.x) && Number.isFinite(o.y) && Number.isFinite(o.z))) {
+        this.ppcNaN++;
+        continue;
+      }
+
+      // position error during PREDICTED only (the metric's definition);
+      // whole-frame dropouts sample the key subset
+      if (
+        enabled && o && g?.state === 'PREDICTED' && maskedSet.has(i) &&
+        (!dropped || PPC_KEY_LMS.includes(i))
+      ) {
+        this.ppcErrs.push(Math.hypot(o.x - t.x, o.y - t.y, o.z - t.z));
+        this.ppcHoldErrs.push(
+          Math.hypot(this.ppcHold[i * 3] - t.x, this.ppcHold[i * 3 + 1] - t.y, this.ppcHold[i * 3 + 2] - t.z),
+        );
+        const kind = group === 'torso' || group === 'head' ? 'core' : group!.endsWith('Leg') ? 'leg' : 'arm';
+        this.ppcTags.push(`${kind}|${g.ageMs < 150 ? 'early' : 'late'}`);
+      }
+
+      // re-entry no-snap: max per-frame output step while the group blends
+      if (o && this.ppcPrev) {
+        if (g?.blending && this.ppcPrevSet[i]) {
+          this.ppcReentryMax = Math.max(
+            this.ppcReentryMax,
+            Math.hypot(o.x - this.ppcPrev[i * 3], o.y - this.ppcPrev[i * 3 + 1], o.z - this.ppcPrev[i * 3 + 2]),
+          );
+        }
+        this.ppcPrev[i * 3] = o.x;
+        this.ppcPrev[i * 3 + 1] = o.y;
+        this.ppcPrev[i * 3 + 2] = o.z;
+        this.ppcPrevSet[i] = true;
+      } else {
+        this.ppcPrevSet[i] = false;
+      }
+    }
+  }
 
   start(): void {
     this.startTime = performance.now();
@@ -202,6 +344,59 @@ export class EvalCollector {
           }
         : undefined;
 
+    let ppc: EvalResult['ppc'];
+    if (this.ppcMask) {
+      const p95 = (xs: number[]): number => {
+        if (!xs.length) return 0;
+        const s = [...xs].sort((a, b) => a - b);
+        return s[Math.min(s.length - 1, Math.floor(s.length * 0.95))];
+      };
+      const mean = (xs: number[]): number =>
+        xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
+      const r4 = (v: number) => Math.round(v * 10000) / 10000;
+      ppc = {
+        enabled: this.ppcEnabled,
+        mask: this.ppcMask,
+        maskedFrames: this.ppcMaskedFrames,
+        predictedSamples: this.ppcErrs.length,
+        posErr: this.ppcErrs.length
+          ? {
+              ppcMean: r4(mean(this.ppcErrs)),
+              ppcP95: r4(p95(this.ppcErrs)),
+              holdMean: r4(mean(this.ppcHoldErrs)),
+              holdP95: r4(p95(this.ppcHoldErrs)),
+            }
+          : undefined,
+        posErrBreakdown: this.ppcErrs.length
+          ? (() => {
+              const acc = new Map<string, { p: number; h: number; n: number }>();
+              for (let i = 0; i < this.ppcErrs.length; i++) {
+                for (const tag of this.ppcTags[i].split('|')) {
+                  const a = acc.get(tag) ?? { p: 0, h: 0, n: 0 };
+                  a.p += this.ppcErrs[i];
+                  a.h += this.ppcHoldErrs[i];
+                  a.n++;
+                  acc.set(tag, a);
+                }
+              }
+              const out: Record<string, { ppc: number; hold: number; n: number }> = {};
+              for (const [k, a] of acc) out[k] = { ppc: r4(a.p / a.n), hold: r4(a.h / a.n), n: a.n };
+              return out;
+            })()
+          : undefined,
+        reentryMaxDelta: r4(this.ppcReentryMax),
+        horizonMaxMs: Math.round(this.ppcHorizonMax),
+        nanCount: this.ppcNaN,
+        syncMasked: (() => {
+          const out: NonNullable<EvalResult['ppc']>['syncMasked'] = {};
+          for (const [k, v] of Object.entries(this.ppcSyncMasked.means())) {
+            out[k as LimbName] = Math.round((v as number) * 100) / 100;
+          }
+          return out;
+        })(),
+      };
+    }
+
     const result: EvalResult = {
       fixture: this.fixture,
       avatar: this.deps.getAvatar().name, // actual, not requested
@@ -217,6 +412,7 @@ export class EvalCollector {
       sync,
       pinchJaw,
       faceTouch,
+      ppc,
       finishedAt: new Date().toISOString(),
     };
     window.__EVAL_RESULT = result;

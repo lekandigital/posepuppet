@@ -204,6 +204,30 @@ test('privacy boundary: every emitted message is exactly schema-shaped', () => {
   expect(() => assertSignalShape({ ...good, axes: { ...good.axes, leanX: NaN } })).toThrow();
 });
 
+test('tracking block (PPC): optional, validated, canonical, passed through', () => {
+  const tracking = {
+    torso: 'visible', head: 'visible', leftArm: 'predicted',
+    rightArm: 'visible', leftLeg: 'relaxed', rightLeg: 'visible',
+  } as const;
+  // absent stays valid (old signals/tapes), present validates + serializes
+  const good = last(run(neutralLeadIn()));
+  assertSignalShape(good);
+  assertSignalShape({ ...good, tracking });
+  expect(canonicalStreamJSON([{ ...good, tracking }])).toContain('"leftArm":"predicted"');
+  // closed sub-shape: wrong keys and wrong states both rejected
+  expect(() => assertSignalShape({ ...good, tracking: { ...tracking, extra: 'visible' } })).toThrow(/tracking/);
+  expect(() => assertSignalShape({ ...good, tracking: { ...tracking, torso: 'faked' } })).toThrow(/tracking/);
+  const { leftLeg: _omit, ...missing } = tracking;
+  expect(() => assertSignalShape({ ...good, tracking: missing })).toThrow(/tracking/);
+
+  // pipeline pass-through: a frame carrying tracking emits it verbatim
+  const core = createBodyInputCore();
+  let sig = null;
+  for (const f of neutralLeadIn()) sig = core.push({ ...f, tracking });
+  expect(sig.tracking).toEqual(tracking);
+  assertSignalShape(sig);
+});
+
 test('sign conventions: lean right → +leanX, lean forward → +leanY', () => {
   const right = last(run(after(neutralLeadIn(), (t) => seq(t, 40, { leanDeg: 12 }))));
   expect(right.axes.leanX).toBeGreaterThan(0.4);

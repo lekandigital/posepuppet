@@ -1,221 +1,245 @@
-# PLAN.md — Pass 2: The Instrument Pass
+# PLAN.md — Predictive Pose Continuity (PPC)
 
-Status: **USER GATE 1 APPROVED 2026-06-12** (in-session structured reply),
-after both USER ACTION items resolved and re-verified. Approved: this plan;
-electives = Tier B1 (velocity VFX) + B2 (auto-director camera), all else
-skipped; R1 = woody demoted to local-only, astronaut returns as default.
-Work proceeds on branch `pass-2-instrument`.
+Status: **COMPLETE — Gate 1 approved in-session; Gate 2 (live occlusion
+test) approved 2026-07-07 after one fix round** (first live test failed
+on full-dropout torso bend/spin and behind-torso punch glitch; fixed by
+rigid core prediction + the chain-length physics gate, focused retest
+passed — see EVAL_NOTES and DECISIONS). Thresholds below are as
+approved; measured revisions (core horizon 250→150 ms for the Flight
+contract, legs visTrust 0.25, velocity-trust stack) are documented in
+DECISIONS.md with their measurements.
+Branch `predictive-pose-continuity-fable`. The BodyArcade Flight plan
+(accepted 2026-07-07) lives in git history at this path.
 
----
+Scope guard, restated from the brief: this pass lives at the PosePuppet
+tracking layer. No per-game prediction, no Flight control-mapping or
+feel changes, no ML, no long-horizon prediction, no claim of
+occlusion-proof tracking anywhere. PPC is explicitly NOT invisible-limb
+tracking and the docs will say so.
 
-## 1. My reading of the codebase
+## 0. What the P0 audit found
 
-~3,000 lines of vanilla TypeScript + three.js + MediaPipe, no framework in
-the hot path. The architecture is in good shape for this pass — nothing
-needs a rewrite, and every pass-2 feature has a natural attachment point:
+### Baselines (regression gates)
 
-- **Pipeline** (`main.ts`): camera/video → PoseLandmarker (33 landmarks,
-  30/s) → mirror → One Euro smoothing → `Retargeter` → render tick. UI is
-  plain DOM. This boot function is the one file that has grown organically
-  (684 lines, visual-QA hooks inlined) and wants decomposition during P1 —
-  decompose, not rewrite.
-- **Retargeting** (`rig/retarget.ts`): two-stage smoothing (pose frames
-  write local-space target quaternions; render ticks slerp toward them),
-  body-frame-relative limb directions, visibility hysteresis with
-  decay-to-rest, calibration persisted to localStorage. The expressiveness
-  layer (exaggeration, secondary motion, occlusion polish) slots in here
-  cleanly: exaggeration scales the rest→target swing before composition;
-  occlusion recovery upgrades the existing decay path (add velocity decay +
-  re-acquisition blend); springs hang off `Avatar.update(dt, time)`.
-- **Avatar abstraction** (`rig/types.ts`): `bones` + `joints` + `update()`
-  behind one interface; robot (procedural) and VRMs load through the same
-  registry. Hand-only creatures fit this interface (different bone set,
-  same contract). Motion Memory can serialize/replay at exactly this
-  boundary — record the per-bone target quaternions the Retargeter writes.
-- **Eval rig** (`eval/`, `tests/`): fixtures → y4m → Chrome fake webcam;
-  in-page collector publishes `window.__EVAL_RESULT`; screen-space limb
-  sync metric. Extending it with pinch→jaw correlation, face-touch reach,
-  occlusion recovery, and Motion Memory round-trip checks is mechanical.
-- **Tests**: 42 Playwright tests in 7 files. Found red at P0: the five
-  generated-avatar load smokes hard-required local-only gitignored VRMs
-  that are no longer on disk. Fixed (skip when the candidate file is
-  absent); suite is now 37 passed / 5 skipped, green.
-- **Post-pass-1 drift**: a generated-avatar audit workstream added a
-  test-only `?generatedAvatar=` path, visual-QA hooks, and committed
-  `woody.vrm` + `Seed-san.vrm`, with woody now the **default avatar**. See
-  risk R1.
+- PosePuppet suite: **73 passed / 5 skipped** — matches the stated
+  baseline (3.5 m, this machine, 2026-07-07).
+- Flight suite, first run: **16 passed / 1 failed / 2 skipped** — the
+  failure was `feel.spec.ts › superman arms: arms down stabilizes, arms
+  out flies`, on a tree with zero changes. Rerun in isolation: **passed
+  (19.6 s)**. This matches the suite-order/contention flake already
+  documented in EVAL_NOTES.md ("passed alone and in the next two full
+  runs; watching it"). Full-suite rerun result recorded below. Treated
+  as flake, not regression — but it will be watched at every later
+  phase, and any repeat gets investigated as a regression, never fixed
+  by retuning Flight.
+- Flight suite, full rerun: **17 passed / 2 skipped** (11.4 m) — clean
+  baseline reproduced.
+- Fully-visible sync/perf baseline: eval/results.json (2026-07-02
+  refresh, headed, Apple M5): upperLimbsMean per fixture×avatar ranges
+  2.2°–23.4° (fast is the honest worst case); detectionRate 1.0
+  everywhere; pose ~29–30 fps, render ~116–123 fps. That table is the
+  non-regression reference (§3).
 
-## 2. P0 baseline (this machine, Apple M5, headed, GPU delegate)
+### The current occlusion path ("legacy hold/decay"), precisely
 
-Archived pass-1 final numbers to `eval/results-pass1-final.json`.
-Fresh baseline (60 s × 3 fixtures × robot/astronaut/woody) — the floor every
-later phase diffs against:
+There is no landmark-level continuity today. Three layers each cope
+separately:
 
-Run: 2026-06-12T06:34:56Z — Apple M5, headed, 60 s per fixture, GPU delegate.
+1. **Landmark smoothing** (`src/pose/smoothing.ts`): One Euro per axis
+   + visibility EMA (0.7/0.3). During occlusion MediaPipe still emits
+   low-visibility garbage positions; the filter keeps filtering them;
+   consumers are expected to gate on visibility.
+2. **Retargeter** (`src/rig/retarget.ts`): per-bone visibility
+   hysteresis (VIS_ON 0.55 / VIS_OFF 0.45) → `confident` flag. On loss:
+   angular-velocity coast (τ 0.25 s) → relax-to-rest (τ 0.7 s,
+   `config.relaxSec`) → idle micro-sway after 1.5 s; 120° joint limit.
+   On re-acquisition: smoothstep blend from the held pose over
+   `clamp(0.8 × lostSec, 0.08 s, 0.5 s)`, half-rate slerp while
+   settling. Bone/rotation space only — positions are never predicted,
+   and body-input never benefits (it runs on raw landmarks).
+3. **body-input** (`packages/body-input`): receives the
+   **pre-smoothing** mirrored landmarks (`main.ts` `onPoseFrame`), runs
+   its own filter bank. Axes go null below `visGate` → shaper decays to
+   neutral. Confidence = 0.6·shoulders + 0.2·hips + 0.2·nose
+   visibility; EMA τ 150 ms up, exponential decay τ 300 ms on dropout.
+4. **Flight** (`apps/flight … bodyControls.ts`, Gate-3-frozen): body
+   source counts as lost below confidence 0.35 or signal older than
+   350 ms → autopilot decays intent to neutral (τ 0.25 s); re-entry
+   slew-bounded at 2.0 intent/s. **This contract is consumed, not
+   touched.**
 
-| fixture | avatar | detection | pose fps | render fps | upper-limb sync (°) | torso (°) | mem t0→t60 (MB) | console errors |
-|---|---|---|---|---|---|---|---|---|
-| arms | robot | 100% | 29.60 | 117.79 | 9.49 | 0.69 | 29→30 | 0 |
-| torso | robot | 100% | 29.71 | 117.06 | 2.24 | 1.44 | 29→29 | 0 |
-| fast | robot | 100% | 29.78 | 117.93 | 18.87 | 2.35 | 29→26 | 0 |
-| arms | vrm:astronaut | 100% | 29.73 | 118.11 | 10.92 | 0.49 | 33→27 | 0 |
-| torso | vrm:astronaut | 100% | 29.71 | 117.70 | 2.29 | 1.73 | 33→25 | 0 |
-| fast | vrm:astronaut | 100% | 28.46 | 114.17 | 20.38 | 2.37 | 33→26 | 0 |
-| arms | vrm:woody | 100% | 29.65 | 117.18 | 9.02 | 0.54 | 34→30 | 0 |
-| torso | vrm:woody | 100% | 29.64 | 117.92 | 2.14 | 2.66 | 34→32 | 0 |
-| fast | vrm:woody | 100% | 29.76 | 118.15 | 17.88 | 3.26 | 34→34 | 0 |
+### The insertion point
 
-**Floors this pass defends:** pose ≥ ~29.5 fps (clip-capped at 30), render
-≥ ~115 fps on this machine, detection 100%, zero console errors, memory
-flat over 60 s. Sync bars from pass 1 (arms/torso ≤15°, fast ≤25°) all
-hold, now on three avatars.
+`main.ts` `onPoseFrame` is a single fork: mirrored landmarks go to (a)
+smoother → retargeter, (b) body-input adapter, (c) eval collector. PPC
+inserts **at that fork, after mirroring, before everything** — one
+continuity stage whose output every consumer inherits (puppeteering AND
+body-input, as the brief requires). Timestamps: frame time already
+flows through here, and the retargeter already learned the hard way
+(Motion Memory round-trip) to use frame-consistent clocks — PPC uses
+frame timestamps only, no wall clocks, no randomness → determinism is
+testable.
 
+Key structural guarantee: **PPC is an exact pass-through for landmarks
+above the visibility gate.** It only writes positions/visibility during
+PREDICTED / RELAXED / re-entry. Fully-visible non-regression is then
+structural; the eval tolerance in §3 is belt-and-braces.
 
-Suite: green (37 passed, 5 skipped — skips are local-only generated-VRM
-candidates, intentionally absent). Zero console errors in eval runs.
+## 1. Design (P1–P2)
 
-**P0 honesty fix found by the first baseline attempt:** the first 9-run
-baseline produced three rows whose avatar label contradicted the requested
-avatar — two "woody" runs carried robot-identical sync numbers, i.e. the
-VRM load had silently failed and `setAvatar`'s catch quietly reverted to
-the robot with only a `console.warn`, which eval doesn't count. All VRMs
-also shared the indistinct name `vrm`. Fixed before re-baselining: VRM
-avatars are now named per file (`vrm:woody`), a failed avatar load is a
-`console.error` (so eval rows can never again pass while measuring the
-fallback), and `eval/run.mjs` records `avatarRequested` and exits non-zero
-on any requested/measured mismatch. The table above is from the guarded
-re-run.
+New `src/pose/continuity.ts` (~350 lines + node unit tests), named in
+code and docs: **Predictive Pose Continuity**.
 
-## 3. USER ACTION — missing inputs (blocking parts of P2–P3)
+- **Ring buffer**: last 16 frames of (t, x, y, z, visibility) per
+  landmark, world + norm streams (one shared state machine; world
+  drives states, norm gets the same-state 2D treatment so eval and
+  root motion stay consistent).
+- **Velocity**: least-squares linear regression over the last 5
+  visible frames (~165 ms @ 30 fps) — noise-robust, no ML.
+- **Per-limb state machine** (groups: leftArm, rightArm, leftLeg,
+  rightLeg, head, torso — driven by their landmarks' smoothed
+  visibility with the existing 0.55/0.45 hysteresis):
+  - `VISIBLE → PREDICTED`: visibility < 0.45 (or full-frame dropout).
+  - `PREDICTED`: position advances on the regressed velocity with
+    exponential damping (τ 180 ms), under constraints: bone-length
+    projection onto the parent landmark (median segment length from
+    the buffer, ±10%), per-frame displacement cap (§2), and a
+    rest-pose bias whose weight grows with age² (0 at entry → 0.3 at
+    horizon). "Gravity" ships only as this rest bias — honest, cheap.
+  - `PREDICTED → RELAXED`: age > horizon (§2). Position eases toward
+    the rest-posture estimate; confidence continues to 0.
+  - `→ VISIBLE` (from either): re-entry blend — measured data ramps in
+    over §2's window with a max per-frame correction. Never snaps.
+- **Confidence output** (written into the visibility field downstream
+  consumers already read): `vis_out = vis_enter × ageDecay ×
+  agreement`, where ageDecay is linear 1.0 → 0.35 across the horizon
+  and agreement ∈ [0.6, 1.0] penalizes prediction that violates
+  bone-length against visible neighbors. Consequence: the retargeter's
+  own VIS_OFF gate hands bones from prediction to the existing relax at
+  ~⅘ of the horizon — the layers compose instead of double-predicting;
+  games see honestly decaying confidence and decide their own
+  autopilot.
+- **Engineering view**: per-limb state chip (state, age ms, conf) in
+  the existing mono engineering surface.
+- Deliberately NOT: visibility ever above the input's, prediction past
+  the horizon, per-game behavior, any learned model.
 
-**a) ~~`design/reference.css` is missing.~~ RESOLVED during P0** — the file
-appeared in the repo (1,013 lines, the grammar exactly as CLAUDE.md
-describes) and is read and committed. One P1 note from it: the reference
-imports Google Fonts; PosePuppet self-hosts or system-stacks its fonts so
-the "0 network requests" receipt stays literally true.
+## 2. Proposed numeric thresholds (Gate-1 approval items)
 
-**b) ~~The four new fixture clips are missing.~~ RESOLVED 2026-06-12** —
-all four arrived as 1620×1080@30 H.264 (.mov, remuxed to .mp4), converted
-to y4m through `npm run prepare-fixtures`. Content verified against spec by
-frame inspection. 30 s detection-sanity eval (robot, headed, archived at
-`eval/results-newfixtures-sanity.json`): facetouch detection 100% /
-upperLimbs 4.98°, fullbody 100% / 6.71° — both fully usable. The hand
-clips stream at full rate; their pose-detection numbers (71–81%, sync
-49–66°) are BlazePose hallucinating a body from a hand and are expected —
-P3 consumes these clips via HandLandmarker, not PoseLandmarker.
-
-Original recording specs kept below for reference: `fixtures/` has only the
-pass-1 clips (arms, torso, fast, fast2). Please record and drop these as
-`.mp4` into `fixtures/` (any orientation, ≥720p, ~10–20 s each — same as
-pass 1; `npm run prepare-fixtures` handles conversion; nothing is ever
-committed):
-
-| file | content spec |
-|---|---|
-| `hand_open_close.mp4` | One hand, palm facing camera, filling ~1/3–1/2 of frame, well lit. Slowly open the hand wide → close to a fist, ×4–5, varying speed. Keep the hand fully in frame. |
-| `hand_pinch_point.mp4` | Same framing. Repeatedly pinch thumb–index together and apart (×6–8, like a talking mouth, varied rhythm and amplitude) — this drives the jaw-correlation metric — then a few seconds of index-finger pointing in different directions. |
-| `facetouch.mp4` | Frame from hips up. Bring a hand slowly to your cheek, hold 1 s, away; then chin, forehead, mouth-cover. Both hands across the takes. Slow and deliberate beats fast. |
-| `fullbody.mp4` | Whole body in frame, head to feet, ~2–3 m back. March in place, shift weight side to side, one small squat, lift each foot, a small step left/right. ~20 s. |
-
-(Nothing is blocked anymore; the table above stays as the record of what
-was asked for.)
-
-## 4. Risks
-
-- **R1 — woody licensing (needs your call at this gate).** `woody.vrm` is
-  converted from a "Toy Story rig free download" fan model of a Disney/Pixar
-  character, is committed to the repo, ships on Vercel, and is the default
-  avatar. That conflicts with the non-negotiable "every asset
-  redistributable in a public repo" and with goal #10. The generated
-  candidates (Vader, Iron Man, Shrek…) are gitignored/test-only — fine —
-  but woody is in git history and in the public build. My proposal: demote
-  woody to local-only (gitignore again, registry entry marked Experimental
-  and auto-hidden when the file is absent), make the CC0 astronaut the
-  default, and note it in ASSETS.md. Your repo, your call — but I won't
-  build pass-2 marketing surfaces (cards, posters, POSTS.md) around an
-  asset we can't redistribute.
-- **R2 — hand tracking needs a second model.** Pose landmarks include only
-  wrist/index/pinky/thumb points — not enough for pinch distance or finger
-  state. P3 needs MediaPipe **HandLandmarker** (21 landmarks/hand). Same
-  family as the pose model we already ship (Google, Apache-2.0, fetched
-  postinstall, served same-origin, recorded in ASSETS.md). I treat
-  Gate-1 approval of this plan as approval for it. Honest scope call:
-  **true per-finger skeletal tracking on full-body avatars does not ship
-  this pass** — hand-only mode gets real finger data (it's the whole point
-  there); Character mode gets open/fist/point approximations driven by the
-  hand model when a hand is near-camera, falling back to pose-only wrist
-  quality. Running two models costs pose-loop budget; the auto-tuner and
-  a "hands boost when hand fills frame" gate manage it (measured at P3).
-- **R3 — backdrop blur over live video.** Real `backdrop-filter` over the
-  camera/stage panes can eat the render-FPS floor. Mitigation is in the
-  brief: true blur only on static chrome; gradient/opacity fakes over live
-  regions. Contrast-checked both ways.
-- **R4 — face-touch believability.** Pure retargeting won't read. Plan:
-  proximity-triggered magnetism — when the wrist lands within a threshold
-  of the head, blend in a light 2-bone IK toward a per-avatar contact
-  anchor (cheek/chin/forehead), ease in/out, hard "never penetrate the head
-  collider" clamp. Per-avatar reach normalization from bind-pose arm
-  length. Avatars whose proportions can't reach become a capability label.
-- **R5 — Motion Memory tolerance.** Replay-on-second-avatar can't be
-  bit-exact (different rigs). Tolerance is defined on the recorded bone
-  stream (quaternion angle error vs source stream on the same avatar,
-  plus joint-name coverage on the re-skin target), not on pixels.
-- **R6 — main.ts decomposition risk.** Pulling the boot function apart
-  while keeping eval + tests green is the riskiest refactor; it happens
-  early in P1 in small commits, suite at every step.
-
-## 5. Phases, attachment points, and effort
-
-(Estimates are wall-clock working time on this machine, suite-green commits
-included. Total ≈ 31–44 h.)
-
-| phase | what lands | est |
+| Threshold | Proposed value | Rationale |
 |---|---|---|
-| P0 | done: inspection, suite fix, baseline, this plan | 1.5 h |
-| P1 | token system + both themes, shell layout (command bar / stage hero / camera signal / control rail / take bar), design plan + 2–3 mockups → **GATE 2**, then full rollout incl. engineering view, settings persistence, privacy receipt (real fetch/XHR counter), Cmd+K palette + shortcuts | 8–11 h |
-| P2 | wrist/palm quality, face-touch (R4), full-body/feet, occlusion recovery (velocity decay + 0.5 s re-acquisition blend), expressiveness layer (springs, exaggeration slider, idle life, switch crossfade, perf auto-tuner) | 7–9 h |
-| P3 | HandLandmarker integration (R2), hand-only mode + stage treatment, expressive hand, ≥1 creature (jaw=pinch), x-ray self-portrait, pinch→jaw eval metric → **GATE 3** (live test) | 5–7 h |
-| P4 | Motion Memory: bone-stream ring buffer, IndexedDB loops, ghost duet, echo chorus, instant replay (slow-mo second angle), re-skin, round-trip test | 4–5 h |
-| P5 | recording director: take scripts as data, gesture/intent seed + hands-free start/advance/stop, framing check, 16:9 + 9:16 composites, stinger/end-card packaging, pose poster, caption helper | 5–7 h |
-| P6 | avatar cards + capability labels, setup coach, onboarding, mode selector polish | 2–3 h |
-| P7 | approved electives (below) | 3–5 h |
-| P8 | full eval refresh, before/after table, README/CHANGELOG/DEMO_SCRIPT/POSTS, screenshot board → **GATE 5** | 2–3 h |
+| Prediction horizon | **400 ms hard cap** (spec range 300–500) | ~12 pose frames; long enough for hand-past-face / step transit, short enough to stay honest. Test-enforced: no PREDICTED sample older than 400 ms, ever. |
+| Confidence decay | **linear, vis×1.0 → vis×0.35 over the 400 ms horizon**, then → 0 within 250 ms in RELAXED; agreement multiplier 0.6–1.0 | crosses retarget VIS_OFF 0.45 at ≈ 330 ms (clean handoff to the existing relax); crosses Flight's 0.35 at ≈ the horizon; visible in the HUD; never fakes certainty |
+| Re-entry duration | **0.8 × outage, clamped [0.1 s, 0.4 s]** | mirrors the gate-approved bone-level rule; flickers recover fast, real occlusions take the full beat; inside the 0.3–0.5 s spec for real occlusions |
+| Max correction per frame | **0.06 m per landmark per pose frame** (~1.8 m/s at 30 fps) during re-entry; existing bone bound (< 10°/render-tick) retained | below fast-gesture speeds on the fixtures, so corrections hide inside motion; a visible snap would need ~0.3 m |
+| Acceptable masked-fixture error | **PPC ≤ legacy on every masked fixture (mandatory); target ≥ 20 % lower on moving-limb masks; provisional absolute bound mean ≤ 0.12 m, p95 ≤ 0.25 m** during PREDICTED (masked landmark vs same-frame truth, masks ≤ 400 ms) | the relative bound is the honest core claim; absolutes are provisional until legacy is measured at P3 — both get published in results.json, and if the absolutes move, DECISIONS.md says why |
+| Fully-visible non-regression | **\|Δ upperLimbsMean\| and \|Δ legsMean\| ≤ 1.0° per fixture×avatar** vs the 2026-07-02 table; detectionRate unchanged; pinch→jaw r ≥ 0.8 held; **zero NaN**; plus the structural pass-through unit test (byte-equal output when fully visible) | 1.0° covers run-to-run jitter on a metric whose means run 2°–23°; the pass-through test is the real guarantee |
 
-## 6. Electives proposal (Gate 1 decision)
+Also fixed by test rather than threshold: determinism (same recorded
+stream → identical PPC output twice), joint limits never exceeded, no
+exploding values on any fixture.
 
-**Take — Tier B1, Velocity VFX (~1.5 h):** the smoothing layer already
-computes velocities; impact rings + sparks are cheap and land in every
-clip. Subtle by default, toggleable, perf-gated.
+## 3. Legacy vs PPC, side by side
 
-**Take — Tier B2, Auto-director camera (~2 h):** spring-damped lean,
-idle slow-orbit, replay angle switch. The replay angle is already needed
-by P4's instant replay, so most of this is shared work.
+| Aspect | Legacy (today) | PPC (proposed) |
+|---|---|---|
+| Landmarks during occlusion | low-vis garbage passes through; gated out downstream | short constrained prediction, decaying confidence |
+| Prediction horizon | none (bone coast τ 0.25 s, rotation only) | 400 ms hard cap, positions + everything downstream inherits |
+| Confidence during loss | binary per-bone flag; body-input decay τ 300 ms | per-landmark decay (linear → 0.35 over 400 ms) + per-limb state flags |
+| Re-entry | bone-space blend clamp(0.8·lost, 0.08–0.5 s) | landmark-space blend clamp(0.8·outage, 0.1–0.4 s) + 0.06 m/frame cap; bone layer unchanged on top |
+| body-input during a hand dropout | axis → null instantly; shaper decays to neutral | axis continues ≤ 400 ms on decaying confidence, then the identical decay |
+| Measured by | occlusion.spec bone angles only | + masked position error, re-entry no-snap delta, horizon cap, determinism, flight-contract timing |
 
-**Skip — Tier B3, Hologram parallax:** off-by-default head-coupled
-parallax is the lowest payoff per hour here and competes with B2 for the
-same camera code. Types/comments seed only.
+Legacy numbers published alongside PPC at P3 (same masked fixtures,
+both systems): hold-last-visible position error during masks,
+masked-run sync means, autopilot engagement time on full dropout.
 
-**Skip — Tier C both:** two-person duet risks single-person quality for an
-Experimental label; audio-reactive light adds a mic permission to a
-privacy-receipt app for marginal demo value. Both noted as future work.
+## 4. Verification plan (P3; flight contract at P4)
 
-## 7. Cut / reorder proposals
+**Masked-fixture harness** — reuses the fixture → y4m → fake-webcam
+rig; no new recordings needed before Gate 1:
 
-- **Reorder: P4 (Motion Memory) before P3's Gate-3 live test if the hand
-  fixtures arrive late.** P4 has zero dependency on the new fixtures; the
-  live-test gate is better spent when hand-only mode is testable. I'll
-  sequence opportunistically around the USER ACTION and keep phases
-  otherwise as written.
-- **Cut nothing else.** The phase list is coherent; everything maps to a
-  goal conjunct.
-- Seed-san.vrm sits committed but unregistered. It's VRM-spec sample
-  (VirtualCast); I'll verify its license terms before using it as the 2–3
-  roster addition candidate at P6, else it stays out (Gate 4 covers any
-  replacement).
+- Mask specs are data (`eval/masks/*.json`): named landmark groups +
+  windows keyed on **videoTimeMs** (deterministic across runs). Planned
+  specs map to the brief's use cases: hand leaves frame (arms), hand
+  crosses face (facetouch), foot disappears (fullbody), brief full
+  dropout + motion blur (fast).
+- Injection is eval-only (`?mask=<name>`), applied at the fork. The
+  **same frame** provides ground truth: record pre-mask landmarks →
+  zero the group's visibility → PPC → record output + state. Truth and
+  output live in one run — no cross-run frame-alignment problem — and
+  the masked-run sync metric samples against the truth stream, so it
+  directly measures "did the puppet keep matching the person while
+  blind", comparable PPC-on vs legacy (`?ppc=0`).
+- New results.json fields: `ppc.maskedPositionError` (mean/p95 m,
+  PREDICTED only, per fixture, PPC and legacy), `ppc.reentryMaxDelta`
+  (m/frame), `ppc.horizonMaxMs`, `ppc.maskedSync` (vs truth, PPC and
+  legacy), `ppc.nanCount`.
+- Existing occlusion.spec stays green unchanged (relax < 0.25 rad,
+  < 4°/tick relaxing, < 10°/tick re-entry, settle ≤ 1.2 s, joint
+  limit) — it then exercises the composed PPC+relax path.
 
-## 8. What I treat as approved by approving this plan
+**Flight confidence contract (P4)** — additive only:
 
-- Elective selection in §6.
-- MediaPipe HandLandmarker as a dependency-class asset (R2).
-- The woody demotion in R1 **unless you say otherwise at this gate**.
-- The phase sequencing in §5/§7.
+- body-input schema gains an optional per-limb `tracking` state block
+  (additive field, protocol stays v1-compatible; Flight ignores it
+  today). No Flight gain/assist/mapping/timing code is touched.
+- Full-frame dropout: PPC's core-landmark (shoulders/hips/nose) decay
+  is tuned so Flight's autopilot engagement time shifts **≤ +100 ms**
+  vs legacy, measured by the existing injected-dropout closed-loop eval
+  (altitude in band, no terrain contact, smooth re-entry — unchanged).
+  The shift is documented in results, not silent. If ≤ +100 ms proves
+  unreachable without dishonest confidence, the fallback is
+  pass-through-on-full-dropout (PPC acts only on partial occlusion) —
+  decided by measurement, logged in DECISIONS.md.
+- Flight suite (17) runs unmodified at every phase; any failure is
+  investigated as a regression of my layer, never fixed by retuning
+  Flight.
+
+**Determinism**: unit test drives a synthetic recorded stream through
+PPC twice in node → identical outputs. PPC has no wall clocks and no
+randomness by construction.
+
+## 5. Phases and effort
+
+- **P1** — ring buffers, velocity regression, state machine,
+  constraints (`continuity.ts` + unit tests). ~½ day. Each phase ends:
+  suite green, commit, EVAL_NOTES + status entries.
+- **P2** — re-entry blending, confidence model, engineering-view
+  chips, main.ts wiring behind `?ppc=` flag (default on). ~½ day.
+- **P3** — mask harness, metrics, legacy-vs-PPC measurement, publish
+  results + threshold check. ~1 day; biggest phase. §2's provisional
+  numbers get confirmed or honestly revised here.
+- **P4** — body-input additive flags, flight-contract measurement,
+  docs (docs/PPC.md: states, constraints, limits, the "not
+  invisible-limb tracking" line; README note; DECISIONS; CHANGELOG).
+  ~½ day.
+- **>> USER GATE 2** — live test: hide a hand mid-gesture, cross the
+  face, step a foot out of frame; the puppet should look intentional,
+  not haunted. Fix what's reported.
+
+## 6. Risks
+
+1. **Decay-shape ↔ VIS-gate coupling**: how long bones ride prediction
+   is set by where the decay crosses 0.45. One constants table, masked
+   evals as the feedback loop, live gate as the final judge.
+2. **Autopilot timing shift** on full dropout — bounded and measured
+   (§4); fallback defined in advance.
+3. **Face-touch interplay**: a predicted wrist keeps face-touch
+   engaged briefly (that IS the hand-crosses-face use case working);
+   the penetration guard runs downstream and the masked facetouch eval
+   watches it.
+4. **Handoff double-motion** (PPC deceleration, then bone coast):
+   velocities at handoff are already damped so coast energy is small;
+   the extended occlusion spec asserts no second-phase kick.
+5. **Flight feel flake** (superman-arms) recurring in contended runs —
+   pre-existing, documented; watched every phase, investigated if it
+   repeats in isolation.
+
+## 7. Explicitly out / unchanged
+
+Flight profile gains, assist ladder, autopilot constants, input
+mappings (all Gate-3-frozen); TinySkies provenance matters;
+LICENSE_NOTES.local.md; fixture videos (gitignored, none committed,
+none re-recorded for Gate 1 — synthetic masks over existing footage
+cover every listed use case); no merge, no push.

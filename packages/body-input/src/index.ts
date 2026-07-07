@@ -3,7 +3,8 @@
 
 export type {
   AxisName, AxisShapingConfig, BodyAxes, BodyEvent, BodyInputConfig, BodyInputFrame,
-  BodySignal, DeepPartial, EventConfig, ExtractionConfig, LandmarkPoint,
+  BodySignal, BodyTracking, DeepPartial, EventConfig, ExtractionConfig, LandmarkPoint,
+  TrackingState,
 } from './types';
 
 export { createBodyInputCore } from './pipeline';

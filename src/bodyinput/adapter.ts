@@ -6,13 +6,19 @@
 
 import {
   createBodyInputCore, createBroadcastSink, createInPageChannel, mountTuner,
-  type BodyInputCore, type BodySignal, type BodySignalSource,
+  type BodyInputCore, type BodySignal, type BodySignalSource, type BodyTracking,
 } from '@bodyarcade/body-input';
 import type { LandmarkPoint } from '../pose/types';
 
 export interface BodyInputAdapter {
-  /** Wire into the pose callback with mirrored norm/world (pre-smoothing). */
-  onPoseFrame(world: LandmarkPoint[] | null, norm: LandmarkPoint[] | null, tsMs: number): void;
+  /** Wire into the pose callback with mirrored norm/world (pre-smoothing).
+   *  tracking = optional per-limb PPC states, passed through to the signal. */
+  onPoseFrame(
+    world: LandmarkPoint[] | null,
+    norm: LandmarkPoint[] | null,
+    tsMs: number,
+    tracking?: BodyTracking,
+  ): void;
   core: BodyInputCore;
   /** in-page signal source (game modes in this tab subscribe here) */
   source: BodySignalSource;
@@ -31,8 +37,8 @@ export function createBodyInputAdapter(): BodyInputAdapter {
   let tuner: { unmount(): void } | null = null;
 
   return {
-    onPoseFrame(world, norm, tsMs) {
-      const signal = core.push({ tsMs, world, norm });
+    onPoseFrame(world, norm, tsMs, tracking) {
+      const signal = core.push({ tsMs, world, norm, tracking });
       last = signal;
       inPage.sink.publish(signal);
       broadcast.publish(signal);

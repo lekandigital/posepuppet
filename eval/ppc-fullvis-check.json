@@ -1,0 +1,200 @@
+{
+  "meta": {
+    "date": "2026-07-07T18:26:49.775Z",
+    "machine": "darwin arm64 — Apple M5",
+    "mode": "headed",
+    "envThrottled": false,
+    "durationSecPerFixture": 60,
+    "note": "headed run on real hardware; FPS numbers are representative"
+  },
+  "results": [
+    {
+      "fixture": "arms",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1790,
+      "detectedFrames": 1790,
+      "detectionRate": 1,
+      "poseFps": 29.84,
+      "renderFps": 119.28,
+      "droppedFrames": 10,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 34,
+        "t60": 31
+      },
+      "sync": {
+        "leftUpperArm": 7.95,
+        "leftForearm": 12.86,
+        "rightUpperArm": 7.66,
+        "rightForearm": 10.53,
+        "torso": 0.56,
+        "leftThigh": 2.65,
+        "rightThigh": 3.26,
+        "upperLimbsMean": 9.75,
+        "legsMean": 2.96
+      },
+      "finishedAt": "2026-07-07T18:22:44.274Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "torso",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1791,
+      "detectedFrames": 1791,
+      "detectionRate": 1,
+      "poseFps": 29.86,
+      "renderFps": 119.72,
+      "droppedFrames": 9,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 29,
+        "t60": 33
+      },
+      "sync": {
+        "leftUpperArm": 1.37,
+        "leftForearm": 1.4,
+        "rightUpperArm": 2.72,
+        "rightForearm": 3.11,
+        "torso": 1.35,
+        "leftThigh": 3.01,
+        "rightThigh": 5.61,
+        "upperLimbsMean": 2.15,
+        "legsMean": 4.31
+      },
+      "finishedAt": "2026-07-07T18:23:45.594Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "fast",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1791,
+      "detectedFrames": 1791,
+      "detectionRate": 1,
+      "poseFps": 29.86,
+      "renderFps": 119.96,
+      "droppedFrames": 9,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 30,
+        "t60": 27
+      },
+      "sync": {
+        "leftUpperArm": 16.44,
+        "leftForearm": 23.21,
+        "rightUpperArm": 17.25,
+        "rightForearm": 22.11,
+        "torso": 2.22,
+        "leftThigh": 2.72,
+        "rightThigh": 3.16,
+        "upperLimbsMean": 19.75,
+        "legsMean": 2.94
+      },
+      "faceTouch": {
+        "engagedFrames": 35,
+        "reachFrames": 30,
+        "penetrationFrames": 0,
+        "reachRate": 0.857,
+        "penetrationRate": 0
+      },
+      "finishedAt": "2026-07-07T18:24:46.676Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "facetouch",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1788,
+      "detectedFrames": 1788,
+      "detectionRate": 1,
+      "poseFps": 29.81,
+      "renderFps": 120.05,
+      "droppedFrames": 12,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 27,
+        "t60": 31
+      },
+      "sync": {
+        "leftUpperArm": 3.53,
+        "leftForearm": 7.62,
+        "rightUpperArm": 13.27,
+        "rightForearm": 5.59,
+        "torso": 0.83,
+        "rightThigh": 0.34,
+        "leftThigh": 3.87,
+        "upperLimbsMean": 7.5,
+        "legsMean": 2.1
+      },
+      "faceTouch": {
+        "engagedFrames": 498,
+        "reachFrames": 497,
+        "penetrationFrames": 0,
+        "reachRate": 0.998,
+        "penetrationRate": 0
+      },
+      "finishedAt": "2026-07-07T18:25:47.828Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "fullbody",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1793,
+      "detectedFrames": 1793,
+      "detectionRate": 1,
+      "poseFps": 29.89,
+      "renderFps": 119.74,
+      "droppedFrames": 7,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 27,
+        "t60": 28
+      },
+      "sync": {
+        "leftUpperArm": 3.17,
+        "leftForearm": 5.86,
+        "rightUpperArm": 2.66,
+        "rightForearm": 12,
+        "torso": 2.37,
+        "leftThigh": 6.28,
+        "leftShin": 7.41,
+        "rightThigh": 5.56,
+        "rightShin": 7.38,
+        "upperLimbsMean": 5.92,
+        "legsMean": 6.66
+      },
+      "faceTouch": {
+        "engagedFrames": 8,
+        "reachFrames": 8,
+        "penetrationFrames": 0,
+        "reachRate": 1,
+        "penetrationRate": 0
+      },
+      "finishedAt": "2026-07-07T18:26:49.466Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    }
+  ]
+}
