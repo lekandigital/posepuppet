@@ -1,3 +1,10 @@
+## 2026-07-06 (@bodyarcade/body-input P1 — core + transports + tapes)
+Done: schema-v1 RFC gated+approved (packages/body-input/PLAN.md); deterministic core (calibration-relative extraction, One Euro→dead zone→expo→slew per axis, hysteresis/debounce events, confidence decay); in-page + BroadcastChannel transports with runtime shape-guarding; input/signal tape recorder-replayer; vite/tsconfig alias, no workspace churn
+Tests: 15/15 new protocol tests (byte-identical replay, landmark-absence boundary, sign conventions, dropout decay curves, upper-body/too-close/mid-gesture/seated failure modes, both transports)
+Also: fixed pre-existing avatar-cycle suite failure (optional-VRM probe fooled by vite SPA-fallback 200 text/html)
+Blockers: none
+Next: P2 — tuner overlay + jitter-floor tool (dead-zone defaults from still.mp4)
+
 ## 2026-07-02 (PASS 2 SHIPPED — Gate 5 approved)
 All five user gates honored; all ten goal conjuncts green. Suite 55 passed / 5 skipped at ship; final eval 17x60s clean (detection 100%, pose 28.2-29.9, render 115-123, all sync bars hold, 0 errors, memory flat)
 Deliverables: glass-cockpit UI (both themes), motion core + expressiveness, hand-only creatures (beaky r=0.941/0.986), Motion Memory (round-trip verified), recording director (hands-free start/advance/stop, 16:9+9:16), guidance, Erika (CC0) roster addition, README/CHANGELOG/DEMO_SCRIPT-v2/POSTS with verification table

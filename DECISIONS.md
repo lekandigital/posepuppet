@@ -140,3 +140,36 @@ speed). That fix surfaced wall-clock velocity estimation breaking replay
 determinism — commitTarget now uses frame time (wall for live, loop time
 for ghosts, synthetic in tests), which also corrected ghost coast
 behavior. Both changes verified by the suite and re-run evals.
+
+## 2026-07-06 — @bodyarcade/body-input P0: RFC location + integration shape
+Schema RFC lives at packages/body-input/PLAN.md (root PLAN.md remains the
+pass-2 artifact). Package integrates via a vite/tsconfig path alias, not
+an npm-workspace conversion — zero install-layout churn, suite stays
+green, extraction to a real workspace later is mechanical. Core is
+three.js-free (ported vector math for the torso basis) so consumers'
+three versions never matter. One Euro is ported, not imported: the
+package carries no dependency on PosePuppet source. Recorded input tapes
+(landmark traces) are gitignored — same privacy class as fixtures.
+
+## 2026-07-06 — body-input P1: runner convention + extraction choices
+Package unit tests live in tests/bodyinput.spec.ts under the existing
+Playwright runner (node-side, no browser) rather than a separate node:test
+harness — one suite, one green. Extraction deviations from the RFC sketch,
+all logged: arm length is measured from shoulder→wrist distance at neutral
+capture (works for hanging or T-pose arms; floored/capped at 1.5–2.6
+shoulder-widths) instead of the 2.2× estimate, which remains the
+pre-neutral fallback; handPoint measures each wrist's distance from a
+synthesized hanging rest and reports the between-arm asymmetry; crouch's
+upper-body fallback uses image-space shoulder drop because MediaPipe world
+coordinates are hip-origin and cannot see whole-body height changes.
+defaults live in src/defaults.ts (not defaults/shaping.json) so the
+jitter tool rewrites a typed module instead of a JSON import.
+
+## 2026-07-06 — avatar probe hardened against SPA-fallback 200s
+Pre-existing suite failure (not body-input): probeOptionalAvatars trusted
+res.ok, but the vite dev server now answers missing optional VRMs
+(woody.vrm) with the SPA fallback page — 200 text/html — so the cycle
+included woody, its load failed on HTML-as-glTF, and the error path
+reverted config back to erika forever. The probe now treats text/html as
+absent. Diagnosed with a scripted click-through (avatar-debug) after the
+failure reproduced on a clean checkout.

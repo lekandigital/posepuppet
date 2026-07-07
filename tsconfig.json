@@ -11,7 +11,10 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "useDefineForClassFields": true,
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "paths": {
+      "@bodyarcade/body-input": ["./packages/body-input/src/index.ts"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "packages/body-input/src"]
 }
