@@ -1,5 +1,24 @@
 # Eval notes
 
+### PPC P1: continuity core + unit coverage (2026-07-07)
+`src/pose/continuity.ts` shipped (not yet wired into the app — that's
+P2): per-landmark 16-frame ring buffers, least-squares velocity over the
+last 5 samples, six per-limb group state machines (VISIBLE → PREDICTED →
+RELAXED) with the Gate-1 constants (horizon 400 ms limbs / 250 ms
+torso+head, confidence linear → 0.35× then → 0, re-entry 0.8×outage
+clamped 0.1–0.4 s with a 0.06 m/frame correction cap, bone-length shell
+±10%, rest bias age²→0.3). Nine node specs all pass, alongside the
+untouched 73 (82 passed / 5 skipped total): exact pass-through when
+fully visible (the structural non-regression guarantee), horizon cap
+never exceeded, prediction beats hold-last-visible by >40% on linear
+motion at ~166 ms, bone-shell bound holds, confidence monotone to 0,
+re-entry max step ≤ 0.06 m with convergence onto measured (blend
+persists past its window until converged — a time-only cutoff would have
+snapped on large displacement, caught in design), full dropout
+synthesizes ≤ horizon then returns honest null, byte-identical
+determinism over a scripted chaotic stream, no NaN/explosion under
+rotating masks + variable dt.
+
 ### GATE 3 APPROVED — final acceptance (2026-07-07)
 Lekan's focused retest on the restored Gate-2 baseline: Superman banking
 correct again; arm-drop stabilization back to the approved behavior;
