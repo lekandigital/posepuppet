@@ -453,6 +453,16 @@ export class Game {
   private flightTuner: FlightTuner | null = null;
   private tunerPrevHeading = 0;
   private headingRateDegS = 0;
+  /** Eval only (?record-intents=1): per-tick inputs + live pose for replay. */
+  private intentTape: {
+    initial: ReturnType<Plane["getReplayState"]> | null;
+    frames: {
+      dt: number; turnRate: number; forward: boolean; brake: boolean;
+      elevate: boolean; descend: boolean;
+      speedAxis: number | null; elevateAxis: number | null;
+    }[];
+    live: ReturnType<Plane["getReplayState"]>[];
+  } | null = null;
   private lobby!: Lobby;
   private hud!: HUD;
   private landmarkHUD!: LandmarkHUD;
@@ -847,7 +857,36 @@ export class Game {
       body: () => this.bodyControls?.debugState() ?? null,
       setProfile: (id: string) => this.bodyControls?.setProfile(id) ?? false,
       setAssist: (id: string) => this.bodyControls?.setAssist(id) ?? false,
+      /**
+       * Eval: replay a recorded intent tape through a fresh REAL Plane
+       * seeded with the recorded snapshot — the replay-tolerance check.
+       */
+      simulateTape: (
+        initial: ReturnType<Plane["getReplayState"]>,
+        frames: NonNullable<Game["intentTape"]>["frames"],
+      ) => {
+        const w = this.worldConfig;
+        const sim = new Plane(
+          w?.globeRadius ?? 5, 1, 0xffffff, w?.seed ?? 42, w?.terrainType ?? "default",
+        );
+        sim.setReplayState(initial);
+        const path = frames.map((f) => {
+          sim.analog =
+            f.speedAxis != null || f.elevateAxis != null
+              ? { speed: f.speedAxis ?? undefined, elevate: f.elevateAxis ?? undefined }
+              : null;
+          sim.update(f.dt, f.turnRate, f.forward, f.brake, f.elevate, false, f.descend);
+          return sim.getReplayState();
+        });
+        sim.dispose();
+        return path;
+      },
     };
+
+    if (new URLSearchParams(window.location.search).has("record-intents")) {
+      this.intentTape = { initial: null, frames: [], live: [] };
+      (window as unknown as { __FLIGHT_TAPE: unknown }).__FLIGHT_TAPE = this.intentTape;
+    }
   }
 
   private onTunerKey = (e: KeyboardEvent) => {
@@ -3519,7 +3558,25 @@ export class Game {
           ? { speed: speedAxis, elevate: elevateAxis }
           : null;
     }
+    // Eval tape: record the FINAL inputs (post keyboard/body merge, post
+    // twister/level-up overrides) so a replay reproduces even forced spins.
+    const tape = this.intentTape;
+    if (
+      tape &&
+      this.gamePhase === "flying" &&
+      this.localPlayer instanceof Plane &&
+      tape.frames.length < 12_000
+    ) {
+      if (!tape.initial) tape.initial = this.localPlayer.getReplayState();
+      tape.frames.push({
+        dt, turnRate, forward, brake, elevate, descend,
+        speedAxis: speedAxis ?? null, elevateAxis: elevateAxis ?? null,
+      });
+    }
     this.localPlayer.update(dt, turnRate, forward, brake, elevate, paintball, descend);
+    if (tape && tape.initial && this.localPlayer instanceof Plane && tape.live.length < tape.frames.length) {
+      tape.live.push(this.localPlayer.getReplayState());
+    }
     // Signed heading rate for the tuner's plane-response readout.
     {
       let dh = this.localPlayer.heading - this.tunerPrevHeading;

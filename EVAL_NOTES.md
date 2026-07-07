@@ -1,5 +1,16 @@
 # Eval notes
 
+### Flight P5: replay tolerance measured — effectively exact (2026-07-07)
+Intent-tape replay (eval/flight-results.json): 1,681 frames of live
+variable-dt flight (dt 5.2–50 ms — the loop really is variable) recorded
+with per-frame dt + final merged inputs + a kinematic snapshot, then
+re-run through a fresh real Plane: max position divergence 2.6e-6 world
+units (globe R=5), heading/altitude/speed divergence exactly 0. The
+documented tolerance ceiling is 0.02 world units / 0.5°; the measured
+value is float noise, six orders of magnitude under it. Caveat stated in
+the spec: out-of-band plane mutations (ring boosts, gremlin hits) are
+not in the tape; the eval flight avoids them.
+
 ### Flight P4: faithful experience, companion mode, combined perf (2026-07-07)
 Combined two-window measurement (eval/flight-perf.json, headed, M5,
 entered through the production Fly card): flight render 111.1 fps

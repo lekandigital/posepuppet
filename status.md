@@ -1,7 +1,5 @@
-## 2026-07-07 (BodyArcade Flight P4 — faithful experience complete, perf 2x target)
-Done: Fly card in PosePuppet rail (+palette) -> same-origin /flight/ w/ companion mode (lite model + suspended stage, auto-restore on window close); in-game TinySkies credit (corner pill -> repo, attribution line leads with the permission credit); boat+carpet fly offline (unlock-gate seeded spec); asset provenance resolved via upstream's own Suno/ElevenLabs/Tripo3D attribution
-Numbers: combined session 111.1 fps flight render + pose 30 Hz + signals 30 Hz (targets 60/45 + 15) — eval/flight-perf.json; keyboard baseline 118.1 fps (P1: 119, delta = noise)
-Tests: vehicles spec green 3.7m; both suites re-running for the commit
-Blockers: none
-Next: P5 ship — README/ARCHITECTURE/FUTURES/replay tolerance/results.json flight section -> GATE 3 final acceptance
-
+## 2026-07-07 (BodyArcade Flight P5 — ship docs + replay, awaiting GATE 3)
+Done: replay rig (?record-intents tape -> simulateTape through a real Plane) — divergence 2.6e-6 world units / 0° heading over 1,681 variable-dt frames (ceiling 0.02/0.5° documented); README flight section + arcade quickstart; apps/flight README keeps upstream text under a BodyArcade credit header w/ real keyboard controls; DEMO_SCRIPT flight money-shot notes; DECISIONS records why flight numbers live in eval/flight-*.json (posepuppet eval runner overwrites results.json)
+Docs current: ARCHITECTURE.md, FUTURES.md (globe-as-hub via the vehicle-capabilities seam), ASSETS.md manifest w/ resolved provenance
+Blockers: USER GATE 3 — final live acceptance flight
+Next: final suite run -> commit -> Lekan's acceptance flight

@@ -1,3 +1,27 @@
+# BodyArcade Flight (fork of GlobeFly / TinySkies)
+
+**TinySkies / GlobeFly by [Danny Limanseta](https://github.com/dannylimanseta/tinyskies)
+is used with permission.** This directory is a faithful fork adapted for
+BodyArcade: fully offline single-player by default (LocalWorldProvider,
+no Postgres/server needed), body-controlled flight via
+`@bodyarcade/body-input`, zero analytics/telemetry. The upstream server
+remains runnable via docker-compose for multiplayer experiments. See
+`../../ARCHITECTURE.md`, `../../ASSETS.md` (per-file manifest), and the
+root README for the BodyArcade side.
+
+Run it: `npm run arcade` at the repo root (serves the built game at
+http://localhost:5173/flight/ on PosePuppet's origin so body signals
+flow), or `npm run dev:client` here for standalone game-only dev.
+
+Actual keyboard controls (the table below is upstream's original text;
+its W/S/Shift/Ctrl rows predate the current code): **A/D turn · W
+accelerate · S brake · ArrowUp climb · Space paintball/action · F
+interact.** Body input maps through profiles — press `B` in-game.
+
+---
+
+# Upstream README (GlobeFly)
+
 # GlobeFly
 
 Multiplayer Three.js game where players fly planes around customizable globes.

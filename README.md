@@ -27,6 +27,38 @@ npm run dev   # → http://localhost:5173, allow camera
 
 Press `⌘K` for the command palette. First run shows a short onboarding.
 
+## BodyArcade Flight — your body flies a plane
+
+[TinySkies / GlobeFly](https://github.com/dannylimanseta/tinyskies) by
+**Danny Limanseta** is used with permission as the foundation of Flight
+mode: a whimsical globe-flight game (plane, boat, magic carpet, landmarks,
+quests), forked faithfully into `apps/flight` and adapted to run fully
+offline with the body as a first-class input source alongside the
+keyboard.
+
+```sh
+cd apps/flight && npm install && cd ../..   # once
+npm run arcade   # builds the game + starts everything on :5173
+```
+
+Open PosePuppet, let it track you, then click the **Fly** card (or
+`⌘K → fly`). The game opens at `/flight/` with your body streaming in —
+lean to bank, and in the default **Superman** profile: arms out to fly,
+arms high to climb, both hands forward to dive/boost, drop your arms to
+stabilize. **Head Pilot** flies seated. Keyboard always wins the moment
+you touch it; a T-pose recaptures your neutral. Press `B` in the game for
+the control tuner (profiles, assist levels, live signal chain). Tracking
+loss auto-levels the plane and control blends back smoothly.
+
+Everything stays local: no server, no analytics, zero network requests —
+the flight suite literally asserts it. Derived control signals are the
+only thing that crosses from PosePuppet to the game; landmarks never
+leave the tracker (`packages/body-input` enforces the boundary at
+runtime). Measured on this machine: 111 fps game render with the pose
+loop at 30 Hz (`eval/flight-perf.json`); intent-tape replay reproduces
+the flight path to 2.6e-6 world units (`eval/flight-results.json`).
+Architecture in `ARCHITECTURE.md`; asset manifest in `ASSETS.md`.
+
 ## What it does
 
 - **Character mode** — the avatar mirrors your upper body (full body with

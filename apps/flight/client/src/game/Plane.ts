@@ -411,6 +411,35 @@ export class Plane {
     this.rollAngle = 0;
   }
 
+  /**
+   * BodyArcade eval: full kinematic snapshot for intent-tape replay —
+   * includes the private smoothing state, so a fresh Plane seeded with a
+   * snapshot reproduces the same trajectory from the same input tape.
+   */
+  getReplayState() {
+    return {
+      qx: this.qPosition.x, qy: this.qPosition.y, qz: this.qPosition.z, qw: this.qPosition.w,
+      heading: this.heading, pitch: this.pitch, altitude: this.altitude, speed: this.speed,
+      bankAngle: this.bankAngle, rollAngle: this.rollAngle,
+      turnInputSmoothed: this.turnInputSmoothed, elevateBlend: this.elevateBlend,
+      prevAltitude: this.prevAltitude,
+    };
+  }
+
+  setReplayState(s: ReturnType<Plane["getReplayState"]>) {
+    this.qPosition.set(s.qx, s.qy, s.qz, s.qw);
+    this.heading = s.heading;
+    this.pitch = s.pitch;
+    this.altitude = s.altitude;
+    this.speed = s.speed;
+    this.bankAngle = s.bankAngle;
+    this.rollAngle = s.rollAngle;
+    this.turnInputSmoothed = s.turnInputSmoothed;
+    this.elevateBlend = s.elevateBlend;
+    this.prevAltitude = s.prevAltitude;
+    this.applyMatrix();
+  }
+
   applyMatrix() {
     const m = buildPlaneMatrix(
       this.qPosition,
