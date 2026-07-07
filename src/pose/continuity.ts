@@ -32,8 +32,22 @@ export const PPC = {
   /** velocity regression: window size and max sample age at prediction entry */
   velWindow: 5,
   velMaxAgeMs: 280,
-  /** exponential damping of the coasted velocity (ms) */
-  dampTauMs: 180,
+  /** exponential damping of the coasted velocity (ms). Short on purpose:
+   *  human gestures reverse on ~300–400 ms periods, so ballistics are only
+   *  trustworthy for the first ~150 ms (fast_dropout masked eval) */
+  dampTauMs: 140,
+  /** velocity trust noise floor (m): regression residuals below this never
+   *  reduce trust — measured MediaPipe world jitter is ~5–10 mm */
+  velTrustNoiseM: 0.015,
+  /** speed knee (m/s): trust = 1/(1+(speed/knee)^4). Gestures much above
+   *  ~1.3 m/s (strikes, fast swings) reverse within the horizon —
+   *  extrapolating them measurably loses to holding (fast_dropout eval);
+   *  deliberate motion below ~1 m/s extrapolates well */
+  velTrustSpeedKnee: 1.3,
+  /** hard drift cap: prediction never strays further than this from the
+   *  last-seen (parent-anchored) position — the "never flies away" bound */
+  maxDriftM: 0.3,
+  maxDriftNorm: 0.25,
   /** rest-pose bias: weight grows with age² to this max at the horizon */
   restBiasMax: 0.3,
   restTauMs: 700,
@@ -41,8 +55,14 @@ export const PPC = {
   segTolerance: 0.1,
   segTauMs: 1000,
   /** predicted speed caps (world m/s, norm units/s) */
-  maxPredSpeed: 3.5,
-  maxPredSpeedNorm: 1.5,
+  maxPredSpeed: 2.5,
+  maxPredSpeedNorm: 1.2,
+  /** entry-pull: with age, the prediction retracts toward the last-seen
+   *  position (anchored to its parent, so it rides torso translation) —
+   *  reversals make flying-away worse than holding; last-seen is the honest
+   *  uncertainty center. Time constant + age exponent. */
+  entryPullTauMs: 250,
+  entryPullExp: 1.5,
   /** re-entry blend: 0.8 × outage, clamped [100, 400] ms */
   reentryScale: 0.8,
   reentryMinMs: 100,
@@ -57,6 +77,13 @@ export const PPC = {
   relaxVisMsCore: 150,
   /** neighbor-agreement multiplier floor */
   agreementFloor: 0.6,
+  /** low-trust prediction decays confidence faster: effective horizon =
+   *  horizon × (floor + (1−floor)·trust). A prediction that is basically
+   *  "hold" carries no information the bone-level hold doesn't — it must
+   *  hand the puppet back to the gate-approved hold quickly (measured:
+   *  driving bones with hold-quality predictions made masked leg/fast sync
+   *  WORSE than legacy; high-trust arm exits made it better) */
+  trustHorizonFloor: 0.35,
 } as const;
 
 export type PpcState = 'VISIBLE' | 'PREDICTED' | 'RELAXED';
@@ -83,6 +110,13 @@ interface GroupSpec {
   /** child ← parent projection pairs, parents processed first */
   chain: Array<[number, number]>;
   core: boolean;
+  /** measured predictive value of this group's confidence: scales the
+   *  effective decay horizon. Legs are 0.25 — stride swings reverse inside
+   *  the horizon, and the masked eval showed leg prediction ≈ hold in
+   *  position while driving leg bones with it made puppet sync WORSE than
+   *  the bone-level hold; positions still flow (body-input crouch/stature
+   *  continuity) but the puppet hands legs back to hold almost at once. */
+  visTrust: number;
 }
 
 // Group layout mirrors how the retargeter consumes landmarks: torso first
@@ -94,6 +128,7 @@ const GROUPS: GroupSpec[] = [
     gate: [LM.leftShoulder, LM.rightShoulder],
     chain: [],
     core: true,
+    visTrust: 1,
   },
   {
     name: 'head',
@@ -101,6 +136,7 @@ const GROUPS: GroupSpec[] = [
     gate: [LM.nose],
     chain: [],
     core: true,
+    visTrust: 1,
   },
   {
     name: 'leftArm',
@@ -114,6 +150,7 @@ const GROUPS: GroupSpec[] = [
       [LM.leftThumb, LM.leftWrist],
     ],
     core: false,
+    visTrust: 1,
   },
   {
     name: 'rightArm',
@@ -127,6 +164,7 @@ const GROUPS: GroupSpec[] = [
       [LM.rightThumb, LM.rightWrist],
     ],
     core: false,
+    visTrust: 1,
   },
   {
     name: 'leftLeg',
@@ -139,6 +177,7 @@ const GROUPS: GroupSpec[] = [
       [LM.leftFootIndex, LM.leftAnkle],
     ],
     core: false,
+    visTrust: 0.25,
   },
   {
     name: 'rightLeg',
@@ -151,8 +190,21 @@ const GROUPS: GroupSpec[] = [
       [LM.rightFootIndex, LM.rightAnkle],
     ],
     core: false,
+    visTrust: 0.25,
   },
 ];
+
+/** Group → member landmark indices (shared with the eval mask harness). */
+export const PPC_GROUP_MEMBERS: Record<PpcGroupName, number[]> = Object.fromEntries(
+  GROUPS.map((g) => [g.name, g.members]),
+) as Record<PpcGroupName, number[]>;
+
+/** landmark index → owning group name (null = unowned). */
+export const PPC_GROUP_OF: (PpcGroupName | null)[] = (() => {
+  const out: (PpcGroupName | null)[] = Array.from({ length: 33 }, () => null);
+  for (const g of GROUPS) for (const m of g.members) out[m] = g.name;
+  return out;
+})();
 
 const RING = 16;
 const N = 33;
@@ -196,18 +248,46 @@ class Track {
     return this.count ? this.v[this.idx(0)] : 0;
   }
 
+  /** Copy the newest well-measured sample into the output landmarks.
+   *  Returns false when the buffer is empty. */
+  latestInto(w: LandmarkPoint, n: LandmarkPoint): boolean {
+    if (!this.count) return false;
+    const i = this.idx(0);
+    w.x = this.wx[i];
+    w.y = this.wy[i];
+    w.z = this.wz[i];
+    n.x = this.nx[i];
+    n.y = this.ny[i];
+    n.z = this.nz[i];
+    return true;
+  }
+
   /** Least-squares velocity over the newest `win` samples no older than
    *  maxAgeMs before `nowMs`. Writes [vx,vy,vz] world + norm into out;
-   *  returns false (zero velocity) when the history is too thin or stale. */
-  velocity(nowMs: number, out: Float64Array): boolean {
+   *  returns false (zero velocity) when the history is too thin or stale.
+   *
+   *  Velocity trust: the fit's own residual scales the result. Oscillating
+   *  motion (a punch reversing inside the window) fits a line badly —
+   *  extrapolating it full-speed overshoots worse than holding still, which
+   *  the fast_dropout masked eval measured. Linear motion keeps ~full
+   *  velocity; jerky motion coasts at a fraction. Deterministic, no ML. */
+  velocity(nowMs: number, out: Float64Array): number {
     out.fill(0);
     const win = Math.min(PPC.velWindow, this.count);
-    if (win < 3) return false;
-    if (nowMs - this.latestT() > PPC.velMaxAgeMs) return false;
+    if (win < 3) return 0;
+    if (nowMs - this.latestT() > PPC.velMaxAgeMs) return 0;
     // means
     let mt = 0;
-    for (let k = 0; k < win; k++) mt += this.t[this.idx(k)];
+    const mean = [0, 0, 0];
+    for (let k = 0; k < win; k++) {
+      const i = this.idx(k);
+      mt += this.t[i];
+      mean[0] += this.wx[i];
+      mean[1] += this.wy[i];
+      mean[2] += this.wz[i];
+    }
     mt /= win;
+    for (let j = 0; j < 3; j++) mean[j] /= win;
     let den = 0;
     const num = [0, 0, 0, 0, 0, 0];
     for (let k = 0; k < win; k++) {
@@ -221,12 +301,51 @@ class Track {
       num[4] += dt * this.ny[i];
       num[5] += dt * this.nz[i];
     }
-    if (den < 1e-9) return false;
+    if (den < 1e-9) return 0;
     for (let j = 0; j < 6; j++) out[j] = num[j] / den;
+
+    // residual RMS of the world fit vs the characteristic displacement the
+    // fitted velocity claims across half the window
+    let se = 0;
+    for (let k = 0; k < win; k++) {
+      const i = this.idx(k);
+      const dt = (this.t[i] - mt) / 1000;
+      const ex = this.wx[i] - (mean[0] + out[0] * dt);
+      const ey = this.wy[i] - (mean[1] + out[1] * dt);
+      const ez = this.wz[i] - (mean[2] + out[2] * dt);
+      se += ex * ex + ey * ey + ez * ez;
+    }
+    const rms = Math.sqrt(se / win);
+    const speed = Math.hypot(out[0], out[1], out[2]);
+    const halfSpan = (this.latestT() - this.t[this.idx(win - 1)]) / 2000;
+    const scale = 0.5 * speed * halfSpan + PPC.velTrustNoiseM;
+    let trust = Math.min(Math.max(1 - rms / scale, 0), 1);
+
+    // deceleration factor: recent (last-3-sample) velocity projected onto
+    // the window velocity. A limb that is already slowing or reversing at
+    // loss must not be extrapolated at window speed — punches reverse, and
+    // flying on is worse than holding (fast_dropout masked eval).
+    if (win >= 5 && speed > 1e-3) {
+      const i0 = this.idx(0);
+      const i2 = this.idx(2);
+      const dtR = (this.t[i0] - this.t[i2]) / 1000;
+      if (dtR > 1e-3) {
+        const rx = (this.wx[i0] - this.wx[i2]) / dtR;
+        const ry = (this.wy[i0] - this.wy[i2]) / dtR;
+        const rz = (this.wz[i0] - this.wz[i2]) / dtR;
+        const dot = (rx * out[0] + ry * out[1] + rz * out[2]) / (speed * speed);
+        trust *= Math.min(Math.max(dot, 0), 1);
+      }
+    }
+    // speed knee: the faster the motion, the shorter its trustworthy future
+    const k = speed / PPC.velTrustSpeedKnee;
+    trust *= 1 / (1 + k * k * k * k);
+    for (let j = 0; j < 6; j++) out[j] *= trust;
+
     // speed caps: prediction never exceeds a plausible gesture speed
     capLen3(out, 0, PPC.maxPredSpeed);
     capLen3(out, 3, PPC.maxPredSpeedNorm);
-    return true;
+    return trust;
   }
 }
 
@@ -269,10 +388,15 @@ interface LmState {
   vel: Float64Array;
   /** confidence at loss (last emitted visibility) */
   visEnter: number;
+  /** velocity trust at loss — scales how long confidence stays useful */
+  trust: number;
   /** neighbor-agreement multiplier, updated by the chain projection */
   agreement: number;
   /** held output at re-entry start (world + norm), for the blend */
   hold: Float64Array; // wx,wy,wz,nx,ny,nz,vis
+  /** last-seen offset from the parent (world + norm) at prediction entry;
+   *  parentless landmarks store the absolute position */
+  entry: Float64Array; // wx,wy,wz,nx,ny,nz
 }
 
 export class PoseContinuity {
@@ -296,8 +420,10 @@ export class PoseContinuity {
       this.lm.push({
         vel: new Float64Array(6),
         visEnter: 0,
+        trust: 0,
         agreement: 1,
         hold: new Float64Array(7),
+        entry: new Float64Array(6),
       });
       this.outWorld.push({ x: 0, y: 0, z: 0, visibility: 0 });
       this.outNorm.push({ x: 0, y: 0, z: 0, visibility: 0 });
@@ -395,9 +521,44 @@ export class PoseContinuity {
           g.blending = false;
           for (const m of g.spec.members) {
             const s = this.lm[m];
-            this.tracks[m].velocity(frameMs, s.vel);
-            s.visEnter = this.outWorld[m].visibility;
+            const track = this.tracks[m];
+            s.trust = track.velocity(frameMs, s.vel);
+            const ow = this.outWorld[m];
+            const on = this.outNorm[m];
+            // re-anchor on the last WELL-MEASURED sample: during the 2–3
+            // frame gate-hysteresis lag the pass-through already emitted
+            // low-visibility garbage positions (MediaPipe hallucinates
+            // during occlusion) — predicting from those anchors the whole
+            // outage to junk. The ring buffer only ever holds vis ≥ 0.5.
+            const gapMs = frameMs - track.latestT();
+            if (gapMs <= PPC.velMaxAgeMs && track.latestInto(ow, on)) {
+              s.visEnter = track.latestVis();
+              // dead-reckon the hysteresis gap: the buffered sample is 2–3
+              // frames old; advance it on the trusted velocity so prediction
+              // starts where the limb plausibly IS, not where it last was
+              const gap = gapMs / 1000;
+              ow.x += s.vel[0] * gap;
+              ow.y += s.vel[1] * gap;
+              ow.z += s.vel[2] * gap;
+              on.x += s.vel[3] * gap;
+              on.y += s.vel[4] * gap;
+              on.z += s.vel[5] * gap;
+            } else {
+              s.visEnter = ow.visibility;
+            }
             s.agreement = 1;
+            // last-seen anchor: offset from the parent (which usually stays
+            // measured), or absolute for parentless landmarks
+            const parent = this.parentOf(g, m);
+            if (parent >= 0) {
+              const pw = this.outWorld[parent];
+              const pn = this.outNorm[parent];
+              s.entry[0] = ow.x - pw.x; s.entry[1] = ow.y - pw.y; s.entry[2] = ow.z - pw.z;
+              s.entry[3] = on.x - pn.x; s.entry[4] = on.y - pn.y; s.entry[5] = on.z - pn.z;
+            } else {
+              s.entry[0] = ow.x; s.entry[1] = ow.y; s.entry[2] = ow.z;
+              s.entry[3] = on.x; s.entry[4] = on.y; s.entry[5] = on.z;
+            }
           }
         } else if (g.blending) {
           g.reentryMs += dtMs;
@@ -510,9 +671,31 @@ export class PoseContinuity {
       on.x += s.vel[3] * dt;
       on.y += s.vel[4] * dt;
       on.z += s.vel[5] * dt;
-      // rest bias: gentle pull toward a hanging chain, growing with age²
-      const wRest = PPC.restBiasMax * Math.min(g.ageMs / g.horizonMs, 1) ** 2;
-      this.pullToRest(g, m, ow, wRest * (1 - Math.exp(-dtMs / PPC.restTauMs)));
+      // entry-pull: retract toward the last-seen pose (parent-anchored) as
+      // age grows — reversals punish flying away; last-seen is the honest
+      // uncertainty center. The hanging-rest pull belongs to RELAXED.
+      const age = Math.min(g.ageMs / g.horizonMs, 1) ** PPC.entryPullExp;
+      const kPull = age * (1 - Math.exp(-dtMs / PPC.entryPullTauMs));
+      const parent = this.parentOf(g, m);
+      const pw = parent >= 0 ? this.outWorld[parent] : null;
+      const pn = parent >= 0 ? this.outNorm[parent] : null;
+      const ax = s.entry[0] + (pw?.x ?? 0); // last-seen anchor, riding the parent
+      const ay = s.entry[1] + (pw?.y ?? 0);
+      const az = s.entry[2] + (pw?.z ?? 0);
+      const anx = s.entry[3] + (pn?.x ?? 0);
+      const any_ = s.entry[4] + (pn?.y ?? 0);
+      const anz = s.entry[5] + (pn?.z ?? 0);
+      if (kPull > 0) {
+        ow.x += (ax - ow.x) * kPull;
+        ow.y += (ay - ow.y) * kPull;
+        ow.z += (az - ow.z) * kPull;
+        on.x += (anx - on.x) * kPull;
+        on.y += (any_ - on.y) * kPull;
+        on.z += (anz - on.z) * kPull;
+      }
+      // hard drift cap: prediction never strays far from the last-seen pose
+      capDrift(ow, ax, ay, az, PPC.maxDriftM);
+      capDrift(on, anx, any_, anz, PPC.maxDriftNorm);
       // bone-length projection against the (already emitted) parent
       this.projectToParent(g, m, ow, s);
     } else {
@@ -520,10 +703,15 @@ export class PoseContinuity {
       this.pullToRest(g, m, ow, 1 - Math.exp(-dtMs / PPC.restTauMs));
     }
 
-    // confidence decay — the honesty channel downstream consumers read
+    // confidence decay — the honesty channel downstream consumers read.
+    // Low velocity trust shrinks the effective horizon: a prediction that
+    // is basically "hold" hands bones back to the gate-approved bone-level
+    // hold quickly instead of driving them with informationless data.
     let vis: number;
     if (g.state === 'PREDICTED') {
-      const k = Math.min(g.ageMs / g.horizonMs, 1);
+      const effHorizon =
+        g.horizonMs * (PPC.trustHorizonFloor + (1 - PPC.trustHorizonFloor) * s.trust);
+      const k = Math.min(g.ageMs / Math.max(effHorizon, 1), 1);
       vis = s.visEnter * (1 - (1 - PPC.visFloorAtHorizon) * k) * s.agreement;
     } else {
       const over = g.ageMs - g.horizonMs;
@@ -531,6 +719,9 @@ export class PoseContinuity {
         s.visEnter * PPC.visFloorAtHorizon * s.agreement *
         Math.max(0, 1 - over / g.relaxVisMs);
     }
+    // group-level predictive value scales the confidence itself: legs emit
+    // ≤ 0.25× so downstream gates hand the puppet to bone-hold immediately
+    vis *= g.spec.visTrust;
     ow.visibility = on.visibility = Math.max(0, Math.min(vis, 1));
 
     // a landmark inside a lost group that is itself still well-measured
@@ -604,6 +795,20 @@ export class PoseContinuity {
         this.segLen.set(child * N + parent, prev === undefined ? len : prev + (len - prev) * k);
       }
     }
+  }
+}
+
+/** Clamp p onto a sphere of radius max around the anchor (ax, ay, az). */
+function capDrift(p: LandmarkPoint, ax: number, ay: number, az: number, max: number): void {
+  const dx = p.x - ax;
+  const dy = p.y - ay;
+  const dz = p.z - az;
+  const d = Math.hypot(dx, dy, dz);
+  if (d > max) {
+    const s = max / d;
+    p.x = ax + dx * s;
+    p.y = ay + dy * s;
+    p.z = az + dz * s;
   }
 }
 

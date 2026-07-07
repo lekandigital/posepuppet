@@ -1,5 +1,53 @@
 # Decisions
 
+## 2026-07-07 — PPC: in-PREDICTED bias targets last-seen, not hanging rest
+The brief sketched an "optional gravity/rest bias that grows with age".
+Measured on the masked fixtures, pulling a predicted limb toward a
+hanging rest mid-prediction fought the useful ballistic phase and helped
+nothing; what actually bounds error on reversing motion is retracting
+toward the LAST-SEEN position, anchored to the (usually still-measured)
+parent so it rides torso translation. Hanging-rest easing still happens —
+in RELAXED, where it always did. Also from measurement: velocity trust is
+a stack of three deterministic factors (fit residual, deceleration
+projection, 2 m/s speed knee) because the fast_dropout eval proved
+constant-velocity extrapolation of strikes loses to holding — fast motion
+now converges to hold-quality instead of flying away, and a hard 0.3 m
+drift cap makes "never flies away" an enforceable bound rather than a
+hope. Prediction entry re-anchors on the ring buffer's last well-measured
+sample (dead-reckoned across the 2–3 hysteresis frames) — the low-vis
+positions MediaPipe emits during occlusion are hallucinations and
+anchoring to them poisoned whole outages (caught by the drift-cap unit
+test before it shipped).
+
+## 2026-07-07 — PPC: confidence encodes measured predictive value per group
+Two masked-eval findings shaped the confidence channel beyond the plan's
+sketch. (1) Velocity trust scales the decay horizon: a prediction the
+trust stack rates as "basically hold" hands bones back to the
+gate-approved bone-hold quickly instead of driving them with
+informationless positions — fast_dropout's masked puppet sync went from
+15 % worse than legacy to better once low-trust confidence decayed fast.
+(2) Legs ship at visTrust 0.25 (a direct confidence multiplier): stride
+swings reverse inside any honest horizon; leg posErr measured ≈ hold at
+every age while leg-bone drive made masked sync 40 % worse than legacy
+(8.1° vs 6.06°). Scaling the confidence itself (not the decay rate)
+matters because the downstream visibility EMA lingers above the bone
+gate when the decay floor sits at 0.35 — legs now emit ≤ 0.23 and gate
+off in ~2 frames, closing the gap (6.21° vs 6.06°). Positions keep
+flowing either way; only the claimed confidence drops. The speed knee
+landed at 1.3 m/s (from 2.0) for the same reason, re-measured on both
+the fast and arms fixtures so the arm-exit win survived.
+
+## 2026-07-07 — PPC: masks live in src/eval/masks.ts, results in ppc-results.json
+Mask specs are bundled data, not fetched JSON — a fetch would ping the
+privacy receipt's network counter, and that counter staying at zero is a
+trust feature. The PPC eval writes eval/ppc-results.json via its own
+runner (eval/run-ppc.mjs): running `eval/run.mjs <one fixture>`
+overwrites eval/results.json wholesale, which nearly clobbered the
+fully-visible baseline twice this pass (restored from git both times).
+Masked runs also sample the sync metric against the pre-mask TRUTH
+stream, and synthesized dropout frames are never counted as detections —
+both numbers must mean what they claim.
+
 ## 2026-06-10 — M5 polish extras skipped (contract-first)
 Hand motion trails, the confidence meter, and the style/theme toggle from
 the mission's M5 list are not in the /goal contract, and the mission says

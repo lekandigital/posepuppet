@@ -1,0 +1,559 @@
+{
+  "meta": {
+    "date": "2026-07-07T15:06:45.008Z",
+    "machine": "darwin arm64",
+    "mode": "headed",
+    "durationSecPerRun": 60,
+    "note": "PPC masked-fixture eval: synthetic occlusion windows over real fixtures; sync sampled against the pre-mask truth stream; posErr during PREDICTED vs same-frame truth, legacy comparator = hold-last-visible."
+  },
+  "results": [
+    {
+      "fixture": "arms",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1788,
+      "detectedFrames": 1788,
+      "detectionRate": 1,
+      "poseFps": 29.8,
+      "renderFps": 119.89,
+      "droppedFrames": 12,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 33,
+        "t60": 31
+      },
+      "sync": {
+        "leftUpperArm": 9.72,
+        "leftForearm": 12.48,
+        "rightUpperArm": 8.51,
+        "rightForearm": 15.72,
+        "torso": 0.68,
+        "leftThigh": 2.73,
+        "rightThigh": 3.26,
+        "upperLimbsMean": 11.61,
+        "legsMean": 2.99
+      },
+      "ppc": {
+        "enabled": true,
+        "mask": "arms_hand_exit",
+        "maskedFrames": 271,
+        "predictedSamples": 955,
+        "posErr": {
+          "ppcMean": 0.127,
+          "ppcP95": 0.3208,
+          "holdMean": 0.1359,
+          "holdP95": 0.3386
+        },
+        "posErrBreakdown": {
+          "arm": {
+            "ppc": 0.127,
+            "hold": 0.1359,
+            "n": 955
+          },
+          "early": {
+            "ppc": 0.0881,
+            "hold": 0.0952,
+            "n": 500
+          },
+          "late": {
+            "ppc": 0.1698,
+            "hold": 0.1807,
+            "n": 455
+          }
+        },
+        "reentryMaxDelta": 0.06,
+        "horizonMaxMs": 400,
+        "nanCount": 0,
+        "syncMasked": {
+          "leftUpperArm": 14.17,
+          "leftForearm": 11.34,
+          "rightUpperArm": 11.14,
+          "rightForearm": 29.6,
+          "torso": 0.49,
+          "leftThigh": 2.89,
+          "rightThigh": 3.08,
+          "upperLimbsMean": 16.56,
+          "legsMean": 2.98
+        }
+      },
+      "finishedAt": "2026-07-07T14:59:33.260Z",
+      "consoleErrors": []
+    },
+    {
+      "fixture": "arms",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1792,
+      "detectedFrames": 1792,
+      "detectionRate": 1,
+      "poseFps": 29.87,
+      "renderFps": 119.87,
+      "droppedFrames": 8,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 28,
+        "t60": 26
+      },
+      "sync": {
+        "leftUpperArm": 8.52,
+        "leftForearm": 16.6,
+        "rightUpperArm": 8.72,
+        "rightForearm": 16.2,
+        "torso": 0.67,
+        "leftThigh": 2.72,
+        "leftShin": 0.62,
+        "rightThigh": 3.3,
+        "rightShin": 1.3,
+        "upperLimbsMean": 12.51,
+        "legsMean": 1.98
+      },
+      "ppc": {
+        "enabled": false,
+        "mask": "arms_hand_exit",
+        "maskedFrames": 272,
+        "predictedSamples": 0,
+        "reentryMaxDelta": 0,
+        "horizonMaxMs": 0,
+        "nanCount": 0,
+        "syncMasked": {
+          "leftUpperArm": 7.51,
+          "leftForearm": 22.09,
+          "rightUpperArm": 11.44,
+          "rightForearm": 31.72,
+          "torso": 0.51,
+          "leftThigh": 2.93,
+          "rightThigh": 2.99,
+          "upperLimbsMean": 18.19,
+          "legsMean": 2.96
+        }
+      },
+      "finishedAt": "2026-07-07T15:00:34.467Z",
+      "consoleErrors": []
+    },
+    {
+      "fixture": "facetouch",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1790,
+      "detectedFrames": 1790,
+      "detectionRate": 1,
+      "poseFps": 29.83,
+      "renderFps": 119.55,
+      "droppedFrames": 10,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 32,
+        "t60": 28
+      },
+      "sync": {
+        "leftUpperArm": 3.32,
+        "leftForearm": 8.17,
+        "rightUpperArm": 12,
+        "rightForearm": 5.73,
+        "torso": 0.71,
+        "rightThigh": 0.39,
+        "leftThigh": 3.93,
+        "upperLimbsMean": 7.3,
+        "legsMean": 2.16
+      },
+      "faceTouch": {
+        "engagedFrames": 480,
+        "reachFrames": 475,
+        "penetrationFrames": 0,
+        "reachRate": 0.99,
+        "penetrationRate": 0
+      },
+      "ppc": {
+        "enabled": true,
+        "mask": "facetouch_face_cross",
+        "maskedFrames": 72,
+        "predictedSamples": 406,
+        "posErr": {
+          "ppcMean": 0.0245,
+          "ppcP95": 0.1722,
+          "holdMean": 0.0303,
+          "holdP95": 0.2491
+        },
+        "posErrBreakdown": {
+          "core": {
+            "ppc": 0.0063,
+            "hold": 0.0061,
+            "n": 231
+          },
+          "early": {
+            "ppc": 0.0172,
+            "hold": 0.0219,
+            "n": 265
+          },
+          "late": {
+            "ppc": 0.0383,
+            "hold": 0.0461,
+            "n": 141
+          },
+          "arm": {
+            "ppc": 0.0486,
+            "hold": 0.0623,
+            "n": 175
+          }
+        },
+        "reentryMaxDelta": 0.012,
+        "horizonMaxMs": 368,
+        "nanCount": 0,
+        "syncMasked": {
+          "leftUpperArm": 2.56,
+          "leftForearm": 7.14,
+          "rightUpperArm": 10.68,
+          "rightForearm": 3.66,
+          "torso": 0.62,
+          "upperLimbsMean": 6.01
+        }
+      },
+      "finishedAt": "2026-07-07T15:01:35.652Z",
+      "consoleErrors": []
+    },
+    {
+      "fixture": "facetouch",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1793,
+      "detectedFrames": 1793,
+      "detectionRate": 1,
+      "poseFps": 29.89,
+      "renderFps": 119.79,
+      "droppedFrames": 7,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 31,
+        "t60": 27
+      },
+      "sync": {
+        "leftUpperArm": 3.47,
+        "leftForearm": 8.73,
+        "rightUpperArm": 11.88,
+        "rightForearm": 5.89,
+        "torso": 0.71,
+        "rightThigh": 0.28,
+        "leftThigh": 4,
+        "upperLimbsMean": 7.49,
+        "legsMean": 2.14
+      },
+      "faceTouch": {
+        "engagedFrames": 475,
+        "reachFrames": 454,
+        "penetrationFrames": 0,
+        "reachRate": 0.956,
+        "penetrationRate": 0
+      },
+      "ppc": {
+        "enabled": false,
+        "mask": "facetouch_face_cross",
+        "maskedFrames": 72,
+        "predictedSamples": 0,
+        "reentryMaxDelta": 0,
+        "horizonMaxMs": 0,
+        "nanCount": 0,
+        "syncMasked": {
+          "leftUpperArm": 2.99,
+          "leftForearm": 9.65,
+          "rightUpperArm": 8.92,
+          "rightForearm": 4.92,
+          "torso": 0.59,
+          "upperLimbsMean": 6.62
+        }
+      },
+      "finishedAt": "2026-07-07T15:02:37.643Z",
+      "consoleErrors": []
+    },
+    {
+      "fixture": "fullbody",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1793,
+      "detectedFrames": 1793,
+      "detectionRate": 1,
+      "poseFps": 29.89,
+      "renderFps": 119.92,
+      "droppedFrames": 7,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 30,
+        "t60": 33
+      },
+      "sync": {
+        "leftUpperArm": 2.64,
+        "leftForearm": 5.68,
+        "rightUpperArm": 2.36,
+        "rightForearm": 12.55,
+        "torso": 1.93,
+        "leftThigh": 5.61,
+        "leftShin": 6.1,
+        "rightThigh": 4.91,
+        "rightShin": 5.73,
+        "upperLimbsMean": 5.81,
+        "legsMean": 5.59
+      },
+      "faceTouch": {
+        "engagedFrames": 9,
+        "reachFrames": 9,
+        "penetrationFrames": 0,
+        "reachRate": 1,
+        "penetrationRate": 0
+      },
+      "ppc": {
+        "enabled": true,
+        "mask": "fullbody_foot_out",
+        "maskedFrames": 107,
+        "predictedSamples": 332,
+        "posErr": {
+          "ppcMean": 0.1705,
+          "ppcP95": 0.4998,
+          "holdMean": 0.1678,
+          "holdP95": 0.52
+        },
+        "posErrBreakdown": {
+          "leg": {
+            "ppc": 0.1705,
+            "hold": 0.1678,
+            "n": 332
+          },
+          "early": {
+            "ppc": 0.1269,
+            "hold": 0.1175,
+            "n": 180
+          },
+          "late": {
+            "ppc": 0.2221,
+            "hold": 0.2275,
+            "n": 152
+          }
+        },
+        "reentryMaxDelta": 0.06,
+        "horizonMaxMs": 400,
+        "nanCount": 0,
+        "syncMasked": {
+          "leftUpperArm": 3.72,
+          "leftForearm": 2.78,
+          "rightUpperArm": 2.47,
+          "rightForearm": 7.98,
+          "torso": 1.61,
+          "leftThigh": 4.79,
+          "leftShin": 5.32,
+          "rightThigh": 9.03,
+          "rightShin": 5.3,
+          "upperLimbsMean": 4.24,
+          "legsMean": 6.11
+        }
+      },
+      "finishedAt": "2026-07-07T15:03:39.443Z",
+      "consoleErrors": []
+    },
+    {
+      "fixture": "fullbody",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1789,
+      "detectedFrames": 1789,
+      "detectionRate": 1,
+      "poseFps": 29.71,
+      "renderFps": 119.35,
+      "droppedFrames": 10,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 29,
+        "t60": 32
+      },
+      "sync": {
+        "leftUpperArm": 2.64,
+        "leftForearm": 5.63,
+        "rightUpperArm": 2.38,
+        "rightForearm": 12.5,
+        "torso": 1.93,
+        "leftThigh": 5.57,
+        "leftShin": 6.05,
+        "rightThigh": 4.89,
+        "rightShin": 5.76,
+        "upperLimbsMean": 5.79,
+        "legsMean": 5.57
+      },
+      "faceTouch": {
+        "engagedFrames": 8,
+        "reachFrames": 8,
+        "penetrationFrames": 0,
+        "reachRate": 1,
+        "penetrationRate": 0
+      },
+      "ppc": {
+        "enabled": false,
+        "mask": "fullbody_foot_out",
+        "maskedFrames": 107,
+        "predictedSamples": 0,
+        "reentryMaxDelta": 0,
+        "horizonMaxMs": 0,
+        "nanCount": 0,
+        "syncMasked": {
+          "leftUpperArm": 3.71,
+          "leftForearm": 2.81,
+          "rightUpperArm": 2.45,
+          "rightForearm": 7.89,
+          "torso": 1.6,
+          "leftThigh": 4.8,
+          "leftShin": 5.23,
+          "rightThigh": 9.32,
+          "rightShin": 5.28,
+          "upperLimbsMean": 4.22,
+          "legsMean": 6.16
+        }
+      },
+      "finishedAt": "2026-07-07T15:04:41.600Z",
+      "consoleErrors": []
+    },
+    {
+      "fixture": "fast",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1793,
+      "detectedFrames": 1793,
+      "detectionRate": 1,
+      "poseFps": 29.76,
+      "renderFps": 119.65,
+      "droppedFrames": 7,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 30,
+        "t60": 27
+      },
+      "sync": {
+        "leftUpperArm": 18.55,
+        "leftForearm": 25.14,
+        "rightUpperArm": 18.19,
+        "rightForearm": 22.39,
+        "torso": 2.44,
+        "leftThigh": 3.92,
+        "rightThigh": 4.47,
+        "upperLimbsMean": 21.06,
+        "legsMean": 4.2
+      },
+      "faceTouch": {
+        "engagedFrames": 15,
+        "reachFrames": 14,
+        "penetrationFrames": 0,
+        "reachRate": 0.933,
+        "penetrationRate": 0
+      },
+      "ppc": {
+        "enabled": true,
+        "mask": "fast_dropout",
+        "maskedFrames": 137,
+        "predictedSamples": 799,
+        "posErr": {
+          "ppcMean": 0.1688,
+          "ppcP95": 0.4956,
+          "holdMean": 0.1662,
+          "holdP95": 0.4955
+        },
+        "posErrBreakdown": {
+          "arm": {
+            "ppc": 0.2451,
+            "hold": 0.241,
+            "n": 484
+          },
+          "early": {
+            "ppc": 0.1357,
+            "hold": 0.133,
+            "n": 575
+          },
+          "core": {
+            "ppc": 0.0515,
+            "hold": 0.0512,
+            "n": 315
+          },
+          "late": {
+            "ppc": 0.2537,
+            "hold": 0.2514,
+            "n": 224
+          }
+        },
+        "reentryMaxDelta": 0.06,
+        "horizonMaxMs": 400,
+        "nanCount": 0,
+        "syncMasked": {
+          "leftUpperArm": 37.04,
+          "leftForearm": 35.65,
+          "rightUpperArm": 21.06,
+          "rightForearm": 13.75,
+          "torso": 4.55,
+          "leftThigh": 2.27,
+          "rightThigh": 3.8,
+          "upperLimbsMean": 26.87,
+          "legsMean": 3.03
+        }
+      },
+      "finishedAt": "2026-07-07T15:05:43.627Z",
+      "consoleErrors": []
+    },
+    {
+      "fixture": "fast",
+      "avatar": "robot",
+      "durationSec": 60,
+      "videoFrames": 1792,
+      "detectedFrames": 1792,
+      "detectionRate": 1,
+      "poseFps": 29.87,
+      "renderFps": 119.16,
+      "droppedFrames": 8,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 31,
+        "t30": 27,
+        "t60": 31
+      },
+      "sync": {
+        "leftUpperArm": 19.09,
+        "leftForearm": 25.54,
+        "rightUpperArm": 18.06,
+        "rightForearm": 22.77,
+        "torso": 2.48,
+        "leftThigh": 4.19,
+        "rightThigh": 4.61,
+        "upperLimbsMean": 21.37,
+        "legsMean": 4.4
+      },
+      "faceTouch": {
+        "engagedFrames": 8,
+        "reachFrames": 8,
+        "penetrationFrames": 0,
+        "reachRate": 1,
+        "penetrationRate": 0
+      },
+      "ppc": {
+        "enabled": false,
+        "mask": "fast_dropout",
+        "maskedFrames": 138,
+        "predictedSamples": 0,
+        "reentryMaxDelta": 0,
+        "horizonMaxMs": 0,
+        "nanCount": 0,
+        "syncMasked": {
+          "leftUpperArm": 37.37,
+          "leftForearm": 34.45,
+          "rightUpperArm": 19.54,
+          "rightForearm": 18.81,
+          "torso": 4.92,
+          "leftThigh": 2.7,
+          "rightThigh": 3.74,
+          "upperLimbsMean": 27.54,
+          "legsMean": 3.22
+        }
+      },
+      "finishedAt": "2026-07-07T15:06:44.908Z",
+      "consoleErrors": []
+    }
+  ]
+}
