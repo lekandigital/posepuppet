@@ -1,6 +1,13 @@
 # PLAN.md — Predictive Pose Continuity (PPC)
 
-Status: **awaiting USER GATE 1** (plan + thresholds approval).
+Status: **COMPLETE — Gate 1 approved in-session; Gate 2 (live occlusion
+test) approved 2026-07-07 after one fix round** (first live test failed
+on full-dropout torso bend/spin and behind-torso punch glitch; fixed by
+rigid core prediction + the chain-length physics gate, focused retest
+passed — see EVAL_NOTES and DECISIONS). Thresholds below are as
+approved; measured revisions (core horizon 250→150 ms for the Flight
+contract, legs visTrust 0.25, velocity-trust stack) are documented in
+DECISIONS.md with their measurements.
 Branch `predictive-pose-continuity-fable`. The BodyArcade Flight plan
 (accepted 2026-07-07) lives in git history at this path.
 
