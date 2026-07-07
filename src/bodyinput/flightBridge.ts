@@ -11,7 +11,10 @@ const ENVELOPE = 'bodyarcade.body-input.v1';
 
 export function defaultFlightUrl(): string {
   const env = import.meta.env.VITE_FLIGHT_URL as string | undefined;
-  return env && env.trim() ? env.trim() : 'http://localhost:5199/';
+  // Same-origin by default: the PosePuppet dev server serves the built
+  // flight app at /flight/, so BroadcastChannel works and the postMessage
+  // relay below is just a redundant second path (the receiver dedupes).
+  return env && env.trim() ? env.trim() : '/flight/';
 }
 
 /** Open (or focus) the flight app and stream body signals to it. */

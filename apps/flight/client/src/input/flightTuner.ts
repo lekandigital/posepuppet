@@ -243,7 +243,27 @@ export class FlightTuner {
           : " · boost READY"
         : "";
       const recenter = d.recenterFlashMs > 0 ? " · RECENTERED" : "";
-      this.statusEl.textContent = `src ${d.reason.toUpperCase()} · ${rate}Hz · age ${age} · conf ${conf}${seated}${boost}${recenter}`;
+      const wire = d.senderConnected
+        ? `${d.transport === "broadcast" ? "bc" : "pm"} v${d.schemaV}`
+        : "no sender";
+      this.statusEl.innerHTML = "";
+      const line1 = document.createElement("div");
+      line1.textContent = `src ${d.reason.toUpperCase()} · ${wire} · ${rate}Hz · age ${age} · conf ${conf}${seated}${boost}${recenter}`;
+      this.statusEl.appendChild(line1);
+      if (!d.senderConnected) {
+        const hint = document.createElement("div");
+        hint.textContent =
+          "PosePuppet isn't reaching this page. BroadcastChannel is " +
+          "origin-scoped — a different port is a different origin. Run " +
+          "`npm run arcade` at the repo root, open PosePuppet, then " +
+          "⌘K → \"fly\" (serves this game same-origin at /flight/).";
+        Object.assign(hint.style, {
+          color: "#f0938a",
+          whiteSpace: "normal",
+          marginTop: "2px",
+        } as CSSStyleDeclaration);
+        this.statusEl.appendChild(hint);
+      }
       this.statusEl.style.color = d.active
         ? "#8fe3c0"
         : d.reason === "autopilot" || d.reason === "reacquiring"

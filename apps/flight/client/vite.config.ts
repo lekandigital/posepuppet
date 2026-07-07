@@ -1,7 +1,11 @@
 import { defineConfig } from "vite";
 import path from "path";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // Built output is served by PosePuppet's dev server under /flight/ so both
+  // apps share one origin (BroadcastChannel is origin-scoped). Standalone
+  // `vite dev` keeps base '/' — the flight test suite runs it that way.
+  base: command === "build" ? "/flight/" : "/",
   resolve: {
     alias: {
       "@globefly/shared": path.resolve(__dirname, "../shared"),
@@ -22,4 +26,4 @@ export default defineConfig({
       allow: [path.resolve(__dirname, ".."), path.resolve(__dirname, "../../../packages")],
     },
   },
-});
+}));

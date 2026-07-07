@@ -1,5 +1,27 @@
 # Eval notes
 
+### Gate-2 blocker: NO-SIGNAL — topology fixed, verified (2026-07-07)
+Live gate attempt failed: tuner showed src NO-SIGNAL · 0Hz, all axes
+zero, while PosePuppet tracked correctly. Root cause (verified by
+reproduction, not inference): the Gate-2 script's two-terminal command
+nested npm runs and dropped --port — vite reported 5173, flight never
+listened on 5199 — and with two ports there is no shared origin, so
+BroadcastChannel could never carry signals regardless. Sender/receiver
+audit: channel name, postMessage envelope, and schema v1 identical on
+both sides — protocol was never wrong. Fix verified end-to-end:
+posepuppet vite serves the built flight app same-origin at /flight/
+(base '/flight/', asset prefixes mapped, publics verified disjoint);
+`npm run arcade` is the single start command; tuner now shows
+transport (bc/pm) + schema + sender-connected with an actionable
+NO-SIGNAL hint. New regression spec (apps/flight/tests/topology.spec.ts,
+headed): real tracker on arms.y4m → /flight/ page over PURE
+BroadcastChannel — senderConnected, >5 Hz, transport broadcast, schema
+v1, age <500 ms, axes moving — green in 7.4 s. Measured along the way:
+a SwiftShader-bound game page in headless throttles even BC event
+delivery to ~0.7 msg/s (sender publishing 10 Hz, consumer page on the
+same origin receiving full rate) — which is why the spec is headed and
+why headless "0 Hz" must never be read as a protocol failure.
+
 ### Flight P3: Feel Lab — profiles, assist ladder, autopilot (2026-07-07)
 Feel suite 8/8 (headed; 7 synthetic + 1 real closed loop):
 (1) neutral drift law — |mean heading rate| < 2°/s, |bank| < 3°, altitude

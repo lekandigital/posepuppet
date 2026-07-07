@@ -52,6 +52,9 @@ test("lobby loads offline: local world minted, zero off-origin requests", async 
 });
 
 test("full flight session offline: GO → intro → HUD, still zero off-origin", async ({ page }) => {
+  // Headless throttles this mediastream-less WebGL page to ~1 rAF/s, so a
+  // full session normally takes ~1.2 min — give it room past the 90 s default.
+  test.setTimeout(150_000);
   const offOrigin = trackRequests(page);
   const errors = trackConsoleErrors(page);
 
