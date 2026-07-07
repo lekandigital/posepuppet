@@ -35,6 +35,7 @@ import { LM } from './pose/indices';
 import { mirrorNorm, mirrorWorld } from './pose/mirror';
 import { LandmarkSmoother } from './pose/smoothing';
 import { PoseContinuity } from './pose/continuity';
+import { MASKS, createMasker } from './eval/masks';
 import type { LandmarkPoint, PoseFrame } from './pose/types';
 import { createRobot } from './rig/robot';
 import { Retargeter } from './rig/retarget';
@@ -1212,6 +1213,13 @@ async function boot() {
   const mNorm: LandmarkPoint[] = [];
   const mWorld: LandmarkPoint[] = [];
 
+  // PPC eval harness: ?mask=<spec> applies deterministic synthetic occlusion
+  // windows (keyed on video time) between mirroring and continuity — the
+  // same frame provides ground truth for the masked-run metrics
+  const maskName = params.get('mask');
+  const masker = maskName && MASKS[maskName] ? createMasker(MASKS[maskName]) : null;
+  if (maskName && !masker) console.warn(`unknown mask spec: ${maskName}`);
+
   function onPoseFrame(frame: PoseFrame | null) {
     // the camera overlay always draws the RAW detection — predicted
     // landmarks never appear over the real video (honesty line)
@@ -1227,6 +1235,18 @@ async function boot() {
       world = config.mirror ? mirrorWorld(frame.world, mWorld) : frame.world;
     }
 
+    const truthWorld = world;
+    const truthNorm = norm;
+    let masked: number[] = [];
+    let maskDropped = false;
+    if (masker && world && norm && frame) {
+      const mr = masker.apply(world, norm, frame.videoTimeMs);
+      world = mr.world;
+      norm = mr.norm;
+      masked = mr.masked;
+      maskDropped = mr.dropped;
+    }
+
     // Predictive Pose Continuity: may briefly carry the stream through an
     // occlusion (≤ 400 ms, decaying confidence) or synthesize through a
     // short full dropout; null once faded — every consumer inherits it
@@ -1239,15 +1259,26 @@ async function boot() {
       latestNorm = cont.norm;
       intents.onLandmarks(cont.norm, tMs);
       bodyInput.onPoseFrame(cont.world, cont.norm, tMs);
-      // detection honesty: a synthesized dropout frame is NOT a detection —
-      // eval only sees frames the detector actually produced
-      evalCollector?.onPoseFrame(frame ? cont.norm : null);
     } else {
       retargeter.updateFromPose(null, null);
       latestNorm = null;
       intents.onLandmarks(null, tMs);
       bodyInput.onPoseFrame(null, null, tMs);
-      evalCollector?.onPoseFrame(null);
+    }
+
+    // detection honesty: a synthesized dropout frame is NOT a detection.
+    // Masked runs sample sync against the TRUTH stream — the metric is
+    // "did the puppet keep matching the real person while blind"
+    if (masker) {
+      evalCollector?.onPoseFrame(frame ? truthNorm : null);
+      if (frame && truthWorld && truthNorm) {
+        evalCollector?.onPpcFrame(
+          masker.spec.name, config.ppc, truthWorld, truthNorm, cont?.world ?? null,
+          masked, maskDropped, continuity.states(),
+        );
+      }
+    } else {
+      evalCollector?.onPoseFrame(frame && cont ? cont.norm : null);
     }
   }
 

@@ -1,3 +1,11 @@
+## 2026-07-07 (PPC P3 — masked-fixture eval, legacy vs PPC published)
+Mask harness (4 specs over real fixtures, loop-repeating, same-frame truth) + run-ppc.mjs → eval/ppc-results.json
+End-to-end masked puppet sync: PPC ≤ legacy on all 4 fixtures; landmark posErr −19%/−6.5% where prediction informs, parity-in-noise on reversal footage (convergence-to-hold is the measured design goal there)
+Guarantees: re-entry ≤ 0.06 m/frame, horizon ≤ 400 ms, 0 NaN; fully-visible deltas ≤ 0.09° upper (tol ±1.0°), floors intact; suite 83/5skip
+Calibration journey logged in DECISIONS (velocity-trust stack, entry-pull, leg visTrust 0.25); docs/PPC.md written
+Blockers: none
+Next: P4 — body-input tracking flags (additive), flight autopilot-timing contract measurement, README note
+
 ## 2026-07-07 (PPC P2 — wired live, engineering chips)
 PPC live at the main.ts fork (all five consumers inherit); ?ppc=0 / panel toggle for legacy A/B; per-limb state chips in engineering view; resets on mirror/file/camera switches
 Honesty: overlay draws raw detection only; synthesized frames never count as detections in eval
