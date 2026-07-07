@@ -1,3 +1,10 @@
+## 2026-07-07 (PPC P1 — continuity core, GATE 1 APPROVED)
+Gate 1 approved in-session (architecture, metrics, thresholds, plan — proceed)
+src/pose/continuity.ts: ring buffers + regression velocity + 6 per-limb state machines + constraints + confidence decay + converging no-snap re-entry, all Gate-1 constants in one table
+9 new node specs green; full suite 82 passed / 5 skipped (73 baseline intact)
+Blockers: none
+Next: P2 — wire into the main.ts fork behind ?ppc flag, engineering-view state chips, reset paths
+
 ## 2026-07-07 (PPC P0 — audit + plan, GATE 1 RAISED)
 Predictive Pose Continuity P0 complete on `predictive-pose-continuity-fable`: occlusion path audited (no landmark-level continuity today; bone-space coast/relax in retarget.ts, body-input decays confidence separately, Flight autopilot contract at 0.35/350ms is consumed not touched)
 Baselines confirmed as regression gates: PosePuppet 73 passed / 5 skipped; Flight 16+1 flake first run (superman-arms, passed isolated — the documented contention flake), clean full rerun 17 passed / 2 skipped
