@@ -73,3 +73,6 @@ public/avatars/woody.vrm
 
 # Design-gate mockup screenshots: synthetic content only, no personal footage
 !design/mockups/*.png
+
+# Sensitive notes, do not commit
+LICENSE_NOTES.md
