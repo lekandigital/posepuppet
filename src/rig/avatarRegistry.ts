@@ -40,7 +40,10 @@ export async function probeOptionalAvatars(): Promise<void> {
     REGISTRY.filter((d) => d.optional && d.url).map(async (d) => {
       try {
         const res = await fetch(d.url!, { method: 'HEAD' });
-        if (!res.ok) unavailable.add(d.id);
+        // dev servers answer missing assets with the SPA fallback page
+        // (200 text/html) — that is an absent avatar, not a present one
+        const html = (res.headers.get('content-type') ?? '').includes('text/html');
+        if (!res.ok || html) unavailable.add(d.id);
       } catch {
         unavailable.add(d.id);
       }
