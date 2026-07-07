@@ -54,6 +54,9 @@ test("live body intent reaches /flight/ over same-origin BroadcastChannel", asyn
   const flight = await context.newPage();
   await flight.goto(`${POSEPUPPET}/flight/`);
   await flight.waitForFunction(() => !!(window as any).__FLIGHT, undefined, { timeout: 30_000 });
+  // Pin a gate-free profile; the default (Superman) reports "unarmed" with
+  // arms down, and this spec is about transport, not profiles.
+  await flight.evaluate(() => (window as any).__FLIGHT.setProfile("pilot-lean"));
 
   await flight.waitForFunction(
     () => {

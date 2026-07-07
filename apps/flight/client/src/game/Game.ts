@@ -857,6 +857,40 @@ export class Game {
     this.flightTuner?.toggle(this.container);
   };
 
+  private recenterToastEl: HTMLElement | null = null;
+  private recenterToastTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** T-pose recenter confirmation — same visual language as game toasts. */
+  private showRecenterToast() {
+    if (!this.recenterToastEl) {
+      const el = document.createElement("div");
+      Object.assign(el.style, {
+        position: "fixed",
+        top: "14%",
+        left: "50%",
+        transform: "translateX(-50%)",
+        padding: "12px 24px",
+        borderRadius: "12px",
+        background: "rgba(0, 0, 0, 0.72)",
+        color: "#a9f0d1",
+        fontFamily: "'Domine', Georgia, serif",
+        fontSize: "1.05rem",
+        letterSpacing: "0.03em",
+        zIndex: "350",
+        pointerEvents: "none",
+        transition: "opacity 0.4s ease",
+      } as CSSStyleDeclaration);
+      el.textContent = "Recentered — this stance is your new neutral";
+      this.container.appendChild(el);
+      this.recenterToastEl = el;
+    }
+    this.recenterToastEl.style.opacity = "1";
+    if (this.recenterToastTimer) clearTimeout(this.recenterToastTimer);
+    this.recenterToastTimer = setTimeout(() => {
+      if (this.recenterToastEl) this.recenterToastEl.style.opacity = "0";
+    }, 3000);
+  }
+
   /** VFX, combo SFX, camera shake, vehicle flash, and speed boost for diamonds (world + race bonus). */
   private triggerPlaneDiamondCollectEffects(worldPos: Vector3, tier: number) {
     this.collectVFX.play(worldPos, tier);
@@ -3405,6 +3439,11 @@ export class Game {
 
     let inputState =
       this.touchControls ? this.touchControls.getState() : this.controls.getState();
+    // T-pose recenter confirmation, visible without the tuner (Gate-2
+    // feedback: the tuner-only flag was easy to miss).
+    if (this.bodyControls?.consumeRecenterFlag()) {
+      this.showRecenterToast();
+    }
     // Body input merges here — the single point it enters the intent layer.
     // Keyboard/touch activity always wins (see BodyFlightControls.merge).
     if (this.bodyControls && this.controls.enabled) {
@@ -7113,6 +7152,9 @@ export class Game {
     this.flightTuner?.dispose();
     this.flightTuner = null;
     window.removeEventListener("keydown", this.onTunerKey);
+    if (this.recenterToastTimer) clearTimeout(this.recenterToastTimer);
+    this.recenterToastEl?.remove();
+    this.recenterToastEl = null;
     this.speedLines?.dispose();
     this.contrails?.dispose();
     this.wakeTrail?.dispose();

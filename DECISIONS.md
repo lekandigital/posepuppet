@@ -301,3 +301,25 @@ bound game page throttles even BroadcastChannel delivery to ~0.7 msg/s
 in headless, so a headless version of this spec would lie). Flight-only
 standalone dev on 5199 remains supported for flight app work (its suite
 runs that way); body signals are only expected in the /flight/ layout.
+
+## 2026-07-07 — GATE 2 APPROVED: Superman default, five feel refinements
+Lekan's live report: no fatigue/nausea, no drift fights, latency felt
+attached, autopilot + recenter worked. Default standing profile =
+SUPERMAN (his pick), seated = HEAD PILOT; profile array reordered so
+Superman is the fresh-session default. Tuning from the report, all
+landed: (1) Head Pilot climb needed an uncomfortably deep backward lean
+— seated leans are small, climbGain 1.6 → 3.0 (descend 2.0); (2)
+Superman arm-drop was choppy — disarm now decays through the same
+τ=0.3 s path as tracking loss and re-arms through the reacquire slew,
+plus arm/release hysteresis (engage armsOut>0.4, hold >0.25) so the gate
+can't flap mid-turn; (3) autopilot/re-entry slightly abrupt — decay τ
+0.25 → 0.3 s, re-entry slew 2.0 → 1.2 intent/s; (4) RECENTERED was easy
+to miss — now a dedicated high-contrast tuner banner (4 s) plus an
+in-game toast that works without the tuner; (5) Superman responsiveness
+— turnGain 1.2 → 1.35, climb 1.5 → 1.7 (modest on purpose; "not
+twitchy"). Gains store bumped to v2 so live-test slider values don't
+mask the new defaults. His Pilot Lean observation (extreme lean ≈
+moderate lean) is the Full Assist turn cap working as designed at 0.95
+— left alone per his own "don't add behavior beyond the design" note.
+Specs pinned to pilot-lean where they test that mapping (the default
+changed under them).

@@ -17,7 +17,9 @@ export interface PlaneResponse {
   bankDeg: number;
 }
 
-const GAIN_STORE_KEY = "bodyarcade_flight_gains_v1";
+// v2: fresh defaults after the Gate-2 tuning pass (old saved gains would
+// silently mask the new per-profile values).
+const GAIN_STORE_KEY = "bodyarcade_flight_gains_v2";
 
 const RAW_AXES = ["leanX", "leanY", "crouch", "tallness", "armsOut", "handsForward"] as const;
 const INTENT_AXES = ["turnRate", "speedAxis", "elevateAxis"] as const;
@@ -31,6 +33,7 @@ export class FlightTuner {
   private profileBtn: HTMLButtonElement | null = null;
   private assistBtn: HTMLButtonElement | null = null;
   private notesEl: HTMLElement | null = null;
+  private recenterEl: HTMLElement | null = null;
 
   constructor(
     private body: BodyFlightControls,
@@ -114,6 +117,23 @@ export class FlightTuner {
     this.statusEl = document.createElement("div");
     this.statusEl.style.marginBottom = "6px";
     el.appendChild(this.statusEl);
+
+    // Recenter confirmation: its own banner — Gate-2 feedback said the old
+    // inline flag drowned among the moving numbers.
+    this.recenterEl = document.createElement("div");
+    Object.assign(this.recenterEl.style, {
+      display: "none",
+      margin: "0 0 8px",
+      padding: "6px 8px",
+      textAlign: "center",
+      fontWeight: "700",
+      letterSpacing: "0.1em",
+      color: "#0d1a12",
+      background: "#8fe3c0",
+      borderRadius: "4px",
+    } as CSSStyleDeclaration);
+    this.recenterEl.textContent = "RECENTERED — NEUTRAL CAPTURED";
+    el.appendChild(this.recenterEl);
 
     const btnRow = document.createElement("div");
     Object.assign(btnRow.style, { display: "flex", gap: "6px", marginBottom: "8px" });
@@ -242,13 +262,12 @@ export class FlightTuner {
           ? ` · boost ${(d.boostArmedIn / 1000).toFixed(1)}s`
           : " · boost READY"
         : "";
-      const recenter = d.recenterFlashMs > 0 ? " · RECENTERED" : "";
       const wire = d.senderConnected
         ? `${d.transport === "broadcast" ? "bc" : "pm"} v${d.schemaV}`
         : "no sender";
       this.statusEl.innerHTML = "";
       const line1 = document.createElement("div");
-      line1.textContent = `src ${d.reason.toUpperCase()} · ${wire} · ${rate}Hz · age ${age} · conf ${conf}${seated}${boost}${recenter}`;
+      line1.textContent = `src ${d.reason.toUpperCase()} · ${wire} · ${rate}Hz · age ${age} · conf ${conf}${seated}${boost}`;
       this.statusEl.appendChild(line1);
       if (!d.senderConnected) {
         const hint = document.createElement("div");
@@ -273,6 +292,9 @@ export class FlightTuner {
     if (this.profileBtn) this.profileBtn.textContent = `${d.profile.label} ⇄`;
     if (this.assistBtn) this.assistBtn.textContent = `${d.assist.label} ⇄`;
     if (this.notesEl) this.notesEl.textContent = d.profile.notes;
+    if (this.recenterEl) {
+      this.recenterEl.style.display = d.recenterFlashMs > 0 ? "block" : "none";
+    }
 
     const setBar = (key: string, v: number, signed: boolean) => {
       const bar = this.bars.get(key);

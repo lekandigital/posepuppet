@@ -30,10 +30,14 @@ const MESSAGE_ENVELOPE = "bodyarcade.body-input.v1";
 const PROFILE_STORE_KEY = "bodyarcade_flight_profile_v1";
 const ASSIST_STORE_KEY = "bodyarcade_flight_assist_v1";
 
-/** Autopilot: axis decay toward neutral on loss (τ ≈ 0.25 s ⇒ ~neutral in 0.5 s). */
-const LOSS_DECAY_TAU_S = 0.25;
-/** Re-entry: max intent change per second while blending back after loss. */
-const REACQUIRE_SLEW_PER_S = 2.0;
+/**
+ * Autopilot: axis decay toward neutral on loss (τ = 0.3 s ⇒ 80% neutral at
+ * 0.5 s). Gate-2 feedback: 0.25 read slightly abrupt.
+ */
+const LOSS_DECAY_TAU_S = 0.3;
+/** Re-entry: max intent change per second while blending back after loss.
+ *  Gate-2 feedback: 2.0 read slightly abrupt; 1.2 blends back over ~0.7 s. */
+const REACQUIRE_SLEW_PER_S = 1.2;
 /** Re-entry blend duration bookkeeping (state leaves "reacquire" when caught up). */
 const REACQUIRE_EPS = 0.02;
 
@@ -65,8 +69,10 @@ export interface BodyFlightProfile {
   /**
    * Optional arming gate: when it returns false the profile treats the
    * body as neutral (e.g. SUPERMAN stabilizes unless arms are out).
+   * `wasArmed` lets the profile apply hysteresis so the gate doesn't
+   * flap at the threshold (Gate-2 feedback: arm-drop felt choppy).
    */
-  armed?(s: BodySignal): boolean;
+  armed?(s: BodySignal, wasArmed: boolean): boolean;
 }
 
 const clamp1 = (v: number) => Math.max(-1, Math.min(1, v));
@@ -77,6 +83,35 @@ const clamp1 = (v: number) => Math.max(-1, Math.min(1, v));
  * right lean maps to negative turnRate.
  */
 export const BODY_PROFILES: BodyFlightProfile[] = [
+  {
+    // Gate-2 outcome: Lekan's pick for the default standing profile.
+    id: "superman",
+    label: "Superman",
+    turnGain: 1.35, // Gate-2: "slightly more responsive" — up from 1.2
+    speedGain: 1.2,
+    climbGain: 1.7,
+    descendGain: 1.0,
+    boostOnHandsForward: true,
+    notes: "arms out to fly (drop arms = stabilize) · lean banks · arms high climbs · hands forward dives+boosts",
+    map(s, p) {
+      // Hands thrust forward = dive/boost: speed up and shed altitude.
+      const dive = s.axes.handsForward;
+      return {
+        turnRate: -s.axes.leanX * p.turnGain,
+        speedAxis: clamp1(s.axes.leanY * 0.6 + dive * p.speedGain),
+        elevateAxis: clamp1(
+          s.axes.armsRaised * p.climbGain - s.axes.crouch * p.descendGain - dive * 0.8,
+        ),
+      };
+    },
+    armed(s, wasArmed) {
+      // Flight posture: arms out (T-ish). Hysteresis: harder to arm than
+      // to stay armed, so the gate doesn't flap mid-turn.
+      return wasArmed
+        ? s.axes.armsOut > 0.25 || s.axes.handsForward > 0.35
+        : s.axes.armsOut > 0.4 || s.axes.handsForward > 0.5;
+    },
+  },
   {
     id: "pilot-lean",
     label: "Pilot Lean",
@@ -95,37 +130,14 @@ export const BODY_PROFILES: BodyFlightProfile[] = [
     },
   },
   {
-    id: "superman",
-    label: "Superman",
-    turnGain: 1.2,
-    speedGain: 1.2,
-    climbGain: 1.5,
-    descendGain: 1.0,
-    boostOnHandsForward: true,
-    notes: "arms out to fly (drop arms = stabilize) · lean banks · arms high climbs · hands forward dives+boosts",
-    map(s, p) {
-      // Hands thrust forward = dive/boost: speed up and shed altitude.
-      const dive = s.axes.handsForward;
-      return {
-        turnRate: -s.axes.leanX * p.turnGain,
-        speedAxis: clamp1(s.axes.leanY * 0.6 + dive * p.speedGain),
-        elevateAxis: clamp1(
-          s.axes.armsRaised * p.climbGain - s.axes.crouch * p.descendGain - dive * 0.8,
-        ),
-      };
-    },
-    armed(s) {
-      // Flight posture: arms out (T-ish). Hysteresis via two thresholds.
-      return s.axes.armsOut > 0.35 || s.axes.handsForward > 0.5;
-    },
-  },
-  {
     id: "head-pilot",
     label: "Head Pilot",
     turnGain: 1.1,
     speedGain: 0,
-    climbGain: 1.6,
-    descendGain: 1.6,
+    // Gate-2: climbing needed an uncomfortably deep backward lean while
+    // seated — seated leans are small, so the climb side gets high gain.
+    climbGain: 3.0,
+    descendGain: 2.0,
     boostOnHandsForward: false,
     notes: "seated: shoulder-line lean turns · lean F/B climbs/descends · speed automated",
     map(s, p) {
@@ -133,7 +145,6 @@ export const BODY_PROFILES: BodyFlightProfile[] = [
         turnRate: -s.axes.leanX * p.turnGain,
         // Speed automated: hold a comfortable cruise (~70% of max band).
         speedAxis: 0.4,
-        // Seated leans are small — leanY drives altitude with high gain.
         // Lean back (−) climbs, lean toward camera (+) descends.
         elevateAxis: clamp1(
           s.axes.leanY <= 0
@@ -218,6 +229,7 @@ export class BodyFlightControls {
   private boostLatched = false;
   private lastBoostAtMs = -Infinity;
   private lastRecenterAtMs = -Infinity;
+  private recenterUnseen = false;
 
   private lastTransport: "broadcast" | "postMessage" | null = null;
 
@@ -262,7 +274,10 @@ export class BodyFlightControls {
     this.recentArrivals.push(this.receivedAtMs);
     if (this.recentArrivals.length > 90) this.recentArrivals.shift();
     if (s.events.includes("action")) this.pendingAction = true;
-    if (s.events.includes("recenter")) this.lastRecenterAtMs = this.receivedAtMs;
+    if (s.events.includes("recenter")) {
+      this.lastRecenterAtMs = this.receivedAtMs;
+      this.recenterUnseen = true;
+    }
 
     // Boost: hold-to-fire on handsForward with hysteresis + refractory.
     if (this.profile.boostOnHandsForward) {
@@ -338,10 +353,14 @@ export class BodyFlightControls {
     );
   }
 
+  private wasArmed = true;
+
   private liveIntent(): { intent: BodyIntent; armed: boolean } {
     const s = this.signal!;
     const p = this.profile;
-    if (p.armed && !p.armed(s)) {
+    const armed = p.armed ? p.armed(s, this.wasArmed) : true;
+    this.wasArmed = armed;
+    if (!armed) {
       return { intent: { turnRate: 0, speedAxis: 0, elevateAxis: 0 }, armed: false };
     }
     const raw = p.map(s, p);
@@ -378,10 +397,23 @@ export class BodyFlightControls {
     }
 
     const { intent: target, armed } = this.liveIntent();
+
+    if (!armed) {
+      // Stabilize (e.g. Superman arms dropped): decay to neutral exactly
+      // like a tracking loss — Gate-2 feedback said the old instant zero
+      // read as a lurch — and pick back up through the reacquire slew.
+      this.mode = "reacquire";
+      const k = 1 - Math.exp(-dtS / LOSS_DECAY_TAU_S);
+      this.outIntent.turnRate += (0 - this.outIntent.turnRate) * k;
+      this.outIntent.speedAxis += (0 - this.outIntent.speedAxis) * k;
+      this.outIntent.elevateAxis += (0 - this.outIntent.elevateAxis) * k;
+      return "unarmed";
+    }
+
     if (this.mode === "autopilot") this.mode = "reacquire";
 
     if (this.mode === "reacquire") {
-      // Slew-bounded blend back — no snap after a dropout.
+      // Slew-bounded blend back — no snap after a dropout or disarm.
       const maxStep = REACQUIRE_SLEW_PER_S * dtS;
       let caughtUp = true;
       for (const k of ["turnRate", "speedAxis", "elevateAxis"] as const) {
@@ -394,12 +426,12 @@ export class BodyFlightControls {
         }
       }
       if (caughtUp) this.mode = "live";
-      return armed ? "reacquiring" : "unarmed";
+      return "reacquiring";
     }
 
     // Live: follow directly (the package already slews per axis).
     this.outIntent = { ...target };
-    return armed ? "ok" : "unarmed";
+    return "ok";
   }
 
   /**
@@ -455,6 +487,13 @@ export class BodyFlightControls {
     };
   }
 
+  /** One-shot: true once after a T-pose recenter (drives the game toast). */
+  consumeRecenterFlag(): boolean {
+    const v = this.recenterUnseen;
+    this.recenterUnseen = false;
+    return v;
+  }
+
   /** Everything the tuner overlay needs, one call per frame. */
   debugState(): BodyDebugState {
     const now = performance.now();
@@ -468,10 +507,10 @@ export class BodyFlightControls {
         this.signal.confidence < MIN_CONFIDENCE && now - this.receivedAtMs <= SIGNAL_STALE_MS
           ? "low-confidence"
           : "autopilot";
+    } else if (this.profile.armed && !this.profile.armed(this.signal, this.wasArmed)) {
+      reason = "unarmed";
     } else if (this.mode === "reacquire") {
       reason = "reacquiring";
-    } else if (this.profile.armed && !this.profile.armed(this.signal)) {
-      reason = "unarmed";
     } else {
       reason = "ok";
     }
@@ -487,7 +526,9 @@ export class BodyFlightControls {
       profile: this.profile,
       assist: this.assist,
       boostArmedIn: Math.max(0, BOOST_REFRACTORY_MS - (now - this.lastBoostAtMs)),
-      recenterFlashMs: Math.max(0, 1500 - (now - this.lastRecenterAtMs)),
+      // Gate-2 feedback: the recenter confirmation was easy to miss — hold
+      // the flash long enough to register (tuner banner + in-game toast).
+      recenterFlashMs: Math.max(0, 4000 - (now - this.lastRecenterAtMs)),
       transport: this.lastTransport,
       senderConnected: recent.length > 0,
       schemaV: this.signal?.v ?? null,
