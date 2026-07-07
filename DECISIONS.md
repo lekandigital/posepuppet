@@ -278,3 +278,26 @@ phase (it self-corrects at the next stillness dwell). Gate-2 bridge
 shipped early (palette "fly" + flightBridge.ts postMessage relay, origin-
 pinned): the live gate needs a real way to launch the game, and it is the
 seed of P4's Fly card.
+
+## 2026-07-07 — Gate-2 NO-SIGNAL incident: root cause and topology fix
+Lekan's live test failed with src NO-SIGNAL · 0Hz. Confirmed root cause,
+in order: (1) the Gate-2 script I wrote used `npm run dev:client --
+--port 5199` — the nested npm layer swallows `--port` (verified: vite
+reported 5173), so flight never ran on the port the bridge targeted;
+(2) with two vite servers, BroadcastChannel can never help — it is
+origin-scoped and a port is part of the origin. Channel name, envelope,
+and schema matched on both sides throughout; the failure was topology,
+not protocol. Fix: same-origin architecture — PosePuppet's vite dev
+server now serves the BUILT flight app at /flight/ via a static plugin
+(flight builds with base '/flight/'; root-absolute asset prefixes
+/audio /3D /2D /npc /fonts are mapped to the same dist — verified
+disjoint from PosePuppet's public/). One command starts everything:
+`npm run arcade`. The palette "fly" now opens same-origin /flight/ and
+still relays via postMessage as a redundant path; the receiver dedupes
+by signal ts. Tuner now reports transport + schema + sender-connected
+and prints an actionable hint on NO-SIGNAL. Regression guard:
+apps/flight/tests/topology.spec.ts (headed — measured: a SwiftShader-
+bound game page throttles even BroadcastChannel delivery to ~0.7 msg/s
+in headless, so a headless version of this spec would lie). Flight-only
+standalone dev on 5199 remains supported for flight app work (its suite
+runs that way); body signals are only expected in the /flight/ layout.

@@ -190,6 +190,12 @@ export interface BodyDebugState {
   assist: AssistLevel;
   boostArmedIn: number; // ms until refractory over; 0 = ready
   recenterFlashMs: number; // >0 briefly after a T-pose recenter event
+  /** Which transport delivered the last signal (both are always armed). */
+  transport: "broadcast" | "postMessage" | null;
+  /** Any signal received within the last 2 s. */
+  senderConnected: boolean;
+  /** Schema major of the last signal (consumers pin v1). */
+  schemaV: number | null;
 }
 
 export class BodyFlightControls {
@@ -213,6 +219,8 @@ export class BodyFlightControls {
   private lastBoostAtMs = -Infinity;
   private lastRecenterAtMs = -Infinity;
 
+  private lastTransport: "broadcast" | "postMessage" | null = null;
+
   private readonly onWindowMessage = (ev: MessageEvent) => {
     const data = ev.data as { t?: string; signal?: unknown } | null;
     if (!data || data.t !== MESSAGE_ENVELOPE) return;
@@ -221,12 +229,12 @@ export class BodyFlightControls {
     } catch {
       return; // not a valid BodySignal — drop, never throw into the page
     }
-    this.accept(data.signal as BodySignal);
+    this.accept(data.signal as BodySignal, "postMessage");
   };
 
   constructor() {
     const bc = createBroadcastSource();
-    const unsub = bc.subscribe((s) => this.accept(s));
+    const unsub = bc.subscribe((s) => this.accept(s, "broadcast"));
     this.unsubscribe = () => {
       unsub();
       bc.close();
@@ -244,8 +252,12 @@ export class BodyFlightControls {
     }
   }
 
-  private accept(s: BodySignal) {
+  private accept(s: BodySignal, via: "broadcast" | "postMessage") {
+    // Same-origin layouts deliver every signal on BOTH transports (the
+    // bridge relays and BroadcastChannel carries) — count each signal once.
+    if (this.signal && s.ts === this.signal.ts) return;
     this.signal = s;
+    this.lastTransport = via;
     this.receivedAtMs = performance.now();
     this.recentArrivals.push(this.receivedAtMs);
     if (this.recentArrivals.length > 90) this.recentArrivals.shift();
@@ -476,6 +488,9 @@ export class BodyFlightControls {
       assist: this.assist,
       boostArmedIn: Math.max(0, BOOST_REFRACTORY_MS - (now - this.lastBoostAtMs)),
       recenterFlashMs: Math.max(0, 1500 - (now - this.lastRecenterAtMs)),
+      transport: this.lastTransport,
+      senderConnected: recent.length > 0,
+      schemaV: this.signal?.v ?? null,
     };
   }
 

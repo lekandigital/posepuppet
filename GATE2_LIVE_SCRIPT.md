@@ -4,27 +4,31 @@ You fly the actual TinySkies plane with your body. Report feel: latency,
 drift, fatigue, nausea, fun — and pick the default profile. Iterate with
 me until it feels right; the world gets no polish before that.
 
-## Setup (2 terminals, ~1 minute)
+> Rev 2 after the NO-SIGNAL failure: PosePuppet and Flight now share ONE
+> origin — the PosePuppet dev server serves the built game at `/flight/`,
+> so BroadcastChannel signals just work. One command starts everything.
+
+## Setup (1 terminal, ~1 minute)
 
 ```bash
-# terminal 1 — PosePuppet (tracker + body-signal producer)
-cd ~/Dev/posepuppet && npm run dev
-
-# terminal 2 — Flight
-cd ~/Dev/posepuppet/apps/flight && npm run dev:client -- --port 5199
+cd ~/Dev/posepuppet && npm run arcade
 ```
 
-1. Open http://localhost:5173, allow the webcam, stand back until the
+(That builds the flight app and starts the dev server — both apps on
+**http://localhost:5173**. No second terminal, no ports to guess.)
+
+1. Open **http://localhost:5173**, allow the webcam, stand back until the
    skeleton tracks (full body in frame is best; waist-up also works).
-2. Press **⌘K → type "fly" → Enter**. The game opens in a new window with
-   your body streaming in. Keep the PosePuppet tab visible somewhere
-   (it is the tracker; don't minimize it).
-3. In the game window press **B** — the BODY → FLIGHT TUNER opens. Check
-   the status line reads `src OK` at ~25–30 Hz.
-4. The game starts on keyboard as usual. Click GO. **The body takes over
+2. Press **⌘K → type "fly" → Enter**. The game opens at
+   **http://localhost:5173/flight/** with your body streaming in. Keep
+   both windows visible (side-by-side is ideal — PosePuppet is the
+   tracker).
+3. In the game window press **B** — the BODY → FLIGHT TUNER opens. The
+   status line must read **`src OK · bc v1 · ~25–30Hz`**. If it ever says
+   `no sender`, the red hint text below it says exactly what to fix.
+4. Click GO. The game starts on keyboard as usual. **The body takes over
    whenever you leave the keyboard alone for 1.5 s**; touching any game
-   key instantly gives you keyboard control back (that's the fallback,
-   always on).
+   key instantly gives keyboard control back (the fallback, always on).
 
 Profiles and assist cycle from the two buttons in the tuner. Start on
 **Pilot Lean / Full Assist**.
