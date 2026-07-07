@@ -1,3 +1,11 @@
+## 2026-07-07 (PPC Gate-2 fixes — rigid core + physics gate; GATE 2 RETEST RAISED)
+Live failures root-caused on real footage: confident-visibility teleports/collapses behind the torso (state machine never fired), per-landmark core prediction shearing the torso quad into bend/spin
+Fixed: rigid torso/head prediction, chain-length physics gate (impossible segment = garbage: held, low conf, never buffered), fresh-run velocity capture, no-snap capped catch-up with converged-only confidence
+6 new regression specs cover his exact list; masked matrix + fully-visible refresh re-published (fast legs improved 1.4°, everything else within tolerance); flight contract +67 ms unchanged
+Suites: PosePuppet 92 passed / 5 skipped; Flight in the commit message
+Blockers: USER GATE 2 focused retest (5 items, docs/PPC_GATE2.md updated)
+Next: Lekan's retest
+
 ## 2026-07-07 (PPC P4 — body-input flags, flight contract, docs — GATE 2 RAISED)
 body-input `tracking` block (additive, optional, closed sub-shape, canonical order; old tapes valid); states flow PosePuppet → signal → games
 Flight contract measured then test-enforced: autopilot engagement legacy 300 ms vs PPC 367 ms (+67 ms, bound +100); core horizon retuned 250→150 ms at MY layer, zero Flight changes; Flight suite 17 passed / 2 skipped unmodified

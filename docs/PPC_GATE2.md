@@ -1,30 +1,29 @@
-# PPC Gate 2 — live occlusion test (~3 minutes)
+# PPC Gate 2 — focused retest (~2 minutes)
 
-Setup: character mode, robot (then repeat anything that felt off on
-erika), engineering view open (`d`) so the per-limb chips are visible.
-`?ppc=0` in the URL gives the legacy path if you want an A/B.
+Character mode, robot, engineering view open (`d`). `?ppc=0` gives the
+legacy A/B at any point. What changed since your report: torso/head now
+predict as one rigid body (no more bend/spin after dropout), and a
+physics gate catches the detector's behind-torso garbage — impossible
+segment lengths are held at low confidence instead of enacted.
 
-1. **Hand exit mid-gesture (30 s).** Raise an arm and sweep it out of
-   frame mid-motion, at slow and at medium speed. The arm should carry
-   the motion briefly (chip: `PRED age·conf`), ease toward rest, and
-   blend back when your hand returns — no snap, no fling, no rubber
-   band. Try a quick flick out-and-back: it should feel near-seamless.
-2. **Hand crosses the face (30 s).** Cover your mouth, brush your
-   cheek, pass a hand slowly across your face. Face-touch should stay
-   engaged (that's PPC carrying the wrist through the occlusion), the
-   head should not flinch when your hand blanks the face landmarks.
-3. **Foot out of frame (30 s, full-body framing).** Step one foot out
-   of frame and back while shifting weight. Expectation: legs behave
-   like they did BEFORE this pass (hold → relax) — leg prediction is
-   deliberately conservative; what you're checking is nothing got
-   worse.
-4. **Full dropout (30 s).** Step entirely out of frame for ~2 s, step
-   back in. The puppet should keep a beat of your exit motion, settle
-   to idle, and re-acquire with a smooth blend, not a pop.
-5. **Shadowbox (30 s).** Fast punches toward and across the camera.
-   The trust stack should keep the puppet from flying on a lost punch —
-   watch for any "haunted" overshoot; there should be none.
+1. **One slow hand exit.** Sweep an arm out of frame and back — brief
+   intentional carry, eased settle, blended return. No snap.
+2. **Hand crossing the face.** Cover your mouth, brush a cheek — head
+   stays stable, face-touch stays engaged through the occlusion.
+3. **One punch with the hand passing behind your torso.** This was the
+   glitch case: the hand should now hold its last believable position
+   for a beat (chip may show the arm PRED or simply low conf) and pick
+   up smoothly when it re-emerges — no whip, no collapse into the body.
+4. **Full-body dropout ~2 s.** Step out of frame entirely, then back.
+   During the blackout the puppet keeps a beat of your exit motion,
+   settles upright to idle — no bending forward, no rotation about any
+   axis. Re-entry blends in, never pops.
+5. **Re-entry scrutiny.** After each of the above, watch the first
+   half-second of recovery: no popping, spinning, or haunted movement
+   anywhere.
 
-Report feel, latency, and anything haunted. Chips reading PRED during
-1–2 and OK the rest of the time is correct; legs flipping to RELAX
-almost immediately in 3 is by design.
+Note on legs/feet: leg prediction is deliberately conservative (measured
+to carry no value on stride reversals) — with full body enabled (`f`),
+a foot leaving frame should behave exactly as it did before this pass.
+Report feel and anything haunted; the per-limb chips (OK / PRED / RELAX
+/ REACQ) tell you what the system thinks it's doing at any moment.
