@@ -92,3 +92,38 @@ test("world persists across reload (same slug rejoined)", async ({ page }) => {
   );
   expect(second).toBe(first);
 });
+
+test("boat and carpet fly offline (vehicle roster faithful)", async ({ page }) => {
+  // Full sessions at headless ~1 rAF/s: give both runs room.
+  test.setTimeout(300_000);
+  const errors = trackConsoleErrors(page);
+  const offOrigin = trackRequests(page);
+
+  // Seed progression past both unlock gates (plane level 5 covers carpet ≥2
+  // and boat ≥4) and ack the celebration modals so the lobby stays clean.
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "globefly_vehicle_progress",
+      JSON.stringify({ plane: { xp: 999999, level: 5, appliedUpgradeIds: [] } }),
+    );
+    localStorage.setItem("globefly_unlocks_ack", JSON.stringify({ carpet: true, boat: true }));
+  });
+
+  for (const vehicle of ["boat", "carpet"] as const) {
+    await page.goto("/");
+    await expect(page.locator("#btn-fly")).toBeVisible({ timeout: 30_000 });
+    const btn = page.locator(`.lobby-vbtn[data-vehicle="${vehicle}"]`);
+    await expect(btn, `${vehicle} unlocked in the lobby`).not.toHaveClass(/locked/);
+    await btn.click();
+    await page.click("#btn-fly");
+    await expect(page.locator("#hud")).toBeAttached({ timeout: 120_000 });
+    const state = await page.evaluate(() => (window as any).__FLIGHT.state());
+    expect(state.vehicle).toBe(vehicle);
+  }
+
+  expect(offOrigin, `off-origin requests: ${offOrigin.join(", ")}`).toHaveLength(0);
+  const real = errors.filter(
+    (e) => !/GroupMarkerNotSet|SwiftShader|GPU stall|WebGL.*deprecated/i.test(e),
+  );
+  expect(real, `console errors: ${real.join(" | ")}`).toHaveLength(0);
+});
