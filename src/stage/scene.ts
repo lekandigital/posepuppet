@@ -13,6 +13,9 @@ export interface Stage {
   canvas: HTMLCanvasElement;
   /** hand-only mode gets its own stage atmosphere (violet, closer camera) */
   setTreatment(t: 'character' | 'hand'): void;
+  /** Flight-companion mode: stop ticking/rendering the stage so the GPU
+   *  budget goes to the game window; tracking keeps running. */
+  setSuspended(v: boolean): void;
 }
 
 export function createStage(canvas: HTMLCanvasElement): Stage {
@@ -76,9 +79,15 @@ export function createStage(canvas: HTMLCanvasElement): Stage {
   let fpsCount = 0;
   let fps = 0;
 
+  let suspended = false;
+
   function loop(now: number) {
     const dt = Math.min((now - last) / 1000, 0.1);
     last = now;
+    if (suspended) {
+      requestAnimationFrame(loop);
+      return;
+    }
     fpsAccum += dt;
     fpsCount++;
     if (fpsAccum >= 0.5) {
@@ -119,5 +128,8 @@ export function createStage(canvas: HTMLCanvasElement): Stage {
     onTick: (cb) => tickCbs.push(cb),
     renderFps: () => fps,
     setTreatment,
+    setSuspended: (v) => {
+      suspended = v;
+    },
   };
 }

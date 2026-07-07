@@ -1,5 +1,42 @@
 # Changelog
 
+## Predictive Pose Continuity (2026-07-07)
+
+Occlusion handling upgraded from per-bone "hold and decay" to a
+principled continuity system at the tracking layer, so puppeteering AND
+`@bodyarcade/body-input` (Flight) inherit it. Explicitly NOT
+invisible-limb tracking — docs/PPC.md states the limits.
+
+### Added
+- **PPC core** (`src/pose/continuity.ts`): per-landmark ring buffers,
+  least-squares velocity with a measured trust stack (fit residual,
+  deceleration projection, 1.3 m/s speed knee), per-limb
+  VISIBLE→PREDICTED→RELAXED state machines (six groups), bone-length
+  shell projection, parent-anchored entry-pull with a hard 0.3 m drift
+  cap, prediction horizon hard-capped at 400 ms (150 ms torso/head),
+  confidence decaying visibly to zero, re-entry blended over 0.8×outage
+  (0.1–0.4 s) with a 0.06 m/frame correction cap that persists until
+  converged. Deterministic; exact pass-through when fully visible.
+- **Masked-fixture eval** (`src/eval/masks.ts`, `eval/run-ppc.mjs` →
+  `eval/ppc-results.json`): synthetic occlusion windows over real
+  fixtures with same-frame ground truth; publishes PPC error next to
+  legacy hold, plus re-entry no-snap, horizon-cap, and NaN checks.
+- **body-input `tracking` block** (additive, optional, schema
+  v1-compatible): per-limb continuity states flow to games; old signals
+  and tapes stay valid.
+- **Flight contract test**: autopilot engagement shift on full dropout
+  measured legacy-vs-PPC and bounded ≤ +100 ms (measured +67 ms). No
+  Flight code touched.
+- Engineering view: live per-limb PPC state chips; `?ppc=0` and a panel
+  toggle for the legacy path.
+
+### Measured
+- Masked landmark error vs hold: −19 % (face-cross), −6.5 % (hand
+  exits), parity-in-noise on fast/stride reversals (convergence to hold
+  is the design goal there — extrapolating reversals measurably loses).
+- Masked puppet sync ≤ legacy on all four specs; fully-visible sync
+  within ±0.09° of the pass-2 baseline; performance floors intact.
+
 ## Pass 2 — "The Instrument Pass" (2026-06-12)
 
 PosePuppet started as webcam-to-avatar puppeteering. This pass turned it

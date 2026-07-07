@@ -1,0 +1,21 @@
+{
+  "baseline": {
+    "date": "2026-07-07T10:02:20.768Z",
+    "mode": "headed",
+    "note": "offline keyboard baseline — no body input; flying with W held",
+    "renderFps": 118.1,
+    "seconds": 15,
+    "longFramePct": 0.2,
+    "jsHeapMB": 98
+  },
+  "combined": {
+    "date": "2026-07-07T10:00:39.094Z",
+    "mode": "headed",
+    "note": "P4 two-window session via Fly card — companion mode (lite model, stage suspended)",
+    "flightRenderFps": 111.1,
+    "flightLongFramePct": 0.8,
+    "poseFps": 30,
+    "bodySignalRateHz": 30,
+    "producerModel": "lite"
+  }
+}

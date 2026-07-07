@@ -130,3 +130,47 @@ Then open: `http://localhost:5173?avatar=woody`
 | Model too large/small | Scale factor; adjust in Blender export settings |
 | Long limbs/proportions | Calibrate in-app or apply per-bone offsets in the settings panel |
 
+
+---
+
+## BodyArcade Flight (`apps/flight/`) — TinySkies / GlobeFly fork manifest
+
+TinySkies / GlobeFly by Danny Limanseta is used with permission —
+https://github.com/dannylimanseta/tinyskies. The permission record is
+retained privately (gitignored); public attribution is the line above,
+in-app credits, and the README section.
+
+Manifest status per acceptance item 1. Classification: **copied** =
+byte-identical to upstream; **adapted** = upstream file modified (each
+gains a note here as it changes); **original** = written for BodyArcade.
+
+| files | class | notes |
+|---|---|---|
+| `apps/flight/client/src/**` except below | copied | upstream game code, three.js 0.172 |
+| `apps/flight/client/src/main.ts` | adapted | removed `@vercel/analytics` init (no telemetry) |
+| `apps/flight/client/package.json` | adapted | removed `@vercel/analytics` dependency |
+| `apps/flight/shared/**`, `apps/flight/server/**` | copied | server kept optional (docker-compose) |
+| `apps/flight/docker-compose.yml`, `README.md`, `docs/**`, `package.json`, `package-lock.json` | copied | upstream root files |
+| `apps/flight/client/public/fonts/*` | copied | Domine, Darumadrop One — Google Fonts, SIL OFL 1.1 |
+| `apps/flight/client/public/audio/**` (~66 SFX + music) | copied — AI-generated for upstream | upstream's own lobby attribution: "Music by Suno, SFX by ElevenLabs" — generated works commissioned by the author, within his grant. Lekan confirms commercial-output tiers with Danny before the repo goes public |
+| `apps/flight/client/public/3D/*.glb` (10 models) | copied — AI-generated for upstream | upstream attribution: "3D Assets by Tripo3D" — same footing as audio |
+| `apps/flight/client/public/2D/**`, `npc/**`, `social-card.png` | copied | game art, presumed author-made; same verification sweep |
+| excluded from fork | — | `.git`, `node_modules`, `dist`, `vercel.json`, `railway.toml`, `.github/`, `api/`, `patch*.js`, `.env` (deploy/codemod glue) |
+
+Original BodyArcade files under `apps/flight` (all ours):
+
+| file | class | notes |
+|---|---|---|
+| `client/src/runtime/localWorlds.ts` | original | LocalWorldProvider (name pools copied from upstream server/src/utils/worldNames.ts) |
+| `client/src/input/bodyControls.ts` | original | body-signal feed + profile mapping + keyboard-priority merge |
+| `client/src/input/flightTuner.ts` | original | control tuner overlay |
+| `playwright.config.ts`, `tests/**` | original | flight suite (offline parity, body closed-loop, perf) |
+
+Upstream files adapted beyond the P0 manifest: `client/src/game/Game.ts`
+(local-mode guards, body-input merge, tuner/eval hooks),
+`client/src/game/Plane.ts` (optional analog speed/elevate consumption),
+`client/src/game/FlightControls.ts` (ControlState optional analog fields),
+`client/src/ui/Lobby.ts` (skip save-feed fetch offline),
+`client/index.html` + `client/src/main.ts` (self-hosted Inter, external
+widget removed), `client/vite.config.ts` + `client/tsconfig.json`
+(body-input alias).
