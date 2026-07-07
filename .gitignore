@@ -76,3 +76,7 @@ public/avatars/woody.vrm
 
 # Sensitive notes, do not commit
 LICENSE_NOTES.md
+
+# private body-control fixture videos
+fixtures/flight/*.mp4
+fixtures/flight/*.mov
