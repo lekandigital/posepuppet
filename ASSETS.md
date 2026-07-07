@@ -157,6 +157,20 @@ gains a note here as it changes); **original** = written for BodyArcade.
 | `apps/flight/client/public/2D/**`, `npc/**`, `social-card.png` | copied | game art, presumed author-made; same verification sweep |
 | excluded from fork | — | `.git`, `node_modules`, `dist`, `vercel.json`, `railway.toml`, `.github/`, `api/`, `patch*.js`, `.env` (deploy/codemod glue) |
 
-Original BodyArcade files added under `apps/flight` in later phases
-(LocalWorldProvider, BodySource, tuner, profiles, eval specs) will be
-listed here as **original** when they land.
+Original BodyArcade files under `apps/flight` (all ours):
+
+| file | class | notes |
+|---|---|---|
+| `client/src/runtime/localWorlds.ts` | original | LocalWorldProvider (name pools copied from upstream server/src/utils/worldNames.ts) |
+| `client/src/input/bodyControls.ts` | original | body-signal feed + profile mapping + keyboard-priority merge |
+| `client/src/input/flightTuner.ts` | original | control tuner overlay |
+| `playwright.config.ts`, `tests/**` | original | flight suite (offline parity, body closed-loop, perf) |
+
+Upstream files adapted beyond the P0 manifest: `client/src/game/Game.ts`
+(local-mode guards, body-input merge, tuner/eval hooks),
+`client/src/game/Plane.ts` (optional analog speed/elevate consumption),
+`client/src/game/FlightControls.ts` (ControlState optional analog fields),
+`client/src/ui/Lobby.ts` (skip save-feed fetch offline),
+`client/index.html` + `client/src/main.ts` (self-hosted Inter, external
+widget removed), `client/vite.config.ts` + `client/tsconfig.json`
+(body-input alias).

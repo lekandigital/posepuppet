@@ -5,11 +5,21 @@ export default defineConfig({
   resolve: {
     alias: {
       "@globefly/shared": path.resolve(__dirname, "../shared"),
+      // BodyArcade: protocol package consumed as TS source, same pattern as
+      // PosePuppet's root vite config. Signals in, landmarks never.
+      "@bodyarcade/body-input": path.resolve(
+        __dirname,
+        "../../../packages/body-input/src/index.ts",
+      ),
     },
   },
   server: {
     port: 5173,
     /** Bind IPv4 + IPv6; otherwise on some systems only ::1 works and `localhost` → 127.0.0.1 fails. */
     host: true,
+    fs: {
+      // let vite serve body-input package source from outside apps/flight
+      allow: [path.resolve(__dirname, ".."), path.resolve(__dirname, "../../../packages")],
+    },
   },
 });

@@ -235,3 +235,22 @@ script; server "build" boots the server) — dormant-compile check is
 prisma generate + tsc --noEmit, which passes. Two more external calls
 found and removed beyond analytics: Google-Fonts Inter (now @fontsource
 self-hosted) and a vibej.am jam widget.
+
+## 2026-07-07 — Flight P2: transport reality and merge design
+(1) BroadcastChannel is same-origin only — two dev servers (5173/5199)
+can't share it. Rather than touching the completed body-input package, the
+flight app accepts a postMessage envelope ({t:'bodyarcade.body-input.v1',
+signal}) validated with the package's own assertSignalShape on receipt;
+PosePuppet relays in-page signals to the window it opens. Same-origin
+deployments still get BroadcastChannel for free (both listeners active).
+(2) Keyboard priority is time-based (any key activity owns the plane for
+1.5 s) rather than a mode switch — no UI, no state to forget, fallback is
+sacred. (3) Analog inputs ride the existing smoothing: speedAxis targets a
+point between MIN and cruise speed approached at the keys' accel/brake
+rates; elevateAxis feeds elevateBlend directly. Upstream behavior is
+bit-identical when the fields are undefined. (4) Body analog applies to
+Plane only for now; turnRate (already continuous) reaches all vehicles.
+(5) Headless finding: pages without a media stream get compositor-
+throttled to ~1 rAF/s in new headless Chrome — the game loop froze, not
+the signals. Body/closed-loop specs run headed; PosePuppet's headless
+suite was never affected because its live video keeps frames flowing.

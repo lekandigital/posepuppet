@@ -42,6 +42,8 @@ import { CameraRig } from "./CameraRig";
 import { SocketClient } from "../network/SocketClient";
 import { resolveServerUrl } from "../runtime/resolveServerUrl";
 import { isLocalMode, localAutoJoin, localLanternAdd } from "../runtime/localWorlds";
+import { BodyFlightControls } from "../input/bodyControls";
+import { FlightTuner } from "../input/flightTuner";
 import { isMobile } from "../utils/isMobile";
 import { StateSync } from "../network/StateSync";
 import { RemotePlaneManager } from "./RemotePlane";
@@ -446,6 +448,11 @@ export class Game {
 
   private socketClient: SocketClient | null = null;
   private stateSync: StateSync | null = null;
+  /** BodyArcade: body input as a parallel control source + its tuner. */
+  private bodyControls: BodyFlightControls | null = null;
+  private flightTuner: FlightTuner | null = null;
+  private tunerPrevHeading = 0;
+  private headingRateDegS = 0;
   private lobby!: Lobby;
   private hud!: HUD;
   private landmarkHUD!: LandmarkHUD;
@@ -786,7 +793,68 @@ export class Game {
 
     this.mountLobby();
     this.container.addEventListener("click", this.onUiClickSound);
+
+    this.initBodyInput();
+
+    // Test/eval hook: ?autostart clicks GO once the lobby is up (real click
+    // path so audio-context and intro behave exactly like a player start).
+    if (new URLSearchParams(window.location.search).has("autostart")) {
+      const t0 = performance.now();
+      const tryGo = () => {
+        const btn = document.getElementById("btn-fly") as HTMLButtonElement | null;
+        if (btn) {
+          btn.click();
+        } else if (performance.now() - t0 < 15_000) {
+          requestAnimationFrame(tryGo);
+        }
+      };
+      requestAnimationFrame(tryGo);
+    }
   }
+
+  /** BodyArcade: body-input source, tuner ("b"), and the __FLIGHT eval handle. */
+  private initBodyInput() {
+    this.bodyControls = new BodyFlightControls();
+    this.flightTuner = new FlightTuner(this.bodyControls, () => {
+      if (!this.localPlayer || this.gamePhase !== "flying") return null;
+      return {
+        headingRateDegS: this.headingRateDegS,
+        speed: this.localPlayer.speed,
+        altitude: this.localPlayer.altitude,
+        bankDeg: (this.localPlayer.bankAngle * 180) / Math.PI,
+      };
+    });
+    window.addEventListener("keydown", this.onTunerKey);
+
+    (window as unknown as { __FLIGHT: unknown }).__FLIGHT = {
+      state: () => {
+        if (!this.localPlayer) return null;
+        return {
+          phase: this.gamePhase,
+          heading: this.localPlayer.heading,
+          headingRateDegS: this.headingRateDegS,
+          speed: this.localPlayer.speed,
+          altitude: this.localPlayer.altitude,
+          bankAngle: this.localPlayer.bankAngle,
+          vehicle: this.localPlayer.vehicle,
+          worldSlug: this.worldSlug,
+          controlsEnabled: this.controls?.enabled ?? false,
+          introActive: this.introActive,
+          running: this.running,
+          gameTime: this.gameTime,
+        };
+      },
+      body: () => this.bodyControls?.debugState() ?? null,
+      setProfile: (id: string) => this.bodyControls?.setProfile(id) ?? false,
+    };
+  }
+
+  private onTunerKey = (e: KeyboardEvent) => {
+    if (e.key.toLowerCase() !== "b" || e.repeat) return;
+    const target = e.target as HTMLElement | null;
+    if (target && (target.isContentEditable || /INPUT|TEXTAREA/.test(target.tagName))) return;
+    this.flightTuner?.toggle(this.container);
+  };
 
   /** VFX, combo SFX, camera shake, vehicle flash, and speed boost for diamonds (world + race bonus). */
   private triggerPlaneDiamondCollectEffects(worldPos: Vector3, tier: number) {
@@ -3334,8 +3402,16 @@ export class Game {
       this.portalInteractionSuppressTimer = Math.max(0, this.portalInteractionSuppressTimer - dt);
     }
 
-    let { turnRate, forward, brake, elevate, descend, paintball, specialAction, interact } =
+    let inputState =
       this.touchControls ? this.touchControls.getState() : this.controls.getState();
+    // Body input merges here — the single point it enters the intent layer.
+    // Keyboard/touch activity always wins (see BodyFlightControls.merge).
+    if (this.bodyControls && this.controls.enabled) {
+      inputState = this.bodyControls.merge(inputState);
+    }
+    let { turnRate, forward, brake, elevate, descend, paintball, specialAction, interact } =
+      inputState;
+    let { speedAxis, elevateAxis } = inputState;
     if (this.choosingLevelUpUpgrade) {
       forward = false;
       brake = true;
@@ -3343,6 +3419,8 @@ export class Game {
       paintball = false;
       specialAction = false;
       interact = false;
+      speedAxis = undefined;
+      elevateAxis = undefined;
     }
     this.updateVehicleTutorial({ turnRate, forward, brake, elevate, paintball, specialAction });
 
@@ -3380,11 +3458,27 @@ export class Game {
         turnRate = spinInput; // Force spin
         forward = false; // Kill forward input
         brake = true; // Force brake
+        speedAxis = undefined; // Twister overrides analog throttle too
+        elevateAxis = undefined;
       }
     }
 
     this.localPlayer.visibility = 1;
+    if (this.localPlayer instanceof Plane) {
+      this.localPlayer.analog =
+        speedAxis != null || elevateAxis != null
+          ? { speed: speedAxis, elevate: elevateAxis }
+          : null;
+    }
     this.localPlayer.update(dt, turnRate, forward, brake, elevate, paintball, descend);
+    // Signed heading rate for the tuner's plane-response readout.
+    {
+      let dh = this.localPlayer.heading - this.tunerPrevHeading;
+      while (dh > Math.PI) dh -= Math.PI * 2;
+      while (dh < -Math.PI) dh += Math.PI * 2;
+      this.headingRateDegS = (dh / Math.max(dt, 1e-4)) * (180 / Math.PI);
+      this.tunerPrevHeading = this.localPlayer.heading;
+    }
     this.localPlayer.group.updateMatrixWorld(true);
     if (
       this.raceManager &&
@@ -7004,6 +7098,11 @@ export class Game {
     this.oceanFish = null;
     this.controls?.dispose();
     this.touchControls?.dispose();
+    this.bodyControls?.dispose();
+    this.bodyControls = null;
+    this.flightTuner?.dispose();
+    this.flightTuner = null;
+    window.removeEventListener("keydown", this.onTunerKey);
     this.speedLines?.dispose();
     this.contrails?.dispose();
     this.wakeTrail?.dispose();

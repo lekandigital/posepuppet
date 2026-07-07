@@ -1,5 +1,29 @@
 # Eval notes
 
+### Flight P2: the body flies the actual plane (2026-07-07)
+Native continuous axes, no key-emulation crutch (Gate-1b approved skip).
+ControlState gained optional speedAxis/elevateAxis; Plane consumes them
+through its existing accel/brake and elevateBlend paths (keyboard path
+byte-identical when they're undefined). BodyFlightControls subscribes on
+two transports at once — BroadcastChannel (same-origin) and a shape-
+guarded postMessage envelope (cross-origin dev popup) — and merges into
+the intent layer at the single controls.getState() call site; any
+keyboard/touch activity owns the plane for 1.5 s. Tuner overlay ('b'):
+raw axes → mapped intent → plane response bars, per-axis gain sliders
+(persisted), profile switcher, signal rate/age readout. Flight suite
+6/6 green, including: synthetic-signal specs (lean turns both signs,
+speed axis 0.55+/0.42- windows, tallness climbs +0.1 alt, keyboard
+override wins then hands back), and the real closed loop — lean_lr.y4m →
+fake webcam → PosePuppet tracker → body-input core → postMessage relay →
+sustained ±8°/s turn windows ≥1.2 s in BOTH directions on the actual
+TinySkies plane. Landmarks never reach the flight page (the envelope
+carries BodySignal only, assertSignalShape enforced on receipt).
+Environment finding, recorded for future specs: a WebGL page with no
+media stream gets compositor-throttled to ~1 rAF/s in new headless
+Chrome (game loop measured frozen at 0.05 s gameTime/s); body specs run
+headed, same convention as PosePuppet's eval. PosePuppet source
+untouched this phase.
+
 ### Flight P1: offline parity green, keyboard untouched (2026-07-07)
 apps/flight runs the full TinySkies experience single-player with no
 server and no Postgres. New flight suite (apps/flight, own Playwright
