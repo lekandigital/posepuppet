@@ -29,6 +29,8 @@ export class FlightTuner {
   private statusEl: HTMLElement | null = null;
   private responseEl: HTMLElement | null = null;
   private profileBtn: HTMLButtonElement | null = null;
+  private assistBtn: HTMLButtonElement | null = null;
+  private notesEl: HTMLElement | null = null;
 
   constructor(
     private body: BodyFlightControls,
@@ -113,21 +115,29 @@ export class FlightTuner {
     this.statusEl.style.marginBottom = "6px";
     el.appendChild(this.statusEl);
 
-    this.profileBtn = document.createElement("button");
-    Object.assign(this.profileBtn.style, {
-      font: "inherit",
-      color: "inherit",
-      background: "rgba(90, 140, 220, 0.25)",
-      border: "1px solid rgba(160, 200, 255, 0.4)",
-      borderRadius: "4px",
-      padding: "2px 8px",
-      cursor: "pointer",
-      marginBottom: "8px",
-    } as CSSStyleDeclaration);
-    this.profileBtn.onclick = () => {
-      this.body.cycleProfile();
+    const btnRow = document.createElement("div");
+    Object.assign(btnRow.style, { display: "flex", gap: "6px", marginBottom: "8px" });
+    const mkBtn = (onClick: () => void) => {
+      const b = document.createElement("button");
+      Object.assign(b.style, {
+        font: "inherit",
+        color: "inherit",
+        background: "rgba(90, 140, 220, 0.25)",
+        border: "1px solid rgba(160, 200, 255, 0.4)",
+        borderRadius: "4px",
+        padding: "2px 8px",
+        cursor: "pointer",
+      } as CSSStyleDeclaration);
+      b.onclick = onClick;
+      btnRow.appendChild(b);
+      return b;
     };
-    el.appendChild(this.profileBtn);
+    this.profileBtn = mkBtn(() => this.body.cycleProfile());
+    this.assistBtn = mkBtn(() => this.body.cycleAssist());
+    el.appendChild(btnRow);
+    this.notesEl = document.createElement("div");
+    Object.assign(this.notesEl.style, { opacity: "0.6", marginBottom: "6px" });
+    el.appendChild(this.notesEl);
 
     const mkSection = (label: string) => {
       const s = document.createElement("div");
@@ -226,11 +236,23 @@ export class FlightTuner {
       const rate = d.signalRateHz.toFixed(0);
       const age = d.signalAgeMs == null ? "—" : `${Math.round(d.signalAgeMs)}ms`;
       const conf = d.signal ? d.signal.confidence.toFixed(2) : "—";
-      const seated = d.signal?.seated ? " seated" : "";
-      this.statusEl.textContent = `src ${d.reason.toUpperCase()} · ${rate}Hz · age ${age} · conf ${conf}${seated}`;
-      this.statusEl.style.color = d.active ? "#8fe3c0" : "#f0b46a";
+      const seated = d.signal?.seated ? " · seated" : "";
+      const boost = d.profile.boostOnHandsForward
+        ? d.boostArmedIn > 0
+          ? ` · boost ${(d.boostArmedIn / 1000).toFixed(1)}s`
+          : " · boost READY"
+        : "";
+      const recenter = d.recenterFlashMs > 0 ? " · RECENTERED" : "";
+      this.statusEl.textContent = `src ${d.reason.toUpperCase()} · ${rate}Hz · age ${age} · conf ${conf}${seated}${boost}${recenter}`;
+      this.statusEl.style.color = d.active
+        ? "#8fe3c0"
+        : d.reason === "autopilot" || d.reason === "reacquiring"
+          ? "#f0b46a"
+          : "#9fb4d8";
     }
-    if (this.profileBtn) this.profileBtn.textContent = `profile: ${d.profile.label} ⇄`;
+    if (this.profileBtn) this.profileBtn.textContent = `${d.profile.label} ⇄`;
+    if (this.assistBtn) this.assistBtn.textContent = `${d.assist.label} ⇄`;
+    if (this.notesEl) this.notesEl.textContent = d.profile.notes;
 
     const setBar = (key: string, v: number, signed: boolean) => {
       const bar = this.bars.get(key);

@@ -254,3 +254,27 @@ Plane only for now; turnRate (already continuous) reaches all vehicles.
 throttled to ~1 rAF/s in new headless Chrome — the game loop froze, not
 the signals. Body/closed-loop specs run headed; PosePuppet's headless
 suite was never affected because its live video keeps frames flowing.
+
+## 2026-07-07 — Flight P3 Feel Lab: what lives where, and what the clips taught
+Shaping split: the package already owns calibration-relative → One Euro →
+measured dead zone → expo → slew per axis; duplicating any of it flight-
+side would double-filter and add lag. Flight owns the game-specific rest:
+profile mapping (3 profiles as data + one map function each), assist
+ladder (Full 0.95 turn cap / 0.75 elevate cap / -0.5 speed floor;
+Standard keyboard-equivalent; Expert 1.6 turn), loss-autopilot (decay
+τ=0.25 s → straight and level; re-entry slew 2.0 intent/s — no snap),
+boost as hold-to-fire (engage 0.75 / release 0.55 / 6-frame hold / 3 s
+refractory). Auto-level needs no spring of its own: bank is derived from
+smoothed turn input upstream, so intent→0 IS auto-level. SUPERMAN's
+"shoulder roll = bank" was dropped — no shoulder-roll axis exists in
+schema v1; leanX is the bank proxy and armsOut is an arming gate
+(arms down = stabilize), which reads better on camera anyway. Fixture
+finding: crouch_stand.mp4's "stand" is a return to neutral, not a
+stretch — tallness stays ~0, so the closed-loop law is descend+recover;
+climb-by-stretch is asserted synthetically. Closed-loop specs sample ≥2
+clip loops and measure dips against the observed baseline because the
+fake webcam loops the file and the neutral can be captured at an awkward
+phase (it self-corrects at the next stillness dwell). Gate-2 bridge
+shipped early (palette "fly" + flightBridge.ts postMessage relay, origin-
+pinned): the live gate needs a real way to launch the game, and it is the
+seed of P4's Fly card.

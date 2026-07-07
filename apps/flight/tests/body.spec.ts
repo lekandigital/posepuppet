@@ -114,7 +114,9 @@ test.describe("body flies the plane", () => {
     const left = await meanHeadingRate(page, 2_500);
     expect(left).toBeGreaterThan(12);
 
-    // Lean forward → speed toward cruise; lean back → decay toward min.
+    // Lean forward → speed toward cruise; lean back → slow down. Full
+    // Assist (default) floors speedAxis at −0.5 ⇒ slow target is exactly
+    // 0.3 + 0.5·0.25 = 0.425 — the throttle floor, not min speed.
     await setPumpAxes(page, { leanX: 0, leanY: 0.8 });
     await page.waitForTimeout(2_500);
     const fastSpeed = await page.evaluate(() => (window as any).__FLIGHT.state().speed);
@@ -122,7 +124,8 @@ test.describe("body flies the plane", () => {
     await page.waitForTimeout(3_000);
     const slowSpeed = await page.evaluate(() => (window as any).__FLIGHT.state().speed);
     expect(fastSpeed).toBeGreaterThan(0.55);
-    expect(slowSpeed).toBeLessThan(0.42);
+    expect(slowSpeed).toBeLessThan(0.46);
+    expect(slowSpeed).toBeGreaterThan(0.38); // the assist floor is holding
 
     // Stand tall → climb above the cruise band.
     const altBefore = await page.evaluate(() => (window as any).__FLIGHT.state().altitude);
@@ -197,10 +200,13 @@ test("closed loop: lean_lr.y4m through PosePuppet turns the plane both ways", as
   const flight = await popupPromise;
   await waitForFlying(flight);
 
-  // Sample heading rate through the clip's lean windows (clip loops).
+  // Sample heading rate across ≥2 full clip loops: the fake webcam loops
+  // the file, and neutral capture can land on an awkward loop phase (it
+  // self-corrects at the next stillness dwell) — long sampling makes the
+  // spec independent of loop phase, same as the crouch_stand spec.
   const samples: number[] = [];
   const t0 = Date.now();
-  while (Date.now() - t0 < 40_000) {
+  while (Date.now() - t0 < 70_000) {
     const rate = await flight.evaluate(() => (window as any).__FLIGHT.state()?.headingRateDegS ?? 0);
     samples.push(rate);
     await flight.waitForTimeout(200);
