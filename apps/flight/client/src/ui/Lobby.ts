@@ -490,6 +490,9 @@ export class Lobby {
     const emptyEl = wrap?.querySelector(".lobby-save-feed-empty") as HTMLElement | null;
     if (!wrap || !list || !emptyEl) return;
 
+    // Local mode (empty serverUrl): no feed to fetch — leave the block hidden.
+    if (!host) return;
+
     const showFeedBlock = (hasEntries: boolean) => {
       if (hasEntries) {
         emptyEl.hidden = true;

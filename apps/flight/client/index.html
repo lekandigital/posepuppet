@@ -17,9 +17,8 @@
   <meta property="og:image:alt" content="Tiny Skies" />
   <meta property="og:url" content="https://tinyskies.vercel.app/" />
   <meta property="og:site_name" content="Tiny Skies" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- BodyArcade: Inter is self-hosted via @fontsource (imported in main.ts) —
+       no Google Fonts at runtime, the game makes zero external requests. -->
   <style>
     @font-face {
       font-family: 'Darumadrop One';
@@ -102,6 +101,6 @@
 <body>
   <div id="app"></div>
   <script type="module" src="/src/main.ts"></script>
-  <script async src="https://vibej.am/2026/widget.js"></script>
+  <!-- BodyArcade: upstream's vibej.am jam widget removed (external script). -->
 </body>
 </html>

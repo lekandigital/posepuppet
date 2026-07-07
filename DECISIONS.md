@@ -221,3 +221,17 @@ Upstream README's control table (W/S pitch, Shift/Ctrl speed) does not
 match its code (A/D turn, W accel, S brake, ArrowUp climb, Space action,
 F interact) — "keyboard identical to upstream" means the code's behavior;
 noted in STUDY_NOTES.md, confirm at Gate 1b.
+
+## 2026-07-07 — Flight P1: offline mode as a guard, not an abstraction
+LocalWorldProvider is a small runtime module (localWorlds.ts) plus
+isLocalMode() guards at the six network touchpoints, not a full
+WorldProvider interface threaded through Game — the god-file's fetches are
+one-liners and an interface would churn more upstream code than it
+protects (revisit if a third provider ever appears). Local mode is the
+default; upstream server mode stays one env var away (VITE_FLIGHT_SERVER=1).
+handleWorldFull needs no local branch: it can only fire from a socket
+event. Upstream root build script was already broken (shared has no build
+script; server "build" boots the server) — dormant-compile check is
+prisma generate + tsc --noEmit, which passes. Two more external calls
+found and removed beyond analytics: Google-Fonts Inter (now @fontsource
+self-hosted) and a vibej.am jam widget.

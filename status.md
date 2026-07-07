@@ -1,3 +1,10 @@
+## 2026-07-07 (BodyArcade Flight P1 — offline parity green)
+Done: LocalWorldProvider (localWorlds.ts: worlds minted client-side, localStorage-persisted, upstream name pools + seed math) + isLocalMode() guards at all six network touchpoints; lantern ledger local; save-feed/events posts no-op; Lobby feed hidden offline; Google-Fonts Inter self-hosted via @fontsource; vibej.am widget removed
+Tests: new flight suite 3/3 green (zero off-origin requests asserted across lobby + full session; world persists across reload); keyboard parity by construction — FlightControls/Plane/SphericalMath/CameraRig/TouchControls byte-identical to upstream (diff-verified); server workspace typechecks (dormant)
+Perf: eval/flight-perf.json — 119 render fps headed while flying, 0.1% long frames, 56 MB heap (pre-body-input baseline)
+Blockers: none
+Next: P2 — BodySource native axes into ControlState, merge beside controls.getState(), tuner overlay in the flight page
+
 ## 2026-07-07 (BodyArcade Flight P0 — rights + recon complete, awaiting GATE 1b)
 Done: permission record verified (private, gitignored, sufficient for faithful public fork w/ credit); TinySkies forked into apps/flight (284 files, analytics stripped, deploy glue excluded, builds green); STUDY_NOTES.md architecture map; PLAN.md rewritten for Flight; ASSETS.md fork manifest; .gitignore negations so global binary ignores don't swallow flight assets
 Key findings: ControlState.turnRate already continuous (body axes drop in w/o touching flight math); offline = 1 mandatory intercept + 4 no-ops; plane/boat/carpet all real behind a capabilities table; loop is variable-dt clamped 50ms (replay tape records dt); upstream README control table is stale vs code
