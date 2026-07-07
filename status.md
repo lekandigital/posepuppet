@@ -1,5 +1,6 @@
-## 2026-07-07 (Gate-3 retest — post-Gate-2 tuning reverted to approved baseline)
-Gate 3 NOT approved: current feel worse than the Gate-2 build. Restored exact Gate-2 control values: autopilot tau 0.25 / slew 2.0, superman 1.2/1.5, arming single-threshold 0.35, disarm instant (no decay/slewed rearm — the mushiness culprit). Kept per instruction: head-pilot climb 3.0/descend 2.0, superman default, recenter banner+toast, all topology/diagnostics/tests/docs. Gains store v3 (drops the diagnostic 0.6 workaround)
-Tests: 9/9 synthetic control specs green on restored baseline; full suites re-running
-Blockers: USER GATE 3 — focused retest (superman banking, arm-drop, neutral, head-pilot climb, autopilot, recenter)
-Next: Lekan's retest -> sign-off -> done
+## 2026-07-07 (GATE 3 APPROVED — BodyArcade Flight ACCEPTED COMPLETE)
+Gate: focused retest passed on the restored Gate-2 baseline — banking/arm-drop/neutral/seated/autopilot/recenter all confirmed; head-pilot gentle climb + recenter visibility kept as approved improvements; Superman default standing, Head Pilot seated
+All acceptance items closed: private permission retained (gitignored); in-app+README attribution; ASSETS manifest complete; offline single-player w/ byte-identical keyboard; body flight w/ 3 live-switchable profiles + tuner; shaping/autopilot/recenter/assist w/ measured dead zones; closed-loop evals green; replay 2.6e-6 world units documented; perf 111fps + pose 30Hz (2x target); both suites green; docs current (README/ARCHITECTURE/ASSETS/FUTURES/DEMO notes)
+Final suites: re-running for the acceptance commit (results in the commit message)
+Blockers: none — awaiting Lekan's merge decision (not merged/pushed per instruction)
+Next: Lekan merges bodyarcade-flight-fable when ready; provenance one-liner to Danny before the repo goes public

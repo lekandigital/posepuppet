@@ -1,5 +1,17 @@
 # Eval notes
 
+### GATE 3 APPROVED — final acceptance (2026-07-07)
+Lekan's focused retest on the restored Gate-2 baseline: Superman banking
+correct again; arm-drop stabilization back to the approved behavior;
+neutral stance = straight flight; Head Pilot seated steering good with
+the kept gentler backward-lean climb ("worthwhile improvement");
+autopilot + reacquisition at Gate-2 timing; T-pose recenter works with
+the kept confirmation visibility; controls no longer aggressive or
+mushy; no meaningful fatigue or nausea. Superman confirmed default
+standing profile, Head Pilot the seated profile. BodyArcade Flight
+accepted as complete. Final full suites re-run for the acceptance
+commit; results recorded in status.md alongside this entry.
+
 ### Flight P5: replay tolerance measured — effectively exact (2026-07-07)
 Intent-tape replay (eval/flight-results.json): 1,681 frames of live
 variable-dt flight (dt 5.2–50 ms — the loop really is variable) recorded
