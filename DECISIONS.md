@@ -203,3 +203,21 @@ recorded metrics rather than pass/fail: leanY cross-bleed during hard
 lateral leans (0.5–0.66 p95, systematic depth error) and action events in
 arms_tpose (the clip contains genuine forward reaches; still.mp4's zero
 events is the false-positive bar). Both documented in the package README.
+
+## 2026-07-07 — Flight P0: fork mechanics and layout
+(1) Monorepo layout: PosePuppet stays at repo root; the TinySkies fork
+lands in apps/flight as a self-contained npm-workspaces project (own
+lockfile, own three@0.172). Moving PosePuppet to apps/posepuppet would
+churn every suite/eval path for zero functional gain — flagged for
+approval in PLAN.md §1 (Gate 1b). (2) Fork exclusions: .git, node_modules,
+dist, deploy glue (vercel.json, railway.toml, .github, api/ serverless
+shim), one-off codemod scripts patch*.js. (3) @vercel/analytics removed
+from client/package.json + main.ts at fork time — no-telemetry
+non-negotiable outranks fork fidelity; only tracking dependency upstream
+had. (4) Root .gitignore's global binary-extension ignores (*.png, *.glb…)
+would have silently swallowed 47 MB of flight assets — added
+!apps/flight/** negations and verified all 284 fork files track. (5)
+Upstream README's control table (W/S pitch, Shift/Ctrl speed) does not
+match its code (A/D turn, W accel, S brake, ArrowUp climb, Space action,
+F interact) — "keyboard identical to upstream" means the code's behavior;
+noted in STUDY_NOTES.md, confirm at Gate 1b.
