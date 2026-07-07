@@ -80,3 +80,8 @@ LICENSE_NOTES.md
 # private body-control fixture videos
 fixtures/flight/*.mp4
 fixtures/flight/*.mov
+
+# private permission records
+LICENSE_NOTES.local.md
+PERMISSION.local.md
+permissions.local.md
