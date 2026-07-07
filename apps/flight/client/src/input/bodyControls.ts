@@ -31,13 +31,15 @@ const PROFILE_STORE_KEY = "bodyarcade_flight_profile_v1";
 const ASSIST_STORE_KEY = "bodyarcade_flight_assist_v1";
 
 /**
- * Autopilot: axis decay toward neutral on loss (τ = 0.3 s ⇒ 80% neutral at
- * 0.5 s). Gate-2 feedback: 0.25 read slightly abrupt.
+ * Autopilot: axis decay toward neutral on loss (τ ≈ 0.25 s ⇒ ~neutral in
+ * 0.5 s). GATE-2 BASELINE — Gate-3 retest found the post-Gate-2 smoothing
+ * (τ 0.3, slew 1.2) made overall control feel worse; restored exactly.
  */
-const LOSS_DECAY_TAU_S = 0.3;
+const LOSS_DECAY_TAU_S = 0.25;
 /** Re-entry: max intent change per second while blending back after loss.
- *  Gate-2 feedback: 2.0 read slightly abrupt; 1.2 blends back over ~0.7 s. */
-const REACQUIRE_SLEW_PER_S = 1.2;
+ *  Gate-2 baseline (2.0) — the slower 1.2 added recovery lag after every
+ *  confidence dip and read as "harder to control". */
+const REACQUIRE_SLEW_PER_S = 2.0;
 /** Re-entry blend duration bookkeeping (state leaves "reacquire" when caught up). */
 const REACQUIRE_EPS = 0.02;
 
@@ -69,10 +71,11 @@ export interface BodyFlightProfile {
   /**
    * Optional arming gate: when it returns false the profile treats the
    * body as neutral (e.g. SUPERMAN stabilizes unless arms are out).
-   * `wasArmed` lets the profile apply hysteresis so the gate doesn't
-   * flap at the threshold (Gate-2 feedback: arm-drop felt choppy).
+   * Gate-2 baseline: a plain predicate, instant both ways — the
+   * hysteresis + decayed-disarm variant tried after Gate 2 made Superman
+   * feel mushy and was reverted at the Gate-3 retest.
    */
-  armed?(s: BodySignal, wasArmed: boolean): boolean;
+  armed?(s: BodySignal): boolean;
 }
 
 const clamp1 = (v: number) => Math.max(-1, Math.min(1, v));
@@ -85,11 +88,13 @@ const clamp1 = (v: number) => Math.max(-1, Math.min(1, v));
 export const BODY_PROFILES: BodyFlightProfile[] = [
   {
     // Gate-2 outcome: Lekan's pick for the default standing profile.
+    // Gains are the exact Gate-2-approved values — the post-Gate-2 bump
+    // (turn 1.35 / climb 1.7) failed the Gate-3 retest and was reverted.
     id: "superman",
     label: "Superman",
-    turnGain: 1.35, // Gate-2: "slightly more responsive" — up from 1.2
+    turnGain: 1.2,
     speedGain: 1.2,
-    climbGain: 1.7,
+    climbGain: 1.5,
     descendGain: 1.0,
     boostOnHandsForward: true,
     notes: "arms out to fly (drop arms = stabilize) · lean banks · arms high climbs · hands forward dives+boosts",
@@ -104,12 +109,9 @@ export const BODY_PROFILES: BodyFlightProfile[] = [
         ),
       };
     },
-    armed(s, wasArmed) {
-      // Flight posture: arms out (T-ish). Hysteresis: harder to arm than
-      // to stay armed, so the gate doesn't flap mid-turn.
-      return wasArmed
-        ? s.axes.armsOut > 0.25 || s.axes.handsForward > 0.35
-        : s.axes.armsOut > 0.4 || s.axes.handsForward > 0.5;
+    armed(s) {
+      // Flight posture: arms out (T-ish). Gate-2 baseline thresholds.
+      return s.axes.armsOut > 0.35 || s.axes.handsForward > 0.5;
     },
   },
   {
@@ -353,13 +355,10 @@ export class BodyFlightControls {
     );
   }
 
-  private wasArmed = true;
-
   private liveIntent(): { intent: BodyIntent; armed: boolean } {
     const s = this.signal!;
     const p = this.profile;
-    const armed = p.armed ? p.armed(s, this.wasArmed) : true;
-    this.wasArmed = armed;
+    const armed = p.armed ? p.armed(s) : true;
     if (!armed) {
       return { intent: { turnRate: 0, speedAxis: 0, elevateAxis: 0 }, armed: false };
     }
@@ -397,23 +396,10 @@ export class BodyFlightControls {
     }
 
     const { intent: target, armed } = this.liveIntent();
-
-    if (!armed) {
-      // Stabilize (e.g. Superman arms dropped): decay to neutral exactly
-      // like a tracking loss — Gate-2 feedback said the old instant zero
-      // read as a lurch — and pick back up through the reacquire slew.
-      this.mode = "reacquire";
-      const k = 1 - Math.exp(-dtS / LOSS_DECAY_TAU_S);
-      this.outIntent.turnRate += (0 - this.outIntent.turnRate) * k;
-      this.outIntent.speedAxis += (0 - this.outIntent.speedAxis) * k;
-      this.outIntent.elevateAxis += (0 - this.outIntent.elevateAxis) * k;
-      return "unarmed";
-    }
-
     if (this.mode === "autopilot") this.mode = "reacquire";
 
     if (this.mode === "reacquire") {
-      // Slew-bounded blend back — no snap after a dropout or disarm.
+      // Slew-bounded blend back — no snap after a dropout.
       const maxStep = REACQUIRE_SLEW_PER_S * dtS;
       let caughtUp = true;
       for (const k of ["turnRate", "speedAxis", "elevateAxis"] as const) {
@@ -426,12 +412,14 @@ export class BodyFlightControls {
         }
       }
       if (caughtUp) this.mode = "live";
-      return "reacquiring";
+      return armed ? "reacquiring" : "unarmed";
     }
 
     // Live: follow directly (the package already slews per axis).
+    // Gate-2 baseline: disarm (arms dropped) zeroes intent instantly and
+    // re-arm picks up instantly — the smoothed variant felt mushy.
     this.outIntent = { ...target };
-    return "ok";
+    return armed ? "ok" : "unarmed";
   }
 
   /**
@@ -507,7 +495,7 @@ export class BodyFlightControls {
         this.signal.confidence < MIN_CONFIDENCE && now - this.receivedAtMs <= SIGNAL_STALE_MS
           ? "low-confidence"
           : "autopilot";
-    } else if (this.profile.armed && !this.profile.armed(this.signal, this.wasArmed)) {
+    } else if (this.profile.armed && !this.profile.armed(this.signal)) {
       reason = "unarmed";
     } else if (this.mode === "reacquire") {
       reason = "reacquiring";
