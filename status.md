@@ -1,6 +1,7 @@
-## 2026-07-07 (Gate-2 blocker fixed — same-origin topology, awaiting live re-test)
-Done: root cause confirmed (script's nested-npm --port dropped => flight on wrong port; BroadcastChannel origin-scoped => can't cross ports); posepuppet vite now serves built flight at /flight/ (base '/flight/', asset prefixes mapped, publics disjoint); `npm run arcade` single-command start; palette "fly" opens same-origin /flight/ + keeps postMessage relay (receiver dedupes by ts); tuner reports transport/schema/sender + actionable NO-SIGNAL hint
-Tests: new topology.spec.ts (headed) — real tracker -> /flight/ over pure BroadcastChannel: >5Hz, v1, age<500ms, axes moving — green 7.4s; measured why headless can't host this spec (SwiftShader-bound page throttles BC delivery to ~0.7 msg/s)
-Blockers: USER GATE 2 — live flight re-test (GATE2_LIVE_SCRIPT.md rev 2: `npm run arcade`, ⌘K -> fly, tuner must read `src OK · bc v1`)
-Next: gate feedback -> iterate feel -> P4
+## 2026-07-07 (GATE 2 APPROVED — Superman default; five feel refinements landed)
+Gate: Lekan flew all three profiles, full lap, dropout recovery, T-pose recenter; report: fun, responsive, no drift/fatigue/nausea. Default standing = SUPERMAN, seated = HEAD PILOT
+Tuning landed: head-pilot climbGain 3.0 (gentle backward lean climbs); superman disarm decays via autopilot path + arming hysteresis (no lurch); autopilot tau 0.3s / re-entry slew 1.2 (smoother both ways); RECENTERED = high-contrast tuner banner 4s + in-game toast; superman turnGain 1.35; gains store v2
+Tests: specs pinned to pilot-lean where they test that mapping; full flight suite re-running with the tuning
+Blockers: none — Gate 2 signed off
+Next: P4 — faithful-experience sweep, in-game TinySkies credit, Fly-card polish, 60/45fps with pose >=15Hz measured
 

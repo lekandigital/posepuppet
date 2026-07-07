@@ -95,6 +95,10 @@ test.describe("body flies the plane", () => {
     const page = await browser.newPage();
     await page.goto(`${FLIGHT}/?autostart=1`);
     await waitForFlying(page);
+    // Pin the profile: the default is Superman (Gate-2 pick), whose
+    // arms-down arming gate would treat this pump's neutral arms as
+    // "stabilize" — these specs test the Pilot Lean mapping.
+    await page.evaluate(() => (window as any).__FLIGHT.setProfile("pilot-lean"));
     await startSignalPump(page);
 
     // Neutral body, no keyboard → near-zero heading rate.
@@ -142,6 +146,7 @@ test.describe("body flies the plane", () => {
     const page = await browser.newPage();
     await page.goto(`${FLIGHT}/?autostart=1`);
     await waitForFlying(page);
+    await page.evaluate(() => (window as any).__FLIGHT.setProfile("pilot-lean"));
     await startSignalPump(page);
     await setPumpAxes(page, { leanX: 0.9 }); // body says: hard right
 
@@ -199,6 +204,7 @@ test("closed loop: lean_lr.y4m through PosePuppet turns the plane both ways", as
   }, FLIGHT);
   const flight = await popupPromise;
   await waitForFlying(flight);
+  await flight.evaluate(() => (window as any).__FLIGHT.setProfile("pilot-lean"));
 
   // Sample heading rate across ≥2 full clip loops: the fake webcam loops
   // the file, and neutral capture can land on an awkward loop phase (it
