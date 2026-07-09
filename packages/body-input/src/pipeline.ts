@@ -10,6 +10,7 @@ import {
 import { quantize } from './schema';
 import { SeatedDetector, seatedCondition } from './seated';
 import { AxisShaper } from './stages';
+import { StrokeDetector } from './stroke';
 import type {
   AxisName, BodyEvent, BodyInputConfig, BodyInputFrame, BodySignal, DeepPartial,
 } from './types';
@@ -62,6 +63,7 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
   }
   const recenterMachine = new HoldToFire(cfg.events.recenter.holdMs, cfg.events.recenter.refractoryMs);
   const actionMachine = new ImpulseDetector(cfg.events.action);
+  const strokeDet = new StrokeDetector(cfg.stroke);
 
   let neutral: NeutralState | null = null;
   let seatedRef: StatureRef | null = null;
@@ -180,6 +182,22 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
         events.push('action');
       }
 
+      // stroke: per-arm fore-aft wrist oscillation (rowing / periodic
+      // motion). Inhibited at low confidence like events; unavailable
+      // frames decay the rhythm instead of spiking it.
+      // Input landmarks are MIRRORED (the package contract), so the
+      // "left" landmark slot holds the user's anatomical RIGHT arm —
+      // swap here so ampL/ampR follow the user's own left/right, the
+      // same user-side convention as leanX.
+      const strokeArmLen = neutral?.armLength ?? 2.2 * m.shoulderWidth;
+      const strokeOk = m.ok && eventsOk && strokeArmLen > 1e-3;
+      strokeDet.step(
+        frame.tsMs,
+        strokeOk && m.right.visOk ? (m.right.rLocal.z - m.right.oLocal.z) / strokeArmLen : null,
+        strokeOk && m.left.visOk ? (m.left.rLocal.z - m.left.oLocal.z) / strokeArmLen : null,
+      );
+      const stroke = strokeDet.snapshot(frame.tsMs);
+
       lastTs = frame.tsMs;
       return {
         v: 1,
@@ -202,6 +220,14 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
         // per-limb continuity states pass straight through when the host
         // tracking layer provides them (additive, optional)
         ...(frame.tracking ? { tracking: frame.tracking } : {}),
+        stroke: {
+          active: stroke.active,
+          count: stroke.count,
+          rate: quantize(stroke.rate),
+          phase: quantize(stroke.phase),
+          ampL: quantize(stroke.ampL),
+          ampR: quantize(stroke.ampR),
+        },
       };
     },
 
@@ -216,6 +242,7 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
       for (const name of AXIS_NAMES) shapers[name].reset();
       recenterMachine.reset();
       actionMachine.reset();
+      strokeDet.reset();
       neutral = null;
       seatedRef = null;
       neutralConfidence = 0;
@@ -234,6 +261,7 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
       for (const name of AXIS_NAMES) shapers[name].setConfig(cfg.axes[name]);
       recenterMachine.configure(cfg.events.recenter.holdMs, cfg.events.recenter.refractoryMs);
       actionMachine.configure(cfg.events.action);
+      strokeDet.configure(cfg.stroke);
     },
 
     getConfig(): BodyInputConfig {

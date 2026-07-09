@@ -3,8 +3,8 @@
 
 export type {
   AxisName, AxisShapingConfig, BodyAxes, BodyEvent, BodyInputConfig, BodyInputFrame,
-  BodySignal, BodyTracking, DeepPartial, EventConfig, ExtractionConfig, LandmarkPoint,
-  TrackingState,
+  BodySignal, BodyStroke, BodyTracking, DeepPartial, EventConfig, ExtractionConfig,
+  LandmarkPoint, StrokeConfig, TrackingState,
 } from './types';
 
 export { createBodyInputCore } from './pipeline';
@@ -13,7 +13,7 @@ export type { AxisDebug, BodyInputCore } from './pipeline';
 export { defaultConfig, mergeConfig, AXIS_NAMES } from './defaults';
 
 export {
-  SCHEMA_V, AXIS_KEYS, EVENT_NAMES, TOP_KEYS,
+  SCHEMA_V, AXIS_KEYS, EVENT_NAMES, STROKE_KEYS, TOP_KEYS,
   assertSignalShape, canonicalSignalJSON, canonicalStreamJSON, quantize,
 } from './schema';
 
@@ -32,5 +32,6 @@ export type { TunerDeps } from './tuner';
 
 export { AxisShaper, deadZone, expo } from './stages';
 export { HoldToFire, ImpulseDetector } from './events';
+export { StrokeDetector } from './stroke';
 export { OneEuro } from './oneEuro';
 export type { NeutralState } from './extract';

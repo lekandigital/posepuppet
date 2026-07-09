@@ -1,24 +1,24 @@
 {
-  "generatedAt": "2026-07-07T03:41:40.738Z",
+  "generatedAt": "2026-07-09T16:46:34.045Z",
   "headless": false,
   "fixtures": {
     "lean_lr": {
-      "signals": 1199,
-      "hz": 29.98,
-      "latencyMsP50": 11.5,
-      "latencyMsP95": 14.1,
+      "signals": 1196,
+      "hz": 29.9,
+      "latencyMsP50": 12.2,
+      "latencyMsP95": 13.4,
       "checks": {
         "leanX+windows": {
           "pass": true,
-          "detail": "2 sustained, 29.2s > +0.45 (need ≥1 ep, ≥2 s)"
+          "detail": "2 sustained, 10.8s > +0.45 (need ≥1 ep, ≥2 s)"
         },
         "leanX-windows": {
           "pass": true,
-          "detail": "2 sustained, 7.0s < -0.45 (need ≥1 ep, ≥2 s)"
+          "detail": "2 sustained, 9.6s < -0.45 (need ≥1 ep, ≥2 s)"
         },
         "crossAxisBleed": {
           "pass": true,
-          "detail": "leanY p95=0.565 during episodes (recorded metric)"
+          "detail": "leanY p95=0.601 during episodes (recorded metric)"
         },
         "returnsToDeadZone": {
           "pass": true,
@@ -35,10 +35,10 @@
       }
     },
     "lean_fb": {
-      "signals": 1791,
-      "hz": 29.85,
-      "latencyMsP50": 11,
-      "latencyMsP95": 14.5,
+      "signals": 1797,
+      "hz": 29.95,
+      "latencyMsP50": 12.1,
+      "latencyMsP95": 13.6,
       "checks": {
         "leanY+windows": {
           "pass": true,
@@ -46,11 +46,11 @@
         },
         "leanY-windows": {
           "pass": true,
-          "detail": "3 sustained, 29.3s < -0.35 (need ≥1 ep, ≥2 s)"
+          "detail": "3 sustained, 29.2s < -0.35 (need ≥1 ep, ≥2 s)"
         },
         "crossAxisBleed": {
           "pass": true,
-          "detail": "leanX p95=0.138 during episodes (recorded metric)"
+          "detail": "leanX p95=0.132 during episodes (recorded metric)"
         },
         "returnsToDeadZone": {
           "pass": true,
@@ -67,14 +67,14 @@
       }
     },
     "crouch_stand": {
-      "signals": 1350,
-      "hz": 30,
-      "latencyMsP50": 11.5,
-      "latencyMsP95": 13.8,
+      "signals": 1343,
+      "hz": 29.84,
+      "latencyMsP50": 12.3,
+      "latencyMsP95": 13.6,
       "checks": {
         "crouchWindows": {
           "pass": true,
-          "detail": "1 sustained, 4.1s > 0.45 (need ≥1 ep, ≥2 s)"
+          "detail": "1 sustained, 3.0s > 0.45 (need ≥1 ep, ≥2 s)"
         },
         "standsBackUp": {
           "pass": true,
@@ -91,10 +91,10 @@
       }
     },
     "arms_tpose": {
-      "signals": 1260,
-      "hz": 30,
-      "latencyMsP50": 11.4,
-      "latencyMsP95": 13.9,
+      "signals": 1257,
+      "hz": 29.93,
+      "latencyMsP50": 12.3,
+      "latencyMsP95": 13.6,
       "checks": {
         "tposeEpisodes": {
           "pass": true,
@@ -119,14 +119,14 @@
       }
     },
     "seated": {
-      "signals": 1200,
-      "hz": 30,
-      "latencyMsP50": 11.7,
-      "latencyMsP95": 14.2,
+      "signals": 1193,
+      "hz": 29.82,
+      "latencyMsP50": 12.1,
+      "latencyMsP95": 15.2,
       "checks": {
         "seatedDetected": {
           "pass": true,
-          "detail": "seated 84.3% after 5 s (≥80%)"
+          "detail": "seated 84.1% after 5 s (≥80%)"
         },
         "noFlapping": {
           "pass": true,
@@ -145,8 +145,8 @@
     "still": {
       "signals": 600,
       "hz": 30,
-      "latencyMsP50": 11.7,
-      "latencyMsP95": 13.9,
+      "latencyMsP50": 12.4,
+      "latencyMsP95": 13.4,
       "checks": {
         "noEvents": {
           "pass": true,
@@ -154,21 +154,25 @@
         },
         "stillnessHigh": {
           "pass": true,
-          "detail": "stillness p50=0.903 (≥0.75)"
+          "detail": "stillness p50=0.904 (≥0.75)"
         },
         "shapedNoiseFloor": {
           "pass": true,
-          "detail": "worst shaped p99=0.0453 (≤0.08)",
+          "detail": "worst shaped p99=0.0427 (≤0.08)",
           "floors": {
-            "leanX": 0.0126,
-            "leanY": 0,
+            "leanX": 0.0138,
+            "leanY": 0.0414,
             "crouch": 0,
-            "tallness": 0.0008,
-            "armsOut": 0.0081,
+            "tallness": 0.019,
+            "armsOut": 0.0082,
             "armsRaised": 0,
-            "handsForward": 0.0453,
+            "handsForward": 0.0427,
             "handPoint": 0
           }
+        },
+        "strokesZero": {
+          "pass": true,
+          "detail": "0 strokes, 0 rhythm-active frames on still footage (need 0/0)"
         },
         "schemaShape": {
           "pass": true,
@@ -177,6 +181,138 @@
         "confident": {
           "pass": true,
           "detail": "confidence p50=1.000 (≥0.6)"
+        }
+      }
+    },
+    "rowing_slow": {
+      "signals": 1237,
+      "hz": 29.95,
+      "latencyMsP50": 12.4,
+      "latencyMsP95": 13.4,
+      "checks": {
+        "strokeCount": {
+          "pass": true,
+          "detail": "12 strokes in window (hand-labeled truth 12, ±1)",
+          "detected": 12
+        },
+        "rhythmActive": {
+          "pass": true,
+          "detail": "rhythm active 85.4% of frames (≥30%)"
+        },
+        "rateRead": {
+          "pass": true,
+          "detail": "rate p50=0.404 Hz over active frames (>0.15)",
+          "rateP50": 0.4036
+        },
+        "schemaShape": {
+          "pass": true,
+          "detail": "every signal schema-clean"
+        },
+        "confident": {
+          "pass": true,
+          "detail": "confidence p50=1.000 (≥0.6)"
+        }
+      }
+    },
+    "rowing_fast": {
+      "signals": 998,
+      "hz": 29.92,
+      "latencyMsP50": 12.3,
+      "latencyMsP95": 13.4,
+      "checks": {
+        "strokeCount": {
+          "pass": true,
+          "detail": "24 strokes in window (hand-labeled truth 24, ±1)",
+          "detected": 24
+        },
+        "rhythmActive": {
+          "pass": true,
+          "detail": "rhythm active 85.9% of frames (≥30%)"
+        },
+        "rateRead": {
+          "pass": true,
+          "detail": "rate p50=0.846 Hz over active frames (>0.15)",
+          "rateP50": 0.8464
+        },
+        "schemaShape": {
+          "pass": true,
+          "detail": "every signal schema-clean"
+        },
+        "confident": {
+          "pass": true,
+          "detail": "confidence p50=1.000 (≥0.6)"
+        },
+        "rateOrdering": {
+          "pass": true,
+          "detail": "rate p50 fast=0.846 Hz vs slow=0.404 Hz (fast > 1.3× slow)"
+        }
+      }
+    },
+    "rowing_left_bias": {
+      "signals": 1430,
+      "hz": 29.98,
+      "latencyMsP50": 11.6,
+      "latencyMsP95": 13.7,
+      "checks": {
+        "strokeCount": {
+          "pass": true,
+          "detail": "16 strokes in window (hand-labeled truth 15, ±1)",
+          "detected": 16
+        },
+        "rhythmActive": {
+          "pass": true,
+          "detail": "rhythm active 85.8% of frames (≥30%)"
+        },
+        "rateRead": {
+          "pass": true,
+          "detail": "rate p50=0.366 Hz over active frames (>0.15)",
+          "rateP50": 0.3665
+        },
+        "leftBiasSign": {
+          "pass": true,
+          "detail": "ampL−ampR p50=0.127 during rhythm (>0.05 — left arm dominant)"
+        },
+        "schemaShape": {
+          "pass": true,
+          "detail": "every signal schema-clean"
+        },
+        "confident": {
+          "pass": true,
+          "detail": "confidence p50=1.000 (≥0.6)"
+        }
+      }
+    },
+    "rowing_seated": {
+      "signals": 767,
+      "hz": 29.95,
+      "latencyMsP50": 12.4,
+      "latencyMsP95": 13.5,
+      "checks": {
+        "strokeCount": {
+          "pass": true,
+          "detail": "13 strokes in window (hand-labeled truth 13, ±1) — measured label (prescribed 15; see STROKE_TRUTH note), confirm at Gate 2",
+          "detected": 13
+        },
+        "rhythmActive": {
+          "pass": true,
+          "detail": "rhythm active 88.4% of frames (≥30%)"
+        },
+        "rateRead": {
+          "pass": true,
+          "detail": "rate p50=0.617 Hz over active frames (>0.15)",
+          "rateP50": 0.6168
+        },
+        "seatedFlag": {
+          "pass": true,
+          "detail": "seated flag 0.0% of frames (recorded metric — count is the assertion)"
+        },
+        "schemaShape": {
+          "pass": true,
+          "detail": "every signal schema-clean"
+        },
+        "confident": {
+          "pass": true,
+          "detail": "confidence p50=0.999 (≥0.6)"
         }
       }
     }

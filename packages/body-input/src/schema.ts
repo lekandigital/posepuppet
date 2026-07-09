@@ -4,6 +4,11 @@
 
 import type { BodyAxes, BodyEvent, BodySignal, TrackingState } from './types';
 
+/** v1-additive OPTIONAL top-level key: periodic-motion (stroke) state.
+ *  Old signals and tapes without it stay valid. Key order is the
+ *  canonical serialization order. */
+export const STROKE_KEYS = ['active', 'count', 'rate', 'phase', 'ampL', 'ampR'] as const;
+
 export const SCHEMA_V = 1 as const;
 
 export const TOP_KEYS = [
@@ -47,7 +52,7 @@ export function assertSignalShape(msg: unknown): asserts msg is BodySignal {
   if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) fail('not a plain object');
   const o = msg as Record<string, unknown>;
   const keys = Object.keys(o)
-    .filter((k) => k !== 'tracking') // optional additive key, validated below
+    .filter((k) => k !== 'tracking' && k !== 'stroke') // optional additive keys, validated below
     .sort();
   const want = [...TOP_KEYS].sort();
   if (keys.length !== want.length || keys.some((k, i) => k !== want[i])) {
@@ -65,6 +70,24 @@ export function assertSignalShape(msg: unknown): asserts msg is BodySignal {
       if (!TRACKING_STATES.includes(tr[k] as TrackingState)) {
         fail(`tracking.${k}=${String(tr[k])} not in {${TRACKING_STATES.join(',')}}`);
       }
+    }
+  }
+  if (o.stroke !== undefined) {
+    const st = o.stroke as Record<string, unknown>;
+    if (typeof st !== 'object' || st === null || Array.isArray(st)) fail('stroke not an object');
+    const sKeys = Object.keys(st).sort();
+    const sWant = [...STROKE_KEYS].sort();
+    if (sKeys.length !== sWant.length || sKeys.some((k, i) => k !== sWant[i])) {
+      fail(`stroke keys [${sKeys.join(',')}] != schema [${sWant.join(',')}]`);
+    }
+    if (typeof st.active !== 'boolean') fail('stroke.active not boolean');
+    if (!isFiniteNumber(st.count) || st.count < 0 || !Number.isInteger(st.count)) {
+      fail('stroke.count not a non-negative integer');
+    }
+    if (!isFiniteNumber(st.rate) || st.rate < 0 || st.rate > 3) fail('stroke.rate out of [0,3]');
+    for (const k of ['phase', 'ampL', 'ampR'] as const) {
+      const v = st[k];
+      if (!isFiniteNumber(v) || v < 0 || v > 1) fail(`stroke.${k} out of [0,1]`);
     }
   }
   if (o.v !== SCHEMA_V) fail(`v=${String(o.v)} (expected ${SCHEMA_V})`);
@@ -112,11 +135,18 @@ function scanForLandmarks(v: unknown, path: string): void {
 }
 
 /** Canonical JSON — fixed key order, quantized-by-construction values.
- *  The optional tracking block serializes last, in TRACKING_KEYS order. */
+ *  Optional blocks serialize last, tracking then stroke, in their
+ *  declared key orders. */
 export function canonicalSignalJSON(s: BodySignal): string {
   const a: BodyAxes = s.axes;
   const tracking = s.tracking
     ? `,"tracking":{${TRACKING_KEYS.map((k) => `"${k}":"${s.tracking![k]}"`).join(',')}}`
+    : '';
+  const st = s.stroke;
+  const stroke = st
+    ? `,"stroke":{"active":${st.active},"count":${JSON.stringify(st.count)}` +
+      `,"rate":${JSON.stringify(st.rate)},"phase":${JSON.stringify(st.phase)}` +
+      `,"ampL":${JSON.stringify(st.ampL)},"ampR":${JSON.stringify(st.ampR)}}`
     : '';
   return (
     `{"v":${s.v},"ts":${JSON.stringify(s.ts)},"confidence":${JSON.stringify(s.confidence)}` +
@@ -126,7 +156,7 @@ export function canonicalSignalJSON(s: BodySignal): string {
     `,"crouch":${JSON.stringify(a.crouch)},"tallness":${JSON.stringify(a.tallness)}` +
     `,"armsOut":${JSON.stringify(a.armsOut)},"armsRaised":${JSON.stringify(a.armsRaised)}` +
     `,"handsForward":${JSON.stringify(a.handsForward)},"handPoint":${JSON.stringify(a.handPoint)}}` +
-    `,"events":[${s.events.map((e) => `"${e}"`).join(',')}]${tracking}}`
+    `,"events":[${s.events.map((e) => `"${e}"`).join(',')}]${tracking}${stroke}}`
   );
 }
 

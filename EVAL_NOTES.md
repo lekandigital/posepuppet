@@ -1,5 +1,49 @@
 # Eval notes
 
+## Rowing P1 — stroke detection in @bodyarcade/body-input (2026-07-09)
+
+New: `StrokeDetector` (packages/body-input/src/stroke.ts) — per-arm
+fore-aft wrist oscillation in the torso basis, position-Schmitt reversal
+detection (velocity zero-crossings flickered at the turn on MediaPipe z),
+catch/drive/recovery cycle anatomy, strokes counted at the finish.
+Signal gains an always-emitted optional `stroke` block (schema stays v1,
+additive like PPC's `tracking`): active/count/rate/phase/ampL/ampR, all
+user-side (ampL = the user's own left arm — the mirrored-landmark slot
+swap was caught by the left-bias fixture reading dominance on the wrong
+side, ampL−ampR p50 −0.140 before, +0.127 after).
+
+Fixture eval (eval/bodyinput-results.json, ALL GREEN, all 10 fixtures):
+- rowing_slow  **12/12** strokes, rate p50 0.404 Hz, rhythm 85% of frames
+- rowing_fast  **24/24**, rate p50 0.846 Hz — rateOrdering fast > 1.3× slow ✓
+- rowing_left_bias **16/15** (±1 bar), ampL−ampR p50 **+0.127** ✓
+- rowing_seated **13/13 measured** (prescribed 15 — see below), rate 0.617 Hz
+- still.mp4: **0 strokes, 0 rhythm-active frames**; signal 30 Hz,
+  latency p50 ≈ 12 ms on every clip
+- unit specs: 7 new stroke tests (synthetic cycles, rate ordering, bias
+  sign, sub-amplitude rejection, decay-to-idle, dropout never spikes the
+  count, schema/canonical round-trip); replay determinism spec now
+  covers the stroke block since it is always emitted.
+
+Harness finding (measured, then fixed in the eval, not the detector):
+the delivered clips start/end mid-motion (YDIF at both edges — no still
+lead-in/tail per protocol), so the fake-webcam y4m LOOP SEAM cuts
+mid-stroke and swallowed or fabricated 1–3 strokes per run. Rowing
+clips now run as a single non-looped pass through the app's ?video=
+file mode (pause → seek 0 → park 4.6 s, longer than maxPeriodMs so the
+drive-duration gate discards any stale pre-seek catch → play once).
+Counts before/after: seated 12→13, left_bias 17(+seam artifact)→16,
+fast 23→24, slow 11→12.
+
+Label discrepancy, flagged for Gate 2: rowing_seated was prescribed 15
+strokes but the take measures **13 completed pulls** — the raw wrist
+trace shows a ~2.5 s pause at 14–16.5 s and a mid-stroke start; a 2 fps
+frame-sheet review agrees (visibly static mid-take stretch). The eval
+asserts the measured label with provenance; minAmp 0.15→0.12 was tried
+first and REVERTED (changed no count — the strokes aren't there).
+Also recorded: the seated flag reads 0% on rowing_seated (framing crops
+the thighs the detector needs) — stroke detection is unaffected, which
+is the actual seated-rowing requirement; noted as a limitation.
+
 ### GATE 2 APPROVED — Predictive Pose Continuity accepted (2026-07-07)
 Lekan's focused retest, all five items passed: the arm's exit motion
 was understood and predicted with a smooth return (no snap/fling); head

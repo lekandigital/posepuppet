@@ -479,3 +479,26 @@ behind a `Waterway` seam interface the future open-data pipeline fills;
 keyboard fallback keeps upstream boat semantics (W hold = accelerate)
 instead of the sketched "W = stroke" — accepted Flight rule is keyboard
 identical to upstream, and it already serves the fallback purpose.
+
+## 2026-07-09 — Rowing P1: stroke detection decisions and measured revisions
+(1) Reversal detection is a position Schmitt trigger (reversalHys 0.06
+arm-lengths from the running extremum), not velocity zero-crossings as
+the prompt sketched — MediaPipe z velocity flickers near the turn even
+after One Euro; position hysteresis is immune. (2) ampL/ampR are
+USER-side (like leanX): the package receives MIRRORED landmarks, so the
+"left" landmark slot is the user's anatomical right arm — the pipeline
+swaps when feeding the detector; caught by the left-bias fixture
+reading the dominant arm on the wrong side. (3) Rowing fixture eval
+runs single-pass video-file mode (?video= + seek-to-0 + park 4.6 s >
+maxPeriodMs so the drive-duration gate discards stale pre-seek
+catches), not the looping fake webcam: the delivered takes start/end
+mid-motion, so a loop seam swallowed or fabricated 1–3 strokes per run
+(measured); counts went 11/12, 24/24, 16/15 once seam-free. (4) minAmp
+0.12 was tried for the seated undercount and REVERTED — it changed no
+count; the real cause is the take itself: raw wrist trace + frame
+review show 13 completed pulls, a ~2.5 s mid-take pause, and a
+mid-stroke start. Eval asserts the measured label 13 (provenance in
+STROKE_TRUTH + EVAL_NOTES), pending Lekan's confirmation at Gate 2.
+(5) Stroke state ships as an ALWAYS-EMITTED optional schema block (v
+stays 1); count is a monotonic field rather than a new event name, so
+the closed event set is untouched and old consumers/tapes stay valid.

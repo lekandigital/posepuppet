@@ -16,7 +16,18 @@ const BASE = 'http://localhost:5173';
 
 const DURATIONS = {
   lean_lr: 40, lean_fb: 60, crouch_stand: 45, arms_tpose: 42, seated: 40, still: 20,
+  // rowing clips: single-pass video-file mode (see below) — the value is
+  // only a poll timeout ceiling, collection ends when the clip does
+  rowing_slow: 55, rowing_fast: 45, rowing_left_bias: 60, rowing_seated: 40,
 };
+
+/** Hand-labeled stroke counts (recording protocol, 2026-07-07) — the ±1
+ *  eval bar. rowing_seated: the protocol prescribed 15, but the take
+ *  contains 13 completed pulls — raw wrist trace shows a ~2.5 s pause at
+ *  14–16.5 s and the clip starts mid-stroke; frame-sheet review agrees
+ *  (EVAL_NOTES 2026-07-09). 13 is the measured label, PENDING LEKAN'S
+ *  CONFIRMATION at Gate 2. */
+const STROKE_TRUTH = { rowing_slow: 12, rowing_fast: 24, rowing_left_bias: 15, rowing_seated: 13 };
 
 const argv = process.argv.slice(2);
 const headless = argv.includes('--headless');
@@ -26,8 +37,10 @@ const fixtures = names.length ? names : Object.keys(DURATIONS);
 // --- schema guard (mirrors src/schema.ts — the tool is plain .mjs) -------
 const TOP = ['v', 'ts', 'confidence', 'seated', 'stillness', 'neutralConfidence', 'axes', 'events'];
 const AXES = ['leanX', 'leanY', 'crouch', 'tallness', 'armsOut', 'armsRaised', 'handsForward', 'handPoint'];
+const STROKE = ['active', 'count', 'rate', 'phase', 'ampL', 'ampR'];
 function checkShape(s) {
-  const keys = Object.keys(s).sort().join();
+  // 'tracking' and 'stroke' are the schema's optional additive blocks
+  const keys = Object.keys(s).filter((k) => k !== 'tracking' && k !== 'stroke').sort().join();
   if (keys !== [...TOP].sort().join()) return `keys ${keys}`;
   if (s.v !== 1) return `v=${s.v}`;
   for (const k of ['ts', 'confidence', 'stillness', 'neutralConfidence']) {
@@ -35,6 +48,13 @@ function checkShape(s) {
   }
   if (Object.keys(s.axes).sort().join() !== [...AXES].sort().join()) return 'axes keys';
   for (const k of AXES) if (!Number.isFinite(s.axes[k])) return `axes.${k} not finite`;
+  if (s.stroke !== undefined) {
+    if (Object.keys(s.stroke).sort().join() !== [...STROKE].sort().join()) return 'stroke keys';
+    if (typeof s.stroke.active !== 'boolean') return 'stroke.active not boolean';
+    for (const k of ['count', 'rate', 'phase', 'ampL', 'ampR']) {
+      if (!Number.isFinite(s.stroke[k])) return `stroke.${k} not finite`;
+    }
+  }
   return null;
 }
 
@@ -109,6 +129,47 @@ function bipolarChecks(signals, axis, quietAxis, mag = 0.45) {
   };
 }
 
+/** Rowing: stroke count vs hand-labeled truth, rhythm coverage, rate
+ *  readability; left-bias and seated variants add their own lines. */
+function rowingChecks(signals, truth, opts = {}) {
+  const c0 = signals[0]?.stroke?.count ?? 0;
+  const c1 = signals[signals.length - 1]?.stroke?.count ?? 0;
+  const detected = c1 - c0;
+  const active = signals.filter((s) => s.stroke?.active);
+  const rateP50 = pctl(active.map((s) => s.stroke.rate), 0.5);
+  const out = {
+    strokeCount: {
+      pass: Math.abs(detected - truth) <= 1,
+      detail: `${detected} strokes in window (hand-labeled truth ${truth}, ±1)${opts.labelNote ?? ''}`,
+      detected,
+    },
+    rhythmActive: {
+      pass: active.length > signals.length * 0.3,
+      detail: `rhythm active ${((100 * active.length) / Math.max(signals.length, 1)).toFixed(1)}% of frames (≥30%)`,
+    },
+    rateRead: {
+      pass: rateP50 > 0.15,
+      detail: `rate p50=${rateP50.toFixed(3)} Hz over active frames (>0.15)`,
+      rateP50,
+    },
+  };
+  if (opts.leftBias) {
+    const d50 = pctl(active.map((s) => s.stroke.ampL - s.stroke.ampR), 0.5);
+    out.leftBiasSign = {
+      pass: d50 > 0.05,
+      detail: `ampL−ampR p50=${d50.toFixed(3)} during rhythm (>0.05 — left arm dominant)`,
+    };
+  }
+  if (opts.seated) {
+    const frac = signals.filter((s) => s.seated).length / Math.max(signals.length, 1);
+    out.seatedFlag = {
+      pass: true,
+      detail: `seated flag ${(frac * 100).toFixed(1)}% of frames (recorded metric — count is the assertion)`,
+    };
+  }
+  return out;
+}
+
 const CHECKS = {
   lean_lr: (s) => bipolarChecks(s, 'leanX', 'leanY'),
   // 0.35 for leanY: signed-window detection at 3.5× its measured noise
@@ -161,6 +222,8 @@ const CHECKS = {
       floors[a] = pctl(signals.map((s) => Math.abs(s.axes[a])), 0.99);
       worst = Math.max(worst, floors[a]);
     }
+    const strokes = (signals[signals.length - 1]?.stroke?.count ?? 0) - (signals[0]?.stroke?.count ?? 0);
+    const activeFrames = signals.filter((s) => s.stroke?.active).length;
     return {
       noEvents: { pass: evTotal === 0, detail: `${evTotal} event frames (need 0)` },
       stillnessHigh: { pass: stillP50 >= 0.75, detail: `stillness p50=${stillP50.toFixed(3)} (≥0.75)` },
@@ -169,8 +232,20 @@ const CHECKS = {
         detail: `worst shaped p99=${worst.toFixed(4)} (≤0.08)`,
         floors,
       },
+      strokesZero: {
+        pass: strokes === 0 && activeFrames === 0,
+        detail: `${strokes} strokes, ${activeFrames} rhythm-active frames on still footage (need 0/0)`,
+      },
     };
   },
+  rowing_slow: (s) => rowingChecks(s, STROKE_TRUTH.rowing_slow),
+  rowing_fast: (s) => rowingChecks(s, STROKE_TRUTH.rowing_fast),
+  rowing_left_bias: (s) => rowingChecks(s, STROKE_TRUTH.rowing_left_bias, { leftBias: true }),
+  rowing_seated: (s) =>
+    rowingChecks(s, STROKE_TRUTH.rowing_seated, {
+      seated: true,
+      labelNote: ' — measured label (prescribed 15; see STROKE_TRUTH note), confirm at Gate 2',
+    }),
 };
 
 // --- rig -------------------------------------------------------------------
@@ -192,9 +267,16 @@ if (!(await serverUp())) {
 const results = { generatedAt: new Date().toISOString(), headless, fixtures: {}, allPass: true };
 
 for (const fixture of fixtures) {
-  const y4m = resolve(root, 'fixtures', 'flight', `${fixture}.y4m`);
-  if (!existsSync(y4m)) {
-    console.error(`missing ${y4m} — npm run prepare-fixtures`);
+  // Rowing fixtures run in single-pass VIDEO-FILE mode (?video=), not the
+  // looping fake webcam: the count-vs-truth check needs exactly one pass —
+  // the clips start/end mid-motion, so a y4m loop seam swallows or
+  // fabricates a stroke every crossing (measured 2026-07-08: ±1–3 per run).
+  const isRowing = fixture.startsWith('rowing_');
+  const src = isRowing
+    ? resolve(root, 'fixtures', 'rowing', `${fixture}.mp4`)
+    : resolve(root, 'fixtures', 'flight', `${fixture}.y4m`);
+  if (!existsSync(src)) {
+    console.error(`missing ${src}${isRowing ? '' : ' — npm run prepare-fixtures'}`);
     process.exit(1);
   }
   const dur = DURATIONS[fixture] ?? 30;
@@ -204,7 +286,7 @@ for (const fixture of fixtures) {
     args: [
       '--use-fake-ui-for-media-stream',
       '--use-fake-device-for-media-stream',
-      `--use-file-for-fake-video-capture=${y4m}`,
+      ...(isRowing ? [] : [`--use-file-for-fake-video-capture=${src}`]),
       '--autoplay-policy=no-user-gesture-required',
       '--disable-backgrounding-occluded-windows',
       '--disable-renderer-backgrounding',
@@ -213,36 +295,78 @@ for (const fixture of fixtures) {
   });
   try {
     const page = await browser.newPage();
-    await page.goto(`${BASE}/?avatar=robot`);
+    const query = isRowing
+      ? `?avatar=robot&video=/fixtures/rowing/${fixture}.mp4`
+      : '?avatar=robot';
+    await page.goto(`${BASE}/${query}`);
     await page.waitForFunction(
       () => window.__BI?.core.getNeutral() !== null && window.__PP?.detectionCount > 10,
       undefined,
       { timeout: 60_000 },
     );
-    const collected = await page.evaluate(
-      (seconds) =>
-        new Promise((res) => {
-          const sigs = [];
-          const lats = [];
-          const unsub = window.__BI.source.subscribe((s) => {
-            sigs.push(s);
-            lats.push(performance.now() - s.ts);
-          });
-          setTimeout(() => {
-            unsub();
-            res({ sigs, lats });
-          }, seconds * 1000);
-        }),
-      dur,
-    );
-    const { sigs, lats } = collected;
-    console.log(`${sigs.length} signals (${(sigs.length / dur).toFixed(1)} Hz)`);
+    const collected = isRowing
+      ? await page.evaluate(
+          (timeoutS) =>
+            new Promise((res) => {
+              // Single pass: pause, rewind, park > maxPeriodMs so the
+              // detector's drive-duration gate discards any pre-seek catch,
+              // then play once and stop at the clip's end (or wrap).
+              const video = document.getElementById('video');
+              video.pause();
+              video.currentTime = 0;
+              setTimeout(() => {
+                const sigs = [];
+                const lats = [];
+                const unsub = window.__BI.source.subscribe((s) => {
+                  sigs.push(s);
+                  lats.push(performance.now() - s.ts);
+                });
+                let prevT = 0;
+                const t0 = performance.now();
+                const poll = setInterval(() => {
+                  const t = video.currentTime;
+                  const done =
+                    t < prevT - 0.5 || // looped
+                    t >= video.duration - 0.05 ||
+                    performance.now() - t0 > timeoutS * 1000;
+                  prevT = Math.max(prevT, t);
+                  if (done) {
+                    clearInterval(poll);
+                    unsub();
+                    res({ sigs, lats, passSeconds: prevT });
+                  }
+                }, 50);
+                void video.play();
+              }, 4600);
+            }),
+          dur,
+        )
+      : await page.evaluate(
+          (seconds) =>
+            new Promise((res) => {
+              const sigs = [];
+              const lats = [];
+              const unsub = window.__BI.source.subscribe((s) => {
+                sigs.push(s);
+                lats.push(performance.now() - s.ts);
+              });
+              setTimeout(() => {
+                unsub();
+                res({ sigs, lats, passSeconds: seconds });
+              }, seconds * 1000);
+            }),
+          dur,
+        );
+    const { sigs, lats, passSeconds } = collected;
+    console.log(`${sigs.length} signals (${(sigs.length / passSeconds).toFixed(1)} Hz over ${passSeconds.toFixed(1)}s)`);
 
     // transparency: percentile profile of the axes this clip exercises
     const PROFILE = {
       lean_lr: ['leanX', 'leanY'], lean_fb: ['leanY', 'leanX'],
       crouch_stand: ['crouch', 'tallness'], arms_tpose: ['armsOut', 'armsRaised', 'handsForward'],
       seated: ['crouch'], still: [],
+      rowing_slow: ['handsForward'], rowing_fast: ['handsForward'],
+      rowing_left_bias: ['handsForward'], rowing_seated: ['handsForward'],
     };
     for (const a of PROFILE[fixture] ?? []) {
       const vals = sigs.map((s) => s.axes[a]);
@@ -254,6 +378,17 @@ for (const fixture of fixtures) {
     if (fixture === 'crouch_stand' || fixture === 'seated') {
       const frac = sigs.filter((s) => s.seated).length / sigs.length;
       console.log(`  seated flag: ${(frac * 100).toFixed(1)}% of frames`);
+    }
+    if (fixture.startsWith('rowing_')) {
+      const active = sigs.filter((s) => s.stroke?.active);
+      const rates = active.map((s) => s.stroke.rate);
+      console.log(
+        `  stroke: count ${(sigs[sigs.length - 1]?.stroke?.count ?? 0) - (sigs[0]?.stroke?.count ?? 0)}, ` +
+          `rate p25=${pctl(rates, 0.25).toFixed(2)} p50=${pctl(rates, 0.5).toFixed(2)} ` +
+          `p75=${pctl(rates, 0.75).toFixed(2)} Hz, ` +
+          `ampL p50=${pctl(active.map((s) => s.stroke.ampL), 0.5).toFixed(2)} ` +
+          `ampR p50=${pctl(active.map((s) => s.stroke.ampR), 0.5).toFixed(2)}`,
+      );
     }
 
     const checks = CHECKS[fixture] ? CHECKS[fixture](sigs) : {};
@@ -269,7 +404,7 @@ for (const fixture of fixtures) {
 
     const fixtureResult = {
       signals: sigs.length,
-      hz: Number((sigs.length / dur).toFixed(2)),
+      hz: Number((sigs.length / passSeconds).toFixed(2)),
       latencyMsP50: Number(pctl(lats, 0.5).toFixed(1)),
       latencyMsP95: Number(pctl(lats, 0.95).toFixed(1)),
       checks,
@@ -283,6 +418,20 @@ for (const fixture of fixtures) {
   } finally {
     await browser.close();
   }
+}
+
+// cross-clip: the read rate must track the performed cadence (slow < fast).
+// Only meaningful when both rowing clips ran in this invocation.
+const slowRate = results.fixtures.rowing_slow?.checks?.rateRead?.rateP50;
+const fastRate = results.fixtures.rowing_fast?.checks?.rateRead?.rateP50;
+if (slowRate !== undefined && fastRate !== undefined) {
+  const pass = fastRate > slowRate * 1.3;
+  results.fixtures.rowing_fast.checks.rateOrdering = {
+    pass,
+    detail: `rate p50 fast=${fastRate.toFixed(3)} Hz vs slow=${slowRate.toFixed(3)} Hz (fast > 1.3× slow)`,
+  };
+  console.log(`\n  ${pass ? '✓' : '✗'} rateOrdering: ${results.fixtures.rowing_fast.checks.rateOrdering.detail}`);
+  if (!pass) results.allPass = false;
 }
 
 const out = resolve(root, 'eval', 'bodyinput-results.json');

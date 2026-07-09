@@ -63,6 +63,21 @@ export function defaultConfig(): BodyInputConfig {
       action: { enter: 0.75, exit: 0.55, minRatePerSec: 1.2, debounceFrames: 3, refractoryMs: 1000 },
       minConfidence: 0.5,
     },
+    stroke: {
+      // Position filter is deliberately heavier than the axis filters —
+      // reversal detection wants a clean turn, not responsiveness (latency
+      // rides on reversalHys anyway). Starting values; the rowing fixture
+      // eval is the arbiter and revisions are logged in DECISIONS.md.
+      oneEuro: { minCutoff: 0.8, beta: 0.01 },
+      // ~4 cm of hand travel on a 65 cm arm — well above the handsForward
+      // jitter floor (0.01 arm lengths on still.mp4), well below a real
+      // stroke (spec'd ~30 cm ≈ 0.45 arm lengths).
+      reversalHys: 0.06,
+      minAmp: 0.15,
+      minHalfPeriodMs: 250,
+      maxPeriodMs: 4000,
+      rateDecayTauMs: 1000,
+    },
     confidenceTauMs: 150,
     confidenceDecayTauMs: 300,
     provisionalNeutralMs: 800,
