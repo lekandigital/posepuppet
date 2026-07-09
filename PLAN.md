@@ -258,6 +258,16 @@ Counting the strokes while recording is the hand-labeled truth the
 ±1 eval checks against — if a take ends up with a different count,
 just tell me the actual number instead of re-recording.
 
+**As delivered (2026-07-08):** all four clips usable at 1080×1920@30;
+durations shorter than spec'd (41.3/33.4/47.7/25.6 s) and the takes
+start/end mid-motion (no still lead-in/tail) — the eval therefore runs
+rowing clips as a single non-looped video pass rather than through the
+looping fake webcam (a loop seam that cuts mid-stroke swallows or
+fabricates strokes). rowing_seated measured at 13 completed pulls (raw
+wrist trace + frame review show a ~2.5 s mid-take pause and a
+mid-stroke start); prescribed 15 — measured label used, flagged for
+Lekan's confirmation at Gate 2.
+
 ## Effort estimates
 
 - P1 stroke detection + schema + fixture eval: ~1 day.

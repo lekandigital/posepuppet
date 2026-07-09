@@ -23,6 +23,9 @@ interface PoseOpts {
   tpose?: boolean;
   /** 0..1: wrists this fraction of an arm length toward the camera */
   armsFwd?: number;
+  /** per-arm overrides of armsFwd (rowing asymmetry) */
+  armsFwdL?: number;
+  armsFwdR?: number;
   pointLeft?: boolean;
   seated?: boolean;
   /** thighs horizontal like a sit, but heels under the hips */
@@ -109,7 +112,9 @@ function makeFrame(tsMs: number, o: PoseOpts = {}): BodyInputFrame {
   const wrist = (side: 1 | -1): [number, number, number] => {
     const s = side === 1 ? world[LM.leftShoulder] : world[LM.rightShoulder];
     if (o.tpose) return [s.x + side * armLen, s.y, s.z];
-    let fwd = o.armsFwd ?? 0;
+    // mirrored landmarks: side=1 is the LEFT lm slot = the user's own RIGHT
+    // arm — per-arm rowing overrides are named user-side, hence the swap
+    let fwd = (side === 1 ? o.armsFwdR : o.armsFwdL) ?? o.armsFwd ?? 0;
     if (o.pointLeft) fwd = side === 1 ? 1 : 0;
     if (fwd > 0) return [s.x, s.y, s.z - fwd * armLen];
     return [s.x + side * 0.02, s.y + armLen, s.z];
@@ -378,6 +383,105 @@ test('handPoint: single pointed arm reads, T-pose does not', () => {
   expect(point.axes.handPoint).toBeGreaterThan(0.6);
   const tpose = last(run(after(neutralLeadIn(), (t) => seq(t, 40, { tpose: true }))));
   expect(tpose.axes.handPoint).toBeLessThan(0.2);
+});
+
+// --- stroke detection (Rowing P1) ------------------------------------------
+
+/** Rowing frames: hands oscillate fore-aft between `base` and `base+amp`
+ *  (arm-length units), one full cycle per `periodMs`. Base stays > 0 so the
+ *  synthetic wrist stays on its forward branch (no hanging-arm pop). */
+function rowSeq(
+  startTs: number, n: number, periodMs: number,
+  ampL = 0.45, ampR = 0.45, base = 0.15,
+): BodyInputFrame[] {
+  return seq(startTs, n, (i) => {
+    const t = (i * STEP) / periodMs;
+    const c = 0.5 + 0.5 * Math.sin(2 * Math.PI * t);
+    return { armsFwdL: base + ampL * c, armsFwdR: base + ampR * c };
+  });
+}
+
+test('stroke: steady rowing counts strokes and reads the rate', () => {
+  // 8 cycles at 40 SPM (1.5 s period) after the neutral lead-in
+  const periodMs = 1500;
+  const frames = after(neutralLeadIn(), (t) => rowSeq(t, Math.round((8 * periodMs) / STEP), periodMs));
+  const signals = run(frames);
+  const fin = last(signals);
+  expect(fin.stroke).toBeDefined();
+  expect(Math.abs(fin.stroke!.count - 8)).toBeLessThanOrEqual(1);
+  expect(fin.stroke!.active).toBe(true);
+  expect(Math.abs(fin.stroke!.rate - 1000 / periodMs)).toBeLessThan(0.12);
+  // symmetric strokes read symmetric amplitudes
+  expect(Math.abs(fin.stroke!.ampL - fin.stroke!.ampR)).toBeLessThan(0.08);
+  // count is monotonic
+  for (let i = 1; i < signals.length; i++) {
+    expect(signals[i].stroke!.count).toBeGreaterThanOrEqual(signals[i - 1].stroke!.count);
+  }
+});
+
+test('stroke: slow vs fast rate ordering', () => {
+  const slow = last(run(after(neutralLeadIn(), (t) => rowSeq(t, Math.round(18000 / STEP), 3000))));
+  const fast = last(run(after(neutralLeadIn(), (t) => rowSeq(t, Math.round(18000 / STEP), 1200))));
+  expect(slow.stroke!.active).toBe(true);
+  expect(fast.stroke!.active).toBe(true);
+  expect(fast.stroke!.rate).toBeGreaterThan(slow.stroke!.rate * 1.5);
+});
+
+test('stroke: left-bias amplitude asymmetry has the documented sign', () => {
+  const frames = after(neutralLeadIn(), (t) => rowSeq(t, Math.round(9000 / STEP), 1500, 0.45, 0.2));
+  const fin = last(run(frames));
+  expect(fin.stroke!.count).toBeGreaterThanOrEqual(4);
+  expect(fin.stroke!.ampL).toBeGreaterThan(fin.stroke!.ampR + 0.1);
+});
+
+test('stroke: sub-amplitude wiggle and stillness never count', () => {
+  // fore-aft wiggle below minAmp (0.15): oscillation exists, strokes must not
+  const wiggle = last(run(after(neutralLeadIn(), (t) => rowSeq(t, Math.round(9000 / STEP), 1500, 0.08, 0.08))));
+  expect(wiggle.stroke!.count).toBe(0);
+  expect(wiggle.stroke!.active).toBe(false);
+  // still footage: jitter only
+  const still = run(seq(0, 90, (i) => ({ jitter: 0.003, jitterPhase: i * 0.7 })));
+  expect(last(still).stroke!.count).toBe(0);
+  expect(last(still).stroke!.active).toBe(false);
+});
+
+test('stroke: stopping decays rate to zero and drops active', () => {
+  let frames = after(neutralLeadIn(), (t) => rowSeq(t, Math.round(6000 / STEP), 1500));
+  frames = after(frames, (t) => seq(t, Math.round(9000 / STEP), { armsFwd: 0.15 })); // rest, hands quiet
+  const signals = run(frames);
+  const fin = last(signals);
+  expect(fin.stroke!.active).toBe(false);
+  expect(fin.stroke!.rate).toBe(0);
+});
+
+test('stroke: dropout mid-rhythm never spikes the count, rhythm resumes', () => {
+  const periodMs = 1500;
+  let frames = after(neutralLeadIn(), (t) => rowSeq(t, Math.round(4 * periodMs / STEP), periodMs));
+  frames = after(frames, (t) => nullFrames(t, 30)); // ~1 s dropout
+  frames = after(frames, (t) => rowSeq(t, Math.round(4 * periodMs / STEP), periodMs));
+  const signals = run(frames);
+  for (const s of signals) assertSignalShape(s);
+  // no frame gains more than one stroke
+  for (let i = 1; i < signals.length; i++) {
+    expect(signals[i].stroke!.count - signals[i - 1].stroke!.count).toBeLessThanOrEqual(1);
+  }
+  // rhythm resumed after the dropout: strokes kept accruing
+  expect(last(signals).stroke!.count).toBeGreaterThanOrEqual(6);
+});
+
+test('stroke block: schema-validated, canonical, bad blocks rejected', () => {
+  const good = last(run(after(neutralLeadIn(), (t) => rowSeq(t, Math.round(6000 / STEP), 1500))));
+  assertSignalShape(good);
+  expect(canonicalStreamJSON([good])).toContain('"stroke":{"active":true');
+  // absent stays valid (old tapes)
+  const { stroke: _omit, ...bare } = good;
+  assertSignalShape(bare);
+  // closed sub-shape and ranges both bite
+  expect(() => assertSignalShape({ ...good, stroke: { ...good.stroke!, extra: 1 } })).toThrow(/stroke/);
+  expect(() => assertSignalShape({ ...good, stroke: { ...good.stroke!, rate: -1 } })).toThrow(/stroke/);
+  expect(() => assertSignalShape({ ...good, stroke: { ...good.stroke!, count: 1.5 } })).toThrow(/stroke/);
+  expect(() => assertSignalShape({ ...good, stroke: { ...good.stroke!, phase: 2 } })).toThrow(/stroke/);
+  expect(() => assertSignalShape({ ...good, stroke: { ...good.stroke!, active: 1 } })).toThrow(/stroke/);
 });
 
 test('in-page transport delivers validated signals', () => {

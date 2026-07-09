@@ -64,3 +64,11 @@ Rowing fixtures missing — exact recording specs in PLAN.md (rowing_slow 12 str
 Baselines: PosePuppet suite 92 passed / 5 skipped; Flight suite result in the Gate-1 commit message
 Blockers: USER GATE 1 — build-vs-adapt + plan approval + fixture recording
 Next: on approval + fixtures, P1 stroke detection in the package
+
+## 2026-07-09 (Rowing P1 — stroke detection green)
+StrokeDetector in @bodyarcade/body-input: fore-aft wrist oscillation, position-Schmitt reversals, catch/drive/recovery; always-emitted additive `stroke` block (v1): active/count/rate/phase/ampL/ampR, user-side arms (mirrored-slot swap caught by the left-bias fixture)
+Fixture eval ALL GREEN, all 10 fixtures: slow 12/12, fast 24/24, left_bias 16/15 + bias sign +0.127, seated 13/13 measured, still 0 strokes; rate ordering fast 0.846 Hz > slow 0.404 Hz; latency p50 ~12 ms
+Harness fix, not detector: clips start/end mid-motion so the y4m loop seam ate/faked strokes — rowing eval now runs one non-looped ?video= pass
+Flag for Gate 2: rowing_seated prescribed 15, measured 13 (real 2.5 s mid-take pause + mid-stroke start, wrist trace + frame review agree) — confirm the label; seated flag itself reads 0% (thighs cropped), stroke detection unaffected
+Blockers: none — P2 (boat impulse-glide) next
+Next: RowingControls in apps/flight, boat impulse hook, both steering profiles, assists/cruise/autopilot, ?row entry, tuner stroke row

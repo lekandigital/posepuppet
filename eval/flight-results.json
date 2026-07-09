@@ -1,13 +1,13 @@
 {
   "replay": {
-    "date": "2026-07-07T11:51:37.626Z",
+    "date": "2026-07-09T17:09:50.802Z",
     "mode": "headed",
     "note": "intent tape (variable dt, recorded per frame) replayed through a fresh Plane",
-    "frames": 1681,
-    "tapeSeconds": 14.101399999976206,
-    "dtMinMs": 3.1,
+    "frames": 1679,
+    "tapeSeconds": 14.035799999996751,
+    "dtMinMs": 2,
     "dtMaxMs": 50,
-    "maxPosArcWorldUnits": 0.0000025723392518806632,
+    "maxPosArcWorldUnits": 0,
     "maxHeadingErrDeg": 0,
     "maxAltitudeErr": 0,
     "maxSpeedErr": 0

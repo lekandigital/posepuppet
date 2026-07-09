@@ -36,9 +36,11 @@ function convertDir(d) {
 }
 
 let converted = convertDir(dir);
-// body-control fixtures (fixtures/flight/) feed the body-input evals
+// body-control fixtures (fixtures/flight/, fixtures/rowing/) feed the body-input evals
 const flightDir = join(dir, 'flight');
 if (existsSync(flightDir)) converted += convertDir(flightDir);
+const rowingDir = join(dir, 'rowing');
+if (existsSync(rowingDir)) converted += convertDir(rowingDir);
 if (converted === 0) {
   console.error('no .mp4 clips in fixtures/');
   process.exit(1);
