@@ -24,7 +24,7 @@ import { saveLoop, listLoops, loadLoop, deleteLoop } from './memory/store';
 import { createIntentDetector } from './gesture/intent';
 import { createBodyInputAdapter, type BodyInputAdapter } from './bodyinput/adapter';
 import type { BodyTracking, TrackingState } from '@bodyarcade/body-input';
-import { openFlight } from './bodyinput/flightBridge';
+import { openFlight, defaultFlightUrl } from './bodyinput/flightBridge';
 import { createDirector } from './director/director';
 import { TAKE_SCRIPTS } from './director/scripts';
 import type { HandPuppetId } from './hand/types';
@@ -957,6 +957,29 @@ async function boot() {
     });
   document.getElementById('fly-btn')?.addEventListener('click', startFlight);
 
+  // BodyArcade Rowing entry: same game, boat vehicle, stroke input —
+  // ?row starts straight on the water (companion mode identical to Fly).
+  const rowUrl = () => {
+    const base = defaultFlightUrl();
+    return `${base}${base.includes('?') ? '&' : '?'}row`;
+  };
+  const startRow = () =>
+    openFlight(
+      bodyInput,
+      {
+        setStageSuspended: (v) => stage.setSuspended(v),
+        useLiteModel: () => {
+          const prev = config.model;
+          if (prev !== 'lite') setConfig('model', 'lite');
+          return () => {
+            if (prev !== 'lite' && config.model === 'lite') setConfig('model', prev);
+          };
+        },
+      },
+      rowUrl(),
+    );
+  document.getElementById('row-btn')?.addEventListener('click', startRow);
+
   // ── recording director: guided takes, hands-free via the gesture seed ──
   let latestNorm: LandmarkPoint[] | null = null;
   const intents = createIntentDetector();
@@ -1181,6 +1204,8 @@ async function boot() {
     { id: 'autocam', label: 'auto-director camera · toggle', run: toggleCmd2('autoCam') },
     { id: 'fly', label: 'fly · bodyarcade flight (body streams into the game)',
       run: () => startFlight() },
+    { id: 'row', label: 'row · bodyarcade rowing (strokes drive the boat)',
+      run: () => startRow() },
     { id: 'body-tuner', label: 'body input · tuner overlay', key: 'b',
       run: () => {
         let host = document.getElementById('bi-tuner-host');

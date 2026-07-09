@@ -1,15 +1,27 @@
 {
   "replay": {
-    "date": "2026-07-09T17:09:50.802Z",
+    "date": "2026-07-09T17:54:28.624Z",
     "mode": "headed",
     "note": "intent tape (variable dt, recorded per frame) replayed through a fresh Plane",
-    "frames": 1679,
-    "tapeSeconds": 14.035799999996751,
-    "dtMinMs": 2,
+    "frames": 1674,
+    "tapeSeconds": 14.030700000002744,
+    "dtMinMs": 2.4,
     "dtMaxMs": 50,
     "maxPosArcWorldUnits": 0,
     "maxHeadingErrDeg": 0,
     "maxAltitudeErr": 0,
     "maxSpeedErr": 0
+  },
+  "rowingClosedLoop": {
+    "date": "2026-07-09T17:59:51.710Z",
+    "mode": "headed",
+    "samples": 236,
+    "rowingSamples": 126,
+    "minutes": 2,
+    "onWaterFrac": 1,
+    "inBandFrac": 1,
+    "crossTrackBandWorldUnits": 1.75,
+    "speedStrokeRatePearsonR": 0.824,
+    "note": "synthetic cadence program 0.3/0.8/0/0.5 Hz through the real boat + waterway; r over settled (≥12 s ≈ 2τ into each segment) active-rowing samples — cruise holds speed at zero cadence by design and is asserted separately"
   }
 }

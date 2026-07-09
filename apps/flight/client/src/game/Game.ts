@@ -44,6 +44,8 @@ import { resolveServerUrl } from "../runtime/resolveServerUrl";
 import { isLocalMode, localAutoJoin, localLanternAdd } from "../runtime/localWorlds";
 import { BodyFlightControls } from "../input/bodyControls";
 import { FlightTuner } from "../input/flightTuner";
+import { RowingControls } from "../input/rowControls";
+import { createOceanCourse, assistTurnRate, type Waterway } from "./Waterway";
 import { isMobile } from "../utils/isMobile";
 import { StateSync } from "../network/StateSync";
 import { RemotePlaneManager } from "./RemotePlane";
@@ -451,6 +453,11 @@ export class Game {
   /** BodyArcade: body input as a parallel control source + its tuner. */
   private bodyControls: BodyFlightControls | null = null;
   private flightTuner: FlightTuner | null = null;
+  /** BodyArcade Rowing: stroke input for the boat + its water course. */
+  private rowingControls: RowingControls | null = null;
+  private waterway: Waterway | null = null;
+  /** ?row: start straight onto the water on first lobby mount. */
+  private rowAutoStartPending = new URLSearchParams(window.location.search).has("row");
   private tunerPrevHeading = 0;
   private headingRateDegS = 0;
   /** Eval only (?record-intents=1): per-tick inputs + live pose for replay. */
@@ -825,15 +832,21 @@ export class Game {
   /** BodyArcade: body-input source, tuner ("b"), and the __FLIGHT eval handle. */
   private initBodyInput() {
     this.bodyControls = new BodyFlightControls();
-    this.flightTuner = new FlightTuner(this.bodyControls, () => {
-      if (!this.localPlayer || this.gamePhase !== "flying") return null;
-      return {
-        headingRateDegS: this.headingRateDegS,
-        speed: this.localPlayer.speed,
-        altitude: this.localPlayer.altitude,
-        bankDeg: (this.localPlayer.bankAngle * 180) / Math.PI,
-      };
-    });
+    this.rowingControls = new RowingControls();
+    this.flightTuner = new FlightTuner(
+      this.bodyControls,
+      () => {
+        if (!this.localPlayer || this.gamePhase !== "flying") return null;
+        return {
+          headingRateDegS: this.headingRateDegS,
+          speed: this.localPlayer.speed,
+          altitude: this.localPlayer.altitude,
+          bankDeg: (this.localPlayer.bankAngle * 180) / Math.PI,
+        };
+      },
+      this.rowingControls,
+      () => this.localPlayer instanceof Boat,
+    );
     window.addEventListener("keydown", this.onTunerKey);
 
     (window as unknown as { __FLIGHT: unknown }).__FLIGHT = {
@@ -857,6 +870,14 @@ export class Game {
       body: () => this.bodyControls?.debugState() ?? null,
       setProfile: (id: string) => this.bodyControls?.setProfile(id) ?? false,
       setAssist: (id: string) => this.bodyControls?.setAssist(id) ?? false,
+      // BodyArcade Rowing: eval/spec handles
+      row: () => this.rowingControls?.debugState() ?? null,
+      rowSample: () =>
+        this.localPlayer instanceof Boat && this.waterway
+          ? this.waterway.sample(this.localPlayer.qPosition)
+          : null,
+      setRowProfile: (id: string) => this.rowingControls?.setProfile(id) ?? false,
+      setRowAssist: (id: string) => this.rowingControls?.setAssist(id) ?? false,
       /**
        * Eval: replay a recorded intent tape through a fresh REAL Plane
        * seeded with the recorded snapshot — the replay-tolerance check.
@@ -973,43 +994,54 @@ export class Game {
       onNameChange: (name) => { this.playerName = name; ProgressionManager.savePlayerName(name); },
       onPlay: (vehicle, options) => {
         if (!ProgressionManager.isVehicleUnlocked(vehicle)) return;
-        this.runFreeplayMode = !!options?.freeplay;
-        this.pendingCampsiteAfterIntro =
-          CAMPSITE_HOME_ENABLED && (options?.startAtCampsite ?? false);
-        this.playerVehicle = vehicle;
-        this.audioManager.startMusic();
-        void this.audioManager.loadSFX("crickets_loop", "/audio/sfx/crickets_loop.mp3").then(() => {
-          this.audioManager.startLoop("crickets_loop", 0);
-        });
-        void this.audioManager.loadSFX(RAIN_LOOP_NAME, "/audio/sfx/rain_1.mp3").then(() => {
-          this.audioManager.startLoop(RAIN_LOOP_NAME, 0);
-        });
-        void this.audioManager.loadSFX(BIRDS_LOOP_NAME, "/audio/sfx/birds_chirp_1.mp3").then(() => {
-          this.audioManager.startLoop(BIRDS_LOOP_NAME, 0);
-        });
-        void this.audioManager.loadSFX(RUMBLE_LOOP_NAME, "/audio/sfx/rumbling_1.mp3").then(() => {
-          this.audioManager.startLoop(RUMBLE_LOOP_NAME, 0);
-        });
-        void this.audioManager.loadSFX(MOONSTONE_RUMBLE_LOOP_NAME, "/audio/sfx/rumble.mp3").then(() => {
-          this.audioManager.startLoop(MOONSTONE_RUMBLE_LOOP_NAME, 0);
-        });
-        void this.audioManager.loadSFX("twister", "/audio/sfx/twister.mp3").then(() => {
-          this.audioManager.startLoop("twister", 0);
-        });
-        void this.audioManager.loadSFX(EXPLOSION_SFX_NAME, "/audio/sfx/explosion_1.mp3");
-        for (const id of LANTERN_COLLECT_SFX_IDS) {
-          void this.audioManager.loadSFX(id, `/audio/sfx/${id}.mp3`);
-        }
-        for (const id of JELLYFISH_COLLECT_SFX_IDS) {
-          void this.audioManager.loadSFX(id, `/audio/sfx/${id}.mp3`);
-        }
-        this.lobby.fadeOut(() => {
-          this.lobby.dispose();
-          this.startGame(vehicle);
-        });
+        this.beginPlay(vehicle, options);
       },
     });
     this.lobby.show();
+    // BodyArcade Rowing (?row): straight onto the water — a session-only
+    // demo/eval entry; unlock progression is neither read nor written.
+    if (this.rowAutoStartPending) {
+      this.rowAutoStartPending = false;
+      this.beginPlay("boat", undefined);
+    }
+  }
+
+  /** Shared start path for the lobby's GO and the ?row direct entry. */
+  private beginPlay(vehicle: Vehicle, options?: { freeplay?: boolean; startAtCampsite?: boolean }) {
+    this.runFreeplayMode = !!options?.freeplay;
+    this.pendingCampsiteAfterIntro =
+      CAMPSITE_HOME_ENABLED && (options?.startAtCampsite ?? false);
+    this.playerVehicle = vehicle;
+    this.audioManager.startMusic();
+    void this.audioManager.loadSFX("crickets_loop", "/audio/sfx/crickets_loop.mp3").then(() => {
+      this.audioManager.startLoop("crickets_loop", 0);
+    });
+    void this.audioManager.loadSFX(RAIN_LOOP_NAME, "/audio/sfx/rain_1.mp3").then(() => {
+      this.audioManager.startLoop(RAIN_LOOP_NAME, 0);
+    });
+    void this.audioManager.loadSFX(BIRDS_LOOP_NAME, "/audio/sfx/birds_chirp_1.mp3").then(() => {
+      this.audioManager.startLoop(BIRDS_LOOP_NAME, 0);
+    });
+    void this.audioManager.loadSFX(RUMBLE_LOOP_NAME, "/audio/sfx/rumbling_1.mp3").then(() => {
+      this.audioManager.startLoop(RUMBLE_LOOP_NAME, 0);
+    });
+    void this.audioManager.loadSFX(MOONSTONE_RUMBLE_LOOP_NAME, "/audio/sfx/rumble.mp3").then(() => {
+      this.audioManager.startLoop(MOONSTONE_RUMBLE_LOOP_NAME, 0);
+    });
+    void this.audioManager.loadSFX("twister", "/audio/sfx/twister.mp3").then(() => {
+      this.audioManager.startLoop("twister", 0);
+    });
+    void this.audioManager.loadSFX(EXPLOSION_SFX_NAME, "/audio/sfx/explosion_1.mp3");
+    for (const id of LANTERN_COLLECT_SFX_IDS) {
+      void this.audioManager.loadSFX(id, `/audio/sfx/${id}.mp3`);
+    }
+    for (const id of JELLYFISH_COLLECT_SFX_IDS) {
+      void this.audioManager.loadSFX(id, `/audio/sfx/${id}.mp3`);
+    }
+    this.lobby.fadeOut(() => {
+      this.lobby.dispose();
+      this.startGame(vehicle);
+    });
   }
 
   /**
@@ -1524,6 +1556,11 @@ export class Game {
 
     if (vehicle === "boat") {
       this.localPlayer = new Boat(globeRadius, seed, terrainType, hullColor, spawnSessionSalt);
+      // BodyArcade Rowing: generate the procedural open-water course from
+      // the spawn (the Waterway seam — real waterway data plugs in here).
+      this.waterway = createOceanCourse(
+        seed, terrainType, this.localPlayer.qPosition, this.localPlayer.heading, globeRadius,
+      );
     } else if (vehicle === "carpet") {
       this.localPlayer = new Carpet(globeRadius, seed, terrainType, spawnSessionSalt, hullColor);
     } else {
@@ -3485,7 +3522,37 @@ export class Game {
     }
     // Body input merges here — the single point it enters the intent layer.
     // Keyboard/touch activity always wins (see BodyFlightControls.merge).
-    if (this.bodyControls && this.controls.enabled) {
+    // The boat is rowed (stroke impulses via RowingControls); plane/carpet
+    // keep the Gate-2-approved flight controller untouched.
+    if (this.rowingControls && this.localPlayer instanceof Boat && this.controls.enabled) {
+      const boat = this.localPlayer;
+      const merged = this.rowingControls.merge(inputState);
+      const bodyOwns = this.rowingControls.bodyActive;
+      boat.rowGlide = bodyOwns;
+      boat.rowSustain = bodyOwns && this.rowingControls.cruising;
+      if (this.gamePhase === "flying") {
+        for (const strength of this.rowingControls.consumeStrokes()) {
+          boat.rowStroke(strength);
+        }
+      } else {
+        this.rowingControls.consumeStrokes();
+      }
+      // Full Assist: soft course-follow on the waterway (body only — the
+      // keyboard path never gets steered).
+      if (bodyOwns && this.rowingControls.assist.courseFollow && this.waterway) {
+        const sample = this.waterway.sample(boat.qPosition);
+        const cap = this.rowingControls.assist.turnCap;
+        merged.turnRate = Math.max(
+          -cap,
+          Math.min(
+            cap,
+            merged.turnRate +
+              assistTurnRate(sample, boat.heading, this.worldConfig?.globeRadius ?? 5),
+          ),
+        );
+      }
+      inputState = merged;
+    } else if (this.bodyControls && this.controls.enabled) {
       const merged = this.bodyControls.merge(inputState);
       // Profile boost gesture (hands forward, hysteresis + refractory in
       // BodyFlightControls) rides the same boost path as ring pickups.
@@ -7206,6 +7273,9 @@ export class Game {
     this.touchControls?.dispose();
     this.bodyControls?.dispose();
     this.bodyControls = null;
+    this.rowingControls?.dispose();
+    this.rowingControls = null;
+    this.waterway = null;
     this.flightTuner?.dispose();
     this.flightTuner = null;
     window.removeEventListener("keydown", this.onTunerKey);

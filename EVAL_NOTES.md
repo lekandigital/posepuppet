@@ -1,5 +1,49 @@
 # Eval notes
 
+## Rowing P2 — impulse-and-glide boat, Gate 2 raised (2026-07-09)
+
+The boat rows: each detected stroke banks a surge budget applied with a
+~0.3 s attack (the visible lunge), water drag is proportional to speed
+(τ ≈ 5.5 s) so every cadence settles at its own speed and stillness is
+an exponential drift — the proportional-drag decision was forced by the
+closed-loop eval design: with the prompt's constant decay, every
+cadence saturated at max speed and the speed↔rate claim was
+unmeasurable. Keyboard boat feel byte-identical (rowing branches are
+inert without the rowing source).
+
+row.spec.ts, 7/7 green (headed):
+- ?row entry starts on the water; 6 strokes at 0.6 Hz → speed > 0.2;
+  rest → glide keeps > 30% of way after 5 s, never stops dead
+- cruise: 6+ steady strokes arm, resting latches (tuner shows CRUISE),
+  speed held within 0.03 over 5 s
+- both steering profiles turn with documented signs (lean ±6°/s floor,
+  asymmetry ±4°/s floor — measured ~5× those floors)
+- tracking loss → turn decays to < 0.06 (drift straight), cruise
+  releases (boat slows on glide); re-entry slew-bounded, max observed
+  turn step ≤ 0.3 per 100 ms sample (cap 2.0/s)
+- keyboard wins in one tick; brake stops the boat from full way
+- rowing_slow.y4m relay closed loop: ≥ 8 real strokes reach the boat,
+  speed p75 > 0.15, on water throughout
+- 2-minute Full-Assist run (cadence program 0.3/0.8/0/0.5 Hz):
+  **on-water 100%, cross-track in-band 100% (±0.35·R), speed↔stroke-rate
+  Pearson r = 0.798** over settled active-rowing samples
+  (eval/flight-results.json → rowingClosedLoop; settling exclusion ≈ 2τ
+  documented there — cruise holds speed at zero cadence by design)
+
+Perf (eval/flight-perf.json, PERF=1 headed): rowing 118.9 fps /
+longFrame 0.1% / heap 82 MB vs flight baseline 120 fps / 84 MB — the
+60/45 floor holds; the waterway sample is the only per-tick addition.
+
+Waterway seam: procedural open-water course (polyline of ocean
+waypoints walked from spawn, steering around coasts via lookahead
+probes); Full Assist follows it as a soft turn bias in Game.tick. The
+interface (sample → onWater/courseHeading/crossTrack) is what real
+waterway data implements later.
+
+Gate 2 raised: ROWING_GATE2_SCRIPT.md — both steering profiles, seated
+2-minute run, autopilot, recenter, keyboard; plus the rowing_seated
+label confirmation (13 measured vs 15 prescribed).
+
 ## Rowing P1 — stroke detection in @bodyarcade/body-input (2026-07-09)
 
 New: `StrokeDetector` (packages/body-input/src/stroke.ts) — per-arm

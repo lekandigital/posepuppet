@@ -1,21 +1,29 @@
 {
   "baseline": {
-    "date": "2026-07-07T10:02:20.768Z",
+    "date": "2026-07-09T17:41:01.560Z",
     "mode": "headed",
     "note": "offline keyboard baseline — no body input; flying with W held",
-    "renderFps": 118.1,
+    "renderFps": 120,
     "seconds": 15,
-    "longFramePct": 0.2,
-    "jsHeapMB": 98
+    "longFramePct": 0,
+    "jsHeapMB": 84
   },
   "combined": {
-    "date": "2026-07-07T10:00:39.094Z",
+    "date": "2026-07-09T17:41:28.845Z",
     "mode": "headed",
     "note": "P4 two-window session via Fly card — companion mode (lite model, stage suspended)",
-    "flightRenderFps": 111.1,
-    "flightLongFramePct": 0.8,
+    "flightRenderFps": 118.8,
+    "flightLongFramePct": 0.1,
     "poseFps": 30,
-    "bodySignalRateHz": 30,
+    "bodySignalRateHz": 30.5,
     "producerModel": "lite"
+  },
+  "rowing": {
+    "date": "2026-07-09T17:41:56.492Z",
+    "mode": "headed",
+    "note": "rowing via ?row — stroke pump 0.62 Hz, Full Assist course-follow active",
+    "renderFps": 118.9,
+    "longFramePct": 0.1,
+    "jsHeapMB": 82
   }
 }

@@ -72,3 +72,12 @@ Harness fix, not detector: clips start/end mid-motion so the y4m loop seam ate/f
 Flag for Gate 2: rowing_seated prescribed 15, measured 13 (real 2.5 s mid-take pause + mid-stroke start, wrist trace + frame review agree) — confirm the label; seated flag itself reads 0% (thighs cropped), stroke detection unaffected
 Blockers: none — P2 (boat impulse-glide) next
 Next: RowingControls in apps/flight, boat impulse hook, both steering profiles, assists/cruise/autopilot, ?row entry, tuner stroke row
+
+## 2026-07-09 (Rowing P2 — boat feel built, Gate 2 pending)
+Impulse-and-glide shipped: strokes bank a surge budget (attack ~0.3 s — the boat visibly lunges per pull), water drag proportional to speed (τ≈5.5 s; each cadence settles at its own speed, stillness = exponential drift), keyboard boat feel byte-identical
+RowingControls (standalone; flight controller untouched): stroke→impulse, two steering profiles as data (row-lean, row-asym — pick at Gate 2), assist ladder (Full Assist = soft Waterway course-follow), cruise after 6 steady strokes (rest holds momentum), autopilot on loss (drift straight + slow, slew-bounded re-entry), keyboard priority
+Waterway seam: procedural open-water course from spawn (polyline of ocean waypoints steered around coasts); interface ready for real waterway data later
+Entry: ?row starts straight on the water; PosePuppet Row card + ⌘K "row"; tuner gained a rowing section (profiles/assist/stroke readout)
+row.spec.ts 7/7 green: surge+glide, cruise, both steering signs, autopilot no-snap recovery, keyboard wins, rowing_slow.y4m fixture relay closed loop, 2-min Full-Assist run — on-water 100%, in-band 100%, speed↔rate r=0.798 (settled samples; eval/flight-results.json)
+Blockers: USER GATE 2 — live row (both profiles, seated, 2-minute run; judge rhythm/connection/fatigue); also confirm rowing_seated label (13 measured vs 15 prescribed)
+Next: Gate-2 feedback → iterate feel; then P3 polish (coach messages, README, FUTURES seam notes)
