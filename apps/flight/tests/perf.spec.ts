@@ -191,3 +191,110 @@ test("combined session: game fps with live pose loop (headed)", async () => {
 
   await browser.close();
 });
+
+/**
+ * Rowing P2: same floors as Flight, measured while actually rowing —
+ * boat via ?row, synthetic stroke pump, Full Assist course-follow active
+ * (the waterway sampling is the only per-tick cost rowing adds).
+ *   PERF=1 npx playwright test perf
+ */
+test("rowing session: boat fps under stroke input (headed)", async () => {
+  test.skip(!process.env.PERF, "PERF=1 required for honest numbers");
+  test.setTimeout(180_000);
+
+  const browser = await chromium.launch({ headless: false });
+  const page = await browser.newPage({ baseURL: "http://localhost:5199" });
+
+  await page.goto("/?row");
+  await page.waitForFunction(
+    () => {
+      const s = (window as any).__FLIGHT?.state();
+      return !!s && s.phase === "flying" && s.vehicle === "boat" && s.introActive === false;
+    },
+    undefined,
+    { timeout: 60_000 },
+  );
+
+  // stroke pump at a demo cadence, then measure while the boat surges/turns
+  await page.evaluate(() => {
+    const w = window as any;
+    let count = 0;
+    let nextAt = performance.now() + 1600;
+    const emit = () => {
+      const now = performance.now();
+      if (now >= nextAt) {
+        count++;
+        nextAt += 1600;
+      }
+      window.postMessage(
+        {
+          t: "bodyarcade.body-input.v1",
+          signal: {
+            v: 1, ts: now, confidence: 1, seated: false, stillness: 0.2,
+            neutralConfidence: 1,
+            axes: {
+              leanX: 0.2, leanY: 0, crouch: 0, tallness: 0,
+              armsOut: 0, armsRaised: 0, handsForward: 0.3, handPoint: 0,
+            },
+            events: [],
+            stroke: { active: true, count, rate: 0.62, phase: 0.5, ampL: 0.4, ampR: 0.35 },
+          },
+        },
+        "*",
+      );
+      requestAnimationFrame(emit);
+    };
+    requestAnimationFrame(emit);
+  });
+  await page.waitForTimeout(4_000); // clear keyboard priority + get way on
+
+  const sample = await page.evaluate(
+    () =>
+      new Promise<{ fps: number; longFramePct: number; seconds: number }>((resolveP) => {
+        const SECONDS = 15;
+        let frames = 0;
+        let longFrames = 0;
+        let last = performance.now();
+        const t0 = last;
+        const tick = (now: number) => {
+          frames++;
+          if (now - last > 25) longFrames++;
+          last = now;
+          if (now - t0 < SECONDS * 1000) {
+            requestAnimationFrame(tick);
+          } else {
+            resolveP({
+              fps: frames / ((now - t0) / 1000),
+              longFramePct: (100 * longFrames) / frames,
+              seconds: (now - t0) / 1000,
+            });
+          }
+        };
+        requestAnimationFrame(tick);
+      }),
+  );
+
+  const mem = await page.evaluate(() => {
+    const m = (performance as unknown as { memory?: { usedJSHeapSize: number } }).memory;
+    return m ? Math.round(m.usedJSHeapSize / 1e6) : null;
+  });
+
+  const rowing = {
+    date: new Date().toISOString(),
+    mode: "headed",
+    note: "rowing via ?row — stroke pump 0.62 Hz, Full Assist course-follow active",
+    renderFps: Math.round(sample.fps * 10) / 10,
+    longFramePct: Math.round(sample.longFramePct * 10) / 10,
+    jsHeapMB: mem,
+  };
+  const evalDir = resolve(__dirname, "../../../eval");
+  mkdirSync(evalDir, { recursive: true });
+  const perfPath = resolve(evalDir, "flight-perf.json");
+  const existing = existsSync(perfPath) ? JSON.parse(readFileSync(perfPath, "utf8")) : {};
+  writeFileSync(perfPath, JSON.stringify({ ...existing, rowing }, null, 2) + "\n");
+  console.log("rowing-perf:", JSON.stringify(rowing));
+
+  expect(sample.fps).toBeGreaterThan(45); // same floor as Flight
+
+  await browser.close();
+});

@@ -502,3 +502,30 @@ STROKE_TRUTH + EVAL_NOTES), pending Lekan's confirmation at Gate 2.
 (5) Stroke state ships as an ALWAYS-EMITTED optional schema block (v
 stays 1); count is a monotonic field rather than a new event name, so
 the closed event set is untouched and old consumers/tapes stay valid.
+
+## 2026-07-09 — Rowing P2: boat feel decisions
+(1) RowingControls is standalone rather than extracted from
+BodyFlightControls — my Gate-1 plan sketched extraction, but the flight
+controller is the Gate-2-frozen baseline and the shared plumbing is
+~80 lines vs genuinely different state machines (impulse/cruise vs
+continuous axes); duplication was the lower-risk call. (2) Rowing water
+drag is PROPORTIONAL to speed (τ ≈ 5.5 s), not the sketched linear
+decay: with constant decay every cadence saturates at max speed and the
+speed↔rate relationship collapses (caught designing the closed-loop
+eval); proportional drag gives each cadence its own settled speed and
+an exponential drift that never hard-stops. Keyboard coast keeps the
+upstream linear COAST_DECAY untouched. (3) Body input on the boat is
+now ALWAYS rowing (strokes+steer); the old incidental lean-steering via
+flight profiles never was gate-approved boat feel. Keyboard boat
+behavior byte-identical. (4) Full Assist course-follow lives in
+Game.tick as a turn-rate bias from the Waterway sample — the boat's
+physics and the keyboard path never see it. (5) Per-stroke ripple VFX
+deferred: the surge (impulse attack ~0.3 s) + the speed-modulated
+upstream wake already carry the rhythm read; Gate 2 decides if the
+stroke needs more. (6) ?row auto-entry calls the extracted beginPlay()
+directly (session-only; progression unlocks neither read nor written);
+the closed-loop eval and the PosePuppet Row card both use it.
+(7) Closed-loop correlation is measured over settled samples (≥2τ into
+each cadence segment) and excludes the rest segment — cruise holds
+speed at zero cadence BY DESIGN; transition samples measure the glide
+constant, not the rhythm coupling. r = 0.798 on the 2-minute run.

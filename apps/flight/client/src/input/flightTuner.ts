@@ -1,5 +1,6 @@
 import type { BodyFlightControls } from "./bodyControls";
 import { BODY_PROFILES } from "./bodyControls";
+import type { RowingControls } from "./rowControls";
 
 /**
  * BodyArcade original: flight-side control tuner overlay.
@@ -36,9 +37,15 @@ export class FlightTuner {
   private notesEl: HTMLElement | null = null;
   private recenterEl: HTMLElement | null = null;
 
+  private rowStatusEl: HTMLElement | null = null;
+  private rowProfileBtn: HTMLButtonElement | null = null;
+  private rowAssistBtn: HTMLButtonElement | null = null;
+
   constructor(
     private body: BodyFlightControls,
     private getPlaneResponse: () => PlaneResponse | null,
+    private row?: RowingControls,
+    private isBoat?: () => boolean,
   ) {
     this.loadGains();
   }
@@ -237,6 +244,33 @@ export class FlightTuner {
       el.appendChild(row);
     }
 
+    // BodyArcade Rowing: stroke readout + rowing profile/assist (boat only).
+    if (this.row) {
+      mkSection("rowing (boat)");
+      const rowBtns = document.createElement("div");
+      Object.assign(rowBtns.style, { display: "flex", gap: "6px", margin: "2px 0 4px" });
+      const mkRowBtn = (onClick: () => void) => {
+        const b = document.createElement("button");
+        Object.assign(b.style, {
+          font: "inherit",
+          color: "inherit",
+          background: "rgba(90, 200, 170, 0.2)",
+          border: "1px solid rgba(140, 230, 200, 0.4)",
+          borderRadius: "4px",
+          padding: "2px 8px",
+          cursor: "pointer",
+        } as CSSStyleDeclaration);
+        b.onclick = onClick;
+        rowBtns.appendChild(b);
+        return b;
+      };
+      this.rowProfileBtn = mkRowBtn(() => this.row!.cycleProfile());
+      this.rowAssistBtn = mkRowBtn(() => this.row!.cycleAssist());
+      el.appendChild(rowBtns);
+      this.rowStatusEl = document.createElement("div");
+      el.appendChild(this.rowStatusEl);
+    }
+
     this.responseEl = document.createElement("div");
     this.responseEl.style.marginTop = "8px";
     el.appendChild(this.responseEl);
@@ -316,6 +350,20 @@ export class FlightTuner {
     setBar("turnRate", d.intent.turnRate / Math.max(0.001, d.profile.turnGain), true);
     setBar("speedAxis", d.intent.speedAxis, true);
     setBar("elevateAxis", d.intent.elevateAxis, true);
+
+    if (this.row && this.rowStatusEl) {
+      const rd = this.row.debugState();
+      const boat = this.isBoat?.() ?? false;
+      if (this.rowProfileBtn) this.rowProfileBtn.textContent = `${rd.profile.label} ⇄`;
+      if (this.rowAssistBtn) this.rowAssistBtn.textContent = `${rd.assist.label} ⇄`;
+      const cruise = rd.cruiseHolding ? "CRUISE" : rd.cruiseArmed ? "cruise armed" : "—";
+      this.rowStatusEl.textContent = boat
+        ? `row ${rd.reason.toUpperCase()} · rate ${rd.strokeRate.toFixed(2)}Hz · ` +
+          `amp L ${rd.ampL.toFixed(2)} R ${rd.ampR.toFixed(2)} · ` +
+          `turn ${rd.turnRate >= 0 ? "+" : ""}${rd.turnRate.toFixed(2)} · ${cruise}`
+        : "row — (not in the boat)";
+      this.rowStatusEl.style.color = boat && rd.active ? "#8fe3c0" : "#9fb4d8";
+    }
 
     if (this.responseEl) {
       const r = this.getPlaneResponse();
