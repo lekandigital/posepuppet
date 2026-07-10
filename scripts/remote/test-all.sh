@@ -33,10 +33,10 @@ fi
 
 echo "Running python audits (if any)..."
 if grep -q "audit:all" package.json; then
-  if [ "$(uname)" = "Darwin" ]; then
+  if command -v blender >/dev/null 2>&1 || [ -d "/Applications/Blender.app" ]; then
     npm run audit:all || echo "Python audits failed."
   else
-    echo "Blender not found, running safe audits only..."
+    echo "SKIP_EXPECTED: Blender-dependent model audit skipped because Blender is not installed."
     npm run audit:self-test || echo "Self-test failed."
     npm run audit:validate || echo "Validate failed."
   fi
