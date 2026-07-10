@@ -94,3 +94,11 @@ permissions.local.md
 !apps/flight/**/*.webp
 !apps/flight/**/*.glb
 !apps/flight/**/*.gltf
+
+# Remote development — local-only state and artifacts
+.local/
+*.bundle
+CLAUDE.local.md
+.env.remote.local
+REMOTE_SETUP_REPORT.local.md
+FABLE_REMOTE_HANDOFF.local.md
