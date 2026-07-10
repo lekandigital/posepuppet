@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 // Default fake-camera fixture; individual tests/eval runs relaunch with
 // other clips via their own browser instances.
 const here = dirname(fileURLToPath(import.meta.url));
-const fixture = resolve(here, 'fixtures', 'arms.y4m');
+const fixture = resolve(here, '.local', 'cache', 'fake-camera', 'arms_tpose.y4m');
 
 export default defineConfig({
   testDir: 'tests',

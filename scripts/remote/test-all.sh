@@ -12,7 +12,11 @@ npm run build
 
 echo "Running tests (Playwright)..."
 if [ -f "playwright.config.ts" ]; then
-  npm run test || echo "Playwright tests returned failure, but continuing script to gather all info."
+  if command -v xvfb-run >/dev/null 2>&1; then
+    xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" npm run test || echo "Playwright tests returned failure, but continuing script to gather all info."
+  else
+    npm run test || echo "Playwright tests returned failure, but continuing script to gather all info."
+  fi
 fi
 
 echo "Running model eval..."

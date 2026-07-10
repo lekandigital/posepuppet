@@ -11,6 +11,10 @@ echo ""
 echo "Process status:"
 if tmux has-session -t posepuppet-dev 2>/dev/null; then
   echo "tmux posepuppet-dev: RUNNING"
+  PANE_PID=$(tmux list-panes -t posepuppet-dev -F "#{pane_pid}" | head -n 1)
+  echo "Tmux Pane PID: $PANE_PID"
+  echo "Process tree:"
+  pstree -p $PANE_PID || echo "pstree not available"
 else
   echo "tmux posepuppet-dev: STOPPED"
 fi
