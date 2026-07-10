@@ -21,7 +21,12 @@ export default defineConfig({
         '--use-fake-device-for-media-stream',
         `--use-file-for-fake-video-capture=${fixture}`,
         '--autoplay-policy=no-user-gesture-required',
-        ...(process.env.USE_SWIFTSHADER ? ['--use-gl=angle', '--use-angle=swiftshader'] : []),
+        ...(process.env.USE_SWIFTSHADER ? [
+          '--use-gl=angle', 
+          '--use-angle=swiftshader',
+          '--enable-unsafe-swiftshader',
+          '--disable-accelerated-video-decode'
+        ] : []),
       ],
     },
     permissions: ['camera', 'microphone'],

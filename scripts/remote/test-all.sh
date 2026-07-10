@@ -10,10 +10,13 @@ npm ci --prefer-offline --no-audit
 echo "Running type check..."
 npm run build
 
+echo "Pre-bundling dependencies to prevent Vite 504 timeouts..."
+npx vite optimize
+
 echo "Running tests (Playwright)..."
 if [ -f "playwright.config.ts" ]; then
   if command -v xvfb-run >/dev/null 2>&1; then
-    USE_SWIFTSHADER=1 xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" npm run test || echo "Playwright tests returned failure, but continuing script to gather all info."
+    USE_SWIFTSHADER=1 xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test || echo "Playwright tests returned failure, but continuing script to gather all info."
   else
     USE_SWIFTSHADER=1 npm run test || echo "Playwright tests returned failure, but continuing script to gather all info."
   fi
