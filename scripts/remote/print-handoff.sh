@@ -18,7 +18,7 @@ else
 fi
 echo ""
 echo "Exact tunnel command:"
-echo "ssh -N -L 5173:127.0.0.1:5173 -i ~/.ssh/pinn_rtx3090 o@192.168.86.152"
+echo "ssh -N -L 5173:127.0.0.1:5173 -i ~/.ssh/pinn_rtx3090 <REMOTE_USER>@<REMOTE_HOST>"
 echo ""
 echo "Local URL:"
 echo "http://localhost:5173"
