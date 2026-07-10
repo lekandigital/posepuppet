@@ -370,3 +370,8 @@ FIRST ACTIONS, IN ORDER
 3. Write PLAN.md with your Tier B/C elective proposal and effort
    estimates; raise USER GATE 1.
 Begin.
+
+REMOTE DEVELOPMENT POINTERS
+- Future agents must read `.claude/rules/remote-development.md`.
+- Future agents must read `CLAUDE.local.md` when it is present.
+- Machine-specific data must remain local and untracked.
