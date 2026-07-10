@@ -24,12 +24,22 @@ fi
 
 echo "Running model eval..."
 if [ -f "eval/run.mjs" ]; then
-  npm run eval || echo "Eval script returned failure."
+  if command -v xvfb-run >/dev/null 2>&1; then
+    USE_SWIFTSHADER=1 xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run eval || echo "Eval script returned failure."
+  else
+    USE_SWIFTSHADER=1 npm run eval || echo "Eval script returned failure."
+  fi
 fi
 
 echo "Running python audits (if any)..."
 if grep -q "audit:all" package.json; then
-  npm run audit:all || echo "Python audits failed."
+  if command -v blender >/dev/null 2>&1 || [ -d "/Applications/Blender.app" ]; then
+    npm run audit:all || echo "Python audits failed."
+  else
+    echo "Blender not found, running safe audits only..."
+    npm run audit:self-test || echo "Self-test failed."
+    npm run audit:validate || echo "Validate failed."
+  fi
 fi
 
 echo "Checking for uncommitted changes (git diff --check)..."
