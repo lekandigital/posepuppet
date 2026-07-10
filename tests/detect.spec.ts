@@ -24,8 +24,9 @@ test('pose landmarks stream and skeleton overlay draws', async ({ page }) => {
   });
 
   // Pose loop is running at a usable rate even in this environment.
-  await page.waitForFunction(() => window.__PP.poseFps() > 5, undefined, {
-    timeout: 15_000,
+  const minFps = process.env.USE_SWIFTSHADER ? 2 : 5;
+  await page.waitForFunction((min) => window.__PP.poseFps() > min, minFps, {
+    timeout: process.env.USE_SWIFTSHADER ? 30_000 : 15_000,
   });
 
   // Overlay canvas actually has skeleton pixels on it.
@@ -45,7 +46,8 @@ test('pose landmarks stream and skeleton overlay draws', async ({ page }) => {
 
 test('eval mode produces metrics over a short run', async ({ page }) => {
   const errors = collectErrors(page);
-  await page.goto('/?eval=arms&dur=10');
+  const dur = process.env.USE_SWIFTSHADER ? 20 : 10;
+  await page.goto(`/?eval=arms&dur=${dur}`);
 
   const result = await page
     .waitForFunction(() => window.__EVAL_RESULT, undefined, { timeout: 90_000 })
