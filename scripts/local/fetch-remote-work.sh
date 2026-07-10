@@ -10,6 +10,9 @@ else
 fi
 
 BRANCH=$(git branch --show-current)
+echo "Creating local backup ref..."
+git update-ref refs/heads/backup/$BRANCH-$(date +%s) $BRANCH
+
 echo "Fetching from remote..."
 git fetch "ssh://$POSEPUPPET_REMOTE_USER@$POSEPUPPET_REMOTE_HOST$POSEPUPPET_REMOTE_REPO" "$BRANCH"
 

@@ -26,8 +26,15 @@ ssh -i "$POSEPUPPET_REMOTE_IDENTITY" "$POSEPUPPET_REMOTE_USER@$POSEPUPPET_REMOTE
   if git rev-parse $BRANCH >/dev/null 2>&1; then
     git update-ref refs/heads/backup/$BRANCH-$(date +%s) $BRANCH
   fi
-  git fetch /tmp/posepuppet-$BRANCH-$HASH.bundle $BRANCH:$BRANCH
-  git checkout $BRANCH
+  git checkout $BRANCH || git checkout -b $BRANCH
+  echo "Fetching bundle..."
+  git fetch /tmp/posepuppet-$BRANCH-$HASH.bundle $BRANCH
+  echo "Fast-forwarding branch..."
+  if ! git merge --ff-only FETCH_HEAD; then
+    echo "ERROR: Non-fast-forward update. Remote branch has diverged."
+    echo "Please resolve locally and try again."
+    exit 1
+  fi
   echo "Remote branch updated to \$(git rev-parse HEAD)"
 EOF
 
