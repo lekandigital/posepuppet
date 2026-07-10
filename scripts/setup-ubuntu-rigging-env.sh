@@ -290,7 +290,7 @@ nvidia = run(["nvidia-smi", "--query-gpu=name,driver_version,memory.total", "--f
 cuda = run(["bash", "-lc", "nvidia-smi | sed -n '3p'"])
 report = {
     "server": {
-        "host": "192.168.86.152",
+        "host": platform.node(),
         "user": run(["whoami"]),
         "os": run(["bash", "-lc", ". /etc/os-release && echo \"$PRETTY_NAME\""]),
         "kernel": platform.release(),

@@ -40,7 +40,7 @@ TEXTURE_EXTS = {
     ".exr",
 }
 SKIP_DIR_PREFIXES = ("model-glb-probe-",)
-DEFAULT_BLENDER = "/Applications/Blender.app/Contents/MacOS/Blender"
+DEFAULT_BLENDER = shutil.which("blender") or "/Applications/Blender.app/Contents/MacOS/Blender"
 
 
 def utc_now() -> str:
