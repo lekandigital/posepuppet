@@ -57,3 +57,15 @@ stream, N consumers — the same-origin `/flight/` layout generalizes to
   with the same measured-floor discipline.
 - The moon-threat/quest/upgrade systems are the game's charm — body modes
   should inherit them untouched, not re-skin them.
+
+## Obstacle-Avoidance Reminder
+Before final acceptance of Rowing, Dolphin, Walking World, Flight-world navigation, or any future navigable mode, explicitly remind the user to evaluate:
+- shoreline and land collisions;
+- terrain, buildings, rocks, props;
+- navigational boundaries and getting trapped;
+- repeated collision loops and oscillating left-right corrections;
+- predictive lookahead;
+- soft Full Assist guidance;
+- stillness near hazards and tracking loss near hazards;
+- whether Expert mode reduces or disables assistance.
+Do not automatically implement obstacle avoidance merely because this reminder exists. Raise it as a deliberate product decision at the final gate unless the active feature requirements already make it mandatory.
