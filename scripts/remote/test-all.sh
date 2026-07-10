@@ -33,7 +33,7 @@ fi
 
 echo "Running python audits (if any)..."
 if grep -q "audit:all" package.json; then
-  if command -v blender >/dev/null 2>&1 || [ -d "/Applications/Blender.app" ]; then
+  if [ "$(uname)" = "Darwin" ]; then
     npm run audit:all || echo "Python audits failed."
   else
     echo "Blender not found, running safe audits only..."
