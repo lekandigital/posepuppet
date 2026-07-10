@@ -21,8 +21,12 @@ export default defineConfig({
         '--use-fake-device-for-media-stream',
         `--use-file-for-fake-video-capture=${fixture}`,
         '--autoplay-policy=no-user-gesture-required',
+        ...(process.env.USE_SWIFTSHADER ? ['--use-gl=angle', '--use-angle=swiftshader'] : []),
       ],
     },
+    permissions: ['camera', 'microphone'],
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
   webServer: {
     command: 'npm run dev',
