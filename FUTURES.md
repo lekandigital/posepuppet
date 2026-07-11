@@ -70,3 +70,42 @@ Before final acceptance of Rowing, Dolphin, Walking World, Flight-world navigati
 - whether Expert mode reduces or disables assistance.
 Do not automatically implement obstacle avoidance merely because this reminder exists. Raise it as a deliberate product decision at the final gate unless the active feature requirements already make it mandatory.
 
+
+
+## What Dolphin proved (2026-07-11) — the open-data pipeline's water seam
+
+Dolphin did NOT become the fourth globe vehicle (the sketch above
+predates the bounded-bay prompt): it is a standalone `apps/dolphin`
+whose world derives from a REAL water polygon via `packages/world-data`.
+That package is now the pipeline's water component in practice, not in
+name:
+
+- Two source modes ship: `relation` (curated OSM multipolygon — right
+  for enclosed shapes like the Bay of Kotor) and `coastline-clip`
+  (natural=coastline ways ∩ a convex play region with named gate cuts —
+  the general path; it restored the Golden Gate, Raccoon Strait, Angel
+  Island and the Oakland estuary that the curated relation excludes).
+- The artifact is self-describing (provenance, license, attribution,
+  gates, simplification stats) and `loadBoundary()` refuses artifacts
+  without attribution — future modes inherit the compliance posture.
+- Runtime surface = `pointInWater` + `signedDistanceToShore`: the same
+  two calls power containment currents, SDF depth, and the minimap.
+  Rowing's procedural Waterway seam is the intended first migration
+  when the pipeline becomes real.
+
+Deferred polish, logged honestly:
+- Decor population (fish/kelp/rocks/ruins) is placed in a ~900 m disc
+  around the spawn reach; roaming the full scaled bay eventually swims
+  out of the dressed area (fog softens it, the minimap keeps meaning).
+  A streaming/re-centering decor field is the natural next step.
+- Torso-wave POSITIVE fixture evals await the recordings listed in
+  FINAL_USER_TEST_PLAN.md; the detector ships on synthetic contracts +
+  real-footage false-positive checks.
+- 4:3 letterbox toggle and ambient audio were optional and skipped.
+
+The obstacle-avoidance reminder below was reviewed for Dolphin at its
+final gate: containment currents + heading assist + the slide guard are
+the shipped answer for shorelines and pockets; there is no other
+collision geometry by design (no rocks/ruins collision — they are
+dressing, and the PS2 fantasy tolerates swimming through kelp). Judge
+live whether that reads as intended.

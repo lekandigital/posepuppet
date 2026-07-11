@@ -186,3 +186,40 @@ recovery (synthetic dropout), Motion Memory round-trip, gesture intents,
 design-system contrast (both themes) and reduced-motion checks, hand-mode
 boot, aspect-preset recordings. `npm run eval` writes `eval/results.json`;
 fixture clips are personal footage and are gitignored, always.
+
+
+## BodyArcade Dolphin — swim a real bay
+
+An original, Ecco-*inspired* mode (nothing copied — no assets, names, or
+level designs): your body swims a dolphin through a dreamy low-poly
+PS2-era underwater world whose boundary is the REAL shape of **San
+Francisco Bay** — OSM coastline data through `packages/world-data`,
+"Boundary data © OpenStreetMap contributors" (ODbL) rendered in-app
+under the minimap, which is the actual polygon with your position on
+it. The world inside is fictional: fog, kelp forests, fish that scatter,
+drowned ruins, caustic light.
+
+```sh
+cd apps/dolphin && npm install && cd ../..   # once
+npm run arcade   # builds flight + dolphin, starts everything on :5173
+```
+
+Click the **Swim** card (or `⌘K → swim`). Bob your chest and hips in a
+smooth wave to kick — each wave surges the dolphin, a steady rhythm
+settles into a cruise, and stopping glides. Lean forward/back to dive
+and surface, tilt your shoulders to carve banked turns, crouch or
+stretch for low-energy depth control, push both hands forward for a
+burst — and sprint into a hard pitch-up at the surface to **breach**.
+T-pose recenters; tracking loss levels out and glides. Keyboard always
+works (W/S dive, A/D turn, Q/E depth, Shift kick, Space burst, 1/2/3
+assist). The kick reads the chest–hip wave in image space, so the lite
+tracker carries it and your hips need to be in frame (the coach line
+says so when they aren't).
+
+Everything stays local; the boundary ships in the bundle (no runtime
+fetching). The suite drives escape attempts at the coast from eight
+directions and asserts the water always pushes back — never a wall,
+never an exit (`eval/dolphin-results.json`). Honest limits: seated kick
+detection and the torso-wave fixture evals await recordings
+(`FINAL_USER_TEST_PLAN.md`); decor is dressed around the central reach,
+not all ~50 km of bay.

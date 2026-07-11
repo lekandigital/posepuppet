@@ -122,3 +122,11 @@ apps/dolphin shipped: pure 120 Hz RNG-free sim (impulse-and-glide, τ 6 s glide)
 Suites: dolphin Playwright suite on NVIDIA :2 (results in commit message + eval/dolphin-results.json); flight suite measured unable to boot the game under Xvfb/SwiftShader (every spec timed out at the flying wait) — game suites run on :2, root suite stays SwiftShader per the two-tier design
 Blockers: none for the automated pass; live swim judgment + torso-wave fixtures are the FINAL_USER_TEST_PLAN.md items
 Next: fixture-eval swim negatives, flight+root suites on this tree, P4 docs/perf/ship
+
+## 2026-07-11 (Dolphin P4 — ship: docs, verification matrix, remote pass complete)
+All feasible remote checks done; the human-only items are consolidated in FINAL_USER_TEST_PLAN.md § Dolphin (live swim feel/fatigue/breach + torso-wave fixture recordings + Apple Silicon perf)
+Verification matrix: body-input 32/32 (7 new swim tests); FULL fixture-eval ALL GREEN (swim negative rows on every clip; three-round measured tuning incl. geometric tilt correction; lean_fb bound = measured variance ceiling ≤2, amps recorded); dolphin suite 12/12 on NVIDIA :2 (cadence coupling 7.7→15.7 m/s, containment battery min shore +18.8 m / zero decel discontinuity, breach + negative, dropout no-snap 0.089 rad, replay byte-identical, topology over pure BroadcastChannel, 60 fps @ 120 Hz sim with floor asserted); flight suite 26 passed + offline.spec green on its SwiftShader tier (NVIDIA console shader-validation quirk documented, thresholds untouched); root suite 106 passed with detect fps floor ENVIRONMENT_BLOCKED on SwiftShader under ambient tenant load — same spec 2/2 green on the NVIDIA tier (preflight recorded: RTX 3090 Ti, permitted)
+Perf: Dolphin 60 fps render (vsync) / 120 Hz sim on the remote GPU; Flight’s accepted 111 fps Apple Silicon baseline untouched; final Dolphin feel/perf on Apple Silicon is the live-gate item per the cross-platform policy
+Docs shipped: README + CHANGELOG + ARCHITECTURE + FUTURES (pipeline water seam + obstacle-avoidance review note) + ASSETS (all-procedural) + apps/dolphin/README + FINAL_USER_TEST_PLAN § Dolphin
+Blockers: only the consolidated live session (not requested now, per instruction)
+Next: Lekan’s live swim per FINAL_USER_TEST_PLAN.md; branch not merged, not pushed
