@@ -392,12 +392,12 @@ test('handPoint: single pointed arm reads, T-pose does not', () => {
  *  synthetic wrist stays on its forward branch (no hanging-arm pop). */
 function rowSeq(
   startTs: number, n: number, periodMs: number,
-  ampL = 0.45, ampR = 0.45, base = 0.15,
+  ampL = 0.45, ampR = 0.45, base = 0.15, extra: PoseOpts = {},
 ): BodyInputFrame[] {
   return seq(startTs, n, (i) => {
     const t = (i * STEP) / periodMs;
     const c = 0.5 + 0.5 * Math.sin(2 * Math.PI * t);
-    return { armsFwdL: base + ampL * c, armsFwdR: base + ampR * c };
+    return { ...extra, armsFwdL: base + ampL * c, armsFwdR: base + ampR * c };
   });
 }
 
@@ -416,6 +416,25 @@ test('stroke: steady rowing counts strokes and reads the rate', () => {
   // count is monotonic
   for (let i = 1; i < signals.length; i++) {
     expect(signals[i].stroke!.count).toBeGreaterThanOrEqual(signals[i - 1].stroke!.count);
+  }
+});
+
+test('stroke: legs/hips invisible (seated upper-body framing) still counts', () => {
+  // Gate-2 round-2 live report: seated propulsion must never depend on
+  // lower-body visibility — the package guarantees stroke detection from
+  // shoulders + wrists alone. (The MODEL-level wrist-depth degradation
+  // that also contributed live is covered by the rowing_seated_upper
+  // fixture eval, full pose model.)
+  for (const vis of [
+    { seated: true, legsVis: 0.1 },
+    { seated: true, legsVis: 0.1, hipsVis: 0.1 },
+  ] as PoseOpts[]) {
+    const frames = after(neutralLeadIn({ ...vis, armsFwd: 0.15 }), (ts) =>
+      rowSeq(ts, 273, 1500, 0.45, 0.45, 0.15, vis),
+    );
+    const fin = last(run(frames));
+    expect(Math.abs(fin.stroke!.count - 6)).toBeLessThanOrEqual(1);
+    expect(fin.stroke!.active).toBe(true);
   }
 });
 

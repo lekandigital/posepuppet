@@ -71,9 +71,17 @@ export const ROW_PROFILES: RowProfile[] = [
   {
     id: "row-lean",
     label: "Lean steering",
-    turnGain: 1.1,
+    // GATE-2 FIX (live 360°-pivot report): leanX saturates at ~15° of
+    // torso tilt, so a "gentle" lean read as full deflection — expo 1.6
+    // makes the response progressive (gentle lean → gentle curve) and the
+    // gain drops 1.1 → 0.8. Yaw is additionally speed-coupled in Game.tick
+    // (carve, don't pivot) — the two together are the handling fix.
+    turnGain: 0.8,
     notes: "lean L/R steers · strokes propel · sit back to rest (cruise)",
-    steer: (s, _asym, p) => -s.axes.leanX * p.turnGain,
+    steer: (s, _asym, p) => {
+      const x = s.axes.leanX;
+      return -Math.sign(x) * Math.pow(Math.abs(x), 1.6) * p.turnGain;
+    },
   },
   {
     id: "row-asym",
@@ -147,6 +155,7 @@ export class RowingControls {
   private lastStrokeAtMs = -Infinity;
 
   private asymSmoothed = 0;
+  private steeringIntentSmoothed = 0;
   private steadyStrokes = 0;
   private cruiseArmed = false;
   private cruiseHolding = false;
@@ -272,11 +281,13 @@ export class RowingControls {
     if (!fresh) {
       if (!this.signal) return "no-signal";
       // autopilot: drift straight (turn → 0), stop crediting strokes,
-      // release cruise so the boat slows on its own glide
+      // release cruise so the boat slows on its own glide. Steering intent
+      // decays with the signal so course-follow regains the helm.
       this.mode = "autopilot";
       this.cruiseHolding = false;
       this.pendingStrokes.length = 0;
       this.outTurn += (0 - this.outTurn) * (1 - Math.exp(-dtS / LOSS_DECAY_TAU_S));
+      this.steeringIntentSmoothed *= Math.exp(-dtS / LOSS_DECAY_TAU_S);
       return this.signal.confidence < MIN_CONFIDENCE &&
         performance.now() - this.receivedAtMs <= SIGNAL_STALE_MS
         ? "low-confidence"
@@ -288,6 +299,18 @@ export class RowingControls {
       -this.assist.turnCap,
       Math.min(this.assist.turnCap, this.profile.steer(s, this.asymSmoothed, this.profile)),
     );
+
+    // Deliberate-steering intent 0..1, from the INPUT axes (not the output
+    // turn, whose scale is profile-dependent): a lean past the noise floor
+    // ramps to full intent by a modest ~0.2 lean; stroke asymmetry counts
+    // the same way. Game uses this to make the Full-Assist course-follow
+    // YIELD to the rower (Gate-2 round-2: "leaning left still drifted
+    // right" — the coxswain out-pulled every gentle lean).
+    const leanIntent = Math.min(1, Math.max(0, (Math.abs(s.axes.leanX) - 0.06) / 0.12));
+    const asymIntent = Math.min(1, Math.max(0, (Math.abs(this.asymSmoothed) - 0.05) / 0.15));
+    const intentTarget = Math.max(leanIntent, asymIntent);
+    this.steeringIntentSmoothed +=
+      (intentTarget - this.steeringIntentSmoothed) * (1 - Math.exp(-dtS / 0.25));
 
     if (this.mode === "autopilot") this.mode = "reacquire";
     if (this.mode === "reacquire") {
@@ -369,11 +392,23 @@ export class RowingControls {
     return this.cruiseHolding;
   }
 
+  /** Keyboard currently owns the boat (priority window) — the game must
+   *  not add any rowing corrections while it does. */
+  get keyboardOwns(): boolean {
+    return performance.now() - this.lastKeyboardActiveMs < KEYBOARD_PRIORITY_MS;
+  }
+
   /** Body currently owns the boat (fresh signal, keyboard quiet). */
   get bodyActive(): boolean {
     return (
       performance.now() - this.lastKeyboardActiveMs >= KEYBOARD_PRIORITY_MS && this.signalFresh()
     );
+  }
+
+  /** How deliberately the rower is steering right now, 0..1 — assists use
+   *  it to yield the helm (course-follow, corner brake) to the human. */
+  get steeringIntent(): number {
+    return this.steeringIntentSmoothed;
   }
 
   debugState(): RowDebugState {

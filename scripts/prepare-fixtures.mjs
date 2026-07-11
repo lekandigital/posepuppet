@@ -23,9 +23,13 @@ function convertDir(d) {
       continue;
     }
     console.log(`converting ${clip} → ${basename(dest)}`);
+    // Cap the SHORT side at 720 (landscape → ×720, portrait → 720×):
+    // capping the LONG side shrank vertical phone clips to 406×720 and
+    // measurably degraded pose detection (rowing closed-loop p75 0.161 →
+    // 0.105); the person's pixel size is what matters, not the frame's.
     execFileSync('ffmpeg', [
       '-y', '-i', src,
-      '-vf', 'scale=-2:720,fps=30',
+      '-vf', "scale='if(gt(iw,ih),-2,720)':'if(gt(iw,ih),720,-2)',fps=30",
       '-pix_fmt', 'yuv420p',
       dest,
     ], { stdio: ['ignore', 'ignore', 'inherit'] });
