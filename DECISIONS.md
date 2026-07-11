@@ -635,3 +635,70 @@ headless software GL at ~3 pose fps — ENVIRONMENT_BLOCKED, assertions
 untouched. Cross-checked on the opt-in gpu-performance tier (headed
 NVIDIA on :2): both pass in 18.7 s. Final performance validation stays
 on Apple Silicon per policy.
+
+## 2026-07-11 — Rowing Gate-2 round 2: seated propulsion + steering authority
+Live retest: surge/idle/recenter/shore/keyboard PASS; seated propulsion
+and lean steering FAIL. Both reproduced and measured remotely (full
+narrative + amplitude table in EVAL_NOTES.md):
+
+(1) SEATED PROPULSION was killed by the LITE pose model, not leg
+visibility: Row inherited Fly's companion mode (lite model for GPU
+budget), and lite's wrist DEPTH collapses when the hands work near the
+frame edge — measured 0.112 arm-lengths cycle amplitude (below the
+0.15 stroke bar → 2/13 strokes) vs 0.252 under full (13/13) on a
+chest-up crop of rowing_seated.mp4, with visibility steady at ~1.0 the
+whole time (nothing downstream could see the failure). Knees-in-frame
+was a camera-distance proxy. DECISION: Row keeps the FULL model; stage
+suspension (the real perf win) stays; Fly unchanged (approved feel,
+lite-robust torso axes). The package itself never depended on legs —
+synthetic legs/hips-invisible rowing counts clean, now a committed spec.
+rowing_seated_upper.mp4 (derived crop, same 13 pulls) is a permanent
+eval fixture; fixture-eval grew --model=lite for characterization.
+
+(2) STEERING FELT BIASED because the Full-Assist course-follow (±0.55)
+out-muscled gentle leans (~0.12 after the expo profile): any lean
+opposing the corridor was fought to a standstill — reads as "left is
+weak" on a rightward corridor. DECISION: deliberate-steering intent,
+measured on the INPUT axes (lean past the 0.06 noise floor → full
+intent by ~0.2; stroke asymmetry likewise), silences course-follow and
+the corner brake; intent decays on signal loss so autopilot keeps
+line-holding; the shore guard is NOT intent-scaled (safety outranks
+authority). New spec fails with the fix disabled, passes with it.
+
+(3) ROWING HUD: in-game feedback strip (stroke pulse sized by pull
+strength, cadence in spm, applied-steering marker, status word,
+plain-language guidance) — tracking failure and control failure are now
+distinguishable at a glance. Live-only judgments are consolidated in
+FINAL_USER_TEST_PLAN.md; no more mid-development live requests.
+
+(4) VALIDATION FALLOUT — running the evals on the rebuilt remote for
+the first time surfaced five harness truths, each measured, no
+threshold touched:
+(a) prepare-fixtures capped the LONG side at 720, so portrait phone
+clips became 406×720 and pose detection measurably degraded (chain p75
+0.161→0.105 the moment the downscaled y4m shadowed the native cache) —
+the converter now caps the SHORT side (portrait → 720×1280) and the
+closed-loop spec prefers the native-resolution cache, its measured
+baseline.
+(b) The closed-loop spec leaked its manually-launched browser on
+assertion failure (throw before close) — failed repeats starved later
+repeats' pose loop (11→6→2.8 fps measured); try/finally now.
+(c) The closed-loop way claim is now judged on OPEN-WATER samples
+(shore-guard drag is the guard's own tested behavior, and identical
+runs measured near-shore fractions 0.29–0.70 as the lean-noise-steered
+boat wandered) and classifies as ENVIRONMENT_BLOCKED when the producer
+pose loop starves (<10 fps under x-bot bursts) or stroke delivery falls
+under 16/60 s — the rhythm floor and on-water assertions still run on
+every run.
+(d) rowing_left_bias "17 vs 15±1" was the STOP-RECORDING REACH: the
+landmark-tape replay shows exactly 15 rhythmic asymmetric pulls
+(finishes 6.4–44.1 s) plus one huge symmetric excursion (~46.8 s, amp
+0.9 both arms) — the eval now counts strokes inside the clip's labeled
+rowing window and prints every finish time for transparency.
+(e) crouch_stand read ZERO crouch on this machine because the looping
+fake camera captured the neutral at an arbitrary loop phase (a
+mid-crouch neutral zeroes the axis; a fresh-core replay of the same
+frames reads crouch 0.9) — episodic stature fixtures now run
+single-pass from t=0 with a core reset, recapturing neutral from the
+protocol's standing pre-roll. Measured green after: 1 sustained 5.1 s
+window.
