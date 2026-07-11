@@ -1,27 +1,46 @@
 {
   "replay": {
-    "date": "2026-07-09T17:54:28.624Z",
+    "date": "2026-07-11T18:09:55.598Z",
     "mode": "headed",
     "note": "intent tape (variable dt, recorded per frame) replayed through a fresh Plane",
-    "frames": 1674,
-    "tapeSeconds": 14.030700000002744,
-    "dtMinMs": 2.4,
-    "dtMaxMs": 50,
+    "frames": 836,
+    "tapeSeconds": 14.099700000047688,
+    "dtMinMs": 10.3,
+    "dtMaxMs": 31.5,
     "maxPosArcWorldUnits": 0,
     "maxHeadingErrDeg": 0,
     "maxAltitudeErr": 0,
     "maxSpeedErr": 0
   },
   "rowingClosedLoop": {
-    "date": "2026-07-09T17:59:51.710Z",
+    "date": "2026-07-11T18:20:27.576Z",
     "mode": "headed",
-    "samples": 236,
-    "rowingSamples": 126,
+    "enduranceSamples": 238,
     "minutes": 2,
     "onWaterFrac": 1,
     "inBandFrac": 1,
+    "alongProgressWorldUnits": 57.82,
     "crossTrackBandWorldUnits": 1.75,
-    "speedStrokeRatePearsonR": 0.824,
-    "note": "synthetic cadence program 0.3/0.8/0/0.5 Hz through the real boat + waterway; r over settled (≥12 s ≈ 2τ into each segment) active-rowing samples — cruise holds speed at zero cadence by design and is asserted separately"
+    "meanStrokingSpeed": 0.188,
+    "stallFrac": 0.0558,
+    "coupling": [
+      {
+        "rateHz": 0.3,
+        "meanSpeed": 0.16108929773080363,
+        "samples": 20
+      },
+      {
+        "rateHz": 0.5,
+        "meanSpeed": 0.19411092864241714,
+        "samples": 20
+      },
+      {
+        "rateHz": 0.7,
+        "meanSpeed": 0.23754143163241673,
+        "samples": 20
+      }
+    ],
+    "speedStrokeRatePearsonR": 0.997,
+    "note": "endurance: continuous 2-min varied-cadence Full-Assist run (guard escapes may leave the corridor briefly by design); coupling: settled speed per cadence on the SAME course start — a continuous run confounds cadence with geography"
   }
 }
