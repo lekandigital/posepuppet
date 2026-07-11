@@ -113,3 +113,35 @@ tracking is hand-only-mode-first; robot face-touch reads reach-to-collar.
 Initial release: webcam → MediaPipe pose → procedural robot / CC0 VRM
 astronaut retargeting, split-screen stage, calibration, recording, eval
 rig with fixtures → y4m fake webcam, screen-space limb sync metric.
+
+
+## BodyArcade Dolphin (2026-07-11)
+
+Body swimming drives a dolphin through a dreamy low-poly PS2 underwater
+world bounded by the REAL shape of San Francisco Bay (OSM coastline
+data, ODbL, credited in-app; the world inside is fictional; Ecco is an
+inspiration, nothing is copied).
+
+- `packages/world-data`: real-water boundary pipeline (offline fetch →
+  simplify → boundary.json with embedded provenance/attribution; two
+  source modes — curated relation, coastline-clip with named gates;
+  runtime point-in-water + signed-distance surface).
+- `@bodyarcade/body-input` v1-additive `swim` block: torso-wave kick
+  detection (chest–hip extent through the reused StrokeDetector; lite-
+  model-safe — no wrist depth). Synthetic contract tests + false-
+  positive checks on all existing fixtures; positive torso-wave fixture
+  evals await recordings (FINAL_USER_TEST_PLAN.md).
+- `apps/dolphin`: pure fixed-timestep swim sim (impulse-and-glide kicks,
+  glide τ 6 s, banked turns, breach ballistics + splash), SDF
+  containment current (soft walls — never exits, never hard-walls,
+  asserted from 8 directions), assist ladder / autopilot / T-pose
+  recenter / full keyboard (WASD + Q/E depth + Shift kick + Space
+  burst), PS2 world (vertex-lit seabed from the real SDF, boid fish
+  that flee, shader kelp, drowned ruins, caustic shafts, motes,
+  shimmer-curtain boundary), minimap = the actual bay polygon,
+  mono HUD + plain-verb coach.
+- PosePuppet: Swim card + ⌘K "swim" (companion mode, lite tracker);
+  `/dolphin/` served same-origin for the BroadcastChannel transport.
+- Skipped deliberately: 4:3 letterbox toggle, ambient audio (both
+  optional); full-bay decor streaming (spawn-reach disc + fog, logged
+  in FUTURES.md). Human-only checks: FINAL_USER_TEST_PLAN.md § Dolphin.

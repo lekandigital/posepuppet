@@ -75,3 +75,45 @@ at 30 Hz (targets: 60 render / floor 45, pose ≥ 15).
   (drift/dropout/boost/arming/assist), same-origin topology guard,
   PERF=1 measurements. WebGL specs run headed — headless throttles a
   mediastream-less page to ~1 rAF/s (measured; see DECISIONS).
+
+
+## BodyArcade Dolphin (apps/dolphin + packages/world-data)
+
+```
+PosePuppet (producer, lite model, stage suspended)
+    │ BodySignal only — axes + events + additive swim block
+    │ (BroadcastChannel same-origin; postMessage relay as the
+    │  cross-origin dev fallback; both shape-guarded)
+    ▼
+/dolphin/  (built standalone app, own three.js, served by the same
+            vite middleware pattern as /flight/)
+    ├─ input/swimControls: keyboard priority, autopilot on loss,
+    │    burst machine, assist ladder
+    ├─ game/sim: PURE 120 Hz fixed-timestep swim model (no RNG,
+    │    byte-identical replays): impulse-and-glide kicks,
+    │    pitch/banked-turn attitude, breach ballistics,
+    │    SDF containment current + in-polygon slide guard
+    ├─ game/world + decor: PS2 pass — vertex-lit seabed displaced by
+    │    the SAME depth function the sim uses, shimmer-curtain
+    │    boundary, boid fish, shader kelp, ruins, shafts, motes
+    └─ ui: mono HUD + coach + minimap (the REAL bay polygon with the
+         ODbL credit rendered under it)
+
+packages/world-data (the future open-data pipeline's water component)
+    offline: fetch → assemble (relation | coastline-clip modes) →
+    simplify → project → boundary.json (provenance + attribution
+    embedded; loadBoundary refuses artifacts without attribution)
+    runtime: pointInWater / signedDistanceToShore — containment,
+    depth field, and minimap all run on these two calls
+```
+
+The swim-kick signal is the vertical chest–hip extent in image space
+(self-normalized, slow EMA) through the same StrokeDetector Rowing
+uses — no wrist depth anywhere, which is why Dolphin's companion mode
+keeps the lite tracker where Rowing must not. Landmarks never cross
+any transport (schema-enforced, both directions measured in tests).
+
+Test topology note: all suite configs and spec constants take PP_PORT
+(default 5173). On shared boxes another checkout may own 5173 with a
+persistent dev server, and reuseExistingServer would silently test the
+wrong tree — dolphin-branch runs pin PP_PORT=5273 --strictPort.
