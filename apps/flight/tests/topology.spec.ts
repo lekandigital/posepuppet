@@ -21,7 +21,7 @@ import { resolve } from "node:path";
 const repoRoot = resolve(__dirname, "../../..");
 const armsClip = resolve(repoRoot, "fixtures", "arms.y4m");
 const flightDist = resolve(repoRoot, "apps/flight/client/dist/index.html");
-const POSEPUPPET = "http://localhost:5173";
+const POSEPUPPET = `http://localhost:${process.env.PP_PORT ?? "5173"}`;
 
 test("live body intent reaches /flight/ over same-origin BroadcastChannel", async () => {
   test.skip(!existsSync(armsClip), "arms.y4m missing (local fixture)");

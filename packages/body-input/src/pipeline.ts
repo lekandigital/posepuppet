@@ -64,6 +64,11 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
   const recenterMachine = new HoldToFire(cfg.events.recenter.holdMs, cfg.events.recenter.refractoryMs);
   const actionMachine = new ImpulseDetector(cfg.events.action);
   const strokeDet = new StrokeDetector(cfg.stroke);
+  // Torso-wave (swim kick): the same detector on a different measured
+  // scalar — vertical chest–hip extent in image space, self-normalized by
+  // its own slow EMA (see defaults.swim for the measured floors).
+  const swimDet = new StrokeDetector(cfg.swim);
+  let swimRef: number | null = null;
 
   let neutral: NeutralState | null = null;
   let seatedRef: StatureRef | null = null;
@@ -198,6 +203,30 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
       );
       const stroke = strokeDet.snapshot(frame.tsMs);
 
+      // swim: torso-wave oscillation of the vertical chest–hip extent
+      // (image space). Two defenses against non-kick motion, both
+      // measured on fixtures (2026-07-11): (1) a RIGID torso tilted by θ
+      // shows extent·cos(θ) — divide the measured tilt back out, so lean
+      // cycles cancel geometrically while the wave's CURL compression
+      // (what a kick is) survives (lean_fb scored 3 kicks uncorrected);
+      // (2) a slow EMA self-reference absorbs posture drift. One scalar —
+      // fed to both detector channels.
+      let swimSignal: number | null = null;
+      if (m.ok && eventsOk && m.shoulderNormY !== null && m.hipNormY !== null) {
+        let extent = m.hipNormY - m.shoulderNormY; // image y-down: hips below
+        const DEG = Math.PI / 180;
+        const tiltP = Math.cos((raw.leanY ?? 0) * cfg.extraction.maxLeanYDeg * DEG);
+        const tiltR = Math.cos((raw.leanX ?? 0) * cfg.extraction.maxLeanXDeg * DEG);
+        extent /= Math.max(0.7, tiltP * tiltR);
+        if (extent > 1e-3) {
+          const aRef = 1 - Math.exp((-dt * 1000) / cfg.swim.refTauMs);
+          swimRef = swimRef === null ? extent : swimRef + (extent - swimRef) * aRef;
+          swimSignal = extent / swimRef - 1;
+        }
+      }
+      swimDet.step(frame.tsMs, swimSignal, swimSignal);
+      const swim = swimDet.snapshot(frame.tsMs);
+
       lastTs = frame.tsMs;
       return {
         v: 1,
@@ -228,6 +257,13 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
           ampL: quantize(stroke.ampL),
           ampR: quantize(stroke.ampR),
         },
+        swim: {
+          active: swim.active,
+          count: swim.count,
+          rate: quantize(swim.rate),
+          phase: quantize(swim.phase),
+          amp: quantize(Math.min(swim.ampL, 1)),
+        },
       };
     },
 
@@ -243,6 +279,8 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
       recenterMachine.reset();
       actionMachine.reset();
       strokeDet.reset();
+      swimDet.reset();
+      swimRef = null;
       neutral = null;
       seatedRef = null;
       neutralConfidence = 0;
@@ -262,6 +300,7 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
       recenterMachine.configure(cfg.events.recenter.holdMs, cfg.events.recenter.refractoryMs);
       actionMachine.configure(cfg.events.action);
       strokeDet.configure(cfg.stroke);
+      swimDet.configure(cfg.swim);
     },
 
     getConfig(): BodyInputConfig {

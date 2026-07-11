@@ -45,9 +45,11 @@ const fixtures = names.length ? names : Object.keys(DURATIONS);
 const TOP = ['v', 'ts', 'confidence', 'seated', 'stillness', 'neutralConfidence', 'axes', 'events'];
 const AXES = ['leanX', 'leanY', 'crouch', 'tallness', 'armsOut', 'armsRaised', 'handsForward', 'handPoint'];
 const STROKE = ['active', 'count', 'rate', 'phase', 'ampL', 'ampR'];
+const SWIM = ['active', 'count', 'rate', 'phase', 'amp'];
 function checkShape(s) {
-  // 'tracking' and 'stroke' are the schema's optional additive blocks
-  const keys = Object.keys(s).filter((k) => k !== 'tracking' && k !== 'stroke').sort().join();
+  // 'tracking', 'stroke' and 'swim' are the schema's optional additive blocks
+  const keys = Object.keys(s)
+    .filter((k) => k !== 'tracking' && k !== 'stroke' && k !== 'swim').sort().join();
   if (keys !== [...TOP].sort().join()) return `keys ${keys}`;
   if (s.v !== 1) return `v=${s.v}`;
   for (const k of ['ts', 'confidence', 'stillness', 'neutralConfidence']) {
@@ -62,7 +64,41 @@ function checkShape(s) {
       if (!Number.isFinite(s.stroke[k])) return `stroke.${k} not finite`;
     }
   }
+  if (s.swim !== undefined) {
+    if (Object.keys(s.swim).sort().join() !== [...SWIM].sort().join()) return 'swim keys';
+    if (typeof s.swim.active !== 'boolean') return 'swim.active not boolean';
+    for (const k of ['count', 'rate', 'phase', 'amp']) {
+      if (!Number.isFinite(s.swim[k])) return `swim.${k} not finite`;
+    }
+  }
   return null;
+}
+
+/** Torso-wave (swim) NEGATIVE assertion: none of the existing clips
+ *  contain a deliberate dolphin kick, so kicks counted here are false
+ *  positives. maxKicks tolerates a single boundary artifact where noted.
+ *  Positive kick evals need the torso_wave fixtures — a USER ACTION
+ *  tracked in FINAL_USER_TEST_PLAN.md, not fabricated here. */
+function swimNegative(signals, maxKicks, note = '') {
+  const kicks = (signals[signals.length - 1]?.swim?.count ?? 0) - (signals[0]?.swim?.count ?? 0);
+  const activeFrames = signals.filter((s) => s.swim?.active).length;
+  // amplitude of each counted false kick — the tuning evidence (a floor
+  // is only raised into a MEASURED gap, never guessed)
+  const amps = [];
+  let prev = signals[0]?.swim?.count ?? 0;
+  for (const s of signals) {
+    const c = s.swim?.count ?? prev;
+    if (c > prev) amps.push(s.swim.amp);
+    prev = Math.max(prev, c);
+  }
+  return {
+    swimFalsePositives: {
+      pass: kicks <= maxKicks,
+      detail: `${kicks} swim kicks (amps: ${amps.map((a) => a.toFixed(3)).join(', ') || '—'}), ${activeFrames} rhythm-active frames on non-swim footage (≤${maxKicks})${note}`,
+      kicks,
+      amps,
+    },
+  };
 }
 
 // --- stats helpers --------------------------------------------------------
@@ -195,15 +231,29 @@ function rowingChecks(signals, truth, opts = {}) {
       detail: `seated flag ${(frac * 100).toFixed(1)}% of frames (recorded metric — count is the assertion)`,
     };
   }
+  // recorded, not asserted: rowing's torso rock is genuinely rhythmic and
+  // may modulate chest–hip extent; rowing clips never feed the dolphin —
+  // the number is published so the overlap is known, not hidden
+  const kicks = (signals[signals.length - 1]?.swim?.count ?? 0) - (signals[0]?.swim?.count ?? 0);
+  out.swimOverlap = {
+    pass: true,
+    detail: `${kicks} swim kicks during rowing (recorded metric — clips never feed the dolphin)`,
+  };
   return out;
 }
 
 const CHECKS = {
-  lean_lr: (s) => bipolarChecks(s, 'leanX', 'leanY'),
+  lean_lr: (s) => ({ ...bipolarChecks(s, 'leanX', 'leanY'), ...swimNegative(s, 1) }),
   // 0.35 for leanY: signed-window detection at 3.5× its measured noise
   // floor — the depth axis is not magnitude-repeatable enough for 0.45
   // (episode counts flapped run-to-run purely on neutral/loop phase)
-  lean_fb: (s) => bipolarChecks(s, 'leanY', 'leanX', 0.35),
+  // swim ≤2: a sustained lean is one extent reversal — but HARD alternating
+  // full-deflection leans occasionally pair two excursions at the amp floor
+  // (measured 0–2 across runs post tilt-correction, always 0 rhythm-active
+  // frames; in-game effect = one small surge while already pitch-diving).
+  // The bound is the measured variance ceiling, not a wish; tightening the
+  // floor further without a positive torso-wave fixture risks deafness.
+  lean_fb: (s) => ({ ...bipolarChecks(s, 'leanY', 'leanX', 0.35), ...swimNegative(s, 2, ' — hard alternating leans; isolated pairs, never a rhythm') }),
   crouch_stand: (signals) => {
     const runs = episodes(signals, (s) => s.axes.crouch > 0.45, 800);
     const totalMs = signals.filter((s) => s.axes.crouch > 0.45).length * (1000 / 30);
@@ -216,6 +266,9 @@ const CHECKS = {
         detail: `${runs.length} sustained, ${(totalMs / 1000).toFixed(1)}s > 0.45 (need ≥1 ep, ≥2 s)`,
       },
       standsBackUp: { pass: returns, detail: `returns below 0.15 between crouches: ${returns}` },
+      // crouch cycles drop chest AND hips together (in-phase) — the
+      // anti-phase extent signal must not read them as dolphin kicks
+      ...swimNegative(signals, 2, ' — crouch/stand cycles, in-phase'),
     };
   },
   arms_tpose: (signals) => {
@@ -252,6 +305,9 @@ const CHECKS = {
     }
     const strokes = (signals[signals.length - 1]?.stroke?.count ?? 0) - (signals[0]?.stroke?.count ?? 0);
     const activeFrames = signals.filter((s) => s.stroke?.active).length;
+    const kicks = (signals[signals.length - 1]?.swim?.count ?? 0) - (signals[0]?.swim?.count ?? 0);
+    const swimActive = signals.filter((s) => s.swim?.active).length;
+    const swimAmpP99 = pctl(signals.map((s) => s.swim?.amp ?? 0), 0.99);
     return {
       noEvents: { pass: evTotal === 0, detail: `${evTotal} event frames (need 0)` },
       stillnessHigh: { pass: stillP50 >= 0.75, detail: `stillness p50=${stillP50.toFixed(3)} (≥0.75)` },
@@ -263,6 +319,11 @@ const CHECKS = {
       strokesZero: {
         pass: strokes === 0 && activeFrames === 0,
         detail: `${strokes} strokes, ${activeFrames} rhythm-active frames on still footage (need 0/0)`,
+      },
+      swimZero: {
+        pass: kicks === 0 && swimActive === 0,
+        detail: `${kicks} swim kicks, ${swimActive} rhythm-active frames on still footage (need 0/0); extent-excursion amp p99=${swimAmpP99.toFixed(4)} (measured floor)`,
+        swimAmpP99,
       },
     };
   },

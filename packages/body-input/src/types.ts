@@ -58,6 +58,23 @@ export interface BodyStroke {
   ampR: number;
 }
 
+/** Torso-wave (dolphin-kick) periodic state — the same detector as stroke
+ *  on a different measured signal: vertical chest–hip extent in image
+ *  space, self-normalized by its own slow EMA so slow posture changes
+ *  (leans, crouches) pass through the reference instead of counting. */
+export interface BodySwim {
+  /** a steady wave rhythm is currently established (≥ 2 counted kicks) */
+  active: boolean;
+  /** completed kicks since pipeline reset — monotonic */
+  count: number;
+  /** kick rate in Hz (EMA of cycle periods; decays to 0) */
+  rate: number;
+  /** 0 at the extent maximum, ~0.5 at the compression, →1 toward the next */
+  phase: number;
+  /** extent excursion of the last counted kick, fraction of resting extent */
+  amp: number;
+}
+
 export type BodyEvent = 'recenter' | 'action'; // closed set in schema v1
 
 export interface BodyAxes {
@@ -100,6 +117,8 @@ export interface BodySignal {
   /** optional periodic-motion state (additive; emitted by cores with a
    *  stroke config — old tapes and consumers stay valid without it) */
   stroke?: BodyStroke;
+  /** optional torso-wave state (additive, same contract as stroke) */
+  swim?: BodySwim;
 }
 
 export type AxisName = keyof BodyAxes;
@@ -166,6 +185,12 @@ export interface BodyInputConfig {
   extraction: ExtractionConfig;
   events: EventConfig;
   stroke: StrokeConfig;
+  /** torso-wave detector (StrokeDetector reused; units are fractions of
+   *  the resting chest–hip extent, not arm lengths) */
+  swim: StrokeConfig & {
+    /** slow EMA time constant for the self-normalizing extent reference */
+    refTauMs: number;
+  };
   /** confidence smoothing / decay time constants (ms) */
   confidenceTauMs: number;
   confidenceDecayTauMs: number;

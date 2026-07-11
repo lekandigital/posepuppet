@@ -19,7 +19,7 @@ import { resolve } from "node:path";
  */
 
 const FLIGHT = "http://localhost:5199";
-const POSEPUPPET = "http://localhost:5173";
+const POSEPUPPET = `http://localhost:${process.env.PP_PORT ?? "5173"}`;
 const repoRoot = resolve(__dirname, "../../..");
 const leanClip = resolve(repoRoot, "fixtures", "flight", "lean_lr.y4m");
 

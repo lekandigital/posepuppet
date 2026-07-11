@@ -78,6 +78,27 @@ export function defaultConfig(): BodyInputConfig {
       maxPeriodMs: 4000,
       rateDecayTauMs: 1000,
     },
+    swim: {
+      // Torso-wave (dolphin kick): the signal is vertical chest–hip extent
+      // in image space, self-normalized by a slow EMA (refTauMs), so its
+      // units are fractions of the resting extent (~1.0 at rest). Floors
+      // measured on existing fixtures 2026-07-11 (fixture-eval swim rows):
+      // still.mp4 amp p99 = 0.0000; lean_lr 0 kicks; the load-bearing
+      // negative is lean_fb — ALTERNATING fwd/back lean cycles modulate
+      // extent by ~0.03–0.05 at a ~6–8 s cadence and scored 3 kicks under
+      // the first gates (minAmp 0.045, maxPeriod 5000). Revised from that
+      // measurement: minAmp 0.055 sits above the lean-tilt crosstalk band
+      // (a deliberate wave reads 0.1–0.2), and maxPeriodMs 3200 breaks
+      // rhythms slower than ~0.31 Hz (lean alternations) while keeping the
+      // slow-wave spec (24–30 waves/min = 0.4–0.5 Hz) comfortably inside.
+      oneEuro: { minCutoff: 0.8, beta: 0.01 },
+      reversalHys: 0.02,
+      minAmp: 0.055,
+      minHalfPeriodMs: 300,
+      maxPeriodMs: 3200,
+      rateDecayTauMs: 1200,
+      refTauMs: 8000,
+    },
     confidenceTauMs: 150,
     confidenceDecayTauMs: 300,
     provisionalNeutralMs: 800,

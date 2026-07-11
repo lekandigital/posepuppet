@@ -9,6 +9,10 @@ import type { BodyAxes, BodyEvent, BodySignal, TrackingState } from './types';
  *  canonical serialization order. */
 export const STROKE_KEYS = ['active', 'count', 'rate', 'phase', 'ampL', 'ampR'] as const;
 
+/** v1-additive OPTIONAL top-level key: torso-wave (swim kick) state.
+ *  Same contract as stroke. Key order is the canonical order. */
+export const SWIM_KEYS = ['active', 'count', 'rate', 'phase', 'amp'] as const;
+
 export const SCHEMA_V = 1 as const;
 
 export const TOP_KEYS = [
@@ -52,7 +56,7 @@ export function assertSignalShape(msg: unknown): asserts msg is BodySignal {
   if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) fail('not a plain object');
   const o = msg as Record<string, unknown>;
   const keys = Object.keys(o)
-    .filter((k) => k !== 'tracking' && k !== 'stroke') // optional additive keys, validated below
+    .filter((k) => k !== 'tracking' && k !== 'stroke' && k !== 'swim') // optional additive keys, validated below
     .sort();
   const want = [...TOP_KEYS].sort();
   if (keys.length !== want.length || keys.some((k, i) => k !== want[i])) {
@@ -88,6 +92,24 @@ export function assertSignalShape(msg: unknown): asserts msg is BodySignal {
     for (const k of ['phase', 'ampL', 'ampR'] as const) {
       const v = st[k];
       if (!isFiniteNumber(v) || v < 0 || v > 1) fail(`stroke.${k} out of [0,1]`);
+    }
+  }
+  if (o.swim !== undefined) {
+    const sw = o.swim as Record<string, unknown>;
+    if (typeof sw !== 'object' || sw === null || Array.isArray(sw)) fail('swim not an object');
+    const wKeys = Object.keys(sw).sort();
+    const wWant = [...SWIM_KEYS].sort();
+    if (wKeys.length !== wWant.length || wKeys.some((k, i) => k !== wWant[i])) {
+      fail(`swim keys [${wKeys.join(',')}] != schema [${wWant.join(',')}]`);
+    }
+    if (typeof sw.active !== 'boolean') fail('swim.active not boolean');
+    if (!isFiniteNumber(sw.count) || sw.count < 0 || !Number.isInteger(sw.count)) {
+      fail('swim.count not a non-negative integer');
+    }
+    if (!isFiniteNumber(sw.rate) || sw.rate < 0 || sw.rate > 3) fail('swim.rate out of [0,3]');
+    for (const k of ['phase', 'amp'] as const) {
+      const v = sw[k];
+      if (!isFiniteNumber(v) || v < 0 || v > 1) fail(`swim.${k} out of [0,1]`);
     }
   }
   if (o.v !== SCHEMA_V) fail(`v=${String(o.v)} (expected ${SCHEMA_V})`);
@@ -135,8 +157,8 @@ function scanForLandmarks(v: unknown, path: string): void {
 }
 
 /** Canonical JSON — fixed key order, quantized-by-construction values.
- *  Optional blocks serialize last, tracking then stroke, in their
- *  declared key orders. */
+ *  Optional blocks serialize last — tracking, stroke, then swim — in
+ *  their declared key orders. */
 export function canonicalSignalJSON(s: BodySignal): string {
   const a: BodyAxes = s.axes;
   const tracking = s.tracking
@@ -148,6 +170,12 @@ export function canonicalSignalJSON(s: BodySignal): string {
       `,"rate":${JSON.stringify(st.rate)},"phase":${JSON.stringify(st.phase)}` +
       `,"ampL":${JSON.stringify(st.ampL)},"ampR":${JSON.stringify(st.ampR)}}`
     : '';
+  const sw = s.swim;
+  const swim = sw
+    ? `,"swim":{"active":${sw.active},"count":${JSON.stringify(sw.count)}` +
+      `,"rate":${JSON.stringify(sw.rate)},"phase":${JSON.stringify(sw.phase)}` +
+      `,"amp":${JSON.stringify(sw.amp)}}`
+    : '';
   return (
     `{"v":${s.v},"ts":${JSON.stringify(s.ts)},"confidence":${JSON.stringify(s.confidence)}` +
     `,"seated":${s.seated},"stillness":${JSON.stringify(s.stillness)}` +
@@ -156,7 +184,7 @@ export function canonicalSignalJSON(s: BodySignal): string {
     `,"crouch":${JSON.stringify(a.crouch)},"tallness":${JSON.stringify(a.tallness)}` +
     `,"armsOut":${JSON.stringify(a.armsOut)},"armsRaised":${JSON.stringify(a.armsRaised)}` +
     `,"handsForward":${JSON.stringify(a.handsForward)},"handPoint":${JSON.stringify(a.handPoint)}}` +
-    `,"events":[${s.events.map((e) => `"${e}"`).join(',')}]${tracking}${stroke}}`
+    `,"events":[${s.events.map((e) => `"${e}"`).join(',')}]${tracking}${stroke}${swim}}`
   );
 }
 

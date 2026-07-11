@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-07-11T17:39:36.273Z",
+  "generatedAt": "2026-07-11T20:48:33.077Z",
   "headless": false,
   "fixtures": {
     "lean_lr": {
-      "signals": 1198,
-      "hz": 29.95,
-      "latencyMsP50": 16.8,
-      "latencyMsP95": 19.2,
+      "signals": 1194,
+      "hz": 29.85,
+      "latencyMsP50": 16.5,
+      "latencyMsP95": 19.5,
       "checks": {
         "leanX+windows": {
           "pass": true,
@@ -14,15 +14,21 @@
         },
         "leanX-windows": {
           "pass": true,
-          "detail": "2 sustained, 9.7s < -0.45 (need ≥1 ep, ≥2 s)"
+          "detail": "2 sustained, 9.6s < -0.45 (need ≥1 ep, ≥2 s)"
         },
         "crossAxisBleed": {
           "pass": true,
-          "detail": "leanY p95=0.690 during episodes (recorded metric)"
+          "detail": "leanY p95=0.661 during episodes (recorded metric)"
         },
         "returnsToDeadZone": {
           "pass": true,
           "detail": "re-centers below 0.15 between episodes: true"
+        },
+        "swimFalsePositives": {
+          "pass": true,
+          "detail": "0 swim kicks (amps: —), 0 rhythm-active frames on non-swim footage (≤1)",
+          "kicks": 0,
+          "amps": []
         },
         "schemaShape": {
           "pass": true,
@@ -35,26 +41,32 @@
       }
     },
     "lean_fb": {
-      "signals": 1800,
-      "hz": 30,
-      "latencyMsP50": 16.8,
-      "latencyMsP95": 20,
+      "signals": 1780,
+      "hz": 29.67,
+      "latencyMsP50": 16.9,
+      "latencyMsP95": 19.8,
       "checks": {
         "leanY+windows": {
           "pass": true,
-          "detail": "2 sustained, 21.8s > +0.35 (need ≥1 ep, ≥2 s)"
+          "detail": "2 sustained, 14.7s > +0.35 (need ≥1 ep, ≥2 s)"
         },
         "leanY-windows": {
           "pass": true,
-          "detail": "4 sustained, 14.6s < -0.35 (need ≥1 ep, ≥2 s)"
+          "detail": "2 sustained, 14.3s < -0.35 (need ≥1 ep, ≥2 s)"
         },
         "crossAxisBleed": {
           "pass": true,
-          "detail": "leanX p95=0.255 during episodes (recorded metric)"
+          "detail": "leanX p95=0.244 during episodes (recorded metric)"
         },
         "returnsToDeadZone": {
           "pass": true,
           "detail": "re-centers below 0.15 between episodes: true"
+        },
+        "swimFalsePositives": {
+          "pass": true,
+          "detail": "0 swim kicks (amps: —), 0 rhythm-active frames on non-swim footage (≤2) — hard alternating leans; isolated pairs, never a rhythm",
+          "kicks": 0,
+          "amps": []
         },
         "schemaShape": {
           "pass": true,
@@ -69,16 +81,22 @@
     "crouch_stand": {
       "signals": 1349,
       "hz": 29.98,
-      "latencyMsP50": 17.1,
-      "latencyMsP95": 22.1,
+      "latencyMsP50": 16.6,
+      "latencyMsP95": 21.6,
       "checks": {
         "crouchWindows": {
           "pass": true,
-          "detail": "1 sustained, 9.5s > 0.45 (need ≥1 ep, ≥2 s)"
+          "detail": "1 sustained, 9.6s > 0.45 (need ≥1 ep, ≥2 s)"
         },
         "standsBackUp": {
           "pass": true,
           "detail": "returns below 0.15 between crouches: true"
+        },
+        "swimFalsePositives": {
+          "pass": true,
+          "detail": "0 swim kicks (amps: —), 0 rhythm-active frames on non-swim footage (≤2) — crouch/stand cycles, in-phase",
+          "kicks": 0,
+          "amps": []
         },
         "schemaShape": {
           "pass": true,
@@ -91,10 +109,10 @@
       }
     },
     "arms_tpose": {
-      "signals": 1213,
-      "hz": 28.88,
-      "latencyMsP50": 17.2,
-      "latencyMsP95": 21.6,
+      "signals": 1253,
+      "hz": 29.83,
+      "latencyMsP50": 17,
+      "latencyMsP95": 19.4,
       "checks": {
         "tposeEpisodes": {
           "pass": true,
@@ -114,7 +132,7 @@
         },
         "confident": {
           "pass": true,
-          "detail": "confidence p50=1.000 (≥0.6)"
+          "detail": "confidence p50=0.999 (≥0.6)"
         }
       }
     },
@@ -122,7 +140,7 @@
       "signals": 1200,
       "hz": 30,
       "latencyMsP50": 16.8,
-      "latencyMsP95": 18.9,
+      "latencyMsP95": 19.1,
       "checks": {
         "seatedDetected": {
           "pass": true,
@@ -143,10 +161,10 @@
       }
     },
     "still": {
-      "signals": 600,
-      "hz": 30,
-      "latencyMsP50": 16.7,
-      "latencyMsP95": 18.8,
+      "signals": 583,
+      "hz": 29.15,
+      "latencyMsP50": 16.8,
+      "latencyMsP95": 19.3,
       "checks": {
         "noEvents": {
           "pass": true,
@@ -154,25 +172,30 @@
         },
         "stillnessHigh": {
           "pass": true,
-          "detail": "stillness p50=0.903 (≥0.75)"
+          "detail": "stillness p50=0.910 (≥0.75)"
         },
         "shapedNoiseFloor": {
           "pass": true,
-          "detail": "worst shaped p99=0.0461 (≤0.08)",
+          "detail": "worst shaped p99=0.0486 (≤0.08)",
           "floors": {
-            "leanX": 0.0063,
-            "leanY": 0.0171,
-            "crouch": 0.0114,
+            "leanX": 0.0091,
+            "leanY": 0.001,
+            "crouch": 0.0103,
             "tallness": 0,
             "armsOut": 0.0056,
             "armsRaised": 0,
-            "handsForward": 0.0461,
+            "handsForward": 0.0486,
             "handPoint": 0
           }
         },
         "strokesZero": {
           "pass": true,
           "detail": "0 strokes, 0 rhythm-active frames on still footage (need 0/0)"
+        },
+        "swimZero": {
+          "pass": true,
+          "detail": "0 swim kicks, 0 rhythm-active frames on still footage (need 0/0); extent-excursion amp p99=0.0000 (measured floor)",
+          "swimAmpP99": 0
         },
         "schemaShape": {
           "pass": true,
@@ -186,9 +209,9 @@
     },
     "rowing_slow": {
       "signals": 1238,
-      "hz": 29.98,
-      "latencyMsP50": 16.5,
-      "latencyMsP95": 21.4,
+      "hz": 29.97,
+      "latencyMsP50": 17.3,
+      "latencyMsP95": 22.3,
       "checks": {
         "strokeCount": {
           "pass": true,
@@ -202,7 +225,11 @@
         "rateRead": {
           "pass": true,
           "detail": "rate p50=0.348 Hz over active frames (>0.15)",
-          "rateP50": 0.3483
+          "rateP50": 0.3481
+        },
+        "swimOverlap": {
+          "pass": true,
+          "detail": "0 swim kicks during rowing (recorded metric — clips never feed the dolphin)"
         },
         "schemaShape": {
           "pass": true,
@@ -217,8 +244,8 @@
     "rowing_fast": {
       "signals": 999,
       "hz": 29.96,
-      "latencyMsP50": 16.2,
-      "latencyMsP95": 21,
+      "latencyMsP50": 17.1,
+      "latencyMsP95": 22.3,
       "checks": {
         "strokeCount": {
           "pass": true,
@@ -227,12 +254,16 @@
         },
         "rhythmActive": {
           "pass": true,
-          "detail": "rhythm active 85.9% of frames (≥30%)"
+          "detail": "rhythm active 86.0% of frames (≥30%)"
         },
         "rateRead": {
           "pass": true,
-          "detail": "rate p50=0.844 Hz over active frames (>0.15)",
-          "rateP50": 0.8435
+          "detail": "rate p50=0.838 Hz over active frames (>0.15)",
+          "rateP50": 0.8375
+        },
+        "swimOverlap": {
+          "pass": true,
+          "detail": "0 swim kicks during rowing (recorded metric — clips never feed the dolphin)"
         },
         "schemaShape": {
           "pass": true,
@@ -244,15 +275,15 @@
         },
         "rateOrdering": {
           "pass": true,
-          "detail": "rate p50 fast=0.844 Hz vs slow=0.348 Hz (fast > 1.3× slow)"
+          "detail": "rate p50 fast=0.838 Hz vs slow=0.348 Hz (fast > 1.3× slow)"
         }
       }
     },
     "rowing_left_bias": {
-      "signals": 1429,
-      "hz": 29.96,
-      "latencyMsP50": 17,
-      "latencyMsP95": 22,
+      "signals": 1430,
+      "hz": 29.98,
+      "latencyMsP50": 16.3,
+      "latencyMsP95": 21.3,
       "checks": {
         "strokeCount": {
           "pass": true,
@@ -261,16 +292,20 @@
         },
         "rhythmActive": {
           "pass": true,
-          "detail": "rhythm active 86.8% of frames (≥30%)"
+          "detail": "rhythm active 86.7% of frames (≥30%)"
         },
         "rateRead": {
           "pass": true,
-          "detail": "rate p50=0.368 Hz over active frames (>0.15)",
-          "rateP50": 0.3681
+          "detail": "rate p50=0.373 Hz over active frames (>0.15)",
+          "rateP50": 0.3726
         },
         "leftBiasSign": {
           "pass": true,
-          "detail": "ampL−ampR p50=0.202 during rhythm (>0.05 — left arm dominant)"
+          "detail": "ampL−ampR p50=0.190 during rhythm (>0.05 — left arm dominant)"
+        },
+        "swimOverlap": {
+          "pass": true,
+          "detail": "0 swim kicks during rowing (recorded metric — clips never feed the dolphin)"
         },
         "schemaShape": {
           "pass": true,
@@ -284,9 +319,9 @@
     },
     "rowing_seated": {
       "signals": 767,
-      "hz": 29.96,
-      "latencyMsP50": 17.5,
-      "latencyMsP95": 22.4,
+      "hz": 29.95,
+      "latencyMsP50": 17.2,
+      "latencyMsP95": 22,
       "checks": {
         "strokeCount": {
           "pass": true,
@@ -295,16 +330,20 @@
         },
         "rhythmActive": {
           "pass": true,
-          "detail": "rhythm active 88.3% of frames (≥30%)"
+          "detail": "rhythm active 88.1% of frames (≥30%)"
         },
         "rateRead": {
           "pass": true,
-          "detail": "rate p50=0.595 Hz over active frames (>0.15)",
-          "rateP50": 0.5946
+          "detail": "rate p50=0.605 Hz over active frames (>0.15)",
+          "rateP50": 0.6054
         },
         "seatedFlag": {
           "pass": true,
           "detail": "seated flag 0.0% of frames (recorded metric — count is the assertion)"
+        },
+        "swimOverlap": {
+          "pass": true,
+          "detail": "0 swim kicks during rowing (recorded metric — clips never feed the dolphin)"
         },
         "schemaShape": {
           "pass": true,
@@ -319,8 +358,8 @@
     "rowing_seated_upper": {
       "signals": 767,
       "hz": 29.96,
-      "latencyMsP50": 16.3,
-      "latencyMsP95": 21,
+      "latencyMsP50": 16.9,
+      "latencyMsP95": 21.3,
       "checks": {
         "strokeCount": {
           "pass": true,
@@ -333,12 +372,16 @@
         },
         "rateRead": {
           "pass": true,
-          "detail": "rate p50=0.579 Hz over active frames (>0.15)",
-          "rateP50": 0.5787
+          "detail": "rate p50=0.573 Hz over active frames (>0.15)",
+          "rateP50": 0.5729
         },
         "seatedFlag": {
           "pass": true,
           "detail": "seated flag 0.0% of frames (recorded metric — count is the assertion)"
+        },
+        "swimOverlap": {
+          "pass": true,
+          "detail": "0 swim kicks during rowing (recorded metric — clips never feed the dolphin)"
         },
         "schemaShape": {
           "pass": true,

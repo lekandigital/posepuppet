@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BodyArcade Dolphin</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #04121f; }
+      #app { position: fixed; inset: 0; }
+      canvas { display: block; }
+      #hud {
+        position: fixed; inset: 0; pointer-events: none;
+        font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: #bfe9ff; text-shadow: 0 1px 2px rgba(0, 8, 16, 0.8);
+      }
+      #hud .panel {
+        position: absolute; padding: 8px 10px;
+        background: rgba(4, 18, 31, 0.55); border: 1px solid rgba(150, 220, 255, 0.35);
+      }
+      #hud-status { left: 12px; top: 12px; }
+      #hud-coach { left: 50%; transform: translateX(-50%); bottom: 68px; text-align: center; }
+      #hud-help { right: 12px; bottom: 12px; text-align: right; }
+      #hud-attrib { left: 12px; bottom: 12px; opacity: 0.85; }
+      #minimap { position: absolute; right: 12px; top: 12px; border: 1px solid rgba(150, 220, 255, 0.35); background: rgba(4, 18, 31, 0.55); }
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="hud">
+      <div id="hud-status" class="panel"></div>
+      <canvas id="minimap" width="200" height="230"></canvas>
+      <div id="hud-coach" class="panel hidden"></div>
+      <div id="hud-attrib" class="panel"></div>
+      <div id="hud-help" class="panel"></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

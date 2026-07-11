@@ -21,7 +21,7 @@ const dur = Number((argv.find((a) => a.startsWith('--dur=')) ?? '--dur=60').spli
 const avatars = (argv.find((a) => a.startsWith('--avatar=')) ?? '--avatar=robot').split('=')[1].split(',');
 const names = argv.filter((a) => !a.startsWith('--'));
 const fixtures = names.length ? names : ['arms', 'torso', 'fast'];
-const BASE = 'http://localhost:5173';
+const BASE = `http://localhost:${process.env.PP_PORT ?? '5173'}`;
 
 async function serverUp() {
   try {

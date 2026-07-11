@@ -19,7 +19,7 @@ mkdirSync(outDir, { recursive: true });
 const fixture = process.argv[2] ?? 'arms';
 const SHOTS = 12;
 const INTERVAL_MS = 900; // 12 × 0.9 s ≈ 10 s span
-const BASE = 'http://localhost:5173';
+const BASE = `http://localhost:${process.env.PP_PORT ?? '5173'}`;
 
 async function serverUp() {
   try {

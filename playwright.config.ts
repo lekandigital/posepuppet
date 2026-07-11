@@ -3,6 +3,8 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 
+const PP_PORT = process.env.PP_PORT ?? '5173';
+
 // Default fake-camera fixture; individual tests/eval runs relaunch with
 // other clips via their own browser instances.
 const here = dirname(fileURLToPath(import.meta.url));
@@ -39,7 +41,7 @@ const cameraArgs = [
 const defaultProject: Project = {
   name: 'default',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: `http://localhost:${PP_PORT}`,
     permissions: ['camera', 'microphone'],
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
@@ -60,7 +62,7 @@ const gpuProject: Project | null =
         name: 'gpu-performance',
         testMatch: /detect\.spec\.ts/,
         use: {
-          baseURL: 'http://localhost:5173',
+          baseURL: `http://localhost:${PP_PORT}`,
           permissions: ['camera', 'microphone'],
           trace: 'retain-on-failure',
           screenshot: 'only-on-failure',
@@ -90,8 +92,8 @@ export default defineConfig({
   reporter: [['list']],
   projects,
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
+    command: `npm run dev -- --port ${PP_PORT} --strictPort`,
+    url: `http://localhost:${PP_PORT}`,
     reuseExistingServer: true,
     timeout: 30_000,
   },
