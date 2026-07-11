@@ -1,296 +1,181 @@
-# PLAN.md — BodyArcade Dolphin
+# V1 — PosePuppet Runtime + HUD: plan
 
-Status: **P0 complete — awaiting USER GATE 1** (water-shape pick + plan
-approval + dolphin fixtures). Branch `bodyarcade-dolphin-fable` in the
-dedicated checkout `~/Dev/posepuppet-dolphin`, forked from the
-remote-development rebuild (`68ac9a3`) with Rowing P1+P2 (`a39d644`) as
-ancestors — the stroke detector this mode reuses is already on the
-branch. Rowing continues in parallel in `~/Dev/posepuppet` on its own
-branch; this plan touches nothing Rowing owns. Previous passes' plans
-(Rowing, PPC, Flight, Instrument Pass) live in git history at this path.
+Branch `feat/pose-runtime-hud`, worktree `~/Dev/wt-runtime`, tmux `ba-runtime`,
+dev port 5174. Autonomy policy per BODYARCADE_CONTEXT.md v2 — no user gates;
+human-only checks land in FINAL_USER_TEST_PLAN.md S1–S3/S11 with evidence.
 
-## P0 — what the code actually says
+## Audit findings (what exists, where the seams are)
 
-**The periodic detector was built for this.** The header comment of
-`packages/body-input/src/stroke.ts` says it plainly: "the Rowing
-primitive, designed for reuse (Dolphin's dive cycle is the same detector
-on a different axis)." `StrokeDetector` is a pure position-Schmitt
-oscillation detector over any scalar signal, frame-timestamp-driven
-(replay-deterministic), with per-side amplitudes and an EMA rate. The
-torso-wave kick is that detector fed a torso signal instead of wrist
-fore-aft. Zero new detection theory needed; the open question is which
-measured torso signal oscillates cleanly (fixtures decide — see Risks).
+**Tracking pipeline (Full App, `src/`).** `src/main.ts` boots:
+camera (`src/camera.ts` — getUserMedia / video-file into one `<video>`) →
+MediaPipe detector (`src/pose/detector.ts`, rVFC-driven, GPU→CPU fallback,
+full/lite hot swap) → mirror (`src/pose/mirror.ts`) → optional eval masker →
+Predictive Pose Continuity (`src/pose/continuity.ts`) → fan-out:
+One-Euro smoothing → retargeter/stage; ring buffers; intent detector; and
+`src/bodyinput/adapter.ts`, the ONLY place landmarks touch
+`@bodyarcade/body-input` — the core derives `BodySignal` and publishes on the
+in-page channel + BroadcastChannel. Hand mode has a parallel detector
+(`src/pose/handDetector.ts`) that the pose detector yields to.
 
-**The schema has a proven additive mechanism.** `BodySignal` is a
-closed-key schema (`schema.ts`); landmarks provably never cross the
-transport, so torso-wave detection must run producer-side in
-`@bodyarcade/body-input`, exactly like Rowing's stroke. Optional
-top-level blocks (`tracking` from PPC, `stroke` from Rowing) keep
-`v: 1`, old tapes valid, canonical serialization stable. Dolphin adds a
-`swim` block the same way rather than overloading `stroke` (rowing's
-block stays arm-semantic; the boat consumes it today).
+**Games (completed, consumers only).** Flight/TinySkies
+(`apps/flight/client`, Rowing is its `?row` mode) and standalone Dolphin
+(`apps/dolphin`) never see landmarks: `input/bodyControls.ts` /
+`input/swimControls.ts` subscribe to BroadcastChannel + a postMessage
+envelope, dedupe by `signal.ts`, gate on staleness/confidence, decay to
+autopilot on loss, and keyboard always wins (KEYBOARD_PRIORITY_MS). Both
+apps alias `@bodyarcade/body-input` to package source. Today the producer is
+a PosePuppet tab in companion mode (`src/bodyinput/flightBridge.ts`).
 
-**Existing axes already cover the rest of the swim model.** From
-`AXIS_KEYS`: `leanY` = pitch dive/surface, `leanX` (shoulder-line lean —
-Flight banks with it today) = banked roll turns, `crouch` = alternate
-depth control, `handsForward` = burst (Flight's boost substrate),
-`recenter` event = T-pose, `stillness` + `confidence` + PPC `tracking`
-block = glide/autopilot. Only the kick is new signal work.
+**Topology.** One origin: root vite serves the app plus built games at
+`/flight/` and `/dolphin/` (BroadcastChannel is origin-scoped — the Gate-2
+lesson). Model + wasm assets live in root `public/models`,
+`public/mediapipe-wasm` (gitignored, fetched at install).
 
-**The same-origin topology is settled and generalizes.** BroadcastChannel
-is origin-scoped; PosePuppet's `vite.config.ts` serves the *built*
-flight app at `/flight/` via a static middleware plugin (base:
-`'/flight/'`, disjoint asset prefixes). Dolphin follows the identical
-pattern at `/dolphin/` — a second instance of a solved problem, not new
-infrastructure.
+**Model-variant law (measured, keep):** Fly = lite, Dolphin = lite,
+Rowing = FULL (lite wrist-depth collapse: 2/13 → 13/13 strokes on the
+seated fixture).
 
-**The globe is not the dolphin's world.** FUTURES.md sketched "Dolphin →
-a fourth vehicle" on the TinySkies globe, but that was written before
-this prompt existed. What the prompt actually specifies — a bounded
-real-water polygon, SDF depth field, PS2 underwater atmosphere (fog,
-vertex lighting, boids, kelp shaders, caustic gobos), an underwater
-camera — is a different scene, renderer, and art direction from the
-globe. See Gate-1 decision material.
+**Licensing check (first-actions item):** there is no `LICENSE_NOTES.md`.
+The TinySkies permission text lives in `ASSETS.md` § "BodyArcade Flight —
+TinySkies / GlobeFly fork manifest" ("used with permission", link, private
+record gitignored as `PERMISSION.local.md`). Requirement satisfied; noted
+in DECISIONS.md rather than inventing a new file.
 
-**Fixture/eval rig conventions carry over.** mp4 → y4m via
-`scripts/prepare-fixtures.mjs` (720p/30 for Chrome's fake webcam);
-episode-structural per-clip assertions in
-`packages/body-input/tools/fixture-eval.mjs` → `eval/`; Rowing's lesson
-is pre-applied: clips that start/end mid-motion get a single non-looped
-`?video=` eval pass, and still lead-in/tail is in the recording spec.
+**Suites.** Root Playwright (fake-webcam y4m + eval rig), `apps/flight/tests`
+(port 5199 + producer), `apps/dolphin/tests` (port 5197 + producer). All
+three must stay green — that is the refactor's contract.
 
-**This checkout is fresh.** No `node_modules`, no `fixtures/` (private,
-untracked — they live on the Mac and in the Rowing checkout). P0 here is
-docs-only; coherence checked with `npm ci` + `tsc --noEmit`. Full suite
-baselines are re-established at P1 entry after fixture sync
-(ENVIRONMENT_BLOCKED at P0: private fixtures not yet synced to this
-clone; last recorded green — PosePuppet 92 passed / 5 skipped, Flight
-17 passed / 2 skipped at Rowing P2 `a39d644`). Per instruction, no
-Playwright/remote-infra/GPU work happens in P0.
+## Extraction map
 
-## Gate-1 decision material
+### `packages/pose-runtime` (new; three-free, DOM-light)
 
-### Where Dolphin lives: `apps/dolphin` (deviation from FUTURES.md's fourth-vehicle sketch)
+Moved verbatim (history-preserving `git mv`, imports adjusted):
 
-Rowing went inside `apps/flight` because everything it needed — the
-boat, the globe, the camera, the wake — already existed there. Dolphin
-is the opposite case: the world (bounded bay, underwater volume, PS2
-fog/palette), the camera (third-person underwater follow + breach
-chase), the physics (3D swim with depth), and every asset are new. What
-Dolphin shares — body-input consumption, shaping stack, One Euro,
-tuner, stroke detection — lives in `packages/body-input`, not in the
-flight client. Building inside the 30k-line TinySkies fork would risk
-the Gate-2-frozen flight/rowing feel for zero reuse gain; a standalone
-`apps/dolphin` (own three.js, own vite build, base `'/dolphin/'`,
-served same-origin by the established static-plugin pattern) risks
-nothing and keeps the PS2 look unconstrained. FUTURES.md gets a note:
-the fourth-vehicle idea remains valid for a *globe cameo* someday; the
-bounded-bay mode is its own app. **Recommendation: apps/dolphin.**
+| from | to |
+|---|---|
+| `src/pose/detector.ts` | `packages/pose-runtime/src/detector.ts` (asset paths become options) |
+| `src/pose/handDetector.ts` | `packages/pose-runtime/src/handDetector.ts` |
+| `src/pose/continuity.ts` | `packages/pose-runtime/src/continuity.ts` |
+| `src/pose/indices.ts` `mirror.ts` `oneEuro.ts` `smoothing.ts` `types.ts` | same names |
+| `src/camera.ts` (capture half) | `packages/pose-runtime/src/camera.ts` |
 
-### Boundary module: `packages/world-data`, offline-only, designed as the future pipeline's water-polygon component
+New composition:
 
-`fetch → assemble multipolygon → simplify → project → boundary.json`,
-run as a prep script (`packages/world-data/tools/`), never at runtime;
-the game bundles the emitted JSON. Sources: **OSM via Overpass**
-(primary — bays/lakes/rivers; ODbL, attribution in-app + README +
-provenance inside boundary.json) and **Natural Earth** (public domain;
-coarse-coastline fallback only — at bay scale NE 10m is a blob, so both
-candidates below use OSM). Simplification: Visvalingam–Whyatt to a
-stated vertex budget (~400–800 outer vertices; islands kept above an
-area threshold), **area delta vs source stated** in the module README
-and asserted in a unit test. Projection: local tangent plane at the
-polygon centroid → meters → game units with a tunable world scale
-(shape is sacred; size is gameplay). The module's public surface
-(`loadBoundary`, point-in-polygon, signed-distance query) is written as
-the pipeline's water component from day one — Rowing's Waterway seam
-becomes a future consumer.
+- `src/runtime.ts` — `createPoseRuntime(opts)`: explicit camera ownership +
+  lifecycle (`idle → starting → running / denied / error / external /
+  stopped`), video element supplied (app) or created hidden (games), model
+  variant, mirror/ppc toggles, an eval-harness frame interceptor hook, PPC
+  tracking states → body-input core (absorbs `src/bodyinput/adapter.ts`),
+  publishes `BodySignal` in-page + BroadcastChannel, exposes a trusted
+  in-process `onFrame` tap (Full App retargeting; same trust domain),
+  `preview` state for the HUD, and privacy/tracking state.
+- `src/preview.ts` — `PreviewFrame`: the approved render state that may
+  cross to the HUD: mirrored, 2D-only, quantized skeleton segments +
+  per-limb tracking + coarse confidence. Never serialized onto a transport.
+- `src/election.ts` — one producer per origin: Web Locks
+  (`bodyarcade-pose-producer`) with a listen-for-traffic fallback; a page
+  that finds an active external producer enters `external` and does NOT
+  open the camera (companion mode keeps working, no duplicate pipelines).
+  Per page, `createPoseRuntime` enforces a singleton.
 
-### The two candidate water shapes (both verified in OSM today)
+### `packages/pose-hud` (new)
 
-**Candidate A — Bay of Kotor (Boka Kotorska), Montenegro.**
-OSM relation **10171079**, `natural=bay` multipolygon, 59 outer + 8
-inner ways, bbox ≈ 22 × 14 km. License: ODbL (attribution wired
-in-app). Why it fits: a winding, fully-enclosed chain of basins linked
-by narrow straits (the Verige strait is a natural gate/arch moment),
-two tiny islands (Our Lady of the Rocks, Sveti Đorđe) begging to be
-ruin anchors, and an unmistakable minimap silhouette. It is the
-prompt's "one great bay" — every stretch is near a shore, so the
-containment current and the shimmer edge are constantly part of play,
-and the SDF depth field (deep basins, shallow straits) writes itself.
-**My recommendation.**
+- `mountPoseHud(host, runtime, { position?, safeArea?, collapsed? })` →
+  handle with `expand/collapse/setSafeArea/unmount`.
+- Bottom-left compact square; collapsible to a status pill; hover/focus/
+  click expands; expanded view swaps preview ↔ live camera feed. Full
+  keyboard parity (tabbable, Enter/Space toggle, Esc collapse, arrow swap).
+- Contents: preview figure, mono tracking state (LIVE / REACQ / SIGNAL
+  LOST / KEYBOARD / CAMERA DENIED / REMOTE FEED), privacy line ("LOCAL
+  INFERENCE · NO UPLOADS"), recenter flash. No settings panel.
+- **Preview renderer decision:** 2D-canvas glowing wireframe figure (the
+  existing x-ray puppet language) — NOT a VRM. Games ship their own three
+  versions (0.172 vs 0.184); a VRM preview would bundle a second three +
+  GL context into every game page. "Cheap VRM or simpler" → simpler, in
+  the frozen visual language, near-zero GPU. Degradation tiers:
+  T0 glow skeleton 30 Hz → T1 flat lines 15 Hz → T2 dot silhouette 10 Hz →
+  T3 text-only; auto-drop on sustained frame-budget pressure, test hook to
+  force tiers.
+- Styles injected, `pp-hud-` scoped, token values copied from the app
+  grammar (graphite glass, 1 px rules, mono labels, cyan/blue accents).
 
-**Candidate B — San Francisco Bay, USA.**
-OSM relation **9451753**, `natural=bay` multipolygon, 11 outer + 3
-inner ways (Alcatraz-class islands), bbox ≈ 42 × 59 km. License: ODbL.
-Why it fits: the most recognizable bay outline on earth — the minimap
-*is* the "this is a real bay" proof with zero explanation — plus the
-Golden Gate strait as a dramatic entrance and real islands as
-landmarks. Risk: the central bay is a large open expanse; at any world
-scale a chunk of the play space is featureless open water (the exact
-"boring sea" the prompt warns about), mitigated by scaling down and
-seeding ruins/kelp forests, but Kotor gets the same charm for free.
+### Full App refactor (zero behavior change)
 
-Both were verified via Overpass on 2026-07-11 (relation IDs, member
-counts, closed multipolygon geometry, bboxes above). Gate 1 picks one;
-the module is shape-agnostic so the other remains a config away.
+`src/main.ts` consumes the runtime: one `createPoseRuntime` with the app's
+video element; the pipeline order (mirror → masker → PPC → smooth →
+retarget; body-input pre-smoothing) is preserved inside the runtime +
+`onFrame` tap. `src/pose/` and `src/bodyinput/adapter.ts` are deleted;
+`src/pose/bodyFrame.ts` (three-dependent, retarget-only) moves to
+`src/rig/bodyFrame.ts`; layout-only camera helpers stay app-side as
+`src/ui/cameraLayout.ts`. `flightBridge.ts` (companion mode) stays.
+The app also mounts the shared HUD? — no: the Full App keeps its own
+camera panel + chain readout (frozen design); HUD is for games.
 
-## Swim model — mapping sketch (fixtures decide the details)
+### Game retrofits (mount points only)
 
-| control | signal | mechanism |
-|---|---|---|
-| kick → thrust | **new**: torso-wave (chest/hip vertical anti-phase) | `StrokeDetector` on a torso scalar → `swim` block (rate/phase/amp) → impulse-and-glide thrust. Rowing's P2 lesson pre-applied: water drag proportional to speed (τ tuned for a dolphin's longer glide), so each kick cadence settles at its own speed and stillness = glide, never a hard stop |
-| dive / surface | `leanY` | pitch rate, auto-level spring, Full-Assist depth clamps |
-| banked turns | `leanX` | roll → yaw coupling (bank-to-turn, the Flight idiom) |
-| alternate depth | `crouch` | low-energy seated/standing depth control |
-| burst | `handsForward` | Flight's boost substrate, hysteresis + debounce |
-| breach | derived | sustained `leanY` pitch-up + speed + near-surface ⇒ leap, camera follow, splash |
-| glide | `stillness` | no input decay to rest — momentum carries |
-| loss → autopilot | `confidence` + `tracking` | glide straight, gentle assist re-entry (PPC contract pattern) |
-| recenter | `recenter` event | T-pose |
-| keyboard | — | WASD + Q/E depth + Shift kick, always available (non-negotiable) |
+- `apps/flight/client/src/main.ts`: init runtime (variant: `?row` → full,
+  else lite) + mount HUD with a safe-area hint clearing the rowing strip /
+  flight HUD; game code untouched (`bodyControls`/`rowControls` keep
+  consuming signals exactly as today, now produced in-page).
+- `apps/dolphin/src/main.ts`: same, lite variant, safe-area clearing the
+  dolphin HUD/minimap (HUD bottom-left conflicts with nothing there —
+  verify on screenshot).
+- Both game vite configs: alias `@bodyarcade/pose-runtime`/`pose-hud` to
+  source; dev-only middleware exposing root `public/models` +
+  `public/mediapipe-wasm` (production topology already same-origin).
+- Camera policy: games request the camera at boot (that is what
+  "initialize Runtime directly" means); denied → `denied` state, HUD says
+  keyboard play, game plays on keys (already true). External producer
+  streaming → `external`, no camera grab.
 
-The torso-wave *measurement* is the one open signal question: the torso
-basis is defined by shoulders/hips, so the oscillation must be read
-from raw normalized image-space chest-vs-hip vertical travel (or
-stature oscillation), not from a basis that subtracts itself.
-Candidates get measured on the fixtures before the detector is wired —
-same measured-floor discipline as Flight's dead zones.
+## File ownership (this branch edits nothing else)
 
-## Depth strategy
+- `packages/pose-runtime/**`, `packages/pose-hud/**` (new)
+- `packages/body-input/**` — interface FROZEN; no edits expected
+- root: `src/pose/**` (removed), `src/camera.ts`, `src/bodyinput/**`,
+  `src/main.ts`, `src/ui/cameraLayout.ts` (new), `src/rig/bodyFrame.ts`,
+  import-path touches in `src/{eval,gesture,memory,rig,hand,overlay,ui,director}`,
+  `vite.config.ts`, `tsconfig.json`
+- `apps/flight/client/src/main.ts`, `apps/flight/client/vite.config.ts`,
+  `apps/flight/client/tsconfig.json`, `apps/flight/tests/hud.spec.ts` (new)
+- `apps/dolphin/src/main.ts`, `apps/dolphin/vite.config.ts`,
+  `apps/dolphin/tsconfig.json`, `apps/dolphin/tests/hud.spec.ts` (new)
+- root `tests/` additions (runtime regression, boundary), `eval/` untouched
+- docs: PLAN/DECISIONS/EVAL_NOTES/STATUS/README/FINAL_USER_TEST_PLAN/ASSETS
 
-SDF-from-boundary on a precomputed grid (part of boundary.json or a
-sibling artifact): depth = maxDepth · smoothstep over distance-to-shore
-+ low-octave fbm noise, so edges are shallow, basins deep, and nothing
-is flat. Optional carved tunnels/arches only if cheap at P3. No real
-bathymetry (prompt: not needed, avoid).
+## Verification plan
 
-## Fixtures — USER ACTION (exact recording specs)
+1. **Baseline (pre-change):** root + flight + dolphin suites, recorded.
+2. **O1 contract:** same suites green post-extraction; eval fixture spot
+   run unchanged within tolerance.
+3. **Boundary test:** instrument both transports; assert every emitted
+   message passes `assertSignalShape` and contains no 33/21-point
+   landmark-like arrays anywhere in the object graph (deep scan).
+4. **Per game Playwright:** HUD mounts; expands/collapses via mouse AND
+   keyboard; camera-denied (permission denied at browser level) still
+   plays on keyboard; exactly one `getUserMedia` call per page
+   (init-script counter).
+5. **Perf (headed :2, display lock):** per game fps with HUD on/off, pose
+   Hz, preview tier costs; floors 60/45 fps, pose ≥ 15 Hz. SwiftShader
+   numbers never count; headless failures classified ENVIRONMENT_BLOCKED.
+6. **Screenshot board + vision self-review** against the frozen language:
+   HUD collapsed/expanded/denied/lost states × three games + app.
 
-Same setup as flight/rowing fixtures: **portrait 1080×1920 @ 30 fps**,
-camera at chest height ~2.5–3 m back, front lighting, plain background
-if possible. Head through knees in frame (hips must stay visible —
-the kick signal is chest-vs-hip). **Start each clip with ~3 s still,
-end with ~2 s still** — Rowing taught us that mid-motion starts/ends
-cost eval fidelity. Drop files in `fixtures/dolphin/` on the Mac.
+## Milestones
 
-The torso wave (the kick): a standing body-wave — soften the knees,
-push the hips forward as the chest eases back, then hips back as the
-chest comes forward. A smooth vertical undulation, chest and hips
-bobbing in anti-phase, ~10–15 cm of visible chest travel. It should
-feel like a groove, not a workout.
-
-| clip | posture | content | truth |
-|---|---|---|---|
-| `torso_wave_slow.mp4` (~60 s) | standing | exactly **12 waves** at a relaxed ~24–30 waves/min, steady | 12 |
-| `torso_wave_fast.mp4` (~45 s) | standing | exactly **24 waves** at ~50–60 waves/min | 24 |
-| `dive_surface_leans.mp4` (~60 s) | standing | **6 forward-lean holds** (~2 s each) alternating with **6 backward-lean holds** (~2 s), returning to neutral ~2 s between | 6 fwd / 6 back |
-| `roll_turns.mp4` (~60 s) | standing | **6 left** and **6 right shoulder-line tilt holds** (~2 s each), alternating, neutral between | 6 L / 6 R |
-| `seated_swim.mp4` (~60 s) | seated on a chair | exactly **12 seated torso waves** (chest bob, hips anchored) at a relaxed pace, then 2 forward + 2 backward lean holds | 12 waves, 2 fwd / 2 back |
-| `breach_attempts.mp4` (~60 s) | standing | exactly **3 breach attempts**: ~5 fast waves immediately followed by a strong backward-lean hold ~2 s, relax; ~5 s neutral between attempts | 3 |
-| still / T-pose / crouch / leans | — | **reuse** `fixtures/flight/` (still, arms_tpose, crouch_stand, lean_lr, lean_fb, seated) | existing labels |
-
-`breach_attempts` is added beyond the prompt's fixture list because the
-verification plan requires "breach triggers on the breach fixture and
-not on others" — the negatives are the other clips (`torso_wave_fast`
-has speed without pitch-up; `dive_surface_leans` has pitch-up without
-speed). Count-while-recording is the hand-labeled truth for the ±1 kick
-eval; if a take comes out different, tell me the actual number rather
-than re-recording.
-
-**Fixture sync for this checkout:** existing flight+rowing fixtures and
-the new dolphin clips need to reach `~/Dev/posepuppet-dolphin/fixtures/`
-(untracked). From the Mac:
-
-```
-rsync -av -e "ssh -i ~/.ssh/pinn_rtx3090" \
-  ~/Dev/posepuppet/fixtures/ o@192.168.86.152:~/Dev/posepuppet-dolphin/fixtures/
-```
-
-(I can copy the existing flight/rowing fixtures across remote checkouts
-read-only at P1 entry myself; only the six new dolphin clips strictly
-need you.)
-
-## Phases and effort estimates
-
-- **P1 — boundary module** (~1 day): `packages/world-data` prep script
-  (Overpass fetch with cached raw response committed alongside for
-  reproducibility, multipolygon assembly, Visvalingam simplification to
-  budget, tangent-plane projection, SDF grid, provenance + license
-  metadata) → `boundary.json`; unit tests: area delta within stated
-  tolerance, point-in-polygon determinism, islands preserved; debug
-  minimap render + vision self-check against the source map;
-  attribution text wired where the game will mount it; module README
-  (sources, licenses, simplification math) written as pipeline docs.
-- **P2 — swim feel in a graybox sea** (~2–2.5 days to Gate 2):
-  torso-wave measurement study on fixtures → `SwimDetector` config
-  (reusing `StrokeDetector`) → additive `swim` block + fixture eval
-  (kick count ±1, rate ordering, seated); `apps/dolphin` scaffold
-  (graybox: fog-colored void, boundary walls as shimmer, SDF depth,
-  debug minimap); impulse-and-glide thrust, pitch/roll, containment
-  current (soft repulsion, never a wall), assist ladder (Full Assist:
-  depth clamps, auto-level, gentle forward drift so stillness never
-  strands), autopilot on loss, T-pose recenter, keyboard fallback,
-  tuner swim section; closed-loop evals (thrust↔kick-rate correlation,
-  8-direction escape attempts, dropout → glide).
-  **>> USER GATE 2: live swim.**
-- **P3 — the world** (~2–3 days): PS2 art pass (low-poly vertex-lit
-  meshes, restricted palette, exponential/dithered fog, additive glow
-  particles, instanced boid fish with flee, kelp vertex-shader sway,
-  caustic gobos, rocks/arches/ruins seeded by the SDF), breach polish
-  (camera follow, splash), minimap final with attribution, optional
-  4:3 toggle, optional local-file ambient audio.
-- **P4 — ship** (~1 day): full eval refresh, perf floors (60 fps render
-  / floor 45 with pose ≥ 15 Hz — Flight's floors), replay determinism,
-  docs (module README, DECISIONS, FUTURES pipeline-seam notes, ASSETS,
-  EVAL_NOTES, README), and the FUTURES.md obstacle-avoidance reminder
-  raised explicitly at the final gate.
-
-## Verification plan (maps 1:1 to the prompt)
-
-- Kick count vs labeled fixtures ±1; rate ordering fast > slow; seated
-  detection works with hips anchored.
-- Thrust correlates with kick rate over settled samples (Rowing's
-  closed-loop method: exclude transitions, state the r).
-- `dive_surface_leans` / `roll_turns` → signed pitch/roll axis evals.
-- Containment: scripted escape attempts from 8 directions never exit
-  the polygon, never hard-wall (velocity into the boundary decays
-  smoothly; position stays inside point-in-polygon at every frame).
-- Breach fires on `breach_attempts` (3/3) and never on the other clips.
-- `boundary.json` vs source polygon: area delta within stated
-  simplification tolerance, asserted in a test.
-- Minimap vision self-check against the source map (EVAL_NOTES).
-- Dropout ⇒ glide + smooth recovery (PPC tracking states consumed).
-- 60/45 fps with pose ≥ 15 Hz; replay determinism (detector is
-  timestamp-pure by construction).
+- M0 baseline suites + env (this commit: PLAN)
+- M1 = O1 extraction + app refactor, suites green
+- M2 = O2 pose-hud + preview + tiers + keyboard
+- M3 = O3 flight/rowing/dolphin retrofit + per-game specs
+- M4 = O4 permission flows, boundary/single-pipeline tests, perf table
+- M5 docs + screenshot board + FINAL_USER_TEST_PLAN S1–S3/S11 + STATUS
 
 ## Risks
 
-- **Torso-wave SNR is the load-bearing unknown.** Vertical chest/hip
-  oscillation may be small in image space (especially seated) and the
-  torso basis can't measure itself. Mitigation: fixture-first — measure
-  three candidate scalars (raw chest-y vs hip-y anti-phase, stature
-  oscillation, shoulder-center world-y) on the six clips before wiring
-  anything; the Schmitt detector needs amplitude, not smoothness. If
-  standing SNR is fine but seated is not, seated falls back to
-  crouch-depth + lean control (documented, coach explains).
-- **Breach false positives** on enthusiastic dive leans — speed + near-
-  surface preconditions + hysteresis; the fixture set has the exact
-  negatives.
-- **ODbL share-alike**: boundary.json is a derived work — attribution
-  in-app/README plus provenance metadata (source, relation ID, fetch
-  date, license) inside the file; prep script committed so derivation
-  is reproducible. This is the documented, compliant path.
-- **World scale vs swim speed** is a feel parameter, not a data one —
-  tunable at Gate 2 (shape preserved, size gamified).
-- **Flight/rowing feel is gate-frozen** — the standalone-app decision
-  exists precisely so Dolphin cannot regress it; the flight suite runs
-  untouched at each phase commit.
-
-## Deviations from the prompt (logged, one line each in DECISIONS.md)
-
-1. `breach_attempts.mp4` added to the fixture list (verification
-   requires a breach positive).
-2. P0 suite baseline classified ENVIRONMENT_BLOCKED in this fresh
-   checkout (no private fixtures yet); re-established at P1 entry.
-3. FUTURES.md fourth-vehicle sketch deliberately not followed for the
-   bounded-bay world (globe cameo remains future-possible).
+- `main.ts` re-wiring regressing eval honesty paths → keep pipeline order
+  bit-identical; masked-eval semantics covered by continuity specs.
+- Node: remote default is v12 — all work under nvm node 22 in `ba-runtime`.
+- Headless WebGL throttling → headed :2 under `flock` for anything timed.
+- three version skew → runtime/HUD stay three-free (decision above).
+- Second `getUserMedia` from the app's own video-file/camera toggle →
+  route ALL capture through the runtime; test enforces one consumer.
