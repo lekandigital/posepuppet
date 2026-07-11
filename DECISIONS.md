@@ -529,3 +529,109 @@ the closed-loop eval and the PosePuppet Row card both use it.
 each cadence segment) and excludes the rest segment — cruise holds
 speed at zero cadence BY DESIGN; transition samples measure the glide
 constant, not the rhythm coupling. r = 0.798 on the 2-minute run.
+
+## 2026-07-11 — Rowing Gate-2 fixes: carve-don't-pivot, shore guard, deterministic eval
+Lekan's live Gate 2: surge/cadence/glide/cruise/keyboard PASS; lean
+over-rotation, land collisions, tuner readability FAIL. All work remote
+on `bodyarcade-rowing-fable-rebuilt`. The fix chain surfaced eight real
+mechanisms — each measured, none guessed:
+
+(1) LEAN OVER-ROTATION, two stacked causes. (a) leanX saturates at ~15°
+of torso tilt, so a "gentle" real lean = full deflection, and yaw had
+full authority at zero speed → in-place pivot. Fixed: expo 1.6 on the
+lean profile (gain 1.1→0.8) + speed-coupled rowing yaw (way factor
+0.12+0.88·min(1, speedRatio/0.55)) — the boat carves, never pivots; the
+keyboard path is untouched. (b) THE TWISTER: water-spout collision
+forces turnRate 7.0 + brake on the boat — literally "a 360° spin in
+place with no forward movement". A feature (kept live), flagged in the
+retest script so it isn't mistaken for steering again.
+
+(2) IDLE TURNING after strokes stop: Full-Assist course-follow kept
+steering the drifting boat. Corrections now scale with way and vanish
+below speed 0.04.
+
+(3) SHORE GUARD (Waterway.ts): speed-scaled lookahead probes steer a
+bias toward the clearer side (escape side HELD while hazard persists —
+fixed-timer holds oscillated in coves); actual hull contact
+(boat.moveBlocked) = full un-scaled helm takeover at every assist level.
+Assist scaling full/standard/expert = 1.0/0.6/0.3; keyboard never
+guarded; ?noguard leak fixed (contact takeover once fired with the
+guard disabled and force-turned beached physics-test boats).
+
+(4) BRAKING KEYS ON TIME-TO-LAND FROM A FIXED 0.9 wu PROBE. Two
+measured traps on the way here: a hazard-fraction criterion from the
+speed-scaled probe algebraically cancels speed (ttl = frac×1.7 s at ANY
+speed) and strangled every cadence; and because faster boats probe
+farther, any speed-scaled brake criterion suppresses exactly the fast
+cadences (systematic anti-coupling, r = −0.8). Fixed-distance TTL
+restored monotone coupling. Approach drag ramps below
+1.2 s to land; stroke surges feather proportionally with drag (a hard
+surge gate deadlocked escape: turn needs way, way needs pulls, pulls
+blocked at the wall).
+
+(5) COURSE GENERATION: routes through the most-open water
+(lookahead-scored candidates, straightness-biased), with lateral channel
+clearance (centerline-only courses hug coasts; fast boats clipped the
+banks), then 2× 3-point smoothing (score ties flip offsets step-to-step
+and the wiggle made the corner brake read phantom bends everywhere —
+fast cadences pinned at 0.1 speed by their own coxswain). Full Assist
+corner brake uses the CHORD bearing 0.8 wu ahead and releases as the
+boat slows. Escape suppresses course-follow only when their signs
+OPPOSE (blanket suppression left the boat off-corridor half the run;
+opposition-only restored line-holding without the trap).
+
+(6) DETERMINISTIC EVAL ENVIRONMENT (house ?autostart pattern):
+?seed pins the world (fresh profiles minted a RANDOM globe per run —
+every earlier iteration tested different geography), ?spawn pins the
+session spawn. Specs pin seed=31415&spawn=137 — the first pair of a
+34-pair scan with NO land within 1.2 wu of the spawn in any direction;
+pocketed starts made the endurance run bimodal (a guard-dawdle branch
+toured 1.7 wu in 2 minutes; the clean start tours ~53 wu). Typical
+spawns on these globes have land within 0.8 wu — the guard is a
+constant companion of live rowing. ?calm disables water spouts + diamond speed spikes (both randomized
+measurements; live play keeps them), ?noguard isolates steering physics
+in feel specs (the guard keeps its own adversarial spec + closed-loop
+integration specs).
+
+(7) MEASUREMENT DESIGN, after the mechanics were right: cadence
+coupling is measured per-cadence on the SAME course start (a continuous
+run confounds cadence with geography — and with DISTANCE: faster boats
+reach the twisty water inside their own window), settled speed = p75
+per window (escape episodes branch chaotically; the top quartile is the
+clean-water settled speed the claim is about — final measurement
+0.161/0.195/0.234 at 0.3/0.5/0.7 Hz, r = 0.999); the endurance run
+asserts what the design guarantees (on-water 100%, along-course
+progress, stall-free stroking) and REPORTS corridor fraction (identical
+pinned runs measured 1.0 and 0.58 — escape-side chaos; the
+transparency-not-assertion pattern from the flight evals).
+
+(8) THE SLIVER TRAP (caught by the adversarial spec failing 2/3 runs,
+then instrumented): the movement gate tests isLand at the next
+~0.002 wu micro-step, but the guard's probes sample every ~0.07+ wu —
+a coastline cape thinner than the sample spacing blocks the hull while
+EVERY probe reads clear water. No hazard → no escape → course-follow
+steers the freed bow straight back into the sliver: telemetry showed
+speed pinned at 0.10, displacement ~10% of it, heading rate
+flip-flopping ±20°/s, for 40 s+ — the literal trap loop Gate 2 warned
+about (and the forced contact-escape defaulted LEFT while the beam
+probes read land-left/water-right). Fixed with a CONTACT LATCH in
+ShoreGuard: when the movement gate rejects a step, pick the escape side
+from wide beam probes (±0.9/±1.6 rad at a fixed 0.5 wu — slivers are
+local; the forward cone is exactly what cannot see them), hold it
+2.5 s (renewed on every blocked frame) with hazard forced ≥0.85 so the
+existing takeover/suppression/drag plumbing engages, and release early
+only once the hull has displaced >0.12 wu with a clear bow. Diagnostic:
+recovery went from NEVER (40 s, two of six adversarial cycles) to
+1–3 s on all six; the fix also lifted the endurance corridor fraction
+0.80 → 0.98 (r = 0.998) — the latch was helping line-holding all along.
+
+TUNER: rowing state is one steady color-coded badge (KEYBOARD /
+AUTOPILOT / REACQUIRING / CRUISE / ROWING x.xx Hz / IDLE); details
+dimmed below — Gate-2 said CRUISE was buried in the busy line.
+
+REMOTE SUITE CLASSIFICATION: the root suite's two detect specs
+(poseFps > 5, videoFrames > 20) fail on the rebuilt remote under
+headless software GL at ~3 pose fps — ENVIRONMENT_BLOCKED, assertions
+untouched. Cross-checked on the opt-in gpu-performance tier (headed
+NVIDIA on :2): both pass in 18.7 s. Final performance validation stays
+on Apple Silicon per policy.
