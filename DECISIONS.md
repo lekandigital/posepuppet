@@ -559,3 +559,39 @@ checkout (private fixtures not yet synced; docs-only commit; npm ci +
 tsc --noEmit run instead); full baselines re-established at P1 entry
 after fixture sync. Last green: PosePuppet 92/5skip, Flight 17/2skip
 at a39d644.
+
+
+## 2026-07-11 — Dolphin P1: boundary module decisions
+(1) Gate 1 picked SAN FRANCISCO BAY (user; my Kotor recommendation
+declined) with explicit preservation requirements: recognizable
+outline, Golden Gate opening, major islands, important channels. Plan
+approved; P1-only scope (no P2/body-input/UI; no display :2; no
+merge/push). (2) The curated OSM relation 9451753 was measured
+INSUFFICIENT against those requirements — the probe harness failed on
+raw for Golden Gate mid and Raccoon Strait (OSM maps both straits as
+separate named features; Angel Island fused to Tiburon; no Golden Gate
+opening). Built a second source mode instead of hand-patching:
+`coastline-clip` assembles the water polygon from natural=coastline
+ways clipped to a convex play region (bbox ∩ seed-side half-plane
+gates: Point Bonita–Lands End, San Quentin–Castro Point), chains
+stitched from true heads, closed by a region-boundary walk whose
+direction and outer ring are picked by the seed — self-validating, no
+orientation folklore. Relation mode kept for enclosed shapes
+(Kotor-class lakes/bays). (3) Sealed-holes policy: islets whose narrow
+harbor water the smoothed shoreline legitimately seals are dropped and
+counted in stats (3 for SF) rather than failing the build; the check
+tool independently asserts required islands (Alcatraz, Angel,
+Treasure/YB, Alameda) survive, so simplification can never silently
+eat a landmark. The halve-epsilon retry ladder remains for genuine
+self-intersections. (4) Vertex budget revised from the plan's sketch
+(400–800 outer, written for the smooth relation): full coastline
+honestly needs more — shipped 1,211 outer / 1,583 total against
+configured 1,600/2,400; runtime PIP/SDF over 1.6 k segments per query
+is still trivially per-frame affordable for one dolphin. (5) Raw
+Overpass responses are committed (coastline cache gzipped, 307 KB) so
+builds are reproducible offline; the stale relation raw was removed
+with its mode's config; boundary.json carries full provenance (source,
+license, attribution, osm base timestamp, bbox, gates) and
+`loadBoundary()` refuses artifacts without attribution. In-app display
+of the ODbL credit lands with the game shell at P2 (no UI work allowed
+in P1).

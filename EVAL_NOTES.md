@@ -1,5 +1,56 @@
 # Eval notes
 
+## Dolphin P1 — boundary module, all checks green (2026-07-11)
+
+`packages/world-data` ships its first artifact:
+`data/boundaries/san-francisco-bay.json`, built offline from OSM
+`natural=coastline` ways (ODbL; attribution inside the artifact,
+refused-if-missing by `loadBoundary`). All numbers below are from
+`eval/worlddata-results.json` (31 checks, ALL GREEN, written by
+`npm run check` in the package).
+
+- Vertex budget: raw 20,908 → **1,583 verts** (outer 1,211, 21 islands)
+  against configured budgets 1,600 outer / 2,400 total.
+- **Area delta −0.0394 %** (tolerance ±1 %), Visvalingam–Whyatt at
+  8,000 m² effective epsilon after a 20 m radial pre-pass; accepted on
+  the first ladder pass (no intersections introduced).
+- Required islands all present as holes: Alcatraz, Angel Island,
+  Treasure/Yerba Buena, Alameda (+ Bird Island named; 21 total ≥ 500 m²;
+  3 harbor islets sealed by simplification, counted in stats).
+- Channels stay open with clearance ratio ≈ 1.0 vs raw: Golden Gate
+  489 m (raw 488), Raccoon Strait 388 m (raw 387), Oakland estuary
+  237 m (raw 237); each also above its configured floor.
+- 10/10 land/water probes agree between the raw assembled polygon and
+  the simplified artifact (the harness distinguishes BAD PROBE — fails
+  on raw — from pipeline regressions; it caught one wrong estuary
+  coordinate during development, fixed by grid-scanning the channel).
+- Determinism: two in-process rebuilds serialize byte-identically
+  (71,883 bytes) and match the committed artifact.
+
+Vision self-check (renders at `packages/world-data/data/render/`,
+untracked like media/, regenerate with `npm run render -- --raw`):
+the simplified minimap is unmistakably San Francisco Bay — Golden Gate
+opening upper-left, Richardson Bay arm, Angel Island with Raccoon
+Strait open above it, Alcatraz and the Treasure/Yerba Buena pair,
+the Oakland estuary cutting east with Alameda as an island, Richmond
+harbor teeth on the northeast shore, San Mateo narrowing, Alviso
+sloughs and the lower South Bay bulb. Side-by-side with the raw render
+the silhouettes are near-indistinguishable at 1024 px; the deltas are
+micro-sloughs and pier detail. The two straight edges (Point
+Bonita–Lands End, San Quentin–Castro Point) are the configured gates,
+stated in the artifact's provenance — they will be the shimmer "edge of
+the dream" in-game, not fake coastline.
+
+Note for Gate 2 material: the first build used OSM's curated
+`natural=bay` relation 9451753 and the probe harness itself exposed the
+problem — Golden Gate mid and Raccoon Strait probes failed *on raw*,
+because OSM delineates both straits as separate features (Angel Island
+came out fused to Tiburon). That relation-mode render read as SF Bay
+but failed the user's explicit "Golden Gate opening + major islands +
+channels" requirement; the coastline-clip mode was built in response
+and the relation mode remains for enclosed shapes (Kotor-class).
+
+
 ## Rowing P2 — impulse-and-glide boat, Gate 2 raised (2026-07-09)
 
 The boat rows: each detected stroke banks a surge budget applied with a
