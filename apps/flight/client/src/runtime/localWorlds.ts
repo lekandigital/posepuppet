@@ -86,6 +86,15 @@ function randomSlug(): string {
 }
 
 function createWorld(existingNames: Set<string>): WorldConfig {
+  // Test/eval hook (?seed=<int>): deterministic world geography — every
+  // fresh browser profile otherwise mints a random globe, which made the
+  // rowing specs test different island layouts run to run (same house
+  // pattern as ?autostart / ?spawn).
+  const seedOverride = new URLSearchParams(window.location.search).get("seed");
+  const seed =
+    seedOverride !== null && Number.isFinite(Number(seedOverride))
+      ? Math.abs(Math.floor(Number(seedOverride))) % 2147483647
+      : Math.floor(Math.random() * 2147483647);
   // Field-for-field what the server's overflow path creates.
   return {
     id: randomSlug(),
@@ -93,7 +102,7 @@ function createWorld(existingNames: Set<string>): WorldConfig {
     name: generateWorldName(existingNames),
     globeRadius: 5.0,
     texture: "earth",
-    seed: Math.floor(Math.random() * 2147483647),
+    seed,
     terrainType: "default",
     createdBy: "Local",
   };

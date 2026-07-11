@@ -38,6 +38,7 @@ export class FlightTuner {
   private recenterEl: HTMLElement | null = null;
 
   private rowStatusEl: HTMLElement | null = null;
+  private rowBadgeEl: HTMLElement | null = null;
   private rowProfileBtn: HTMLButtonElement | null = null;
   private rowAssistBtn: HTMLButtonElement | null = null;
 
@@ -267,7 +268,21 @@ export class FlightTuner {
       this.rowProfileBtn = mkRowBtn(() => this.row!.cycleProfile());
       this.rowAssistBtn = mkRowBtn(() => this.row!.cycleAssist());
       el.appendChild(rowBtns);
+      // Gate-2 feedback: the one busy text line buried CRUISE — the row
+      // STATE gets a big steady badge; details go on a dimmer second line.
+      this.rowBadgeEl = document.createElement("div");
+      Object.assign(this.rowBadgeEl.style, {
+        margin: "0 0 4px",
+        padding: "5px 8px",
+        textAlign: "center",
+        fontWeight: "700",
+        letterSpacing: "0.12em",
+        borderRadius: "4px",
+        background: "rgba(120, 160, 220, 0.15)",
+      } as CSSStyleDeclaration);
+      el.appendChild(this.rowBadgeEl);
       this.rowStatusEl = document.createElement("div");
+      this.rowStatusEl.style.opacity = "0.75";
       el.appendChild(this.rowStatusEl);
     }
 
@@ -351,18 +366,43 @@ export class FlightTuner {
     setBar("speedAxis", d.intent.speedAxis, true);
     setBar("elevateAxis", d.intent.elevateAxis, true);
 
-    if (this.row && this.rowStatusEl) {
+    if (this.row && this.rowStatusEl && this.rowBadgeEl) {
       const rd = this.row.debugState();
       const boat = this.isBoat?.() ?? false;
       if (this.rowProfileBtn) this.rowProfileBtn.textContent = `${rd.profile.label} ⇄`;
       if (this.rowAssistBtn) this.rowAssistBtn.textContent = `${rd.assist.label} ⇄`;
-      const cruise = rd.cruiseHolding ? "CRUISE" : rd.cruiseArmed ? "cruise armed" : "—";
+      // one steady word for the state that matters, color-coded
+      let badge: string;
+      let color: string;
+      if (!boat) {
+        badge = "NOT IN THE BOAT";
+        color = "#9fb4d8";
+      } else if (rd.reason === "keyboard") {
+        badge = "KEYBOARD";
+        color = "#cfe4ff";
+      } else if (rd.reason === "autopilot" || rd.reason === "no-signal") {
+        badge = "AUTOPILOT — DRIFTING";
+        color = "#f0b46a";
+      } else if (rd.reason === "reacquiring" || rd.reason === "low-confidence") {
+        badge = "REACQUIRING";
+        color = "#f0b46a";
+      } else if (rd.cruiseHolding) {
+        badge = "CRUISE — RESTING";
+        color = "#8fe3c0";
+      } else if (rd.strokeRate > 0.05) {
+        badge = `ROWING ${rd.strokeRate.toFixed(2)} Hz`;
+        color = "#8fe3c0";
+      } else {
+        badge = "IDLE — GLIDING";
+        color = "#9fb4d8";
+      }
+      this.rowBadgeEl.textContent = badge;
+      this.rowBadgeEl.style.color = color;
       this.rowStatusEl.textContent = boat
-        ? `row ${rd.reason.toUpperCase()} · rate ${rd.strokeRate.toFixed(2)}Hz · ` +
-          `amp L ${rd.ampL.toFixed(2)} R ${rd.ampR.toFixed(2)} · ` +
-          `turn ${rd.turnRate >= 0 ? "+" : ""}${rd.turnRate.toFixed(2)} · ${cruise}`
-        : "row — (not in the boat)";
-      this.rowStatusEl.style.color = boat && rd.active ? "#8fe3c0" : "#9fb4d8";
+        ? `amp L ${rd.ampL.toFixed(2)} R ${rd.ampR.toFixed(2)} · ` +
+          `turn ${rd.turnRate >= 0 ? "+" : ""}${rd.turnRate.toFixed(2)}` +
+          `${rd.cruiseArmed && !rd.cruiseHolding ? " · cruise armed" : ""}`
+        : "";
     }
 
     if (this.responseEl) {

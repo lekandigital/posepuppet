@@ -71,9 +71,17 @@ export const ROW_PROFILES: RowProfile[] = [
   {
     id: "row-lean",
     label: "Lean steering",
-    turnGain: 1.1,
+    // GATE-2 FIX (live 360°-pivot report): leanX saturates at ~15° of
+    // torso tilt, so a "gentle" lean read as full deflection — expo 1.6
+    // makes the response progressive (gentle lean → gentle curve) and the
+    // gain drops 1.1 → 0.8. Yaw is additionally speed-coupled in Game.tick
+    // (carve, don't pivot) — the two together are the handling fix.
+    turnGain: 0.8,
     notes: "lean L/R steers · strokes propel · sit back to rest (cruise)",
-    steer: (s, _asym, p) => -s.axes.leanX * p.turnGain,
+    steer: (s, _asym, p) => {
+      const x = s.axes.leanX;
+      return -Math.sign(x) * Math.pow(Math.abs(x), 1.6) * p.turnGain;
+    },
   },
   {
     id: "row-asym",
@@ -367,6 +375,12 @@ export class RowingControls {
   /** Cruise is holding speed (rower resting, momentum kept). */
   get cruising(): boolean {
     return this.cruiseHolding;
+  }
+
+  /** Keyboard currently owns the boat (priority window) — the game must
+   *  not add any rowing corrections while it does. */
+  get keyboardOwns(): boolean {
+    return performance.now() - this.lastKeyboardActiveMs < KEYBOARD_PRIORITY_MS;
   }
 
   /** Body currently owns the boat (fresh signal, keyboard quiet). */
