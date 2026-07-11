@@ -81,3 +81,11 @@ Entry: ?row starts straight on the water; PosePuppet Row card + ⌘K "row"; tune
 row.spec.ts 7/7 green: surge+glide, cruise, both steering signs, autopilot no-snap recovery, keyboard wins, rowing_slow.y4m fixture relay closed loop, 2-min Full-Assist run — on-water 100%, in-band 100%, speed↔rate r=0.798 (settled samples; eval/flight-results.json)
 Blockers: USER GATE 2 — live row (both profiles, seated, 2-minute run; judge rhythm/connection/fatigue); also confirm rowing_seated label (13 measured vs 15 prescribed)
 Next: Gate-2 feedback → iterate feel; then P3 polish (coach messages, README, FUTURES seam notes)
+
+## 2026-07-11 (Dolphin P0 — plan raised)
+BodyArcade Dolphin P0 on `bodyarcade-dolphin-fable` in the dedicated `~/Dev/posepuppet-dolphin` checkout (Rowing continues in parallel in `~/Dev/posepuppet`, untouched): seams studied — StrokeDetector was built for the dolphin kick (its header says so), schema has the proven additive-block mechanism, existing axes cover pitch/roll/depth/burst/recenter, same-origin static-plugin topology generalizes to `/dolphin/`
+Gate-1 recommendations in PLAN.md: standalone `apps/dolphin` (deviation from FUTURES.md fourth-vehicle sketch, logged), `packages/world-data` offline boundary module; two OSM-verified candidates — Bay of Kotor rel 10171079 (recommended) vs San Francisco Bay rel 9451753, both ODbL with in-app attribution
+Dolphin fixtures missing — exact recording specs in PLAN.md (torso_wave_slow 12 waves, torso_wave_fast 24, dive_surface_leans 6/6, roll_turns 6/6, seated_swim 12+leans, breach_attempts 3; flight fixtures reused for still/T-pose/crouch/leans)
+Baseline: ENVIRONMENT_BLOCKED at P0 (fresh checkout, no private fixtures; npm ci + tsc --noEmit green instead); full suites re-baselined at P1 entry after fixture sync
+Blockers: USER GATE 1 — water-shape pick + plan approval + fixture recording
+Next: on approval + fixtures, P1 boundary module (fetch → simplify → boundary.json + minimap + attribution)
