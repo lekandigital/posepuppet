@@ -529,3 +529,33 @@ the closed-loop eval and the PosePuppet Row card both use it.
 each cadence segment) and excludes the rest segment — cruise holds
 speed at zero cadence BY DESIGN; transition samples measure the glide
 constant, not the rhythm coupling. r = 0.798 on the 2-minute run.
+
+
+## 2026-07-11 — Dolphin P0: seams + Gate-1 material
+(1) Dolphin lives in a standalone `apps/dolphin` (own three.js, base
+'/dolphin/', served same-origin by the flight static-plugin pattern) —
+a DEVIATION from FUTURES.md's fourth-vehicle sketch: the prompt's
+bounded-bay world (real polygon, SDF depth, PS2 fog/boids/kelp,
+underwater camera) shares nothing with the globe scene, everything
+Dolphin reuses lives in packages/body-input, and building inside the
+30k-line fork would risk the Gate-2-frozen flight/rowing feel for zero
+reuse gain. A globe cameo stays future-possible. (2) Boundary module =
+`packages/world-data`, offline prep script only (no runtime fetching);
+OSM/Overpass primary (ODbL, in-app attribution + provenance metadata
+inside boundary.json), Natural Earth fallback documented as
+coarse-coastline-only (at bay scale NE 10m is a blob — both candidates
+use OSM). (3) Candidates verified live on Overpass 2026-07-11: Bay of
+Kotor rel 10171079 (59 outer + 8 inner ways, ~22×14 km — recommended:
+enclosed winding basins, constant shore proximity suits containment
+current + SDF depth) and San Francisco Bay rel 9451753 (11+3 ways,
+~42×59 km — maximal minimap recognition, but a large open midsection).
+(4) Torso-wave kick reuses StrokeDetector (written for this — its
+header names Dolphin) via a NEW additive optional `swim` block rather
+than overloading rowing's arm-semantic `stroke` block. (5)
+`breach_attempts.mp4` added beyond the prompt's fixture list — the
+verification plan needs a breach positive; negatives come from the
+other clips. (6) P0 suite baseline ENVIRONMENT_BLOCKED in this fresh
+checkout (private fixtures not yet synced; docs-only commit; npm ci +
+tsc --noEmit run instead); full baselines re-established at P1 entry
+after fixture sync. Last green: PosePuppet 92/5skip, Flight 17/2skip
+at a39d644.

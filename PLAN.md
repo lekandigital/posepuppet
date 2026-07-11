@@ -1,293 +1,296 @@
-# PLAN.md — BodyArcade Rowing
+# PLAN.md — BodyArcade Dolphin
 
-Status: **P0 complete — awaiting USER GATE 1** (build-vs-adapt decision +
-plan approval + rowing fixtures). Branch `bodyarcade-rowing-fable`,
-renamed from the unused placeholder `bodyarcade-water-worlds-fable` at
-main `940d31c` (Flight + Predictive Pose Continuity both accepted and
-merged; no preservation branch touched). Previous passes' plans (PPC,
-Flight, Instrument Pass) live in git history at this path.
+Status: **P0 complete — awaiting USER GATE 1** (water-shape pick + plan
+approval + dolphin fixtures). Branch `bodyarcade-dolphin-fable` in the
+dedicated checkout `~/Dev/posepuppet-dolphin`, forked from the
+remote-development rebuild (`68ac9a3`) with Rowing P1+P2 (`a39d644`) as
+ancestors — the stroke detector this mode reuses is already on the
+branch. Rowing continues in parallel in `~/Dev/posepuppet` on its own
+branch; this plan touches nothing Rowing owns. Previous passes' plans
+(Rowing, PPC, Flight, Instrument Pass) live in git history at this path.
 
 ## P0 — what the code actually says
 
-**The boat is real, tuned, and already half-wired for body input.**
-`apps/flight/client/src/game/Boat.ts` is a complete player vehicle:
-accel/brake/coast physics (`COAST_DECAY = 0.07/s` — slow glide is
-already the resting behavior), smoothed turn input (same
-`TURN_INPUT_SMOOTH = 8/s` idiom as the plane), ocean spawn via
-`isMainOcean`, land-collision gating, bob animation, `speedBoost()`,
-upgrade multipliers. It has a `WakeTrail`, per-vehicle camera tuning
-(`shared/vehicleCapabilities.ts`: tilt 0.28, height 0.95, FOV boost 10),
-NPC boat fleets, ocean audio, and the fishing minigame. `Boat.update(dt,
-turnRate, forward, brake, …)` has the same shape as `Plane.update`.
+**The periodic detector was built for this.** The header comment of
+`packages/body-input/src/stroke.ts` says it plainly: "the Rowing
+primitive, designed for reuse (Dolphin's dive cycle is the same detector
+on a different axis)." `StrokeDetector` is a pure position-Schmitt
+oscillation detector over any scalar signal, frame-timestamp-driven
+(replay-deterministic), with per-side amplitudes and an EMA rate. The
+torso-wave kick is that detector fed a torso signal instead of wrist
+fore-aft. Zero new detection theory needed; the open question is which
+measured torso signal oscillates cleanly (fixtures decide — see Risks).
 
-**Body input already reaches the boat — for steering only.** Game.tick
-merges `BodyFlightControls` output into the shared `ControlState` and
-calls `this.localPlayer.update(...)` regardless of vehicle
-(Game.ts:3488–3576). So body lean can steer the boat today; but the
-continuous `speedAxis`/`elevateAxis` are consumed only by `Plane`
-(`localPlayer.analog`, Game.ts:3555). Rowing is exactly the missing
-propulsion path — a new input mapping onto an existing vehicle, which is
-what FUTURES.md predicted and what Flight itself was.
+**The schema has a proven additive mechanism.** `BodySignal` is a
+closed-key schema (`schema.ts`); landmarks provably never cross the
+transport, so torso-wave detection must run producer-side in
+`@bodyarcade/body-input`, exactly like Rowing's stroke. Optional
+top-level blocks (`tracking` from PPC, `stroke` from Rowing) keep
+`v: 1`, old tapes valid, canonical serialization stable. Dolphin adds a
+`swim` block the same way rather than overloading `stroke` (rowing's
+block stays arm-semantic; the boat consumes it today).
 
-**Landmarks never cross the transport — so stroke detection must run
-producer-side, in the package.** `BodySignal` is a closed-key schema of
-derived axes (`packages/body-input/src/schema.ts` enforces exact shape
-and scans for landmark-shaped payloads). The consumer (flight app) never
-sees wrists. Therefore `strokeRate/strokePhase/strokeAmplitude` cannot
-be computed in the game; they are new derived fields computed in
-`@bodyarcade/body-input` where the landmarks live. The schema already
-has the additive-optional pattern for this (the PPC `tracking` block):
-an optional top-level key keeps `v: 1`, old tapes stay valid, the
-canonical serializer gains a fixed-order tail. That is the "v1.x"
-mechanism.
+**Existing axes already cover the rest of the swim model.** From
+`AXIS_KEYS`: `leanY` = pitch dive/surface, `leanX` (shoulder-line lean —
+Flight banks with it today) = banked roll turns, `crouch` = alternate
+depth control, `handsForward` = burst (Flight's boost substrate),
+`recenter` event = T-pose, `stillness` + `confidence` + PPC `tracking`
+block = glide/autopilot. Only the kick is new signal work.
 
-**The extraction layer already measures what strokes need.**
-`extract.ts` computes per-arm `wristLocal` (wrist relative to shoulder
-center, in the torso basis) with the fore-aft component along `vz` — the
-same measured quantity behind `handsForward`, which was reliable enough
-for Flight's boost gesture. Stroke axis = oscillation of `wristLocal.z`
-per arm. The pipeline is a pure state machine over frame timestamps
-(replay-deterministic by construction), and the `AxisShaper`/One-Euro/
-hysteresis idioms to build on are all in place.
+**The same-origin topology is settled and generalizes.** BroadcastChannel
+is origin-scoped; PosePuppet's `vite.config.ts` serves the *built*
+flight app at `/flight/` via a static middleware plugin (base:
+`'/flight/'`, disjoint asset prefixes). Dolphin follows the identical
+pattern at `/dolphin/` — a second instance of a solved problem, not new
+infrastructure.
 
-**The globe has no rivers.** Terrain is a continuous land/ocean field
-(`SimplexNoise.ts`) with an "ocean backbone" mask guaranteeing one
-connected main ocean, plus smaller disconnected water components. There
-is no waterway graph, no centerline, nothing river-shaped. This forces a
-deviation from the prompt's "river run" language — see Deviations.
+**The globe is not the dolphin's world.** FUTURES.md sketched "Dolphin →
+a fourth vehicle" on the TinySkies globe, but that was written before
+this prompt existed. What the prompt actually specifies — a bounded
+real-water polygon, SDF depth field, PS2 underwater atmosphere (fog,
+vertex lighting, boids, kelp shaders, caustic gobos), an underwater
+camera — is a different scene, renderer, and art direction from the
+globe. See Gate-1 decision material.
 
-**Fixture/eval rig** — mp4 → y4m via `scripts/prepare-fixtures.mjs`
-(720p/30 for Chrome's fake webcam), per-clip BodySignal assertions in
-`packages/body-input/tools/fixture-eval.mjs` (episode-structural, no
-hardcoded timestamps) → `eval/bodyinput-results.json`, closed-loop
-headed Playwright specs in `apps/flight/tests/` (headless WebGL gets
-compositor-throttled; project convention is documented there). Flight
-fixtures are portrait 1080×1920@30, 40–80 s. Rowing fixtures do not
-exist yet — **USER ACTION below.**
+**Fixture/eval rig conventions carry over.** mp4 → y4m via
+`scripts/prepare-fixtures.mjs` (720p/30 for Chrome's fake webcam);
+episode-structural per-clip assertions in
+`packages/body-input/tools/fixture-eval.mjs` → `eval/`; Rowing's lesson
+is pre-applied: clips that start/end mid-motion get a single non-looped
+`?video=` eval pass, and still lead-in/tail is in the recording spec.
 
-**Baseline**: PosePuppet root suite green at P0 (92 passed, 5 skipped);
-Flight suite result recorded in the Gate-1 commit message. Perf floors
-for rowing = Flight's existing floors (`eval/flight-perf.json`: 60 fps
-render / floor 45, pose ≥ 15 Hz).
+**This checkout is fresh.** No `node_modules`, no `fixtures/` (private,
+untracked — they live on the Mac and in the Rowing checkout). P0 here is
+docs-only; coherence checked with `npm ci` + `tsc --noEmit`. Full suite
+baselines are re-established at P1 entry after fixture sync
+(ENVIRONMENT_BLOCKED at P0: private fixtures not yet synced to this
+clone; last recorded green — PosePuppet 92 passed / 5 skipped, Flight
+17 passed / 2 skipped at Rowing P2 `a39d644`). Per instruction, no
+Playwright/remote-infra/GPU work happens in P0.
 
 ## Gate-1 decision material
 
-### Build vs adapt: ADAPT the TinySkies boat
+### Where Dolphin lives: `apps/dolphin` (deviation from FUTURES.md's fourth-vehicle sketch)
 
-The Track-F fork revealed a real, fully-tuned boat (FUTURES.md called
-this the load-bearing discovery). Building a fresh boat would duplicate
-spherical math, camera, wake, audio, land collision, and would need its
-own feel pass. Adapting means rowing inherits a boat that already feels
-right under keyboard, and the work concentrates where the prompt wants
-it: stroke detection and the impulse-glide connection. Permission
-covers it. **Recommendation: adapt.**
+Rowing went inside `apps/flight` because everything it needed — the
+boat, the globe, the camera, the wake — already existed there. Dolphin
+is the opposite case: the world (bounded bay, underwater volume, PS2
+fog/palette), the camera (third-person underwater follow + breach
+chase), the physics (3D swim with depth), and every asset are new. What
+Dolphin shares — body-input consumption, shaping stack, One Euro,
+tuner, stroke detection — lives in `packages/body-input`, not in the
+flight client. Building inside the 30k-line TinySkies fork would risk
+the Gate-2-frozen flight/rowing feel for zero reuse gain; a standalone
+`apps/dolphin` (own three.js, own vite build, base `'/dolphin/'`,
+served same-origin by the established static-plugin pattern) risks
+nothing and keeps the PS2 look unconstrained. FUTURES.md gets a note:
+the fourth-vehicle idea remains valid for a *globe cameo* someday; the
+bounded-bay mode is its own app. **Recommendation: apps/dolphin.**
 
-### Where rowing lives: `apps/flight` gains a boat body-mode (no `apps/rowing`)
+### Boundary module: `packages/world-data`, offline-only, designed as the future pipeline's water-polygon component
 
-Everything rowing needs — globe, water, boat, camera, effects, HUD,
-tuner, same-origin `/flight/` topology, the body-input merge point, the
-eval handle — lives in apps/flight. A separate app would either fork the
-30k-line client or import across app boundaries; both are worse than the
-Flight precedent: one game, vehicles as modes, per-vehicle body
-profiles. The lobby already treats vehicles as a roster.
-**Recommendation: apps/flight.**
+`fetch → assemble multipolygon → simplify → project → boundary.json`,
+run as a prep script (`packages/world-data/tools/`), never at runtime;
+the game bundles the emitted JSON. Sources: **OSM via Overpass**
+(primary — bays/lakes/rivers; ODbL, attribution in-app + README +
+provenance inside boundary.json) and **Natural Earth** (public domain;
+coarse-coastline fallback only — at bay scale NE 10m is a blob, so both
+candidates below use OSM). Simplification: Visvalingam–Whyatt to a
+stated vertex budget (~400–800 outer vertices; islands kept above an
+area threshold), **area delta vs source stated** in the module README
+and asserted in a unit test. Projection: local tangent plane at the
+polygon centroid → meters → game units with a tunable world scale
+(shape is sacred; size is gameplay). The module's public surface
+(`loadBoundary`, point-in-polygon, signed-distance query) is written as
+the pipeline's water component from day one — Rowing's Waterway seam
+becomes a future consumer.
 
-## Design
+### The two candidate water shapes (both verified in OSM today)
 
-### P1 — stroke detection in `@bodyarcade/body-input` (v1.x additive)
+**Candidate A — Bay of Kotor (Boka Kotorska), Montenegro.**
+OSM relation **10171079**, `natural=bay` multipolygon, 59 outer + 8
+inner ways, bbox ≈ 22 × 14 km. License: ODbL (attribution wired
+in-app). Why it fits: a winding, fully-enclosed chain of basins linked
+by narrow straits (the Verige strait is a natural gate/arch moment),
+two tiny islands (Our Lady of the Rocks, Sveti Đorđe) begging to be
+ruin anchors, and an unmistakable minimap silhouette. It is the
+prompt's "one great bay" — every stretch is near a shore, so the
+containment current and the shimmer edge are constantly part of play,
+and the SDF depth field (deep basins, shallow straits) writes itself.
+**My recommendation.**
 
-New `StrokeDetector` in the package (`src/stroke.ts`), fed from the
-existing per-arm measures inside the pipeline:
+**Candidate B — San Francisco Bay, USA.**
+OSM relation **9451753**, `natural=bay` multipolygon, 11 outer + 3
+inner ways (Alcatraz-class islands), bbox ≈ 42 × 59 km. License: ODbL.
+Why it fits: the most recognizable bay outline on earth — the minimap
+*is* the "this is a real bay" proof with zero explanation — plus the
+Golden Gate strait as a dramatic entrance and real islands as
+landmarks. Risk: the central bay is a large open expanse; at any world
+scale a chunk of the play space is featureless open water (the exact
+"boring sea" the prompt warns about), mitigated by scaling down and
+seeding ruins/kelp forests, but Kotor gets the same charm for free.
 
-- **Signal**: per-arm wrist fore-aft position in the torso basis
-  (`wristLocal.z / armLen`, the handsForward substrate), One-Euro
-  smoothed; differentiate to velocity on frame timestamps.
-- **Detection**: zero-crossings of smoothed fore-aft wrist velocity with
-  hysteresis (velocity must exceed a floor derived from still.mp4's
-  measured jitter, same discipline as the flight dead zones) and a
-  minimum half-period (rejects tremor; the implied max detectable rate
-  is far above any sane rowing cadence).
-- **Phase state machine**: catch (front reversal) → drive (pull back) →
-  recovery (return forward). `strokePhase` ∈ [0,1) continuous within the
-  cycle; a stroke event fires once per drive.
-- **Outputs** (schema-additive optional `stroke` block, `v` stays 1):
-  `rate` (Hz, EMA over recent periods, decays to 0 when strokes stop),
-  `phase` (0..1), `ampL`/`ampR` (0..1, per-arm normalized stroke
-  amplitude over the last cycle), `active` (rhythmic motion currently
-  detected). Quantized like everything else; canonical JSON extended
-  with a fixed-order tail; `assertSignalShape` validates the block when
-  present. Old tapes and consumers unaffected.
-- **Seated**: the torso basis and wrist measures are all
-  shoulder-relative — seated rowing is arm-dominant and needs no special
-  casing; the seated fixture verifies rather than assumes.
-- **Dolphin reuse**: the detector is a generic periodic-limb-oscillation
-  primitive parameterized by axis (fore-aft here; vertical later). It
-  ships in the package, not the game.
+Both were verified via Overpass on 2026-07-11 (relation IDs, member
+counts, closed multipolygon geometry, bboxes above). Gate 1 picks one;
+the module is shape-agnostic so the other remains a config away.
 
-Fixture eval extends the package tool: stroke count ±1 vs known truth
-per clip, rate slow < fast, left-bias amplitude asymmetry with the
-documented sign, still => `active` never true, zero strokes.
+## Swim model — mapping sketch (fixtures decide the details)
 
-### P2 — boat feel: impulse-and-glide + assists
+| control | signal | mechanism |
+|---|---|---|
+| kick → thrust | **new**: torso-wave (chest/hip vertical anti-phase) | `StrokeDetector` on a torso scalar → `swim` block (rate/phase/amp) → impulse-and-glide thrust. Rowing's P2 lesson pre-applied: water drag proportional to speed (τ tuned for a dolphin's longer glide), so each kick cadence settles at its own speed and stillness = glide, never a hard stop |
+| dive / surface | `leanY` | pitch rate, auto-level spring, Full-Assist depth clamps |
+| banked turns | `leanX` | roll → yaw coupling (bank-to-turn, the Flight idiom) |
+| alternate depth | `crouch` | low-energy seated/standing depth control |
+| burst | `handsForward` | Flight's boost substrate, hysteresis + debounce |
+| breach | derived | sustained `leanY` pitch-up + speed + near-surface ⇒ leap, camera follow, splash |
+| glide | `stillness` | no input decay to rest — momentum carries |
+| loss → autopilot | `confidence` + `tracking` | glide straight, gentle assist re-entry (PPC contract pattern) |
+| recenter | `recenter` event | T-pose |
+| keyboard | — | WASD + Q/E depth + Shift kick, always available (non-negotiable) |
 
-- **`RowingControls`** (`apps/flight/client/src/input/rowControls.ts`),
-  sibling of `BodyFlightControls`, sharing its transport/staleness/
-  keyboard-priority machinery (extract the common core rather than
-  copy). Consumes the `stroke` block; emits per-tick rowing intent.
-- **Propulsion**: each detected stroke (drive phase) applies an impulse
-  scaled by mean amplitude; between strokes the boat's existing
-  `COAST_DECAY` does the gliding. Implemented as an additive path on
-  Boat (an `impulse()`/analog-style hook, the same pattern `Plane.analog`
-  used) — **zero changes to the keyboard constants or upstream feel.**
-  A short attack envelope makes the per-stroke surge visible: the boat
-  visibly lunges on each drive. That surge read is the demo.
-- **Steering, both profiles as data** (`ROW_PROFILES`, same shape as
-  `BODY_PROFILES`): `row-asym` — turnRate from (ampL − ampR); `row-lean`
-  — turnRate from leanX. Pick the default at Gate 2. Flight's
-  boost/action gestures are **disabled in rowing profiles** (hands
-  thrust forward every stroke — they would constantly misfire the
-  fishing action / boost).
-- **Assist ladder** (same `ASSIST_LEVELS` pattern): Full Assist softly
-  steers toward the course centerline (see Waterway seam) and holds a
-  gentle speed floor while strokes continue; Standard/Expert relax caps.
-- **Cruise**: after N steady strokes (rate variance under threshold),
-  cruise latches — momentum holds near the recent average so the user
-  can rest; resumes manual on the next stroke or posture change.
-  Fatigue is a design constraint: target effort is conversational
-  motion (hands travel ~30 cm), not gym form.
-- **Autopilot on tracking loss**: reuse Flight's decay pattern — thrust
-  intent decays, boat drifts straight and slows; slew-bounded blend on
-  re-entry (never snaps). T-pose recenter: already a package event,
-  reused as-is.
-- **Keyboard fallback**: upstream boat keys keep working exactly as
-  upstream (W hold = accelerate, S brake, A/D turn), with Flight's
-  keyboard-priority rule (keys win for 1.5 s). See Deviations.
-- **Entry**: a direct-entry URL param (`?vehicle=boat` / `?row`) that
-  starts the boat for rowing/demo/eval (progression untouched otherwise
-  — the boat's normal unlock celebration stays), plus a minimal "Row"
-  card in PosePuppet next to "Fly" reusing `openFlight()` with the row
-  URL. Tuner ("b") gains a stroke readout row (rate/phase/ampL/ampR/
-  cruise state).
+The torso-wave *measurement* is the one open signal question: the torso
+basis is defined by shoulders/hips, so the oscillation must be read
+from raw normalized image-space chest-vs-hip vertical travel (or
+stature oscillation), not from a basis that subtracts itself.
+Candidates get measured on the fixtures before the detector is wired —
+same measured-floor discipline as Flight's dead zones.
 
->> **USER GATE 2** — live row: both steering profiles, seated, a
-2-minute run; Lekan judges rhythm, connection, fatigue. Iterate.
-(Gate-approved Flight feel is frozen; nothing in P2 touches plane
-controls or gains.)
+## Depth strategy
 
-### P3 — polish + ship
-
-Coach messages via the existing toast/HUD surface ("Bigger strokes read
-better", "Sit back to rest — momentum will hold"), README rowing
-section, EVAL_NOTES, FUTURES.md waterway-data seam notes, DECISIONS.md.
-
-### The waterway seam (design only — no open-data work)
-
-Interface in apps/flight: `Waterway` — `sample(posQ): { onWater:
-boolean, centerlineHeading: number, crossTrack: number }`. v1
-implementation is procedural from the existing globe: a generated
-open-water course (waypoints sampled on `isMainOcean` cells, smoothed
-into a loop that hugs the coast where possible). Full Assist and the
-closed-loop eval consume only the interface, so the future open-data
-pipeline swaps in real waterway geometry without touching rowing logic.
-Documented in FUTURES.md at P3.
-
-## Deviations from the prompt (and why)
-
-1. **"Rivers/lakes" → open-water course.** The globe has no rivers —
-   terrain is a land/ocean field with a connected main ocean and
-   incidental lakes. Building procedural rivers would mean reworking
-   accepted Globe terrain (risk + perf) for geometry the open-data
-   pipeline will replace anyway. Instead: the 2-minute run is a coastal/
-   open-water course behind the `Waterway` seam; "stays on the waterway"
-   = stays on water and within a cross-track band of the course.
-2. **Keyboard fallback keeps upstream semantics.** The prompt sketches
-   "W hold = stroke"; upstream boat W is hold-to-accelerate, and
-   Flight's accepted, non-negotiable rule is keyboard identical to
-   upstream. W hold already delivers the fallback's purpose (propel the
-   boat without a body); re-mapping it to synthetic strokes would change
-   accepted feel for no capability gain.
-3. **Stroke fields stay schema v1 (additive optional block), not a v2
-   bump.** FUTURES.md sketched "v2"; the PPC `tracking` block
-   established the additive-optional pattern that keeps every existing
-   consumer and recorded tape valid. Same measured-floor discipline,
-   no version churn.
-
-## Verification
-
-- **Fixture evals** (package tool → `eval/bodyinput-results.json` or a
-  rowing sibling): stroke count within ±1 of known truth per clip; rate
-  ordering slow < fast (values stated); left-bias clip: ampL − ampR
-  positive and stable; still.mp4: zero strokes, `active` false
-  throughout; seated clip: detection parity with standing.
-- **Closed-loop** (`apps/flight/tests/row.spec.ts`, headed like the
-  rest): fixture-driven 2-minute run stays on water / in the cross-track
-  band under Full Assist; speed correlates with stroke rate (Pearson r
-  stated in eval output); injected dropout → drift straight + slow, no
-  snap on recovery; replay determinism — recorded signal tape (with
-  stroke block) replays byte-identically through the package per the
-  canonical-JSON check.
-- **Perf**: Flight's floors (60/45 fps, pose ≥ 15 Hz) re-measured with
-  rowing active.
-- **Suites**: PosePuppet root + Flight suites stay green at every
-  commit.
+SDF-from-boundary on a precomputed grid (part of boundary.json or a
+sibling artifact): depth = maxDepth · smoothstep over distance-to-shore
++ low-octave fbm noise, so edges are shallow, basins deep, and nothing
+is flat. Optional carved tunnels/arches only if cheap at P3. No real
+bathymetry (prompt: not needed, avoid).
 
 ## Fixtures — USER ACTION (exact recording specs)
 
-Same setup as the flight fixtures: **portrait 1080×1920 @ 30 fps**,
-camera at chest height ~2.5–3 m back, full torso + arms in frame
-through full stroke extension (hands never leave frame at full reach),
-front lighting, plain background if possible. Start each clip with ~3 s
-standing/sitting still (neutral capture), end with ~2 s still. Drop the
-files in `fixtures/rowing/` as `.mp4`; `npm run prepare-fixtures`
-converts them.
+Same setup as flight/rowing fixtures: **portrait 1080×1920 @ 30 fps**,
+camera at chest height ~2.5–3 m back, front lighting, plain background
+if possible. Head through knees in frame (hips must stay visible —
+the kick signal is chest-vs-hip). **Start each clip with ~3 s still,
+end with ~2 s still** — Rowing taught us that mid-motion starts/ends
+cost eval fidelity. Drop files in `fixtures/dolphin/` on the Mac.
 
-The stroke motion: both hands reach forward toward the camera at chest
-height, then pull back to the ribs — a relaxed sculling motion, elbows
-soft. Amplitude target ~30 cm of hand travel; this should feel like a
-gesture, not a workout.
+The torso wave (the kick): a standing body-wave — soften the knees,
+push the hips forward as the chest eases back, then hips back as the
+chest comes forward. A smooth vertical undulation, chest and hips
+bobbing in anti-phase, ~10–15 cm of visible chest travel. It should
+feel like a groove, not a workout.
 
-| clip | posture | content | true count |
+| clip | posture | content | truth |
 |---|---|---|---|
-| `rowing_slow.mp4` (~60 s) | standing | exactly **12 strokes** at a relaxed ~18–20 strokes/min, symmetric | 12 |
-| `rowing_fast.mp4` (~45 s) | standing | exactly **24 strokes** at ~35–40 strokes/min, symmetric | 24 |
-| `rowing_left_bias.mp4` (~45 s) | standing | exactly **15 strokes**, left arm full range, right arm ~half range | 15 |
-| `rowing_seated.mp4` (~60 s) | seated on a chair | exactly **15 strokes** at ~20–25 strokes/min, symmetric | 15 |
-| still | — | **reuse** `fixtures/flight/still.mp4` | 0 |
+| `torso_wave_slow.mp4` (~60 s) | standing | exactly **12 waves** at a relaxed ~24–30 waves/min, steady | 12 |
+| `torso_wave_fast.mp4` (~45 s) | standing | exactly **24 waves** at ~50–60 waves/min | 24 |
+| `dive_surface_leans.mp4` (~60 s) | standing | **6 forward-lean holds** (~2 s each) alternating with **6 backward-lean holds** (~2 s), returning to neutral ~2 s between | 6 fwd / 6 back |
+| `roll_turns.mp4` (~60 s) | standing | **6 left** and **6 right shoulder-line tilt holds** (~2 s each), alternating, neutral between | 6 L / 6 R |
+| `seated_swim.mp4` (~60 s) | seated on a chair | exactly **12 seated torso waves** (chest bob, hips anchored) at a relaxed pace, then 2 forward + 2 backward lean holds | 12 waves, 2 fwd / 2 back |
+| `breach_attempts.mp4` (~60 s) | standing | exactly **3 breach attempts**: ~5 fast waves immediately followed by a strong backward-lean hold ~2 s, relax; ~5 s neutral between attempts | 3 |
+| still / T-pose / crouch / leans | — | **reuse** `fixtures/flight/` (still, arms_tpose, crouch_stand, lean_lr, lean_fb, seated) | existing labels |
 
-Counting the strokes while recording is the hand-labeled truth the
-±1 eval checks against — if a take ends up with a different count,
-just tell me the actual number instead of re-recording.
+`breach_attempts` is added beyond the prompt's fixture list because the
+verification plan requires "breach triggers on the breach fixture and
+not on others" — the negatives are the other clips (`torso_wave_fast`
+has speed without pitch-up; `dive_surface_leans` has pitch-up without
+speed). Count-while-recording is the hand-labeled truth for the ±1 kick
+eval; if a take comes out different, tell me the actual number rather
+than re-recording.
 
-**As delivered (2026-07-08):** all four clips usable at 1080×1920@30;
-durations shorter than spec'd (41.3/33.4/47.7/25.6 s) and the takes
-start/end mid-motion (no still lead-in/tail) — the eval therefore runs
-rowing clips as a single non-looped video pass rather than through the
-looping fake webcam (a loop seam that cuts mid-stroke swallows or
-fabricates strokes). rowing_seated measured at 13 completed pulls (raw
-wrist trace + frame review show a ~2.5 s mid-take pause and a
-mid-stroke start); prescribed 15 — measured label used, flagged for
-Lekan's confirmation at Gate 2.
+**Fixture sync for this checkout:** existing flight+rowing fixtures and
+the new dolphin clips need to reach `~/Dev/posepuppet-dolphin/fixtures/`
+(untracked). From the Mac:
 
-## Effort estimates
+```
+rsync -av -e "ssh -i ~/.ssh/pinn_rtx3090" \
+  ~/Dev/posepuppet/fixtures/ o@192.168.86.152:~/Dev/posepuppet-dolphin/fixtures/
+```
 
-- P1 stroke detection + schema + fixture eval: ~1 day.
-- P2 boat propulsion/steering/assists/cruise/autopilot/entry/tuner:
-  ~1.5 days to Gate 2, plus iteration from the live gate.
-- P3 polish/docs/seam notes: ~0.5 day.
+(I can copy the existing flight/rowing fixtures across remote checkouts
+read-only at P1 entry myself; only the six new dolphin clips strictly
+need you.)
+
+## Phases and effort estimates
+
+- **P1 — boundary module** (~1 day): `packages/world-data` prep script
+  (Overpass fetch with cached raw response committed alongside for
+  reproducibility, multipolygon assembly, Visvalingam simplification to
+  budget, tangent-plane projection, SDF grid, provenance + license
+  metadata) → `boundary.json`; unit tests: area delta within stated
+  tolerance, point-in-polygon determinism, islands preserved; debug
+  minimap render + vision self-check against the source map;
+  attribution text wired where the game will mount it; module README
+  (sources, licenses, simplification math) written as pipeline docs.
+- **P2 — swim feel in a graybox sea** (~2–2.5 days to Gate 2):
+  torso-wave measurement study on fixtures → `SwimDetector` config
+  (reusing `StrokeDetector`) → additive `swim` block + fixture eval
+  (kick count ±1, rate ordering, seated); `apps/dolphin` scaffold
+  (graybox: fog-colored void, boundary walls as shimmer, SDF depth,
+  debug minimap); impulse-and-glide thrust, pitch/roll, containment
+  current (soft repulsion, never a wall), assist ladder (Full Assist:
+  depth clamps, auto-level, gentle forward drift so stillness never
+  strands), autopilot on loss, T-pose recenter, keyboard fallback,
+  tuner swim section; closed-loop evals (thrust↔kick-rate correlation,
+  8-direction escape attempts, dropout → glide).
+  **>> USER GATE 2: live swim.**
+- **P3 — the world** (~2–3 days): PS2 art pass (low-poly vertex-lit
+  meshes, restricted palette, exponential/dithered fog, additive glow
+  particles, instanced boid fish with flee, kelp vertex-shader sway,
+  caustic gobos, rocks/arches/ruins seeded by the SDF), breach polish
+  (camera follow, splash), minimap final with attribution, optional
+  4:3 toggle, optional local-file ambient audio.
+- **P4 — ship** (~1 day): full eval refresh, perf floors (60 fps render
+  / floor 45 with pose ≥ 15 Hz — Flight's floors), replay determinism,
+  docs (module README, DECISIONS, FUTURES pipeline-seam notes, ASSETS,
+  EVAL_NOTES, README), and the FUTURES.md obstacle-avoidance reminder
+  raised explicitly at the final gate.
+
+## Verification plan (maps 1:1 to the prompt)
+
+- Kick count vs labeled fixtures ±1; rate ordering fast > slow; seated
+  detection works with hips anchored.
+- Thrust correlates with kick rate over settled samples (Rowing's
+  closed-loop method: exclude transitions, state the r).
+- `dive_surface_leans` / `roll_turns` → signed pitch/roll axis evals.
+- Containment: scripted escape attempts from 8 directions never exit
+  the polygon, never hard-wall (velocity into the boundary decays
+  smoothly; position stays inside point-in-polygon at every frame).
+- Breach fires on `breach_attempts` (3/3) and never on the other clips.
+- `boundary.json` vs source polygon: area delta within stated
+  simplification tolerance, asserted in a test.
+- Minimap vision self-check against the source map (EVAL_NOTES).
+- Dropout ⇒ glide + smooth recovery (PPC tracking states consumed).
+- 60/45 fps with pose ≥ 15 Hz; replay determinism (detector is
+  timestamp-pure by construction).
 
 ## Risks
 
-- **Depth noise on the fore-aft stroke axis** — MediaPipe z is the
-  noisiest coordinate. Mitigations: One-Euro + velocity-floor hysteresis
-  + min half-period; the handsForward axis proved z workable in Flight.
-  If fixtures show it's still marginal, fall back to a hybrid axis
-  (fore-aft + vertical wrist arc, which real rowing has anyway). This is
-  exactly what the fixture gate is for.
-- **Gesture collisions**: every stroke passes through "hands forward" —
-  Flight's boost/action triggers are disabled in rowing profiles from
-  the start.
-- **Fatigue**: 2 minutes at 24 SPM must stay conversational — cruise
-  mode, modest amplitude normalization, and "sit back to rest" coaching
-  are load-bearing, not polish.
-- **Boat unlock progression**: direct-entry param must not corrupt the
-  saved progression state (entry bypasses selection, not unlocks).
+- **Torso-wave SNR is the load-bearing unknown.** Vertical chest/hip
+  oscillation may be small in image space (especially seated) and the
+  torso basis can't measure itself. Mitigation: fixture-first — measure
+  three candidate scalars (raw chest-y vs hip-y anti-phase, stature
+  oscillation, shoulder-center world-y) on the six clips before wiring
+  anything; the Schmitt detector needs amplitude, not smoothness. If
+  standing SNR is fine but seated is not, seated falls back to
+  crouch-depth + lean control (documented, coach explains).
+- **Breach false positives** on enthusiastic dive leans — speed + near-
+  surface preconditions + hysteresis; the fixture set has the exact
+  negatives.
+- **ODbL share-alike**: boundary.json is a derived work — attribution
+  in-app/README plus provenance metadata (source, relation ID, fetch
+  date, license) inside the file; prep script committed so derivation
+  is reproducible. This is the documented, compliant path.
+- **World scale vs swim speed** is a feel parameter, not a data one —
+  tunable at Gate 2 (shape preserved, size gamified).
+- **Flight/rowing feel is gate-frozen** — the standalone-app decision
+  exists precisely so Dolphin cannot regress it; the flight suite runs
+  untouched at each phase commit.
+
+## Deviations from the prompt (logged, one line each in DECISIONS.md)
+
+1. `breach_attempts.mp4` added to the fixture list (verification
+   requires a breach positive).
+2. P0 suite baseline classified ENVIRONMENT_BLOCKED in this fresh
+   checkout (no private fixtures yet); re-established at P1 entry.
+3. FUTURES.md fourth-vehicle sketch deliberately not followed for the
+   bounded-bay world (globe cameo remains future-possible).
