@@ -45,6 +45,7 @@ import { isLocalMode, localAutoJoin, localLanternAdd } from "../runtime/localWor
 import { BodyFlightControls } from "../input/bodyControls";
 import { FlightTuner } from "../input/flightTuner";
 import { RowingControls } from "../input/rowControls";
+import { RowingHUD } from "../ui/RowingHUD";
 import { createOceanCourse, assistTurnRate, clearWaterFrac, ShoreGuard, type Waterway } from "./Waterway";
 import { isMobile } from "../utils/isMobile";
 import { StateSync } from "../network/StateSync";
@@ -453,6 +454,7 @@ export class Game {
   /** BodyArcade: body input as a parallel control source + its tuner. */
   private bodyControls: BodyFlightControls | null = null;
   private flightTuner: FlightTuner | null = null;
+  private rowingHUD: RowingHUD | null = null;
   /** BodyArcade Rowing: stroke input for the boat + its water course. */
   private rowingControls: RowingControls | null = null;
   private waterway: Waterway | null = null;
@@ -3565,6 +3567,15 @@ export class Game {
       const boat = this.localPlayer;
       const merged = this.rowingControls.merge(inputState);
       const bodyOwns = this.rowingControls.bodyActive;
+      // Rowing feedback strip (Gate-2 round-2): stroke pulse, cadence,
+      // steering, plain-language signal guidance — always on for the boat
+      if (this.gamePhase === "flying" && this.hud) {
+        if (!this.rowingHUD) this.rowingHUD = new RowingHUD(this.hud.root);
+        this.rowingHUD.setVisible(true);
+        this.rowingHUD.update(this.rowingControls.debugState());
+      } else {
+        this.rowingHUD?.setVisible(false);
+      }
       boat.rowGlide = bodyOwns;
       boat.rowSustain = bodyOwns && this.rowingControls.cruising;
       if (this.gamePhase === "flying") {
@@ -3601,6 +3612,16 @@ export class Game {
         }
         let corrections = 0;
         let cornerLevel = 0;
+        // GATE-2 round-2 fix (live report): the coxswain must never
+        // out-steer the rower. assistTurnRate reaches ±0.55 while a gentle
+        // lean through the expo profile reads ~0.12, so Full Assist felt
+        // like "leaning left still drifts right" — deliberate steering
+        // (lean or stroke asymmetry, measured on the INPUT axes) silences
+        // the course-follow pull and the corner brake, and hands-off
+        // restores them (autopilot keeps corridor-holding). The shore
+        // guard is deliberately NOT scaled by intent: safety keeps
+        // outranking authority.
+        const userIntent = this.rowingControls.steeringIntent;
         if (bodyOwns && this.rowingControls.assist.courseFollow && this.waterway) {
           const sample = this.waterway.sample(boat.qPosition);
           const R = this.worldConfig?.globeRadius ?? 5;
@@ -3613,16 +3634,18 @@ export class Game {
           if (escaping && escape !== 0 && Math.sign(follow) !== Math.sign(escape)) {
             follow = 0;
           }
-          corrections += follow;
+          corrections += follow * (1 - userIntent);
           // coxswain: brake into corners the boat cannot follow at speed
           let need = sample.aheadHeading - boat.heading;
           while (need > Math.PI) need -= Math.PI * 2;
           while (need < -Math.PI) need += Math.PI * 2;
           // a brake must release as the boat slows or it parks the boat at
-          // the corner forever (a slow boat can already make any turn)
+          // the corner forever (a slow boat can already make any turn) —
+          // and it yields to deliberate steering like the course pull does
           cornerLevel =
             Math.min(1, Math.max(0, (Math.abs(need) - 0.7) / 1.3)) *
-            Math.min(1, boat.speedRatio / 0.5);
+            Math.min(1, boat.speedRatio / 0.5) *
+            (1 - userIntent);
         }
         const assistId = this.rowingControls.assist.id;
         const guardGain = assistId === "full" ? 1 : assistId === "standard" ? 0.6 : 0.3;
@@ -7391,6 +7414,8 @@ export class Game {
     this.bodyControls = null;
     this.rowingControls?.dispose();
     this.rowingControls = null;
+    this.rowingHUD?.dispose();
+    this.rowingHUD = null;
     this.waterway = null;
     this.shoreGuard = null;
     this.flightTuner?.dispose();

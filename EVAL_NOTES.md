@@ -922,3 +922,108 @@ media/m0-smoke.png shows the split screen working — person clearly visible
 left, empty dark stage right, LIVE badge and privacy footer present. No pose
 detection yet, so nothing to judge on motion. Stage reads dark but the
 ground disc and grid are visible; lighting will matter once the robot is in.
+
+
+## 2026-07-11 — Rowing Gate-2 round 2: seated propulsion + steering authority
+
+Lekan's live retest passed idle stability, direction detection,
+re-centering, standing propulsion, cadence response, shore avoidance,
+and keyboard — and failed two things. Both reproduced remotely, both
+mechanisms measured before fixing.
+
+### Seated propulsion "requires knees" — actually the lite pose model
+
+The report: seated rowing only propelled once the knees were in frame.
+The package has no lower-body dependency (synthetic legs/hips-invisible
+rowing counts 10/10 strokes, confidence 0.78 — now a committed spec),
+so the chain was reproduced on video. A chest-up crop of
+rowing_seated.mp4 (fixtures/rowing/rowing_seated_upper.mp4, derived via
+`ffmpeg -vf crop=1080:660:0:600`, same 13 pulls) through the app:
+
+| framing              | model | cycle p2p (arm lengths) | strokes |
+|----------------------|-------|-------------------------|---------|
+| chest-up (tight+0.5) | lite  | 0.112 (< 0.15 bar)      | 2/13    |
+| chest-up (tight+0.5) | full  | 0.252                   | 11/13   |
+| chest-up             | lite  | —                       | 13/13   |
+| chest-up             | full  | —                       | 13/13   |
+| original seated      | lite  | 0.199                   | 11–12/13|
+| original seated      | full  | —                       | 13/13   |
+
+The lite model's wrist DEPTH collapses as the hands work near the frame
+edge — while its visibility output stays ~1.0 (no dropout, no warning:
+landmark-tape analysis showed 0% null frames). The Row entry inherited
+Fly's companion mode, which switches PosePuppet to the lite model; a
+desk-seated rower with hands low in frame lands exactly in the collapse
+zone. Knee visibility was a proxy for camera distance, not a cause.
+Fix: Row keeps the FULL model (stage suspension — the real GPU win —
+stays); Fly's torso-scale axes are lite-robust and keep the approved
+behavior. rowing_seated_upper is now a permanent eval fixture (13±1,
+full model), and fixture-eval grew a --model=lite flag for
+characterization runs.
+
+### "Left weak, right strong, left lean drifts right" — the coxswain
+
+Under Full Assist, assistTurnRate pulls toward the corridor with up to
+±0.55 turn while a gentle lean through the expo profile produces ~0.12
+— the course-follow out-muscled every gentle lean whose direction
+opposed the corridor, which reads exactly as an inconsistent, biased
+helm (Flight has no course-follow, hence "worse than Flight"). Fix:
+deliberate-steering intent (from the INPUT axes — lean past the noise
+floor ramps to full intent by ~0.2; stroke asymmetry likewise) silences
+the course-follow and the corner brake; hands-off decays intent so
+autopilot line-holding returns; the shore guard is NOT intent-scaled —
+safety still outranks authority. New spec ("a deliberate gentle lean
+out-steers the coxswain, both ways") verified to FAIL with the fix
+disabled and PASS with it.
+
+Residual live possibility, addressed by feedback rather than code: a
+posture-biased leanX neutral (seated slouch after a standing capture)
+would still read asymmetric — the new rowing HUD strip shows the
+applied steering marker, so a biased read is visible at a glance, and
+the strip suggests a T-pose recenter when seated with a low-confidence
+neutral.
+
+### Rowing feedback strip (RowingHUD)
+
+Always on for the boat: pulse per accepted stroke sized by pull
+strength, cadence in spm, applied-steering marker, status word
+(ROWING / IDLE / CRUISE / KEYBOARD / SIGNAL LOST / TRACKING UNSURE /
+REACQUIRING), and a plain-language guidance line (hands in view, add
+light, fuller pulls, T-pose recalibrate). Distinguishes tracking
+failure from control failure at a glance — the round-2 UX request.
+
+### Validation fallout (harness, not product)
+
+Running the evals on the rebuilt remote for the first time surfaced
+five harness truths, all fixed without touching a threshold:
+
+- prepare-fixtures capped the LONG side at 720 so portrait phone clips
+  became 406×720; the moment that downscaled y4m shadowed the native
+  cache, the closed-loop chain's sustained way fell p75 0.161 → 0.105 —
+  input resolution is part of the claim. The converter now caps the
+  SHORT side; the spec prefers the native cache.
+- The closed-loop spec leaked its browser when an assertion threw:
+  failed repeats starved later repeats' pose loop (11 → 6 → 2.8 fps
+  measured). try/finally now.
+- The closed-loop way claim is judged on OPEN-WATER samples (identical
+  runs measured near-shore fractions 0.29–0.70 as the lean-noise-
+  steered boat wandered; shore drag is the guard's own tested job), and
+  the spec classifies ENVIRONMENT_BLOCKED when the producer starves
+  (<10 pose fps under x-bot bursts) or delivers <16 strokes/60 s.
+  Rhythm-delivery and on-water assertions run on every run; healthy
+  runs measure p75 0.12–0.14 against the 0.12 bar.
+- rowing_left_bias "17 vs 15±1" was the stop-recording reach: the
+  landmark-tape replay shows exactly 15 rhythmic asymmetric pulls
+  (finishes 6.4–44.1 s) plus one huge symmetric excursion at ~46.8 s
+  (amp 0.9 on BOTH arms — no pull looks like that). The eval counts
+  strokes inside the labeled rowing window and prints every finish
+  time.
+- crouch_stand read ZERO crouch here because the looping fake camera
+  captured the neutral at an arbitrary loop phase — a mid-crouch
+  neutral zeroes the axis (a fresh-core replay of the same frames reads
+  crouch 0.9). Episodic stature fixtures now run single-pass from t=0
+  with a core reset so neutral comes from the protocol's standing
+  pre-roll; measured green after (1 sustained 5.1 s window).
+
+Remaining human-only checks are consolidated in FINAL_USER_TEST_PLAN.md
+(Rowing section) for a single final session.

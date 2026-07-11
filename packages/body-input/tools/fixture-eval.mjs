@@ -19,6 +19,7 @@ const DURATIONS = {
   // rowing clips: single-pass video-file mode (see below) — the value is
   // only a poll timeout ceiling, collection ends when the clip does
   rowing_slow: 55, rowing_fast: 45, rowing_left_bias: 60, rowing_seated: 40,
+  rowing_seated_upper: 40,
 };
 
 /** Hand-labeled stroke counts (recording protocol, 2026-07-07) — the ±1
@@ -27,10 +28,16 @@ const DURATIONS = {
  *  14–16.5 s and the clip starts mid-stroke; frame-sheet review agrees
  *  (EVAL_NOTES 2026-07-09). 13 is the measured label, PENDING LEKAN'S
  *  CONFIRMATION at Gate 2. */
-const STROKE_TRUTH = { rowing_slow: 12, rowing_fast: 24, rowing_left_bias: 15, rowing_seated: 13 };
+const STROKE_TRUTH = {
+  rowing_slow: 12, rowing_fast: 24, rowing_left_bias: 15, rowing_seated: 13,
+  // chest-up crop of rowing_seated (same 13 pulls) — the Gate-2 live seated
+  // report framing: propulsion must not depend on leg visibility
+  rowing_seated_upper: 13,
+};
 
 const argv = process.argv.slice(2);
 const headless = argv.includes('--headless');
+const liteModel = argv.includes('--model=lite');
 const names = argv.filter((a) => !a.startsWith('--'));
 const fixtures = names.length ? names : Object.keys(DURATIONS);
 
@@ -132,9 +139,30 @@ function bipolarChecks(signals, axis, quietAxis, mag = 0.45) {
 /** Rowing: stroke count vs hand-labeled truth, rhythm coverage, rate
  *  readability; left-bias and seated variants add their own lines. */
 function rowingChecks(signals, truth, opts = {}) {
-  const c0 = signals[0]?.stroke?.count ?? 0;
-  const c1 = signals[signals.length - 1]?.stroke?.count ?? 0;
-  const detected = c1 - c0;
+  // Strokes are counted inside the clip's labeled ROWING WINDOW (video
+  // seconds, from the recording protocol / wrist trace): boundary motions
+  // — reaching to start/stop the recording — are real fore-aft excursions
+  // the detector honestly reports, but they are not pulls and the hand
+  // label does not include them (left_bias: 15 pulls finish 6.4–44.1 s,
+  // stop-reach at ~46.8 s reads amp 0.9 on BOTH arms).
+  const [w0, w1] = opts.windowS ?? [-Infinity, Infinity];
+  const videoT = (sig) => (opts.playAt != null ? (sig.ts - opts.playAt) / 1000 : 0);
+  const strokeTimes = [];
+  let prevCount = signals[0]?.stroke?.count ?? 0;
+  for (const sig of signals) {
+    const c = sig.stroke?.count ?? prevCount;
+    if (c > prevCount) {
+      const t = videoT(sig);
+      if (opts.windowS == null || (t >= w0 && t <= w1)) {
+        for (let k = prevCount; k < c; k++) strokeTimes.push(t);
+      }
+    }
+    prevCount = Math.max(prevCount, c);
+  }
+  const detected = strokeTimes.length;
+  if (opts.playAt != null) {
+    console.log(`  stroke finishes (video s): ${strokeTimes.map((t) => t.toFixed(1)).join(' ')}`);
+  }
   const active = signals.filter((s) => s.stroke?.active);
   const rateP50 = pctl(active.map((s) => s.stroke.rate), 0.5);
   const out = {
@@ -238,14 +266,26 @@ const CHECKS = {
       },
     };
   },
-  rowing_slow: (s) => rowingChecks(s, STROKE_TRUTH.rowing_slow),
-  rowing_fast: (s) => rowingChecks(s, STROKE_TRUTH.rowing_fast),
-  rowing_left_bias: (s) => rowingChecks(s, STROKE_TRUTH.rowing_left_bias, { leftBias: true }),
-  rowing_seated: (s) =>
+  rowing_slow: (s, playAt) => rowingChecks(s, STROKE_TRUTH.rowing_slow, { playAt }),
+  rowing_fast: (s, playAt) => rowingChecks(s, STROKE_TRUTH.rowing_fast, { playAt }),
+  rowing_left_bias: (s, playAt) =>
+    rowingChecks(s, STROKE_TRUTH.rowing_left_bias, {
+      leftBias: true,
+      playAt,
+      // rowing segment from the wrist trace: pulls finish 6.4–44.1 s; the
+      // stop-recording reach (~46.8 s, symmetric amp ~0.9) is not a pull
+      windowS: [4, 45.5],
+    }),
+  rowing_seated: (s, playAt) =>
     rowingChecks(s, STROKE_TRUTH.rowing_seated, {
       seated: true,
+      playAt,
       labelNote: ' — measured label (prescribed 15; see STROKE_TRUTH note), confirm at Gate 2',
     }),
+  // chest-up crop of rowing_seated (same pulls): the Gate-2 round-2 live
+  // framing — propulsion must never depend on leg visibility
+  rowing_seated_upper: (s, playAt) =>
+    rowingChecks(s, STROKE_TRUTH.rowing_seated_upper, { seated: true, playAt }),
 };
 
 // --- rig -------------------------------------------------------------------
@@ -271,12 +311,19 @@ for (const fixture of fixtures) {
   // looping fake webcam: the count-vs-truth check needs exactly one pass —
   // the clips start/end mid-motion, so a y4m loop seam swallows or
   // fabricates a stroke every crossing (measured 2026-07-08: ±1–3 per run).
+  // crouch_stand is single-pass too: a looping fake camera captures the
+  // neutral at an ARBITRARY loop phase — a mid-crouch neutral zeroes the
+  // whole axis (measured 2026-07-11: 0 sustained windows on the rebuilt
+  // remote, while a single pass from t=0 reads crouch 0.9). Episodic
+  // stature claims need the clip's opening standing segment as neutral.
   const isRowing = fixture.startsWith('rowing_');
-  const src = isRowing
-    ? resolve(root, 'fixtures', 'rowing', `${fixture}.mp4`)
+  const singlePass = isRowing || fixture === 'crouch_stand';
+  const fixtureDir = isRowing ? 'rowing' : 'flight';
+  const src = singlePass
+    ? resolve(root, 'fixtures', fixtureDir, `${fixture}.mp4`)
     : resolve(root, 'fixtures', 'flight', `${fixture}.y4m`);
   if (!existsSync(src)) {
-    console.error(`missing ${src}${isRowing ? '' : ' — npm run prepare-fixtures'}`);
+    console.error(`missing ${src}${singlePass ? '' : ' — npm run prepare-fixtures'}`);
     process.exit(1);
   }
   const dur = DURATIONS[fixture] ?? 30;
@@ -286,7 +333,7 @@ for (const fixture of fixtures) {
     args: [
       '--use-fake-ui-for-media-stream',
       '--use-fake-device-for-media-stream',
-      ...(isRowing ? [] : [`--use-file-for-fake-video-capture=${src}`]),
+      ...(singlePass ? [] : [`--use-file-for-fake-video-capture=${src}`]),
       '--autoplay-policy=no-user-gesture-required',
       '--disable-backgrounding-occluded-windows',
       '--disable-renderer-backgrounding',
@@ -295,18 +342,19 @@ for (const fixture of fixtures) {
   });
   try {
     const page = await browser.newPage();
-    const query = isRowing
-      ? `?avatar=robot&video=/fixtures/rowing/${fixture}.mp4`
-      : '?avatar=robot';
+    const modelQ = liteModel ? '&model=lite' : '';
+    const query = singlePass
+      ? `?avatar=robot&video=/fixtures/${fixtureDir}/${fixture}.mp4${modelQ}`
+      : `?avatar=robot${modelQ}`;
     await page.goto(`${BASE}/${query}`);
     await page.waitForFunction(
       () => window.__BI?.core.getNeutral() !== null && window.__PP?.detectionCount > 10,
       undefined,
       { timeout: 60_000 },
     );
-    const collected = isRowing
+    const collected = singlePass
       ? await page.evaluate(
-          (timeoutS) =>
+          ({ timeoutS, resetCore }) =>
             new Promise((res) => {
               // Single pass: pause, rewind, park > maxPeriodMs so the
               // detector's drive-duration gate discards any pre-seek catch,
@@ -314,6 +362,14 @@ for (const fixture of fixtures) {
               const video = document.getElementById('video');
               video.pause();
               video.currentTime = 0;
+              // Fresh core for EPISODIC STATURE fixtures only: their
+              // neutral must come from the clip's standing pre-roll (a
+              // looping-phase mid-crouch neutral zeroes the crouch axis —
+              // measured). The rowing fixtures keep the page's neutral:
+              // resetting them onto a frame-0 MID-STROKE park shifted the
+              // arm-length normalization and cost 2 of 13 seated strokes
+              // (measured), and stroke detection never needed the reset.
+              if (resetCore) window.__BI.core.reset();
               setTimeout(() => {
                 const sigs = [];
                 const lats = [];
@@ -333,13 +389,14 @@ for (const fixture of fixtures) {
                   if (done) {
                     clearInterval(poll);
                     unsub();
-                    res({ sigs, lats, passSeconds: prevT });
+                    res({ sigs, lats, passSeconds: prevT, playAt: window.__playAt });
                   }
                 }, 50);
+                window.__playAt = performance.now();
                 void video.play();
               }, 4600);
             }),
-          dur,
+          { timeoutS: dur, resetCore: fixture === 'crouch_stand' },
         )
       : await page.evaluate(
           (seconds) =>
@@ -391,7 +448,7 @@ for (const fixture of fixtures) {
       );
     }
 
-    const checks = CHECKS[fixture] ? CHECKS[fixture](sigs) : {};
+    const checks = CHECKS[fixture] ? CHECKS[fixture](sigs, collected.playAt) : {};
     // universal checks
     let shapeErr = null;
     for (const s of sigs) {

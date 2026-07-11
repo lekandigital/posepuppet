@@ -963,18 +963,18 @@ async function boot() {
     const base = defaultFlightUrl();
     return `${base}${base.includes('?') ? '&' : '?'}row`;
   };
+  // Rowing keeps the FULL pose model (unlike Fly): stroke detection reads
+  // wrist DEPTH, and the lite model's z collapses when the hands work near
+  // the frame edge — measured on the chest-up seated crop: cycle amplitude
+  // 0.112 arm lengths under lite (below the 0.15 stroke bar, 2/13 strokes)
+  // vs 0.252 under full (13/13). Gate-2 live seated propulsion died exactly
+  // this way. The stage stays suspended — that is the real GPU budget win;
+  // Fly's torso-scale axes are robust to lite and keep it (approved feel).
   const startRow = () =>
     openFlight(
       bodyInput,
       {
         setStageSuspended: (v) => stage.setSuspended(v),
-        useLiteModel: () => {
-          const prev = config.model;
-          if (prev !== 'lite') setConfig('model', 'lite');
-          return () => {
-            if (prev !== 'lite' && config.model === 'lite') setConfig('model', prev);
-          };
-        },
       },
       rowUrl(),
     );
