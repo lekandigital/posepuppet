@@ -165,7 +165,7 @@ const rowingClipCandidates = [
   resolve(repoRoot, "fixtures", "rowing", "rowing_slow.y4m"),
 ];
 const rowingClip = rowingClipCandidates.find((p) => existsSync(p)) ?? rowingClipCandidates[0]!;
-const POSEPUPPET = "http://localhost:5173";
+const POSEPUPPET = `http://localhost:${process.env.PP_PORT ?? "5173"}`;
 
 test("closed loop: rowing_slow.y4m through PosePuppet propels the boat", async () => {
   test.skip(!existsSync(rowingClip), "rowing_slow.y4m missing (local fixture)");

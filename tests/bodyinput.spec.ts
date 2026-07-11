@@ -38,6 +38,9 @@ interface PoseOpts {
   /** deterministic per-landmark jitter amplitude, meters (needs jitterPhase) */
   jitter?: number;
   jitterPhase?: number;
+  /** torso-wave compression, meters: shoulders sink while hips rise
+   *  (anti-phase) — shrinks the chest–hip extent, the swim-kick substrate */
+  waveM?: number;
 }
 
 function lm(x: number, y: number, z: number, visibility = 0.95): LandmarkPoint {
@@ -82,6 +85,14 @@ function makeFrame(tsMs: number, o: PoseOpts = {}): BodyInputFrame {
   world[LM.nose] = lm(nose[0], nose[1] + drop, nose[2]);
   world[LM.leftHip] = lm(0.1, drop, 0, hipsVis);
   world[LM.rightHip] = lm(-0.1, drop, 0, hipsVis);
+  if (o.waveM) {
+    // anti-phase: chest down, hips up — extent compresses (y is down)
+    world[LM.leftShoulder].y += o.waveM;
+    world[LM.rightShoulder].y += o.waveM;
+    world[LM.nose].y += o.waveM;
+    world[LM.leftHip].y -= 0.7 * o.waveM;
+    world[LM.rightHip].y -= 0.7 * o.waveM;
+  }
 
   // legs
   if (o.crouchDeep) {
@@ -501,6 +512,105 @@ test('stroke block: schema-validated, canonical, bad blocks rejected', () => {
   expect(() => assertSignalShape({ ...good, stroke: { ...good.stroke!, count: 1.5 } })).toThrow(/stroke/);
   expect(() => assertSignalShape({ ...good, stroke: { ...good.stroke!, phase: 2 } })).toThrow(/stroke/);
   expect(() => assertSignalShape({ ...good, stroke: { ...good.stroke!, active: 1 } })).toThrow(/stroke/);
+});
+
+// --- swim (torso-wave) detection (Dolphin P2) -------------------------------
+// The kick signal is vertical chest–hip extent, self-normalized by a slow
+// EMA. No torso-wave fixture exists yet (FINAL_USER_TEST_PLAN.md tracks the
+// recording); these synthetic streams pin the detector's contract, and the
+// fixture eval pins the negatives on real footage.
+
+/** Torso-wave frames: one compression per periodMs, waveM meters deep. */
+function waveSeq(startTs: number, n: number, periodMs: number, waveM = 0.05, extra: PoseOpts = {}): BodyInputFrame[] {
+  return seq(startTs, n, (i) => {
+    const t = (i * STEP) / periodMs;
+    return { ...extra, waveM: waveM * (0.5 - 0.5 * Math.cos(2 * Math.PI * t)) };
+  });
+}
+
+test('swim: steady torso wave counts kicks and reads the rate', () => {
+  const periodMs = 1500;
+  const frames = after(neutralLeadIn(), (t) => waveSeq(t, Math.round((8 * periodMs) / STEP), periodMs));
+  const signals = run(frames);
+  const fin = last(signals);
+  expect(fin.swim).toBeDefined();
+  expect(Math.abs(fin.swim!.count - 8)).toBeLessThanOrEqual(1);
+  expect(fin.swim!.active).toBe(true);
+  expect(Math.abs(fin.swim!.rate - 1000 / periodMs)).toBeLessThan(0.12);
+  for (let i = 1; i < signals.length; i++) {
+    expect(signals[i].swim!.count).toBeGreaterThanOrEqual(signals[i - 1].swim!.count);
+    expect(signals[i].swim!.count - signals[i - 1].swim!.count).toBeLessThanOrEqual(1);
+  }
+});
+
+test('swim: slow vs fast wave rate ordering', () => {
+  const slow = last(run(after(neutralLeadIn(), (t) => waveSeq(t, Math.round(18000 / STEP), 3000))));
+  const fast = last(run(after(neutralLeadIn(), (t) => waveSeq(t, Math.round(18000 / STEP), 1200))));
+  expect(slow.swim!.active).toBe(true);
+  expect(fast.swim!.active).toBe(true);
+  expect(fast.swim!.rate).toBeGreaterThan(slow.swim!.rate * 1.5);
+});
+
+test('swim: sustained lean is one reversal, never a rhythm', () => {
+  // dive intent (hold a forward lean) must not read as kicking
+  let frames = after(neutralLeadIn(), (t) => seq(t, Math.round(6000 / STEP), { leanFwdDeg: 12 }));
+  frames = after(frames, (t) => seq(t, Math.round(3000 / STEP), {}));
+  const fin = last(run(frames));
+  expect(fin.swim!.count).toBe(0);
+  expect(fin.swim!.active).toBe(false);
+});
+
+test('swim: crouch bounce (in-phase) and sub-amplitude wobble never count', () => {
+  // whole-body drop: chest and hips move TOGETHER — extent unchanged
+  const bounce = last(run(after(neutralLeadIn(), (t) =>
+    seq(t, Math.round(9000 / STEP), (i) => ({ dropM: 0.15 * (0.5 - 0.5 * Math.cos((2 * Math.PI * i * STEP) / 1500)) })))));
+  expect(bounce.swim!.count).toBe(0);
+  // a real wave shape but below minAmp
+  const wobble = last(run(after(neutralLeadIn(), (t) => waveSeq(t, Math.round(9000 / STEP), 1500, 0.008))));
+  expect(wobble.swim!.count).toBe(0);
+  // still footage: jitter only
+  const still = last(run(seq(0, 90, (i) => ({ jitter: 0.003, jitterPhase: i * 0.7 }))));
+  expect(still.swim!.count).toBe(0);
+});
+
+test('swim: hips invisible → no kicks, no crash; stopping decays to zero', () => {
+  // hidden hips remove the extent signal — the block stays quiet (the
+  // dolphin coach explains; seated depth falls back to crouch/lean)
+  const noHips = last(run(after(neutralLeadIn({ hipsVis: 0.1 }), (t) =>
+    waveSeq(t, Math.round(6000 / STEP), 1500, 0.05, { hipsVis: 0.1 }))));
+  expect(noHips.swim!.count).toBe(0);
+  // rhythm then rest: rate decays, active drops
+  let frames = after(neutralLeadIn(), (t) => waveSeq(t, Math.round(6000 / STEP), 1500));
+  frames = after(frames, (t) => seq(t, Math.round(9000 / STEP), {}));
+  const fin = last(run(frames));
+  expect(fin.swim!.active).toBe(false);
+  expect(fin.swim!.rate).toBe(0);
+});
+
+test('swim: dropout mid-rhythm never spikes the count, rhythm resumes', () => {
+  const periodMs = 1500;
+  let frames = after(neutralLeadIn(), (t) => waveSeq(t, Math.round((4 * periodMs) / STEP), periodMs));
+  frames = after(frames, (t) => nullFrames(t, 30));
+  frames = after(frames, (t) => waveSeq(t, Math.round((4 * periodMs) / STEP), periodMs));
+  const signals = run(frames);
+  for (const s of signals) assertSignalShape(s);
+  for (let i = 1; i < signals.length; i++) {
+    expect(signals[i].swim!.count - signals[i - 1].swim!.count).toBeLessThanOrEqual(1);
+  }
+  expect(last(signals).swim!.count).toBeGreaterThanOrEqual(6);
+});
+
+test('swim block: schema-validated, canonical, bad blocks rejected', () => {
+  const good = last(run(after(neutralLeadIn(), (t) => waveSeq(t, Math.round(6000 / STEP), 1500))));
+  assertSignalShape(good);
+  expect(canonicalStreamJSON([good])).toContain('"swim":{"active":true');
+  const { swim: _omit, ...bare } = good;
+  assertSignalShape(bare); // absent stays valid (old tapes)
+  expect(() => assertSignalShape({ ...good, swim: { ...good.swim!, extra: 1 } })).toThrow(/swim/);
+  expect(() => assertSignalShape({ ...good, swim: { ...good.swim!, rate: -1 } })).toThrow(/swim/);
+  expect(() => assertSignalShape({ ...good, swim: { ...good.swim!, count: 1.5 } })).toThrow(/swim/);
+  expect(() => assertSignalShape({ ...good, swim: { ...good.swim!, amp: 2 } })).toThrow(/swim/);
+  expect(() => assertSignalShape({ ...good, swim: { ...good.swim!, active: 1 } })).toThrow(/swim/);
 });
 
 test('in-page transport delivers validated signals', () => {

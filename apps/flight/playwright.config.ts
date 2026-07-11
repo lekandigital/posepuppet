@@ -1,5 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
+const PP_PORT = process.env.PP_PORT ?? "5173";
+
 // BodyArcade Flight suite — separate from PosePuppet's root suite so the
 // two apps stay independently green. Port 5199 avoids PosePuppet's 5173.
 export default defineConfig({
@@ -21,8 +23,8 @@ export default defineConfig({
     },
     {
       // PosePuppet (the body-signal producer) for closed-loop specs.
-      command: "npm run dev --prefix ../..",
-      url: "http://localhost:5173",
+      command: `npm run dev --prefix ../.. -- --port ${PP_PORT} --strictPort`,
+      url: `http://localhost:${PP_PORT}`,
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,
     },

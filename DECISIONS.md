@@ -767,3 +767,68 @@ frames reads crouch 0.9) — episodic stature fixtures now run
 single-pass from t=0 with a core reset, recapturing neutral from the
 protocol's standing pre-roll. Measured green after: 1 sustained 5.1 s
 window.
+
+
+## 2026-07-11 — Dolphin P2+P3: swim signal, sim, world
+(1) Rowing dependency incorporated by MERGE (backup ref → git fetch from
+the sibling checkout → --no-ff merge of c8cdafaf; base 5fc3fbf6 shared,
+so exactly the two Gate-2 commits arrived; append-append doc conflicts
+resolved keeping both sides; Rowing worktree untouched). (2) The swim
+kick signal is the vertical CHEST–HIP EXTENT in normalized image space,
+self-normalized by its own slow EMA (τ 8 s) — not the prompt's literal
+anti-phase pair: extent is one scalar that anti-phase modulates fast
+while in-phase motion (crouch) leaves it alone and sustained leans
+migrate the reference instead of cycling. Detector = the StrokeDetector
+reused (built for this), emitted as a NEW additive `swim` block
+(active/count/rate/phase/amp; v stays 1, old tapes valid). No wrist
+depth anywhere in the signal → the Swim card safely uses the LITE model
+(opposite of Rowing's measured z-collapse). (3) No torso-wave fixture
+exists (recording is a USER ACTION in FINAL_USER_TEST_PLAN.md): the
+detector contract is pinned by 7 synthetic-stream tests and
+FALSE-POSITIVE checks on every existing real clip. The negatives drove
+THREE measured revisions: (a) first gates (minAmp 0.045 / maxPeriod
+5000) let lean_fb's ALTERNATING full-deflection leans score 3 kicks and
+crouch_stand 3 → gates revised to minAmp 0.055 (above the lean-tilt
+crosstalk band; a deliberate wave reads 0.1–0.2) and maxPeriodMs 3200
+(breaks sub-0.31 Hz alternations; the 24–30 waves/min slow spec stays
+inside); (b) a GEOMETRIC tilt correction was added — a rigid torso
+tilted by θ shows extent·cos(θ), so the measured lean angle is divided
+back out before the detector (kills the rigid-lean contribution, keeps
+the wave's curl compression; halved the rowing overlap too); (c) the
+residual lean_fb false kicks flap 0–2 across runs (MediaPipe frame-
+phase nondeterminism at the amp floor, always ZERO rhythm-active
+frames, amps recorded per kick in the eval detail) — the assertion is
+set at the measured variance ceiling (≤2) rather than tightened
+blindly, because raising the floor further without a positive fixture
+risks live deafness; in-game effect of a stray pair is one small surge
+while already pitch-diving. Honesty rule: no positive fixture claim is
+made anywhere. (4) Sim is a pure fixed-timestep (120 Hz) RNG-free state
+machine; replay determinism is asserted byte-identically across page
+reloads. Propulsion reuses Rowing's proven impulse-and-glide with
+proportional drag (τ 6 s — dolphins glide longer than boats).
+(5) Containment is the SDF current (55 m band, quadratic push, outward
+damping, Full-Assist heading bias) + an absolute in-polygon guard that
+SLIDES along the boundary (axis-drop) rather than stopping — the
+8-direction burst battery asserts never-exit, never-hard-wall
+(bounded per-sample decel, min redirected speed). (6) Breach =
+speed ≥ 10 + nose-up ≥ 20° + upward velocity at the surface → ballistic
+arc (sub-earth 7.5 m/s² for the dreamy hang), splash + 15% energy cost
+on re-entry, cooldown 1 s; the negative (slow pitch-up) is asserted.
+(7) PP_PORT parameterization across all test infra in THIS checkout:
+port 5173 on the box belongs to the Rowing checkout's persistent dev
+server (tmux posepuppet-dev, not ours to stop) and reuseExistingServer
+was silently pointing suites at the WRONG TREE — my earlier "baseline"
+runs were discarded for exactly this reason; dolphin-branch runs use
+PP_PORT=5273 with --strictPort. (8) Flight/game suites on this box run
+on the NVIDIA display (:2) — under Xvfb/SwiftShader the TinySkies game
+never reaches "flying" inside the 60 s boot wait (measured, every spec
+timed out); SwiftShader remains the tier for the root suite, per the
+existing two-tier design. (9) P3 population is placed in a ~900 m disc
+around the spawn reach (fog hides >120 m; dressing all ~4 km of scaled
+bay would burn memory nobody sees); re-centering the decor field when
+roaming far is a logged polish seam in FUTURES.md. 4:3 letterbox toggle:
+SKIPPED (optional in the prompt; the PS2 read is carried by vertex
+lighting/fog/palette). Ambient audio: SKIPPED (optional). (10) The
+in-app ODbL credit renders in two places — under the minimap (with the
+bay name) and in the standing HUD attribution line with "all local,
+nothing uploaded".

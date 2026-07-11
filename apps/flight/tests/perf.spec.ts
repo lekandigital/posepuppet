@@ -106,7 +106,7 @@ test("combined session: game fps with live pose loop (headed)", async () => {
   });
   const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
   const producer = await context.newPage();
-  await producer.goto("http://localhost:5173/");
+  await producer.goto(`http://localhost:${process.env.PP_PORT ?? "5173"}/`);
   await producer.waitForFunction(() => (window as any).__PP?.detectionCount > 10, undefined, {
     timeout: 60_000,
   });
@@ -117,7 +117,7 @@ test("combined session: game fps with live pose loop (headed)", async () => {
   const flight = await popupPromise;
   await flight.waitForLoadState("domcontentloaded");
   // Autostart into the cockpit for the measurement window.
-  await flight.goto("http://localhost:5173/flight/?autostart=1");
+  await flight.goto(`http://localhost:${process.env.PP_PORT ?? "5173"}/flight/?autostart=1`);
   await flight.waitForFunction(
     () => {
       const s = (window as any).__FLIGHT?.state();

@@ -34,6 +34,9 @@ export interface Measure {
   /** norm-space (image, y down) shoulder-center y + width — crouch fallback */
   shoulderNormY: number | null;
   shoulderWidthNorm: number | null;
+  /** norm-space hip-center y — with shoulderNormY this is the vertical
+   *  chest–hip extent, the torso-wave (swim kick) substrate */
+  hipNormY: number | null;
   /** nose relative to shoulder center in the torso basis (leanY fallback) */
   noseLocalZ: number | null;
   /** mean straight shoulder→wrist length over visible arms */
@@ -77,7 +80,7 @@ export class Extractor {
     basis: { vx: v3(1, 0, 0), vy: v3(0, 1, 0), vz: v3(0, 0, 1) },
     hipsValid: false, shoulderWidth: 0.34,
     statureWorld: null, shoulderNormY: null, shoulderWidthNorm: null,
-    noseLocalZ: null, armLenMeasured: null,
+    hipNormY: null, noseLocalZ: null, armLenMeasured: null,
     left: emptyArm(), right: emptyArm(),
     thighsHorizontal: null, anklesForwardRatio: null, legFoldRatio: null,
     kneesVisible: false, anklesVisible: false, hipsVisible: false,
@@ -98,6 +101,7 @@ export class Extractor {
     m.statureWorld = null;
     m.shoulderNormY = null;
     m.shoulderWidthNorm = null;
+    m.hipNormY = null;
     m.noseLocalZ = null;
     m.armLenMeasured = null;
     m.left.visOk = false;
@@ -157,6 +161,11 @@ export class Extractor {
       if (Math.min(nls.visibility, nrs.visibility) >= 0.4) {
         m.shoulderNormY = (nls.y + nrs.y) / 2;
         m.shoulderWidthNorm = Math.hypot(nls.x - nrs.x, nls.y - nrs.y);
+      }
+      const nlh = frame.norm[LM.leftHip];
+      const nrh = frame.norm[LM.rightHip];
+      if (Math.min(nlh.visibility, nrh.visibility) >= 0.4) {
+        m.hipNormY = (nlh.y + nrh.y) / 2;
       }
     }
 

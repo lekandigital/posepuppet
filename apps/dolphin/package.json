@@ -1,0 +1,22 @@
+{
+  "name": "@bodyarcade/dolphin",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "BodyArcade Dolphin — body-swimming through a low-poly PS2 underwater San Francisco Bay. Real boundary, fictional world inside.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "three": "^0.172.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/three": "^0.172.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}

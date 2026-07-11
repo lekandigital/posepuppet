@@ -17,8 +17,9 @@
     "audit:validate": "python3 tools/validate_model_audits.py model-audits",
     "audit:staleness": "python3 tools/check_audit_staleness.py models_for_animation model-audits",
     "audit:all": "npm run audit:self-test && npm run audit:models && npm run audit:validate && npm run audit:staleness",
-    "arcade": "npm --prefix apps/flight run build:client && vite",
-    "flight:build": "npm --prefix apps/flight run build:client"
+    "arcade": "npm --prefix apps/flight run build:client && npm --prefix apps/dolphin run build && vite",
+    "flight:build": "npm --prefix apps/flight run build:client",
+    "dolphin:build": "npm --prefix apps/dolphin run build"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.2.9",

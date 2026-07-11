@@ -34,9 +34,10 @@ export function openFlight(
   bodyInput: BodyInputAdapter,
   deps: FlightCompanionDeps = {},
   url = defaultFlightUrl(),
+  windowName = 'bodyarcade-flight',
 ): void {
   const target = new URL(url, window.location.href);
-  const win = window.open(target.href, 'bodyarcade-flight');
+  const win = window.open(target.href, windowName);
   if (!win) return; // popup blocked — user can retry from the palette/card
 
   const unsub = bodyInput.source.subscribe((signal) => {

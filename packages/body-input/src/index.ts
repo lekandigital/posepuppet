@@ -3,7 +3,7 @@
 
 export type {
   AxisName, AxisShapingConfig, BodyAxes, BodyEvent, BodyInputConfig, BodyInputFrame,
-  BodySignal, BodyStroke, BodyTracking, DeepPartial, EventConfig, ExtractionConfig,
+  BodySignal, BodyStroke, BodySwim, BodyTracking, DeepPartial, EventConfig, ExtractionConfig,
   LandmarkPoint, StrokeConfig, TrackingState,
 } from './types';
 
@@ -13,7 +13,7 @@ export type { AxisDebug, BodyInputCore } from './pipeline';
 export { defaultConfig, mergeConfig, AXIS_NAMES } from './defaults';
 
 export {
-  SCHEMA_V, AXIS_KEYS, EVENT_NAMES, STROKE_KEYS, TOP_KEYS,
+  SCHEMA_V, AXIS_KEYS, EVENT_NAMES, STROKE_KEYS, SWIM_KEYS, TOP_KEYS,
   assertSignalShape, canonicalSignalJSON, canonicalStreamJSON, quantize,
 } from './schema';
 

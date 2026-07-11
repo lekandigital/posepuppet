@@ -1,42 +1,42 @@
 {
   "replay": {
-    "date": "2026-07-11T18:09:55.598Z",
+    "date": "2026-07-11T20:10:17.038Z",
     "mode": "headed",
     "note": "intent tape (variable dt, recorded per frame) replayed through a fresh Plane",
-    "frames": 836,
-    "tapeSeconds": 14.099700000047688,
-    "dtMinMs": 10.3,
-    "dtMaxMs": 31.5,
-    "maxPosArcWorldUnits": 0,
+    "frames": 841,
+    "tapeSeconds": 14.064799999952243,
+    "dtMinMs": 7.9,
+    "dtMaxMs": 50,
+    "maxPosArcWorldUnits": 9.424321830774487e-7,
     "maxHeadingErrDeg": 0,
     "maxAltitudeErr": 0,
     "maxSpeedErr": 0
   },
   "rowingClosedLoop": {
-    "date": "2026-07-11T18:20:27.576Z",
+    "date": "2026-07-11T20:20:52.031Z",
     "mode": "headed",
     "enduranceSamples": 238,
     "minutes": 2,
     "onWaterFrac": 1,
     "inBandFrac": 1,
-    "alongProgressWorldUnits": 57.82,
+    "alongProgressWorldUnits": 54.97,
     "crossTrackBandWorldUnits": 1.75,
-    "meanStrokingSpeed": 0.188,
+    "meanStrokingSpeed": 0.179,
     "stallFrac": 0.0558,
     "coupling": [
       {
         "rateHz": 0.3,
-        "meanSpeed": 0.16108929773080363,
+        "meanSpeed": 0.16182707724891066,
         "samples": 20
       },
       {
         "rateHz": 0.5,
-        "meanSpeed": 0.19411092864241714,
+        "meanSpeed": 0.19601138541857432,
         "samples": 20
       },
       {
         "rateHz": 0.7,
-        "meanSpeed": 0.23754143163241673,
+        "meanSpeed": 0.24125422127499663,
         "samples": 20
       }
     ],

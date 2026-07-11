@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-07-11T19:50:17.212Z",
+  "cadenceCoupling": [
+    {
+      "rateHz": 0.4,
+      "speed": 7.668887694051683
+    },
+    {
+      "rateHz": 0.9,
+      "speed": 15.70560054119442
+    }
+  ],
+  "glideSpeedAfter3s": 10.986631109771189,
+  "burstPeakSpeed": 17.144285760642717,
+  "containment": {
+    "minShoreDist": 18.84275531015767,
+    "minSpeedWhileBursting": 20.810665237690976,
+    "maxDecelPer200ms": 0
+  },
+  "breach": {
+    "breaches": 1,
+    "splashes": 1
+  },
+  "dropout": {
+    "maxPitchStepRad": 0.0893260367988219,
+    "trackingDuringLoss": "autopilot"
+  },
+  "replayDigest": "-658.577955,-6.000000,-1086.323794,0.500000,16.000000,240,0|-637",
+  "perf": {
+    "fps": 60.00983767830792,
+    "simHz": 120.01967535661583,
+    "gpuRun": true
+  }
+}

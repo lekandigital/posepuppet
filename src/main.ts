@@ -980,6 +980,27 @@ async function boot() {
     );
   document.getElementById('row-btn')?.addEventListener('click', startRow);
 
+  // BodyArcade Dolphin entry: standalone app at same-origin /dolphin/.
+  // The swim-kick signal reads image-space chest–hip extent (no wrist
+  // depth), so the LITE model is safe here — same companion mode as Fly.
+  const startSwim = () =>
+    openFlight(
+      bodyInput,
+      {
+        setStageSuspended: (v) => stage.setSuspended(v),
+        useLiteModel: () => {
+          const prev = config.model;
+          if (prev !== 'lite') setConfig('model', 'lite');
+          return () => {
+            if (prev !== 'lite' && config.model === 'lite') setConfig('model', prev);
+          };
+        },
+      },
+      '/dolphin/',
+      'bodyarcade-dolphin',
+    );
+  document.getElementById('swim-btn')?.addEventListener('click', startSwim);
+
   // ── recording director: guided takes, hands-free via the gesture seed ──
   let latestNorm: LandmarkPoint[] | null = null;
   const intents = createIntentDetector();
@@ -1206,6 +1227,8 @@ async function boot() {
       run: () => startFlight() },
     { id: 'row', label: 'row · bodyarcade rowing (strokes drive the boat)',
       run: () => startRow() },
+    { id: 'swim', label: 'swim · bodyarcade dolphin (torso waves swim the bay)',
+      run: () => startSwim() },
     { id: 'body-tuner', label: 'body input · tuner overlay', key: 'b',
       run: () => {
         let host = document.getElementById('bi-tuner-host');

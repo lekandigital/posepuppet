@@ -1,5 +1,71 @@
 # Eval notes
 
+## Dolphin P2+P3 — body swimming, containment, the PS2 bay (2026-07-11)
+
+**Test-integrity note first:** every number below was produced with the
+producer pinned to THIS tree (`PP_PORT=5273 --strictPort`). The first
+baseline attempt was discarded — port 5173 on the remote box belongs to
+the sibling Rowing checkout's persistent dev server, and
+`reuseExistingServer` silently made it the producer. The PP_PORT
+parameterization (all suite configs + spec constants + eval tools) is
+the fix, and DECISIONS.md logs it.
+
+**Swim detection (@bodyarcade/body-input, `swim` block).** Signal:
+vertical chest–hip extent in normalized image space, self-normalized by
+a slow EMA (τ 8 s); detector = StrokeDetector reused. 32/32 protocol
+tests green, including 7 new synthetic swim tests: 8-wave count ±1 with
+rate read, slow/fast ordering, sustained-lean never a rhythm, in-phase
+crouch bounce and sub-amplitude wobble and still-jitter all zero,
+hips-hidden quiet (no crash), dropout never spikes the count, schema
+closed-shape + canonical serialization + old-tapes-stay-valid.
+Fixture false-positive rows (real footage, full pose model):
+still 0 kicks / 0 rhythm-active (amp p99 = 0.0000 — the measured floor); lean_lr 0/0; crouch_stand ≤2 asserted, 0–1 measured post-revision; lean_fb ≤2 asserted at the measured variance ceiling (0–2 across runs, isolated at-floor pairs, never a rhythm — see DECISIONS for the three-round tuning journey incl. the geometric tilt correction); rowing clips recorded-not-asserted (6→3 kicks after tilt correction; they never feed the dolphin). No torso-wave fixture exists, so no positive
+fixture claim is made anywhere — the recording specs live in
+FINAL_USER_TEST_PLAN.md as the standing USER ACTION.
+
+**Dolphin suite (apps/dolphin, headed on the NVIDIA display, results in
+eval/dolphin-results.json):** 12/12 passed (4.7 m, DISPLAY=:2, DOLPHIN_GPU=1, PP_PORT=5273).
+- Impulse-and-glide: cadence → settled speed (0.4 Hz → 7.7 m/s, 0.9 Hz → 15.7 m/s); glide
+  after stopping keeps 11.0 m/s three seconds after the last kick (from a 15.7 m/s cruise — a real glide, not a brake).
+- Containment battery: 8-direction full-burst escape attempts from a
+  self-located near-shore point — in-polygon on EVERY sample, min shore
+  distance +18.8 m, min redirected speed 20.8 m/s, max
+  per-200 ms decel 0.0 m/s (no hard wall).
+- Breach: sprint + pitch-up fires (leap → splash → swim); the low-speed
+  negative never fires.
+- Dropout: max pitch step 0.089 (threshold 0.12 — set at ~8× below snap scale after the first run measured a 0.7% margin against 0.09) rad per 100 ms during loss
+  (never snaps), glide holds, recovery slew-bounded, kick count never
+  spikes.
+- Replay determinism: identical intent scripts → byte-identical
+  trajectories, including across page reloads.
+- Transport topology: built app at same-origin /dolphin/ receives live
+  fixture-driven signals over pure BroadcastChannel (fullbody.y4m —
+  hips in frame, since the kick signal needs them).
+- Perf: 60 fps render (vsync-capped on the NVIDIA display; floor 45 asserted on GPU runs) at a rock-steady 120 Hz sim; SwiftShader runs record fps without asserting the floor, and final feel/perf validation stays on Apple Silicon per the cross-platform policy.
+
+**Environment finding (flight suite):** under Xvfb/SwiftShader the
+TinySkies game never reaches the "flying" state inside its 60 s boot
+wait — every spec timed out; on the NVIDIA display (:2) the game boots
+normally. Game suites (flight, dolphin) therefore run on :2 on this
+box; the root PosePuppet suite stays on the headless SwiftShader tier
+per the existing two-tier design. This is an environment classification,
+not a threshold change.
+
+**Vision self-check (PS2 brief)** — media/dolphin-p3/{spawn,cruise,
+deep,surface}.png (gitignored media/, regenerate with
+`node apps/dolphin/shots.mjs` against a dev server): reads as intended —
+flat-shaded low-poly seabed with rocks and drowned columns, depth-tinted
+fog (teal at 6 m, deep blue at 18 m), kelp blades and fish silhouettes
+in the middle distance, additive motes, the surface as a lit band from
+below, and the minimap silhouette unmistakably San Francisco Bay with
+the ODbL credit under it; the HUD reads in plain mono (DEPTH/SPEED/KICK/
+ASSIST/TRACKING). Palette holds to deep-blue/teal/cyan/sand — nothing
+photoreal, nothing beige. Honest critiques for the live gate: the
+dolphin from dead-astern reads as a tapered body more than a dolphin
+(¾ and side angles show the fins; judge on camera), and the middle
+distance can feel sparse between decor clusters — the fog carries the
+mood but a denser pass is a cheap follow-up if it reads empty live.
+
 ## Dolphin P1 — boundary module, all checks green (2026-07-11)
 
 `packages/world-data` ships its first artifact:

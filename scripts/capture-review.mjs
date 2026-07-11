@@ -24,7 +24,7 @@ const SNAP_TIMES = timesArg
   : [2, 4.5, 7, 9.5, 12];
 // --avatar=vrm captures the VRM instead of the robot (prefixes filenames)
 const avatar = (process.argv.find((a) => a.startsWith('--avatar=')) ?? '--avatar=robot').split('=')[1];
-const BASE = 'http://localhost:5173';
+const BASE = `http://localhost:${process.env.PP_PORT ?? '5173'}`;
 
 async function serverUp() {
   try {
