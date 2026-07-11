@@ -1,0 +1,191 @@
+{
+  "name": "san-francisco-bay",
+  "displayName": "San Francisco Bay",
+  "mode": "coastline-clip",
+  "source": {
+    "provider": "OpenStreetMap via Overpass API (natural=coastline ways)",
+    "url": "https://www.openstreetmap.org/#map=11/37.70/-122.29",
+    "license": "ODbL-1.0",
+    "attribution": "Boundary data © OpenStreetMap contributors"
+  },
+  "raw": "data/raw/san-francisco-bay-coastline.osm.json.gz",
+  "out": "data/boundaries/san-francisco-bay.json",
+  "bbox": [
+    37.42,
+    -122.56,
+    37.97,
+    -122.03
+  ],
+  "seed": {
+    "lat": 37.7,
+    "lon": -122.3
+  },
+  "cuts": [
+    {
+      "name": "Pacific gate (Point Bonita – Lands End)",
+      "a": [
+        37.8155,
+        -122.5295
+      ],
+      "b": [
+        37.7885,
+        -122.5115
+      ]
+    },
+    {
+      "name": "San Pablo gate (San Quentin – Castro Point)",
+      "a": [
+        37.958,
+        -122.5
+      ],
+      "b": [
+        37.938,
+        -122.4
+      ]
+    }
+  ],
+  "islandMinAreaM2": 500,
+  "islandNames": [
+    {
+      "name": "Alcatraz Island",
+      "lat": 37.8267,
+      "lon": -122.423
+    },
+    {
+      "name": "Angel Island",
+      "lat": 37.8609,
+      "lon": -122.4326
+    },
+    {
+      "name": "Treasure Island / Yerba Buena Island",
+      "lat": 37.8235,
+      "lon": -122.3708
+    },
+    {
+      "name": "Alameda",
+      "lat": 37.765,
+      "lon": -122.247
+    },
+    {
+      "name": "Brooks Island",
+      "lat": 37.9035,
+      "lon": -122.3585
+    },
+    {
+      "name": "Red Rock Island",
+      "lat": 37.9313,
+      "lon": -122.4452
+    },
+    {
+      "name": "Bird Island",
+      "lat": 37.8957,
+      "lon": -122.3593
+    }
+  ],
+  "simplify": {
+    "radialPreSpacingM": 20,
+    "minTriangleAreaM2": 8000,
+    "minRingVerts": 12,
+    "maxPasses": 8
+  },
+  "budget": {
+    "outerMax": 1600,
+    "totalMax": 2400
+  },
+  "expect": {
+    "polygons": 1,
+    "requiredIslands": [
+      "Alcatraz Island",
+      "Angel Island",
+      "Treasure Island / Yerba Buena Island",
+      "Alameda"
+    ],
+    "minHoles": 4,
+    "maxHoles": 80
+  },
+  "checks": {
+    "maxAreaDeltaPct": 1.0,
+    "channelMinClearanceM": 200,
+    "channelKeepRatio": 0.8
+  },
+  "probes": [
+    {
+      "name": "Golden Gate strait mid",
+      "lat": 37.8185,
+      "lon": -122.478,
+      "expect": "water"
+    },
+    {
+      "name": "Central Bay (Alcatraz–Berkeley)",
+      "lat": 37.845,
+      "lon": -122.41,
+      "expect": "water"
+    },
+    {
+      "name": "Raccoon Strait",
+      "lat": 37.868,
+      "lon": -122.444,
+      "expect": "water"
+    },
+    {
+      "name": "Richardson Bay",
+      "lat": 37.87,
+      "lon": -122.49,
+      "expect": "water"
+    },
+    {
+      "name": "South Bay mid (San Mateo bridge)",
+      "lat": 37.58,
+      "lon": -122.18,
+      "expect": "water"
+    },
+    {
+      "name": "San Francisco downtown",
+      "lat": 37.79,
+      "lon": -122.41,
+      "expect": "land"
+    },
+    {
+      "name": "Oakland downtown",
+      "lat": 37.804,
+      "lon": -122.271,
+      "expect": "land"
+    },
+    {
+      "name": "Berkeley",
+      "lat": 37.87,
+      "lon": -122.27,
+      "expect": "land"
+    },
+    {
+      "name": "Pacific beyond the gate",
+      "lat": 37.788,
+      "lon": -122.525,
+      "expect": "land"
+    },
+    {
+      "name": "San Pablo Bay beyond the gate",
+      "lat": 37.965,
+      "lon": -122.44,
+      "expect": "land"
+    }
+  ],
+  "channels": [
+    {
+      "name": "Golden Gate",
+      "lat": 37.8185,
+      "lon": -122.478
+    },
+    {
+      "name": "Raccoon Strait",
+      "lat": 37.868,
+      "lon": -122.444
+    },
+    {
+      "name": "Oakland estuary",
+      "lat": 37.793,
+      "lon": -122.289,
+      "minClearanceM": 60
+    }
+  ]
+}

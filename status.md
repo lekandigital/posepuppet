@@ -89,3 +89,11 @@ Dolphin fixtures missing — exact recording specs in PLAN.md (torso_wave_slow 1
 Baseline: ENVIRONMENT_BLOCKED at P0 (fresh checkout, no private fixtures; npm ci + tsc --noEmit green instead); full suites re-baselined at P1 entry after fixture sync
 Blockers: USER GATE 1 — water-shape pick + plan approval + fixture recording
 Next: on approval + fixtures, P1 boundary module (fetch → simplify → boundary.json + minimap + attribution)
+
+## 2026-07-11 (Dolphin P1 — boundary module green)
+Gate 1 resolved: Lekan picked San Francisco Bay (preserve outline, Golden Gate opening, major islands, channels) and approved the plan, P1-only scope
+`packages/world-data` shipped: offline fetch → assemble → simplify → project → `data/boundaries/san-francisco-bay.json` (provenance + ODbL attribution inside; `loadBoundary` refuses artifacts without it); runtime surface `pointInWater`/`signedDistanceToShore` for the containment current and SDF depth
+Key build finding: OSM's curated bay relation excludes Golden Gate + Raccoon Strait (probes failed on raw) — built `coastline-clip` mode (coastline ways ∩ convex region with two named gates) which restores every channel and island; relation mode kept for enclosed shapes like Kotor
+Numbers (eval/worlddata-results.json, 31 checks ALL GREEN): 20,908 → 1,583 verts (outer 1,211, 21 islands), area delta −0.0394 %, channels Golden Gate 489 m / Raccoon 388 m / Oakland estuary 237 m at keep-ratio ≈ 1.0, byte-identical rebuilds; minimap vision check unmistakably SF Bay (raw ≈ simplified at 1024 px)
+Blockers: none for P1; fixtures (specs in PLAN.md) still pending for P2
+Next: on go-ahead — P2 graybox swim (torso-wave detector, apps/dolphin scaffold, containment current, assists) toward live Gate 2

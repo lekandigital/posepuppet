@@ -174,3 +174,11 @@ Upstream files adapted beyond the P0 manifest: `client/src/game/Game.ts`
 `client/index.html` + `client/src/main.ts` (self-hosted Inter, external
 widget removed), `client/vite.config.ts` + `client/tsconfig.json`
 (body-input alias).
+
+## BodyArcade Dolphin — world data (packages/world-data)
+
+| files | class | notes |
+|---|---|---|
+| `packages/world-data/data/raw/san-francisco-bay-coastline.osm.json.gz` | data — OpenStreetMap | Overpass extract of `natural=coastline` ways, bbox 37.42..37.97 / −122.56..−122.03, fetched 2026-07-11; © OpenStreetMap contributors, ODbL 1.0; committed so builds reproduce offline |
+| `packages/world-data/data/boundaries/san-francisco-bay.json` | data — derived from OSM | simplified + projected boundary artifact; full provenance, license, and attribution embedded in the file; `loadBoundary()` refuses artifacts without attribution; the in-app ODbL credit ships with the dolphin shell (P2) |
+| `packages/world-data/src/**`, `tools/**`, `configs/**` | original | boundary pipeline (fetch/build/render/check) + runtime containment/distance surface |

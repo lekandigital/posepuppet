@@ -1,0 +1,17 @@
+{
+  "name": "@bodyarcade/world-data",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Real-water boundary pipeline: OSM water polygon in (offline), bundled boundary.json out. The future open-data pipeline's water-polygon component.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "fetch": "node tools/fetch-boundary.mjs",
+    "build": "node tools/build-boundary.mjs",
+    "render": "node tools/render-boundary.mjs",
+    "check": "node tools/check-boundary.mjs"
+  }
+}

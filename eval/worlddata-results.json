@@ -1,0 +1,212 @@
+{
+  "generated": "2026-07-11T09:20:12.704Z",
+  "module": "@bodyarcade/world-data",
+  "config": "san-francisco-bay",
+  "mode": "coastline-clip",
+  "stats": {
+    "rawVertices": 20908,
+    "vertices": 1583,
+    "outerVertices": 1211,
+    "holes": 21,
+    "droppedIslets": 21,
+    "droppedWaterRings": 5,
+    "holesSealedBySimplification": 3,
+    "areaRawM2": 700153321,
+    "areaM2": 699877760,
+    "areaDeltaPct": -0.0394,
+    "simplify": {
+      "method": "visvalingam-whyatt",
+      "radialPreSpacingM": 20,
+      "minTriangleAreaM2": 8000,
+      "requestedMinTriangleAreaM2": 8000,
+      "minRingVerts": 12,
+      "passes": 1
+    }
+  },
+  "source": {
+    "provider": "OpenStreetMap via Overpass API (natural=coastline ways)",
+    "mode": "coastline-clip",
+    "url": "https://www.openstreetmap.org/#map=11/37.70/-122.29",
+    "license": "ODbL-1.0",
+    "attribution": "Boundary data © OpenStreetMap contributors",
+    "osmBaseTimestamp": "2026-07-11T09:08:02Z",
+    "bbox": [
+      37.42,
+      -122.56,
+      37.97,
+      -122.03
+    ],
+    "cuts": [
+      {
+        "name": "Pacific gate (Point Bonita – Lands End)",
+        "a": [
+          37.8155,
+          -122.5295
+        ],
+        "b": [
+          37.7885,
+          -122.5115
+        ]
+      },
+      {
+        "name": "San Pablo gate (San Quentin – Castro Point)",
+        "a": [
+          37.958,
+          -122.5
+        ],
+        "b": [
+          37.938,
+          -122.4
+        ]
+      }
+    ]
+  },
+  "checks": [
+    {
+      "name": "format tag",
+      "pass": true,
+      "value": "bodyarcade-boundary/1"
+    },
+    {
+      "name": "polygon count",
+      "pass": true,
+      "value": "1 (expect 1)"
+    },
+    {
+      "name": "island present: Alcatraz Island",
+      "pass": true
+    },
+    {
+      "name": "island present: Angel Island",
+      "pass": true
+    },
+    {
+      "name": "island present: Treasure Island / Yerba Buena Island",
+      "pass": true
+    },
+    {
+      "name": "island present: Alameda",
+      "pass": true
+    },
+    {
+      "name": "island count sane",
+      "pass": true,
+      "value": "21 islands (4..80), named: Alameda; Angel Island; Treasure Island / Yerba Buena Island; Alcatraz Island; Bird Island"
+    },
+    {
+      "name": "no self-intersections",
+      "pass": true,
+      "value": "22 rings"
+    },
+    {
+      "name": "no ring crossings / holes contained",
+      "pass": true
+    },
+    {
+      "name": "area delta within tolerance",
+      "pass": true,
+      "value": "-0.0394% (tolerance ±1%)"
+    },
+    {
+      "name": "outer vertex budget",
+      "pass": true,
+      "value": "1211 <= 1600"
+    },
+    {
+      "name": "total vertex budget",
+      "pass": true,
+      "value": "1583 <= 2400 (raw 20908)"
+    },
+    {
+      "name": "probe Golden Gate strait mid (water)",
+      "pass": true,
+      "value": "raw+simplified agree"
+    },
+    {
+      "name": "probe Central Bay (Alcatraz–Berkeley) (water)",
+      "pass": true,
+      "value": "raw+simplified agree"
+    },
+    {
+      "name": "probe Raccoon Strait (water)",
+      "pass": true,
+      "value": "raw+simplified agree"
+    },
+    {
+      "name": "probe Richardson Bay (water)",
+      "pass": true,
+      "value": "raw+simplified agree"
+    },
+    {
+      "name": "probe South Bay mid (San Mateo bridge) (water)",
+      "pass": true,
+      "value": "raw+simplified agree"
+    },
+    {
+      "name": "probe San Francisco downtown (land)",
+      "pass": true,
+      "value": "raw+simplified agree"
+    },
+    {
+      "name": "probe Oakland downtown (land)",
+      "pass": true,
+      "value": "raw+simplified agree"
+    },
+    {
+      "name": "probe Berkeley (land)",
+      "pass": true,
+      "value": "raw+simplified agree"
+    },
+    {
+      "name": "probe Pacific beyond the gate (land)",
+      "pass": true,
+      "value": "raw+simplified agree"
+    },
+    {
+      "name": "probe San Pablo Bay beyond the gate (land)",
+      "pass": true,
+      "value": "raw+simplified agree"
+    },
+    {
+      "name": "island interior is land: Alameda",
+      "pass": true
+    },
+    {
+      "name": "island interior is land: Angel Island",
+      "pass": true
+    },
+    {
+      "name": "island interior is land: Alcatraz Island",
+      "pass": true
+    },
+    {
+      "name": "island interior is land: Bird Island",
+      "pass": true
+    },
+    {
+      "name": "channel open: Golden Gate",
+      "pass": true,
+      "value": "clearance 489 m (raw 488 m, floor 200 m, keep ≥0.8×)"
+    },
+    {
+      "name": "channel open: Raccoon Strait",
+      "pass": true,
+      "value": "clearance 388 m (raw 387 m, floor 200 m, keep ≥0.8×)"
+    },
+    {
+      "name": "channel open: Oakland estuary",
+      "pass": true,
+      "value": "clearance 237 m (raw 237 m, floor 60 m, keep ≥0.8×)"
+    },
+    {
+      "name": "rebuild determinism",
+      "pass": true,
+      "value": "71883 bytes"
+    },
+    {
+      "name": "committed artifact matches rebuild",
+      "pass": true
+    }
+  ],
+  "allPass": true
+}
