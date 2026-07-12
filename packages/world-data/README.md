@@ -7,9 +7,16 @@ game metres, and emit a self-describing `boundary.json` that games bundle
 and import. The playable world inside is fictional; the outline is real —
 the minimap is the proof.
 
-This package is the seed of the future open-data pipeline: it is that
-pipeline's **water-polygon component**, designed to be absorbed rather
-than rewritten. One artifact format, N shapes, each a config away.
+This package was the seed of the open-data pipeline, and the absorption
+has happened: `tools/worldbake` (repo root) calls this package's
+`buildBoundary()` as its **water-polygon component** and emits full
+world artifacts (`bodyarcade-world/1` — terrain, layers, collision, nav
+graphs, minimap, spawns, transitions) under `data/worlds/<region>/`.
+The package hosts both runtime surfaces: the boundary surface below
+(unchanged — standalone Dolphin's contract) and the world surface
+(`loadWorld`, `decodeHeights`, `heightAt`, `worldPointInWater`,
+`nearestNavNode` — see `WORLD_SCHEMA.md`). One artifact format per
+scale, N regions, each a config away.
 
 ## Non-negotiables
 

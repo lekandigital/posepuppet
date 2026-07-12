@@ -128,6 +128,10 @@ export function bake(config, { render = false } = {}) {
       maxElevationM: heightmap.maxElevationM,
       seaLevelM: 0,
       sourceZoom: heightmap.sourceZoom,
+      // present only when the config asked for a bathymetry floor —
+      // absent means untouched source elevations
+      clampMinM: heightmap.clampMinM ?? undefined,
+      clampedCells: heightmap.clampMinM !== null ? heightmap.clampedCells : undefined,
       encoding: heightsEnc.encoding,
       offsetM: heightsEnc.offsetM,
       scaleM: heightsEnc.scaleM,

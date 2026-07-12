@@ -14742,6 +14742,7 @@
   "normalize": {
    "droppedDegenerate": 0,
    "droppedRelationSeam": 0,
+   "droppedSelfIntersecting": 0,
    "clippedAway": 0
   },
   "notes": []

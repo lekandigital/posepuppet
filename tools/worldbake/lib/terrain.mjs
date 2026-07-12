@@ -105,6 +105,11 @@ function loadMosaic(cacheDir, tiles) {
  */
 export function buildHeightmap(config, cacheDir, proj, bboxM, acquired) {
   const cell = config.terrain?.cellSizeM ?? 10;
+  // optional floor for coarse offshore bathymetry (ETOPO1-class sources
+  // can report kilometre-deep cells inside a harbour) — a documented,
+  // stated transform, never silent: count lands in the artifact stats
+  const clampMin = config.terrain?.clampMinM ?? null;
+  let clampedCells = 0;
   const [minx, miny, maxx, maxy] = bboxM;
   const width = Math.floor((maxx - minx) / cell) + 1;
   const height = Math.floor((maxy - miny) / cell) + 1;
@@ -132,7 +137,8 @@ export function buildHeightmap(config, cacheDir, proj, bboxM, acquired) {
       const e10 = mosaic.elevAtPixel(px0 + 1, py0);
       const e01 = mosaic.elevAtPixel(px0, py0 + 1);
       const e11 = mosaic.elevAtPixel(px0 + 1, py0 + 1);
-      const e = (e00 * (1 - fx) + e10 * fx) * (1 - fy) + (e01 * (1 - fx) + e11 * fx) * fy;
+      let e = (e00 * (1 - fx) + e10 * fx) * (1 - fy) + (e01 * (1 - fx) + e11 * fx) * fy;
+      if (clampMin !== null && e < clampMin) { e = clampMin; clampedCells++; }
       const rounded = roundDm(e);
       heights[j * width + i] = rounded;
       if (rounded < minE) minE = rounded;
@@ -148,6 +154,8 @@ export function buildHeightmap(config, cacheDir, proj, bboxM, acquired) {
     minElevationM: minE,
     maxElevationM: maxE,
     sourceZoom: z,
+    clampMinM: clampMin,
+    clampedCells,
     heights,
   };
 }

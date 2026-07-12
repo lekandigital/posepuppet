@@ -184,7 +184,7 @@ export function normalizeLayers(config, extract) {
   const coastlineWays = [];
   const pierWays = [];
   const aerowayNodes = [];
-  const diagnostics = { droppedDegenerate: 0, droppedRelationSeam: 0, clippedAway: 0 };
+  const diagnostics = { droppedDegenerate: 0, droppedRelationSeam: 0, droppedSelfIntersecting: 0, clippedAway: 0 };
 
   /** clip → simplify → round; returns polyline pieces (>=2 pts). */
   const linePieces = (el) => {
@@ -207,7 +207,13 @@ export function normalizeLayers(config, extract) {
       const cand = visvalingam(pre, { minTriangleAreaM2: e, minRingVerts: eps.minRingVerts });
       if (!ringSelfIntersects(cand)) { ring = cand; break; }
     }
-    if (!ring) ring = pre; // raw clipped ring as the safe fallback
+    if (!ring) {
+      // ladder exhausted; the clipped ring itself may self-intersect
+      // (Sutherland–Hodgman on a non-convex subject can bowtie) — never
+      // ship a bad ring, drop and count instead
+      if (ringSelfIntersects(pre)) { diagnostics.droppedSelfIntersecting++; return null; }
+      ring = pre;
+    }
     if (Math.abs(shoelaceSigned(ring)) < 1) { diagnostics.droppedDegenerate++; return null; }
     return roundRing(shoelaceSigned(ring) > 0 ? ring : ring.slice().reverse()); // outward CCW
   };

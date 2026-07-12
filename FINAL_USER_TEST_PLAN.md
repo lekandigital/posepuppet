@@ -1,7 +1,13 @@
 # FINAL USER TEST PLAN — one consolidated human pass
 ## Front matter
 - Environment prep (branch/merge state, hardware, camera, lighting, ports)
-- Region decision deadline status (§14)
+- Region decision deadline status (§14): the Open World region defaults
+  to **Ísafjörður, Iceland** (V2 world-data, 2026-07-11 — scoring in
+  REGION_CANDIDATES.md; Friday Harbor, WA is the baked runner-up).
+  Swapping regions is a cheap re-bake (`tools/worldbake` README) UNTIL
+  V4's realistic art pass begins hand-tuning to the location — that
+  milestone is the deadline. Name a personally meaningful place before
+  then and it becomes the region; no action needed to accept the default.
 - Estimated total time; recommended order (below)
 - Evidence index: links to eval/results.json, screenshot boards,
   recordings, per-prompt EVAL_NOTES

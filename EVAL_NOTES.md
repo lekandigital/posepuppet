@@ -1,5 +1,56 @@
 # Eval notes
 
+## V2 world-data — worldbake pipeline, two regions baked, 69 checks green (2026-07-11)
+
+**What shipped.** `tools/worldbake` (dependency-free Node, no
+Playwright — golden files) bakes a compact real-world region into
+`bodyarcade-world/1`: terrain heightfield (u16 base64, terrarium tiles),
+coastline, sea + lake water polygons, waterways, roads, paths, building
+footprints (heights from tags/levels), landuse zones, admin boundaries,
+aeroways, ear-clipped building collision meshes, walk + row nav graphs,
+minimap vectors, and data-derived spawns/transitions (airfield / walk /
+dock / dive). Runtime surface in `packages/world-data/src/world.ts`
+(`loadWorld` refuses missing attribution — tested both directions).
+Schema doc: `packages/world-data/WORLD_SCHEMA.md`. Sources + licenses:
+`DATA_SOURCES.md` (endpoints re-verified live 2026-07-11; the main
+Overpass instance 406s undescriptive User-Agents — the fetcher rotates
+mirrors with a descriptive UA).
+
+**Regions.** Shortlist scored on live Overpass counts in
+`REGION_CANDIDATES.md`; **Ísafjörður** is the working default (990
+buildings, fjord walls to 788 m, real airport, enclosed harbor pool —
+all four modes in one frame). **Friday Harbor** (1 744 buildings, FHR
+runway, Brown Island a real hole in the sea polygon) was baked second,
+following the README recipe as the doc proof. Both minimap renders
+visually verified against real geography (street names — Urðarvegur,
+A Street — come out of the artifact).
+
+**Numbers (eval/worldbake-results.json, 69 checks, all green).**
+Determinism: full re-bake from committed cache is byte-identical to the
+committed artifact for both regions (1 153 911 / 1 200 740 bytes) +
+golden sha256s. Geometry: 0
+self-intersecting rings of 1 069 (ísafjörður) / 1 854 (friday-harbor);
+sea area delta 0.0016% / −0.0078% (tolerance ±1%). Collision:
+965/965 and 1 744/1 744 building meshes with triangle-area ==
+footprint-area within 0.5%. Nav: walk components cover every
+settlement probe ≤ 60 m; row lattice reaches the bay from every dock
+and dive transition (BFS-asserted). Terrain probes: town ≈ sea level,
+fjord plateau 788 m; Friday Harbor bathymetry floored at −60 m
+(`clampMinM`, stated in the artifact — ETOPO1-class offshore data is
+that coarse).
+
+**Absorption regression.** The Dolphin boundary module is called as a
+library (its `buildBoundary()` assembles every sea polygon); its own
+31-check suite runs inside worldbake's checks and stays green, the SF
+Bay artifact is byte-identical, and the standalone dolphin app builds.
+
+**Honest limitations.** >60°N terrain is smooth at the ~10 m scale
+(coarser DEM upstream; GLO-30 documented as the upgrade path);
+offshore bathymetry below 60°N is ETOPO1-coarse (clamp option);
+multipolygon buildings with members outside the bbox are dropped and
+counted; the row network is a 40 m water lattice, not waterway
+centerlines. All stated in WORLD_SCHEMA.md.
+
 ## Dolphin P2+P3 — body swimming, containment, the PS2 bay (2026-07-11)
 
 **Test-integrity note first:** every number below was produced with the

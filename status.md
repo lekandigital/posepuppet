@@ -130,3 +130,10 @@ Perf: Dolphin 60 fps render (vsync) / 120 Hz sim on the remote GPU; Flight’s a
 Docs shipped: README + CHANGELOG + ARCHITECTURE + FUTURES (pipeline water seam + obstacle-avoidance review note) + ASSETS (all-procedural) + apps/dolphin/README + FINAL_USER_TEST_PLAN § Dolphin
 Blockers: only the consolidated live session (not requested now, per instruction)
 Next: Lekan’s live swim per FINAL_USER_TEST_PLAN.md; branch not merged, not pushed
+
+## 2026-07-11 (V2 world-data — pipeline shipped, two regions baked, all checks green)
+tools/worldbake + bodyarcade-world/1 schema shipped: terrain, water (sea via the absorbed Dolphin boundary builder + lakes), waterways, roads/paths, buildings, landuse, boundaries, aeroways, collision meshes, walk+row nav graphs, minimap, data-derived spawns + mode transitions; offline-first with committed sha256-checksummed caches
+Ísafjörður baked as the working default (REGION_CANDIDATES.md: 3 candidates scored on live Overpass counts; terrain variance decided it); Friday Harbor baked second purely from the README as the doc proof; region swap stays a cheap re-bake until V4 realistic art (deadline recorded in FINAL_USER_TEST_PLAN front matter)
+Verification: 69 golden-file checks green (byte-identical re-bakes, schema round-trip, attribution refusal, geometry sanity, nav reachability, collision area parity) in eval/worldbake-results.json; boundary suite 31 green; SF Bay artifact byte-identical; standalone dolphin builds; tsc green
+Blockers: none
+Next: V4 consumes data/worlds/isafjordur/world.json read-only; optional region override open until V4 realistic art pass

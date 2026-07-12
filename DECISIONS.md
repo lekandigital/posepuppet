@@ -832,3 +832,91 @@ lighting/fog/palette). Ambient audio: SKIPPED (optional). (10) The
 in-app ODbL credit renders in two places — under the minimap (with the
 bay name) and in the standing HUD attribution line with "all local,
 nothing uploaded".
+
+## 2026-07-11 — V2 world-data: region default is Ísafjörður, by scored shortlist
+Three candidates scored on live Overpass completeness counts plus the
+pack §14 criteria (REGION_CANDIDATES.md has the tables). Friday Harbor
+beat it on completeness and compactness; Ísafjörður won on the deciding
+criterion — terrain variance (sea level → 788 m inside the bbox, and
+rowable water + walkable settlement + real airport + fjord walls in one
+camera frame). Friday Harbor became the second-location bake that
+proves the README. The choice is a cheap re-bake until V4's realistic
+art pass starts hand-tuning (recorded in FINAL_USER_TEST_PLAN front
+matter); Lekan can name any place before then and it becomes the region.
+
+## 2026-07-11 — V2 world-data: terrarium tiles over Copernicus GLO-30
+Both verified live (endpoints in DATA_SOURCES.md — the prompt was right
+not to trust memory: overpass-api.de now 406s undescriptive
+User-Agents, and the kumi mirror throws transient dispatcher errors, so
+the fetcher rotates mirrors with a descriptive UA and backoff).
+Terrarium PNGs decode with ~80 dependency-free lines (node zlib +
+hand-rolled unfiltering); GLO-30 is Cloud-Optimized GeoTIFF — a real
+dependency or a much bigger decoder. Cost: above 60°N terrarium falls
+back to coarser-than-SRTM sources, so the Ísafjörður terrain is smooth
+at the ~10 m scale (stated in WORLD_SCHEMA.md and REGION_CANDIDATES.md;
+the 700 m relief still dominates). GLO-30 is the documented upgrade
+path, isolated behind lib/terrain.mjs. Overture: healthy (monthly
+GeoParquet), evaluated and deferred — consuming it means Parquet
+tooling, and its layers are largely OSM-derived at 2–4 km² scale.
+
+## 2026-07-11 — V2 world-data: absorption = call buildBoundary(), don't port it
+The sea polygon is assembled by the SAME function that shipped the SF
+Bay boundary: worldbake writes its coastline extract subset as a raw
+cache file, synthesizes a boundary config in memory, and calls the
+package's buildBoundary(). One additive change to the package tools
+(readRaw accepts absolute paths); the SF Bay artifact stays
+byte-identical and the boundary check suite runs inside worldbake's own
+checks as a permanent absorption regression. Lakes (natural=water) ride
+alongside as additional water polygons with their own classes.
+
+## 2026-07-11 — V2 world-data: caches are committed, including tile PNGs
+Offline-first + deterministic means the inputs ship with the repo:
+Overpass extracts gzipped (node gzipSync writes no timestamp — byte-
+stable), terrarium tiles as-is, all sha256-recorded in the artifact's
+source.inputs. Needed a scoped .gitignore exception (the repo globally
+ignores *.png — the aero-glass lesson). ~2–4 MB per region, the price
+of "re-bake with no network, byte-identical, forever".
+
+## 2026-07-11 — V2 world-data: determinism machinery is hand-rolled on purpose
+Custom stable serializer (fixed key order from construction, number
+arrays compacted, -0 normalized, undefined keys dropped, round-trip
+asserted), cm/dm rounding at every emit point, ties in every sort/
+selection broken by OSM id or index. No native image or geo libraries
+anywhere in the pipeline — npm install variance can't touch the bytes.
+Golden checks re-bake from cache and require byte-identity plus a
+recorded sha256.
+
+## 2026-07-11 — V2 world-data: row network is a water lattice, not centerlines
+The rowable graph samples the water polygons on a 40 m lattice (8-way,
+midpoint-wet edges, min shore clearance) instead of tracing waterway
+centerlines: it reaches every dock and dive point by construction,
+handles bays/fjords (where there are no centerlines) uniformly, and
+narrow rivers join it naturally where wide enough. Stated as a schema
+limitation; checks assert dock→bay and dive→bay reachability.
+
+## 2026-07-11 — V2 world-data: bathymetry floor is a config option, stated in the artifact
+Terrarium tiles carry ETOPO1-class bathymetry offshore below 60°N —
+coarse enough to report a 1.1 km "seafloor" inside Friday Harbor.
+Rather than silently normalizing, `terrain.clampMinM` floors it per
+config and the artifact records `clampMinM` + `clampedCells` (absent
+when unused, so Ísafjörður's terrain stays untouched source data). The
+transform is visible in the schema, the README, and the stats.
+
+## 2026-07-11 — V2 world-data: the Friday Harbor "harbour hole" was my seed, not the data
+Chasing a probe failure I first misdiagnosed a sea-polygon hole as an
+OSM basin-ring quirk; the actual bug was the config water seed sitting
+on Brown Island (it is much larger than eyeballed). The bake had been
+right all along. Two things were kept from the chase, both real: a
+CW-ring orientation guard in the absorbed builder (a water-enclosing
+closed coastline must never become a fake island; SF Bay byte-identical
+before/after, its 21 holes all true CCW islands) and a normalize-stage
+rule that a ring which still self-intersects after the halve-epsilon
+ladder is dropped and counted (one Friday Harbor wetland), never
+shipped. Lesson recorded: validate seeds against the rendered minimap
+before blaming the pipeline.
+
+## 2026-07-11 — V2 world-data: Nominatim allowed at config-creation time only
+`worldbake --place "Name"` geocodes once to seed a config bbox (frozen
+into the config, reviewed by a human); bakes never geocode. Documented
+in DATA_SOURCES.md; keeps "worldbake <place>" from the prompt honest
+without adding a runtime or bake-time network dependency.
