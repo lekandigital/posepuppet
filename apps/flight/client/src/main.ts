@@ -55,6 +55,8 @@ if (bootParams.get("hud") !== "0") {
   // test/eval surface (tier forcing, preview cost) — same convention as __FLIGHT
   (window as unknown as { __PP_HUD: typeof hud }).__PP_HUD = hud;
 }
+// test/eval surface: runtime state + pose rate for the perf table
+(window as unknown as { __POSE_RT: typeof runtime }).__POSE_RT = runtime;
 void runtime.start();
 
 if (import.meta.hot) {

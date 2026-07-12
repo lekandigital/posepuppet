@@ -5,11 +5,10 @@
 // game suites (headless WebGL is compositor-throttled).
 import { test, expect, chromium, type Browser, type Page } from "@playwright/test";
 import { existsSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const repoRoot = resolve(HERE, "../../..");
+// CJS transpile context (no "type": "module" here) — __dirname, not import.meta
+const repoRoot = resolve(__dirname, "../../..");
 const FLIGHT = `http://localhost:${process.env.FLIGHT_PORT ?? "5199"}`;
 const clip = resolve(repoRoot, ".local/cache/fake-camera/arms_tpose.y4m");
 const clipFallback = resolve(repoRoot, "fixtures", "arms.y4m");
@@ -170,18 +169,21 @@ test.describe("camera denied", () => {
     await expect(hud).toHaveAttribute("data-state", /denied|error/, { timeout: 30_000 });
     await expect(page.locator('[data-testid="pp-hud-msg"]')).toContainText("KEYBOARD");
 
-    // keyboard play: wait for flight, then W accelerates / A turns
+    // keyboard play: wait for flight (incl. intro end — body.spec convention)
     await page.waitForFunction(
       () => {
-        const f = (window as unknown as { __FLIGHT?: { state(): { phase: string; controlsEnabled: boolean } } }).__FLIGHT;
+        const f = (window as unknown as {
+          __FLIGHT?: { state(): { phase: string; introActive: boolean; controlsEnabled: boolean } };
+        }).__FLIGHT;
         const s = f?.state();
-        return !!s && s.phase === "flying" && s.controlsEnabled === true;
+        return !!s && s.phase === "flying" && s.introActive === false && s.controlsEnabled === true;
       },
       undefined,
       { timeout: 60_000 },
     );
     // hold A: the keyboard turn shows up as a sustained heading rate
     await page.keyboard.down("a");
+    await page.waitForTimeout(1000); // let the turn ramp before sampling
     const samples: number[] = [];
     for (let i = 0; i < 10; i++) {
       samples.push(
