@@ -11,6 +11,7 @@
 | JetBrains Mono (variable) | `@fontsource-variable/jetbrains-mono`, bundled at build | SIL OFL 1.1 | no (node_modules → dist assets) |
 | Fraunces (variable) | `@fontsource-variable/fraunces`, bundled at build | SIL OFL 1.1 | no (node_modules → dist assets) |
 | MediaPipe `hand_landmarker.task` | Google, fetched postinstall | Apache-2.0 | no (downloaded to `public/models/`) |
+| MediaPipe `selfie_segmenter.tflite` + `selfie_segmenter_landscape.tflite` | Google, fetched postinstall (V7 presentation layer) | Apache-2.0 | no (downloaded to `public/models/`) |
 | Hand puppets (hand / beaky / x-ray) | procedural, built from three.js primitives in `src/hand/` | ours | yes (code only) |
 
 Fonts are self-hosted and served same-origin so the privacy receipt's

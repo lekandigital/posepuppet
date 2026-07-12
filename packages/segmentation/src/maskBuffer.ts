@@ -11,6 +11,8 @@ export interface MaskStats {
   flicker: number;
   /** fraction of pixels currently counted as person (0..1) */
   coverage: number;
+  /** person bounding box, normalized 0..1; null when nobody is masked */
+  bbox: { x0: number; y0: number; x1: number; y1: number } | null;
 }
 
 // soft threshold band: below LO fully background, above HI fully person
@@ -27,6 +29,7 @@ export class MaskBuffer {
   private h = 0;
   private flicker = 0;
   private coverage = 0;
+  private bbox: MaskStats['bbox'] = null;
 
   constructor(private alpha = 0.55) {
     this.canvas = document.createElement('canvas');
@@ -56,6 +59,7 @@ export class MaskBuffer {
     const d = this.img!.data;
     let deltaSum = 0;
     let cover = 0;
+    let bx0 = w, by0 = h, bx1 = -1, by1 = -1;
     const band = HI - LO;
     for (let i = 0; i < n; i++) {
       const v = (ema[i] = a * conf[i] + (1 - a) * ema[i]);
@@ -64,18 +68,28 @@ export class MaskBuffer {
       t = t < 0 ? 0 : t > 1 ? 1 : t;
       const al = (t * t * (3 - 2 * t) * 255) | 0;
       if (this.prevAlpha) deltaSum += Math.abs(al - this.prevAlpha[i]);
-      if (al > 127) cover++;
+      if (al > 127) {
+        cover++;
+        const x = i % w;
+        const y = (i / w) | 0;
+        if (x < bx0) bx0 = x;
+        if (x > bx1) bx1 = x;
+        if (y < by0) by0 = y;
+        if (y > by1) by1 = y;
+      }
       d[i * 4 + 3] = al;
     }
     if (this.prevAlpha) this.flicker = deltaSum / n / 255;
     else this.prevAlpha = new Uint8ClampedArray(n);
     for (let i = 0; i < n; i++) this.prevAlpha[i] = d[i * 4 + 3];
     this.coverage = cover / n;
+    this.bbox =
+      bx1 < 0 ? null : { x0: bx0 / w, y0: by0 / h, x1: (bx1 + 1) / w, y1: (by1 + 1) / h };
     this.ctx.putImageData(this.img!, 0, 0);
   }
 
   stats(): MaskStats {
-    return { flicker: this.flicker, coverage: this.coverage };
+    return { flicker: this.flicker, coverage: this.coverage, bbox: this.bbox };
   }
 
   reset(): void {

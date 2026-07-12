@@ -6,6 +6,7 @@
 // mask-quality eval. All inference is in-browser; nothing leaves the page.
 
 export { createSegmenter } from './segmenter';
+export { createWorkerSegmenter } from './workerSegmenter';
 export type { PersonSegmenter, SegmenterAssets, SegmenterOptions } from './segmenter';
 export { MaskBuffer } from './maskBuffer';
 export type { MaskStats } from './maskBuffer';

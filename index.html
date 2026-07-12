@@ -98,8 +98,9 @@
           </div>
         </section>
         <div class="privacy-line">
-          all inference runs in your browser — no frame, landmark, or recording
-          ever leaves this machine
+          all inference — pose, hands, person segmentation — runs in your
+          browser; no frame, landmark, mask, or recording ever leaves this
+          machine
         </div>
       </aside>
     </main>
@@ -108,6 +109,17 @@
       <div class="tb-cell" id="tb-transport">
         <button id="ghost-btn" class="tb-btn ghost" title="loop your last 8 s on a ghost (g)">⬡ ghost</button>
         <button id="replay-btn" class="tb-btn" title="instant replay — last 5 s, slow, side angle (i)">↺ replay</button>
+      </div>
+      <div class="tb-cell" id="tb-present" aria-label="camera presentation"
+        title="camera presentation — person segmentation, computed locally like everything else (x cycles)">
+        <span class="pm-label">CAM</span>
+        <button class="pm-btn" data-pm="raw" title="plain camera + skeleton">RAW</button>
+        <button class="pm-btn" data-pm="blur" title="background defocused, you sharp">BLUR</button>
+        <button class="pm-btn" data-pm="cutout" title="background removed — you on glass">CUT</button>
+        <button class="pm-btn" data-pm="silhouette" title="you as a luminous silhouette">SIL</button>
+        <button class="pm-btn" data-pm="chip" title="stage full-frame, you in a corner body chip">CHIP</button>
+        <button class="pm-btn" data-pm="stage" title="your cutout ON the stage beside the avatar">STAGE</button>
+        <button id="pm-skel" class="pm-btn skel" title="skeleton-ghost overlay on the cutout body">SKEL</button>
       </div>
       <div class="chain" id="chain">
         <span class="node dim" id="chain-cam"><b>CAM</b> <span>—</span></span>
