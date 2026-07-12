@@ -1089,6 +1089,216 @@ media/m0-smoke.png shows the split screen working — person clearly visible
 left, empty dark stage right, LIVE badge and privacy footer present. No pose
 detection yet, so nothing to judge on motion. Stage reads dark but the
 ground disc and grid are visible; lighting will matter once the robot is in.
+## 2026-07-11 — Rowing Gate-2 round 2: seated propulsion + steering authority
+
+Lekan's live retest passed idle stability, direction detection,
+re-centering, standing propulsion, cadence response, shore avoidance,
+and keyboard — and failed two things. Both reproduced remotely, both
+mechanisms measured before fixing.
+
+### Seated propulsion "requires knees" — actually the lite pose model
+
+The report: seated rowing only propelled once the knees were in frame.
+The package has no lower-body dependency (synthetic legs/hips-invisible
+rowing counts 10/10 strokes, confidence 0.78 — now a committed spec),
+so the chain was reproduced on video. A chest-up crop of
+rowing_seated.mp4 (fixtures/rowing/rowing_seated_upper.mp4, derived via
+`ffmpeg -vf crop=1080:660:0:600`, same 13 pulls) through the app:
+
+| framing              | model | cycle p2p (arm lengths) | strokes |
+|----------------------|-------|-------------------------|---------|
+| chest-up (tight+0.5) | lite  | 0.112 (< 0.15 bar)      | 2/13    |
+| chest-up (tight+0.5) | full  | 0.252                   | 11/13   |
+| chest-up             | lite  | —                       | 13/13   |
+| chest-up             | full  | —                       | 13/13   |
+| original seated      | lite  | 0.199                   | 11–12/13|
+| original seated      | full  | —                       | 13/13   |
+
+The lite model's wrist DEPTH collapses as the hands work near the frame
+edge — while its visibility output stays ~1.0 (no dropout, no warning:
+landmark-tape analysis showed 0% null frames). The Row entry inherited
+Fly's companion mode, which switches PosePuppet to the lite model; a
+desk-seated rower with hands low in frame lands exactly in the collapse
+zone. Knee visibility was a proxy for camera distance, not a cause.
+Fix: Row keeps the FULL model (stage suspension — the real GPU win —
+stays); Fly's torso-scale axes are lite-robust and keep the approved
+behavior. rowing_seated_upper is now a permanent eval fixture (13±1,
+full model), and fixture-eval grew a --model=lite flag for
+characterization runs.
+
+### "Left weak, right strong, left lean drifts right" — the coxswain
+
+Under Full Assist, assistTurnRate pulls toward the corridor with up to
+±0.55 turn while a gentle lean through the expo profile produces ~0.12
+— the course-follow out-muscled every gentle lean whose direction
+opposed the corridor, which reads exactly as an inconsistent, biased
+helm (Flight has no course-follow, hence "worse than Flight"). Fix:
+deliberate-steering intent (from the INPUT axes — lean past the noise
+floor ramps to full intent by ~0.2; stroke asymmetry likewise) silences
+the course-follow and the corner brake; hands-off decays intent so
+autopilot line-holding returns; the shore guard is NOT intent-scaled —
+safety still outranks authority. New spec ("a deliberate gentle lean
+out-steers the coxswain, both ways") verified to FAIL with the fix
+disabled and PASS with it.
+
+Residual live possibility, addressed by feedback rather than code: a
+posture-biased leanX neutral (seated slouch after a standing capture)
+would still read asymmetric — the new rowing HUD strip shows the
+applied steering marker, so a biased read is visible at a glance, and
+the strip suggests a T-pose recenter when seated with a low-confidence
+neutral.
+
+### Rowing feedback strip (RowingHUD)
+
+Always on for the boat: pulse per accepted stroke sized by pull
+strength, cadence in spm, applied-steering marker, status word
+(ROWING / IDLE / CRUISE / KEYBOARD / SIGNAL LOST / TRACKING UNSURE /
+REACQUIRING), and a plain-language guidance line (hands in view, add
+light, fuller pulls, T-pose recalibrate). Distinguishes tracking
+failure from control failure at a glance — the round-2 UX request.
+
+### Validation fallout (harness, not product)
+
+Running the evals on the rebuilt remote for the first time surfaced
+five harness truths, all fixed without touching a threshold:
+
+- prepare-fixtures capped the LONG side at 720 so portrait phone clips
+  became 406×720; the moment that downscaled y4m shadowed the native
+  cache, the closed-loop chain's sustained way fell p75 0.161 → 0.105 —
+  input resolution is part of the claim. The converter now caps the
+  SHORT side; the spec prefers the native cache.
+- The closed-loop spec leaked its browser when an assertion threw:
+  failed repeats starved later repeats' pose loop (11 → 6 → 2.8 fps
+  measured). try/finally now.
+- The closed-loop way claim is judged on OPEN-WATER samples (identical
+  runs measured near-shore fractions 0.29–0.70 as the lean-noise-
+  steered boat wandered; shore drag is the guard's own tested job), and
+  the spec classifies ENVIRONMENT_BLOCKED when the producer starves
+  (<10 pose fps under x-bot bursts) or delivers <16 strokes/60 s.
+  Rhythm-delivery and on-water assertions run on every run; healthy
+  runs measure p75 0.12–0.14 against the 0.12 bar.
+- rowing_left_bias "17 vs 15±1" was the stop-recording reach: the
+  landmark-tape replay shows exactly 15 rhythmic asymmetric pulls
+  (finishes 6.4–44.1 s) plus one huge symmetric excursion at ~46.8 s
+  (amp 0.9 on BOTH arms — no pull looks like that). The eval counts
+  strokes inside the labeled rowing window and prints every finish
+  time.
+- crouch_stand read ZERO crouch here because the looping fake camera
+  captured the neutral at an arbitrary loop phase — a mid-crouch
+  neutral zeroes the axis (a fresh-core replay of the same frames reads
+  crouch 0.9). Episodic stature fixtures now run single-pass from t=0
+  with a core reset so neutral comes from the protocol's standing
+  pre-roll; measured green after (1 sustained 5.1 s window).
+
+Remaining human-only checks are consolidated in FINAL_USER_TEST_PLAN.md
+(Rowing section) for a single final session.
+
+---
+
+## V1 O1 — pose-runtime extraction (2026-07-11)
+
+The tracking pipeline moved out of apps/posepuppet into
+packages/pose-runtime (git-mv history preserved): detector, hand
+detector, PoseContinuity, mirror, One Euro smoothing bank, capture
+ownership, plus the absorbed body-input adapter. The Full App boots on
+`createPoseRuntime` with an in-process frame tap; pipeline order is
+unchanged (mirror → eval masker → PPC → {smooth → retarget, body-input
+pre-smoothing}).
+
+Evidence:
+- Root suite post-extraction: 110 passed / 5 skipped / 2 failed — the two
+  failures are tests/detect.spec.ts under SwiftShader, identical to the
+  pre-extraction baseline (ENVIRONMENT_BLOCKED; they pass on the
+  gpu-performance project post-extraction: 2/2 in .local logs).
+- Baselines recorded first: root 105P/2F/5S (same two), flight on :2
+  26P/1F/4S (offline.spec THREE MeshDepthMaterial console error — driver
+  flake, pre-existing code), dolphin 12P.
+- New tests green: runtime-boundary (BodySignal deep-scan landmark-free;
+  PreviewFrame quantized 2D), runtime-app (single getUserMedia consumer +
+  producer Web Lock held; camera-denied honest status, no page errors).
+
+
+---
+
+## V1 O2–O4 — HUD, game retrofits, perf, evidence (2026-07-11)
+
+### Suites (all under the locks; game suites headed on :2)
+- Root: 110 passed / 5 skipped / 2 failed — the same two `detect.spec.ts`
+  SwiftShader-only failures as the pre-extraction baseline
+  (ENVIRONMENT_BLOCKED; both pass in the gpu-performance project).
+- Flight: 37 specs — green including the 6 new `hud.spec.ts` tests; the
+  one batch-run miss (rowing closed-loop p75 0.108 vs 0.12, a documented
+  flap) re-ran green twice; the baseline `offline.spec` failure was a
+  driver flake (passes now).
+- Dolphin: 16/16 including 4 new HUD tests.
+- Boundary: BodySignal deep-scan landmark-free at unit level and on the
+  live broadcast wire in both games; PreviewFrame quantized 2D (no depth,
+  no raw visibility floats); one getUserMedia consumer per page (app,
+  flight, dolphin); producer Web Lock held while capturing.
+
+### Perf (eval/runtime-hud-perf.json; headed :2, RTX 3090 / Linux GL-ANGLE)
+| game | fps HUD on | fps HUD off | pose Hz | preview draw |
+|---|---|---|---|---|
+| flight (lite, worker) | ~57–60 | ~57–60 | ~29 | ≤0.11 ms any tier |
+| rowing (FULL, worker, 15 Hz cap) | ~41–43 † | ~30–48 † | ~13–14 | ≤0.09 ms |
+| dolphin (lite, worker) | ~57–59 | ~55–60 | ~29 | ≤0.10 ms |
+
+† run-to-run wobble on this box exceeds the HUD delta (one run measured
+HUD-on FASTER than off). Rowing near-misses the 45/15 floors here; the
+chain was root-caused, not hand-waved: main-thread FULL detection = 30 fps
+with 38 long tasks/8 s → worker detection = 43 fps with ZERO long tasks →
+the residual is GPU-process contention between full-model inference and
+the game's rendering (worker GL verified hardware NVIDIA via
+UNMASKED_RENDERER probe; capture verified 640×360; CPU delegate in module
+workers fails upstream — "ModuleFactory not set"). Per the repo's
+cross-platform policy the final floor validation is Apple Silicon
+(Metal-ANGLE MediaPipe is materially faster) — FINAL_USER_TEST_PLAN S3.2.
+Flight and dolphin hold the floors with margin. Fix ladder applied and
+measured: worker offload (+13 fps), backdrop-filter removed from the HUD
+(+4 fps on flight), 640×360 capture, 15 Hz rowing cap.
+
+### Rowing signal quality through the NEW in-page chain
+`scripts/rowing-inpage-probe.mjs`: rowing_slow.y4m → in-page runtime
+(640×360, FULL model in worker, 15 Hz) → 14 strokes delivered to the
+boat, on-water for the full 60 s window — matching the producer-tab
+closed-loop spec's environment range on this box (its own ENVIRONMENT
+gates accept ≥8 as chain-proof; ≥16 as full quality; runs at 14 were
+measured there too).
+
+### Eval refresh (retargeting parity, headed :2 GPU — like the baseline)
+| fixture | upperLimbs° committed | upperLimbs° post-V1 | pose fps | errors |
+|---|---|---|---|---|
+| arms | 9.51 | 9.82 | 29.6 | 0 |
+| torso | 2.20 | 2.13 | 29.7 | 0 |
+| fast | 19.89 | 20.14 | 29.7 | 0 |
+Deltas within run noise; detection 100% everywhere. (A SwiftShader-xvfb
+run first showed 24°/4°/40° at pose 3.7 fps — the runner itself flagged
+the environment throttle; starved detection inflates screen-space sync
+error. Recorded here so nobody mistakes that artifact for a regression.)
+
+### Screenshot board + vision self-review (.local/shots/v1, gitignored —
+fixture footage)
+Board: flight live/expanded/camera-feed/collapsed/denied, rowing live
+(boat + strip), dolphin live/expanded/denied, app post-extraction
+dark + light.
+- Language: graphite glass, 1 px rules, mono labels, cyan-as-live-signal
+  — reads as the same instrument family as the app and the game strips;
+  no redesign, no template smell. The x-ray wireframe is instantly
+  legible as "you".
+- Live video legibility: HUD is opaque-glass (no backdrop blur — perf),
+  labels pass contrast on every background sampled.
+- Safe areas verified visually: rowing strip clear at y=118; dolphin ODbL
+  attribution clear at y=64 (the credit must never be covered).
+- Fixed from review: privacy line truncation ("LOCAL INFERI") — the
+  hidden recenter flash reserved layout width; now display-gated, line
+  reads LOCAL INFERENCE (compact) / + · NO UPLOADS (expanded). Rowing
+  board shot originally captured the plane (autostart overrides ?row) —
+  re-shot with the boat + strip visible.
+- Honest cosmetic note: under Chromium's --deny-permission-prompts the
+  gUM rejection is not NotAllowedError, so the HUD shows CAMERA ERROR
+  rather than CAMERA DENIED; both carry the keyboard-play message and the
+  specs accept both. Real user denials map to 'denied'.
+
 
 ## Final verification summary (commands → logs)
 
