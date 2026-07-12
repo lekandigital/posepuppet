@@ -871,3 +871,49 @@ nothing uploaded".
   gpu-performance project — 2026-07-10 baseline log).
 - pose-runtime is three-free; `bodyFrame.ts` (three-dependent, retarget
   support) moved to src/rig/ instead of the package.
+
+## V3 — Walking Locomotion (2026-07-12)
+
+- Gait = ONE detector over two substrate parameter banks (march =
+  knee-lift difference in thigh lengths; sway = lateral hip-center
+  excursion in shoulder widths, slow-EMA DC-removed like swim's extent
+  reference), selected per frame by knee availability, with an extremum
+  REBASE on substrate switch. Running both banks in parallel was
+  rejected: real marching sways the hips at step frequency and a
+  two-detector sum double-counts structurally; one signal cannot.
+- Steps count at EVERY hysteresis-qualified reversal (each direction
+  change of the L/R alternation = one footfall), unlike stroke's
+  one-per-cycle finish. Cadence = 1000/stepIntervalEMA, so the slow-lean
+  false-rhythm band (0.1–0.35 Hz) is excluded by maxStepMs = 1600 alone —
+  the swim detector's lesson applied at design time instead of after a
+  fixture surprise. Gait floors (march minAmp 0.22 thigh, sway 0.08 sw)
+  passed every fixture negative on the first measured run (0 steps on
+  lean_lr/lean_fb/crouch_stand/seated/still).
+- Comfort is enforced at the MODEL OUTPUT, not by consumer discipline:
+  hard caps on speed/accel/yaw-rate/yaw-accel, slew-limited eye height,
+  and no pitch/roll/FOV/oscillation code path at all. `envelope()`
+  self-reports observed maxima; an adversarial property test asserts no
+  input sequence can exceed the caps. V4 inherits comfort by
+  construction, not by review.
+- Path assist yields to deliberate lean (|leanX| ≥ 0.22 silences it) —
+  the Rowing coxswain lesson carried over; budget 14°/s, scaled to zero
+  below 0.5 m/s so it can never rotate a standing user.
+- Camera-unavailable = runtime state 'denied' OR 'error' for coach/HUD
+  purposes (headless auto-deny surfaces as 'error' — the Dolphin suite's
+  documented /denied|error/ tolerance).
+- Graybox runs the LITE pose model (gait reads hips/knees in image/world
+  space; no wrist-depth dependence — rowing's full-model lesson does not
+  apply to walking).
+- Shared-file edits kept to the established additive patterns: root
+  tsconfig.json gains the locomotion paths/include entries (the same
+  per-package pattern V1/V2 used; no existing keys touched); root
+  playwright config untouched (new specs land in tests/ which it already
+  globs); fixture-eval.mjs now respects PP_PORT (5173/5184 are squatted
+  by other checkouts' persistent servers on this box — measured again
+  this run; V3 evals pin PP_PORT=5185).
+- Vision review round 1 caught the path ribbon rendered invisible (strip
+  winding faced down → backface-culled). Fixed with DoubleSide + a
+  bright center line; recaptured. The capture pass exists precisely to
+  catch this class of defect.
+- fixtures/ for eval runs copied from the wt-runtime worktree (private,
+  gitignored, never committed) rather than re-recorded.

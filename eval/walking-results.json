@@ -1,0 +1,122 @@
+{
+  "generatedBy": "tests/walking-eval.spec.ts (V3 Walking synthetic-stream eval)",
+  "generatedAt": "2026-07-12T14:50:46.146Z",
+  "note": "Synthetic-stream chain: landmarks → body-input gait → controller → locomotion. Real-clip validation deferred (clips optional; see FINAL_USER_TEST_PLAN S8).",
+  "comfortCaps": {
+    "maxSpeed": 2.4,
+    "maxAccel": 2.5,
+    "maxDecel": 3.5,
+    "maxYawRateDps": 45,
+    "maxYawAccelDps2": 180,
+    "eyeHeight": 1.6,
+    "duckDrop": 0.55,
+    "eyeSlewPerS": 0.9,
+    "vignette": {
+      "enabled": true,
+      "yawRateOnDps": 18,
+      "accelOn": 1.2,
+      "max": 0.55,
+      "slewPerS": 2.5
+    }
+  },
+  "scenarios": [
+    {
+      "name": "march_0.5hz_cycle",
+      "stepsExpected": 12,
+      "stepsDetected": 11,
+      "cadenceExpectedHz": 1,
+      "cadenceDetectedHz": 1,
+      "cadenceErrPct": 0,
+      "steadySpeedMps": 0.712,
+      "envelope": {
+        "maxSpeed": 0.72,
+        "maxAccel": 2.5,
+        "maxYawRateDps": 0
+      },
+      "pass": true
+    },
+    {
+      "name": "march_0.9hz_cycle",
+      "stepsExpected": 21.6,
+      "stepsDetected": 20,
+      "cadenceExpectedHz": 1.8,
+      "cadenceDetectedHz": 1.798,
+      "cadenceErrPct": 0.1,
+      "steadySpeedMps": 1.283,
+      "envelope": {
+        "maxSpeed": 1.303,
+        "maxAccel": 2.5,
+        "maxYawRateDps": 0
+      },
+      "pass": true
+    },
+    {
+      "name": "march_1.35hz_cycle",
+      "stepsExpected": 32.4,
+      "stepsDetected": 31,
+      "cadenceExpectedHz": 2.7,
+      "cadenceDetectedHz": 2.716,
+      "cadenceErrPct": 0.6,
+      "steadySpeedMps": 1.924,
+      "envelope": {
+        "maxSpeed": 1.954,
+        "maxAccel": 2.5,
+        "maxYawRateDps": 0
+      },
+      "pass": true
+    },
+    {
+      "name": "sway_0.55hz_cycle",
+      "stepsExpected": 13.2,
+      "stepsDetected": 12,
+      "cadenceDetectedHz": 1.103,
+      "steadySpeedMps": 0.783,
+      "envelope": {
+        "maxSpeed": 0.789,
+        "maxAccel": 2.5
+      },
+      "pass": true
+    },
+    {
+      "name": "seated_glide",
+      "steadySpeedMps": 1.114,
+      "mode": "glide",
+      "envelope": {
+        "maxSpeed": 1.114
+      },
+      "pass": true
+    },
+    {
+      "name": "dropout_3s",
+      "speedAtLossMps": 1.282,
+      "stopAfterMs": 1253,
+      "maxDecelDuringLoss": 1.3,
+      "headingDriftDeg": 0,
+      "recovered": true,
+      "envelope": {
+        "maxAccel": 2.5,
+        "maxYawAccelDps2": 0
+      },
+      "pass": true
+    },
+    {
+      "name": "comfort_adversarial_30s",
+      "observed": {
+        "maxSpeed": 1.257,
+        "maxAccel": 3.5,
+        "maxYawRateDps": 0,
+        "maxYawAccelDps2": 0,
+        "maxEyeSlewPerS": 0
+      },
+      "caps": {
+        "maxSpeed": 2.4,
+        "maxAccel": 3.5,
+        "maxYawRateDps": 45,
+        "maxYawAccelDps2": 180,
+        "maxEyeSlewPerS": 0.9
+      },
+      "pass": true
+    }
+  ],
+  "allPass": true
+}

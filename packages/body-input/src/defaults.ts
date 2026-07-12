@@ -99,6 +99,42 @@ export function defaultConfig(): BodyInputConfig {
       rateDecayTauMs: 1200,
       refTauMs: 8000,
     },
+    gait: {
+      // Step detection wants responsiveness (a fast march reverses every
+      // ~330 ms) — lighter filtering than rowing's, latency still riding
+      // on the hysteresis. Starting values; the synthetic-stream evals +
+      // fixture negative rows are the arbiter (revisions in DECISIONS.md).
+      march: {
+        // Units: thigh lengths of knee-lift DIFFERENCE between the legs.
+        // A deliberate march swings ±0.4..1.0 (peak-to-peak 0.8+); the
+        // still/lean/crouch fixtures keep the difference under ~0.1.
+        oneEuro: { minCutoff: 1.4, beta: 0.02 },
+        reversalHys: 0.07,
+        minAmp: 0.22,
+        ampNorm: 0.9,
+        shiftScale: 1.6,
+      },
+      sway: {
+        // Units: shoulder widths of lateral hip-center excursion, DC-
+        // removed by the refTauMs EMA. A deliberate weight shift sways
+        // ±0.1..0.4; lean-turn crosstalk lives below ~0.06 (lean rotates
+        // the torso about the hips more than it translates them) — the
+        // fixture-eval negative rows (lean_lr especially) measure this.
+        oneEuro: { minCutoff: 1.2, beta: 0.015 },
+        reversalHys: 0.03,
+        minAmp: 0.08,
+        ampNorm: 0.45,
+        shiftScale: 2.5,
+        refTauMs: 6000,
+      },
+      // Physiology: 37 spm (slow deliberate march) .. 273 spm rejects
+      // tremor; the load-bearing negative is slow alternating leans at
+      // ~0.1–0.35 Hz — their half-cycles exceed maxStepMs and never
+      // establish a rhythm (the swim detector's lesson).
+      minStepMs: 220,
+      maxStepMs: 1600,
+      cadenceDecayTauMs: 900,
+    },
     confidenceTauMs: 150,
     confidenceDecayTauMs: 300,
     provisionalNeutralMs: 800,

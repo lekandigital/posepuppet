@@ -2,7 +2,7 @@
 // provably absent — the key set is closed) and a canonical serializer with
 // fixed key order so identical streams compare byte-identical.
 
-import type { BodyAxes, BodyEvent, BodySignal, TrackingState } from './types';
+import type { BodyAxes, BodyEvent, BodyGait, BodySignal, TrackingState } from './types';
 
 /** v1-additive OPTIONAL top-level key: periodic-motion (stroke) state.
  *  Old signals and tapes without it stay valid. Key order is the
@@ -12,6 +12,12 @@ export const STROKE_KEYS = ['active', 'count', 'rate', 'phase', 'ampL', 'ampR'] 
 /** v1-additive OPTIONAL top-level key: torso-wave (swim kick) state.
  *  Same contract as stroke. Key order is the canonical order. */
 export const SWIM_KEYS = ['active', 'count', 'rate', 'phase', 'amp'] as const;
+
+/** v1-additive OPTIONAL top-level key: gait (step) state. Same contract
+ *  as stroke/swim. Key order is the canonical order. */
+export const GAIT_KEYS = ['active', 'count', 'cadence', 'phase', 'amp', 'shift', 'source'] as const;
+
+export const GAIT_SOURCES: readonly BodyGait['source'][] = ['legs', 'sway', 'none'] as const;
 
 export const SCHEMA_V = 1 as const;
 
@@ -56,7 +62,7 @@ export function assertSignalShape(msg: unknown): asserts msg is BodySignal {
   if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) fail('not a plain object');
   const o = msg as Record<string, unknown>;
   const keys = Object.keys(o)
-    .filter((k) => k !== 'tracking' && k !== 'stroke' && k !== 'swim') // optional additive keys, validated below
+    .filter((k) => k !== 'tracking' && k !== 'stroke' && k !== 'swim' && k !== 'gait') // optional additive keys, validated below
     .sort();
   const want = [...TOP_KEYS].sort();
   if (keys.length !== want.length || keys.some((k, i) => k !== want[i])) {
@@ -112,6 +118,28 @@ export function assertSignalShape(msg: unknown): asserts msg is BodySignal {
       if (!isFiniteNumber(v) || v < 0 || v > 1) fail(`swim.${k} out of [0,1]`);
     }
   }
+  if (o.gait !== undefined) {
+    const g = o.gait as Record<string, unknown>;
+    if (typeof g !== 'object' || g === null || Array.isArray(g)) fail('gait not an object');
+    const gKeys = Object.keys(g).sort();
+    const gWant = [...GAIT_KEYS].sort();
+    if (gKeys.length !== gWant.length || gKeys.some((k, i) => k !== gWant[i])) {
+      fail(`gait keys [${gKeys.join(',')}] != schema [${gWant.join(',')}]`);
+    }
+    if (typeof g.active !== 'boolean') fail('gait.active not boolean');
+    if (!isFiniteNumber(g.count) || g.count < 0 || !Number.isInteger(g.count)) {
+      fail('gait.count not a non-negative integer');
+    }
+    if (!isFiniteNumber(g.cadence) || g.cadence < 0 || g.cadence > 4) fail('gait.cadence out of [0,4]');
+    for (const k of ['phase', 'amp'] as const) {
+      const v = g[k];
+      if (!isFiniteNumber(v) || v < 0 || v > 1) fail(`gait.${k} out of [0,1]`);
+    }
+    if (!isFiniteNumber(g.shift) || g.shift < -1 || g.shift > 1) fail('gait.shift out of [-1,1]');
+    if (!GAIT_SOURCES.includes(g.source as BodyGait['source'])) {
+      fail(`gait.source=${String(g.source)} not in {${GAIT_SOURCES.join(',')}}`);
+    }
+  }
   if (o.v !== SCHEMA_V) fail(`v=${String(o.v)} (expected ${SCHEMA_V})`);
   if (!isFiniteNumber(o.ts)) fail('ts not a finite number');
   for (const k of ['confidence', 'stillness', 'neutralConfidence'] as const) {
@@ -157,8 +185,8 @@ function scanForLandmarks(v: unknown, path: string): void {
 }
 
 /** Canonical JSON — fixed key order, quantized-by-construction values.
- *  Optional blocks serialize last — tracking, stroke, then swim — in
- *  their declared key orders. */
+ *  Optional blocks serialize last — tracking, stroke, swim, then gait —
+ *  in their declared key orders. */
 export function canonicalSignalJSON(s: BodySignal): string {
   const a: BodyAxes = s.axes;
   const tracking = s.tracking
@@ -176,6 +204,13 @@ export function canonicalSignalJSON(s: BodySignal): string {
       `,"rate":${JSON.stringify(sw.rate)},"phase":${JSON.stringify(sw.phase)}` +
       `,"amp":${JSON.stringify(sw.amp)}}`
     : '';
+  const g = s.gait;
+  const gait = g
+    ? `,"gait":{"active":${g.active},"count":${JSON.stringify(g.count)}` +
+      `,"cadence":${JSON.stringify(g.cadence)},"phase":${JSON.stringify(g.phase)}` +
+      `,"amp":${JSON.stringify(g.amp)},"shift":${JSON.stringify(g.shift)}` +
+      `,"source":"${g.source}"}`
+    : '';
   return (
     `{"v":${s.v},"ts":${JSON.stringify(s.ts)},"confidence":${JSON.stringify(s.confidence)}` +
     `,"seated":${s.seated},"stillness":${JSON.stringify(s.stillness)}` +
@@ -184,7 +219,7 @@ export function canonicalSignalJSON(s: BodySignal): string {
     `,"crouch":${JSON.stringify(a.crouch)},"tallness":${JSON.stringify(a.tallness)}` +
     `,"armsOut":${JSON.stringify(a.armsOut)},"armsRaised":${JSON.stringify(a.armsRaised)}` +
     `,"handsForward":${JSON.stringify(a.handsForward)},"handPoint":${JSON.stringify(a.handPoint)}}` +
-    `,"events":[${s.events.map((e) => `"${e}"`).join(',')}]${tracking}${stroke}${swim}}`
+    `,"events":[${s.events.map((e) => `"${e}"`).join(',')}]${tracking}${stroke}${swim}${gait}}`
   );
 }
 

@@ -257,3 +257,31 @@ never an exit (`eval/dolphin-results.json`). Honest limits: seated kick
 detection and the torso-wave fixture evals await recordings
 (`FINAL_USER_TEST_PLAN.md`); decor is dressed around the central reach,
 not all ~50 km of bay.
+
+## Walking locomotion (V3) — the Open World gets legs
+
+`packages/locomotion` turns the body-input `gait` block (marching in
+place when your legs are framed, weight-shift sway when they are not —
+one detector, the substrate switches with framing) into comfortable
+first-person ground movement: cadence sets speed, lean steers under a
+hard 45°/s yaw cap, crouch ducks, sitting switches to lean-glide, WASD
+always works (camera denied included), tracking loss eases to a stop and
+re-enters without a snap, a T-pose recenters. Comfort is enforced INSIDE
+the model — speed/acceleration/yaw caps, a slew-limited eye height, no
+head-bob or horizon-tilt code path at all — and the model reports its
+own observed maxima as evidence (`eval/walking-results.json`).
+
+```bash
+cd apps/walking && npm install && cd ../..   # once
+cd apps/walking && npm run dev               # graybox on :5175 → /walking/
+```
+
+The graybox is a proving rig, not a town: a flat world with an S-curve
+path ribbon whose polyline implements the same `PathHint` contract V4's
+nav graph will provide (Full Assist steers you softly back inside the
+shoulder and yields to a deliberate lean). `?drive=march&hz=0.9` runs
+the closed-loop synthetic driver — the exact production chain with no
+camera. Honest limits: positive real-clip gait validation awaits the
+optional march/weight-shift recordings (`FINAL_USER_TEST_PLAN.md` S8.4);
+the nausea check is human-only by nature (S8.1). Integration contract
+for the Open World: `packages/locomotion/INTEGRATION.md`.

@@ -37,6 +37,14 @@ export interface Measure {
   /** norm-space hip-center y — with shoulderNormY this is the vertical
    *  chest–hip extent, the torso-wave (swim kick) substrate */
   hipNormY: number | null;
+  /** norm-space hip-center x — with a slow DC reference this is the
+   *  lateral sway (weight-shift gait) substrate; mirrored: + = the
+   *  user's own right */
+  hipNormX: number | null;
+  /** signed knee-lift difference between the legs in thigh-length units
+   *  (+ = the user's LEFT knee high = weight over their right foot) —
+   *  the marching gait substrate; null unless knees+hips visible */
+  kneeDiff: number | null;
   /** nose relative to shoulder center in the torso basis (leanY fallback) */
   noseLocalZ: number | null;
   /** mean straight shoulder→wrist length over visible arms */
@@ -80,7 +88,7 @@ export class Extractor {
     basis: { vx: v3(1, 0, 0), vy: v3(0, 1, 0), vz: v3(0, 0, 1) },
     hipsValid: false, shoulderWidth: 0.34,
     statureWorld: null, shoulderNormY: null, shoulderWidthNorm: null,
-    hipNormY: null, noseLocalZ: null, armLenMeasured: null,
+    hipNormY: null, hipNormX: null, kneeDiff: null, noseLocalZ: null, armLenMeasured: null,
     left: emptyArm(), right: emptyArm(),
     thighsHorizontal: null, anklesForwardRatio: null, legFoldRatio: null,
     kneesVisible: false, anklesVisible: false, hipsVisible: false,
@@ -102,6 +110,8 @@ export class Extractor {
     m.shoulderNormY = null;
     m.shoulderWidthNorm = null;
     m.hipNormY = null;
+    m.hipNormX = null;
+    m.kneeDiff = null;
     m.noseLocalZ = null;
     m.armLenMeasured = null;
     m.left.visOk = false;
@@ -166,6 +176,7 @@ export class Extractor {
       const nrh = frame.norm[LM.rightHip];
       if (Math.min(nlh.visibility, nrh.visibility) >= 0.4) {
         m.hipNormY = (nlh.y + nrh.y) / 2;
+        m.hipNormX = (nlh.x + nrh.x) / 2;
       }
     }
 
@@ -208,6 +219,23 @@ export class Extractor {
         mpToInternal(w[LM.leftAnkle], this.scratch.r);
         const legLen = dist(this.scratch.p, this.scratch.q) + dist(this.scratch.q, this.scratch.r);
         if (legLen > 1e-3) m.legFoldRatio = dist(this.scratch.p, this.scratch.r) / legLen;
+      }
+    }
+
+    // gait (march) substrate: per-leg knee lift relative to the OWN-side
+    // hip in internal y-up space, normalized by the mean thigh length (a
+    // rigid segment — stable under the lift itself). Mirrored landmarks:
+    // the LM.left* slots are the user's anatomical RIGHT side.
+    if (m.kneesVisible && m.hipsVisible) {
+      mpToInternal(w[LM.leftHip], this.scratch.p);
+      mpToInternal(w[LM.leftKnee], this.scratch.q);
+      mpToInternal(w[LM.rightHip], this.scratch.r);
+      mpToInternal(w[LM.rightKnee], this.scratch.s);
+      const thigh = (dist(this.scratch.p, this.scratch.q) + dist(this.scratch.r, this.scratch.s)) / 2;
+      if (thigh > 1e-3) {
+        const liftUserRight = this.scratch.q.y - this.scratch.p.y; // LM.left* = user's right
+        const liftUserLeft = this.scratch.s.y - this.scratch.r.y;
+        m.kneeDiff = (liftUserLeft - liftUserRight) / thigh;
       }
     }
 

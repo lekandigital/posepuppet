@@ -75,6 +75,29 @@ export interface BodySwim {
   amp: number;
 }
 
+/** Gait (walking) periodic state — schema v1 additive, optional. Steps
+ *  from left/right alternation: knee-lift difference when legs are in
+ *  frame ('legs'), lateral hip sway when they are not ('sway' — the
+ *  weight-shift / desk-framing substrate). One detector, one rhythm;
+ *  the source switches with framing without dropping the count. */
+export interface BodyGait {
+  /** a steady step rhythm is currently established (≥ 2 counted steps) */
+  active: boolean;
+  /** completed steps (footfalls) since pipeline reset — monotonic */
+  count: number;
+  /** step rate in steps/second (EMA of step intervals; decays to 0) */
+  cadence: number;
+  /** 0 at the last footfall, →1 approaching the next */
+  phase: number;
+  /** excursion of the last counted step, 0..1 of a full stride */
+  amp: number;
+  /** weight-shift axis, −1..1, + = weight over the user's own right foot */
+  shift: number;
+  /** substrate measured THIS frame: legs (knee alternation), sway
+   *  (lateral hip excursion), or none (dropout / hips unseen) */
+  source: 'legs' | 'sway' | 'none';
+}
+
 export type BodyEvent = 'recenter' | 'action'; // closed set in schema v1
 
 export interface BodyAxes {
@@ -119,6 +142,8 @@ export interface BodySignal {
   stroke?: BodyStroke;
   /** optional torso-wave state (additive, same contract as stroke) */
   swim?: BodySwim;
+  /** optional gait state (additive, same contract as stroke) */
+  gait?: BodyGait;
 }
 
 export type AxisName = keyof BodyAxes;
@@ -180,6 +205,39 @@ export interface StrokeConfig {
   rateDecayTauMs: number;
 }
 
+/** Gait substrate. 'legs' = knee-lift difference (thigh-length units);
+ *  'sway' = lateral hip excursion (shoulder-width units). */
+export type GaitSource = 'legs' | 'sway';
+
+export interface GaitSourceConfig {
+  /** position filter on this substrate's scalar */
+  oneEuro: { minCutoff: number; beta: number };
+  /** Schmitt-trigger width: a reversal registers when the signal retreats
+   *  this far (substrate units) from the running extremum */
+  reversalHys: number;
+  /** minimum peak-to-peak excursion (substrate units) for a step to count */
+  minAmp: number;
+  /** excursion that reads as amp = 1 (a full stride) */
+  ampNorm: number;
+  /** filtered signal → shift axis multiplier (then clamped to ±1) */
+  shiftScale: number;
+}
+
+export interface GaitConfig {
+  /** knee-lift-difference bank (marching in place, stepping) */
+  march: GaitSourceConfig;
+  /** lateral-hip-sway bank (weight-shift walking, kneeless framing) */
+  sway: GaitSourceConfig & {
+    /** slow EMA time constant for the DC-removing sway reference */
+    refTauMs: number;
+  };
+  /** physiological step-interval gates, shared by both banks */
+  minStepMs: number;
+  maxStepMs: number;
+  /** cadence decay time constant once the rhythm is stale */
+  cadenceDecayTauMs: number;
+}
+
 export interface BodyInputConfig {
   axes: Record<AxisName, AxisShapingConfig>;
   extraction: ExtractionConfig;
@@ -191,6 +249,8 @@ export interface BodyInputConfig {
     /** slow EMA time constant for the self-normalizing extent reference */
     refTauMs: number;
   };
+  /** gait (step) detector — marching legs + weight-shift sway banks */
+  gait: GaitConfig;
   /** confidence smoothing / decay time constants (ms) */
   confidenceTauMs: number;
   confidenceDecayTauMs: number;

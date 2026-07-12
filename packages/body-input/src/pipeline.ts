@@ -9,6 +9,7 @@ import {
 } from './extract';
 import { quantize } from './schema';
 import { SeatedDetector, seatedCondition } from './seated';
+import { GaitDetector } from './gait';
 import { AxisShaper } from './stages';
 import { StrokeDetector } from './stroke';
 import type {
@@ -69,6 +70,10 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
   // its own slow EMA (see defaults.swim for the measured floors).
   const swimDet = new StrokeDetector(cfg.swim);
   let swimRef: number | null = null;
+  // Gait (steps): knee-lift alternation when legs are framed, lateral hip
+  // sway when they aren't. One detector, one rhythm (see gait.ts).
+  const gaitDet = new GaitDetector(cfg.gait);
+  let gaitSwayRef: number | null = null;
 
   let neutral: NeutralState | null = null;
   let seatedRef: StatureRef | null = null;
@@ -227,6 +232,27 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
       swimDet.step(frame.tsMs, swimSignal, swimSignal);
       const swim = swimDet.snapshot(frame.tsMs);
 
+      // gait: marching knee alternation ('legs') with lateral hip sway as
+      // the kneeless fallback ('sway'). The sway DC reference keeps
+      // updating whenever hips are measurable — posture drift and slow
+      // repositioning pass through the reference instead of counting.
+      let marchSignal: number | null = null;
+      let swaySignal: number | null = null;
+      if (m.ok && eventsOk) {
+        if (m.kneeDiff !== null) marchSignal = m.kneeDiff;
+        if (m.hipNormX !== null) {
+          const widthRef = neutral?.shoulderWidthNorm ?? m.shoulderWidthNorm;
+          if (widthRef !== null && widthRef > 1e-4) {
+            const x = m.hipNormX / widthRef;
+            const aRef = 1 - Math.exp((-dt * 1000) / cfg.gait.sway.refTauMs);
+            gaitSwayRef = gaitSwayRef === null ? x : gaitSwayRef + (x - gaitSwayRef) * aRef;
+            swaySignal = x - gaitSwayRef;
+          }
+        }
+      }
+      gaitDet.step(frame.tsMs, marchSignal, swaySignal);
+      const gait = gaitDet.snapshot(frame.tsMs);
+
       lastTs = frame.tsMs;
       return {
         v: 1,
@@ -264,6 +290,15 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
           phase: quantize(swim.phase),
           amp: quantize(Math.min(swim.ampL, 1)),
         },
+        gait: {
+          active: gait.active,
+          count: gait.count,
+          cadence: quantize(gait.cadence),
+          phase: quantize(gait.phase),
+          amp: quantize(gait.amp),
+          shift: quantize(gait.shift),
+          source: gait.source,
+        },
       };
     },
 
@@ -281,6 +316,8 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
       strokeDet.reset();
       swimDet.reset();
       swimRef = null;
+      gaitDet.reset();
+      gaitSwayRef = null;
       neutral = null;
       seatedRef = null;
       neutralConfidence = 0;
@@ -301,6 +338,7 @@ export function createBodyInputCore(over?: DeepPartial<BodyInputConfig>): BodyIn
       actionMachine.configure(cfg.events.action);
       strokeDet.configure(cfg.stroke);
       swimDet.configure(cfg.swim);
+      gaitDet.configure(cfg.gait);
     },
 
     getConfig(): BodyInputConfig {
