@@ -57,7 +57,37 @@ S3.2 | Rowing fps floor on Apple Silicon (the one open perf number) | The remote
 _Entries deferred to V5 Character Control completion._
 
 ### S5  Motion Memory 2 creative session (trim, mirror, chorus, re-skin)
-_Entries deferred to V6 Motion Memory 2 completion._
+
+#### V6 environment — S5.1–S5.5
+- Branch `feat/motion-memory-2` in `~/Dev/wt-motionmem` (unmerged; remote
+  dev server runs from this tree). Port **5178**.
+- Tunnel from the Mac: `ssh -N -L 5178:127.0.0.1:5178 -i
+  ~/.ssh/pinn_rtx3090 o@192.168.86.152` then open http://localhost:5178.
+- Camera + lighting: normal webcam session, front-lit, ~2 m back so arms
+  are fully in frame; Character mode.
+- V6 evidence: .local/mm2-final2.log (root suite 120P/5S + the two
+  ENVIRONMENT_BLOCKED detect.spec SwiftShader fails, green on the GPU
+  project — EVAL_NOTES §V6), memory specs 12/12 (tests/memory.spec.ts,
+  tests/memory-library.spec.ts), .local/shots/v6 (screenshot board),
+  EVAL_NOTES §V6, DECISIONS §V6, docs/MOTION_MEMORY.md (schema/energy/
+  mirror contracts).
+- Estimated V6 human time: ~18 min.
+
+S5.1 | Library + motion-tape feel at real pose rates | Trim-handle drag latency, live-preview responsiveness and tape legibility are feel judgments; SwiftShader ran at ~2 Hz pose, Apple Silicon runs ~25–30 Hz | Tunnel, http://localhost:5178, camera on, perform ~10 s of varied motion | ⌘K “save loop” (or press `l` → library); open ✂ tape on the card; drag the in/out handles; press ▸ preview while dragging; ✦ best 5 s; ✂ apply trim | Tape strip shows a dense, readable energy curve matching what you did (bursts tall, stillness flat); handles track the pointer with no lag; preview ghost updates within a beat of releasing a handle; apply shrinks the card's duration to the kept window | Trim exactness + bestWindow unit specs; UI e2e drives the same flow on the fixture (kept window asserted ≤ 5 s); thumbnails deterministic | The core creative loop feels mushy and nobody trims takes | 5
+
+S5.2 | Mirror handedness live | The automated proof uses a synthetic wave; a human waving a REAL right hand at a mirrored webcam is the honest end-to-end check | Same session; save a loop of you waving your RIGHT hand only, nothing else | Library → tape → toggle ⇋ mirror → ▸ play (duet); watch the ghost beside the live avatar | The ghost waves its LEFT hand (a true mirror partner, not a copy); no other limb misbehaves; toggling mirror off mid-play snaps sides back on the next loop wrap | Rig-level mirror spec: mean < 5° / max < 12° vs ground-truth mirrored render; left arm carries the wave (handedness assertion); involution ≤ 2 LSB | A silently wrong-handed mirror poisons every duet clip | 3
+
+S5.3 | Echo chorus + opacity/delay presets on camera | Whether faint/half/solid and tight/beat/wide read as distinct, tasteful stage looks is aesthetic judgment | Same session; a saved loop playing as duet; echo slider at ×3 | Cycle ghost faint → half → solid, then echo delay tight → beat → wide while performing alongside | Each preset is visibly distinct; solid ×3 wide reads as a motion delay line without swallowing the live avatar; faint stays legible over the grain/vignette; changes apply live without restarting playback | setOpacity/setDelay live paths exercised in UI e2e (presets clicked); ghost pipeline unchanged from v1 (round-trip spec) | The money-shot chorus looks muddy on real footage | 3
+
+S5.4 | Re-skin across the roster | Whether a loop recorded on one body reads as the SAME performance on a different rig is judgment | Same session; a saved loop recorded while astronaut was live | Play the loop as duet; switch live avatar (a) through robot/erika/woody; replay the same loop on each | The performance is recognizably identical on every rig (timing, phrasing); no limb explosions on any roster body; card still names the capture avatar | Re-skin exact by construction (loop = retarget input; v1 round-trip spec ≤ 5° mean on a second rig); migration spec pins frames byte-identical | Re-skin is the headline of Motion Memory; a rig-specific artifact kills it | 3
+
+S5.5 | Pass-2 loops survive the migration (real v1 data) | The migration spec seeds v1-SHAPE records; your browser may hold loops actually written by pass-2 code | On the Mac, open the posepuppet origin you used in pass 2 (same browser profile) with the V6 build served there — or accept this check as covered-by-spec if that profile is gone | Open the library on a profile holding pre-V6 loops | Old loops appear as cards (avatar “unknown”, mode from kind), play correctly, trim/mirror work on them; nothing lost | Browser migration spec on seeded v1 records (byte-identical frames, ids/names/timestamps kept, re-open no-op) | Real-user data loss on upgrade | 2
+
+#### Post-S5 note for the tester
+The duet ghost keeps playing after the library closes (deliberate — you
+perform beside it). `g` or the ghost button stops it. Hand-kind loops
+show “hand loop” on the card and don't replay yet; that surface arrives
+with Recording v2 (V7).
 
 ### S6  Recording v2 takes: one per presentation mode; cutout-on-stage
 _Entries deferred to V7 Recording v2 completion._

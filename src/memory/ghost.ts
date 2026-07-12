@@ -2,16 +2,19 @@
 // roster avatar, through its OWN Retargeter — the same pipeline that
 // drives the live avatar, so a loop recorded once performs identically on
 // any rig (re-skin). The echo chorus is N ghosts at staggered offsets — a
-// motion delay line. Playback only; nothing here scores anything.
+// motion delay line. Mirror playback reflects the loop across the sagittal
+// plane at decode time (see memory/mirror.ts) — a playback option, never
+// stored data. Playback only; nothing here scores anything.
 
 import * as THREE from 'three';
 import { Retargeter } from '../rig/retarget';
 import { loadAvatarById, type AvatarId } from '../rig/avatarRegistry';
 import type { Avatar } from '../rig/types';
-import { decodePoseFrame, blankLandmarks, type MotionLoop } from './stream';
+import { decodePoseFrame, blankLandmarks, type LoopCapture } from './stream';
+import { mirrorPoseInPlace } from './mirror';
 
 /** Ghost material: violet, translucent, additive-leaning — the Memory hue. */
-function ghostify(obj: THREE.Object3D, opacity: number): void {
+function ghostify(obj: THREE.Object3D, opacity: number): THREE.MeshStandardMaterial {
   const mat = new THREE.MeshStandardMaterial({
     color: 0x9d7bff,
     emissive: 0x9d7bff,
@@ -28,25 +31,33 @@ function ghostify(obj: THREE.Object3D, opacity: number): void {
     mesh.castShadow = false;
     mesh.renderOrder = 5;
   });
+  return mat;
 }
 
 class GhostInstance {
   retargeter: Retargeter;
+  offsetMs: number;
+  private material: THREE.MeshStandardMaterial;
   private world = blankLandmarks();
   private norm = blankLandmarks();
   private frameIdx = 0;
 
   constructor(
     readonly avatar: Avatar,
-    readonly offsetMs: number,
+    offsetMs: number,
     opacity: number,
   ) {
-    ghostify(avatar.object, opacity);
+    this.offsetMs = offsetMs;
+    this.material = ghostify(avatar.object, opacity);
     this.retargeter = new Retargeter(avatar);
   }
 
+  setOpacity(o: number): void {
+    this.material.opacity = o;
+  }
+
   /** Feed the loop frame nearest to (t - offset); loops wrap. */
-  seek(loop: MotionLoop, tMs: number): void {
+  seek(loop: LoopCapture, tMs: number, mirror: boolean): void {
     const dur = Math.max(loop.durationMs, 1);
     const local = ((tMs - this.offsetMs) % dur + dur) % dur;
     // frames are time-ordered; walk the index (loops reset it)
@@ -59,6 +70,7 @@ class GhostInstance {
     }
     const f = loop.frames[this.frameIdx];
     decodePoseFrame(f, this.world, this.norm);
+    if (mirror) mirrorPoseInPlace(this.world, this.norm);
     // frame time (wrap-safe: velocity estimation skips non-monotonic steps)
     this.retargeter.updateFromPose(this.world, this.norm, f.t);
   }
@@ -81,14 +93,23 @@ export interface GhostOptions {
    *  ghost IS the star (instant replay) */
   placement?: 'beside' | 'center';
   baseOpacity?: number;
+  /** sagittal-plane reflection — a right-hand wave performs left-handed */
+  mirror?: boolean;
 }
 
 export interface GhostPlayer {
   readonly object: THREE.Group;
   readonly active: boolean;
-  start(loop: MotionLoop, avatarId: AvatarId, opts: GhostOptions): Promise<void>;
+  start(loop: LoopCapture, avatarId: AvatarId, opts: GhostOptions): Promise<void>;
   stop(): void;
   setEchoes(n: number): void;
+  /** swap the playing loop without rebuilding ghosts (live trim preview) */
+  setLoop(l: LoopCapture): void;
+  setMirror(m: boolean): void;
+  /** base ghost opacity; echoes fade from it as before */
+  setOpacity(o: number): void;
+  /** echo stagger in ms */
+  setDelay(ms: number): void;
   tick(dt: number, time: number): void;
 }
 
@@ -97,7 +118,7 @@ export function createGhostPlayer(): GhostPlayer {
   object.name = 'ghosts';
 
   let ghosts: GhostInstance[] = [];
-  let loop: MotionLoop | null = null;
+  let loop: LoopCapture | null = null;
   let avatarId: AvatarId = 'robot';
   let echoOffset = 300;
   let playT = 0;
@@ -105,7 +126,10 @@ export function createGhostPlayer(): GhostPlayer {
   let wantEchoes = 1;
   let placement: 'beside' | 'center' = 'beside';
   let baseOpacity = 0.42;
+  let mirror = false;
   let building = false;
+
+  const echoOpacity = (i: number) => Math.max(0.16, baseOpacity - i * 0.09);
 
   async function build(n: number): Promise<void> {
     if (building || !loop) return;
@@ -115,7 +139,7 @@ export function createGhostPlayer(): GhostPlayer {
       while (ghosts.length < n) {
         const i = ghosts.length;
         const av = await loadAvatarById(avatarId);
-        const g = new GhostInstance(av, i * echoOffset, Math.max(0.16, baseOpacity - i * 0.09));
+        const g = new GhostInstance(av, i * echoOffset, echoOpacity(i));
         if (placement === 'beside') {
           // duet: ghosts stand beside/behind the live avatar
           av.object.position.x += -0.55 - i * 0.4;
@@ -148,6 +172,7 @@ export function createGhostPlayer(): GhostPlayer {
       rate = opts.rate ?? 1;
       placement = opts.placement ?? 'beside';
       baseOpacity = opts.baseOpacity ?? 0.42;
+      mirror = opts.mirror ?? false;
       playT = 0;
       wantEchoes = Math.max(1, Math.min(opts.echoes, 4));
       while (ghosts.length) ghosts.pop()!.dispose();
@@ -161,11 +186,26 @@ export function createGhostPlayer(): GhostPlayer {
       wantEchoes = Math.max(1, Math.min(n, 4));
       void build(wantEchoes);
     },
+    setLoop(l) {
+      loop = l;
+      playT = 0;
+    },
+    setMirror(m) {
+      mirror = m;
+    },
+    setOpacity(o) {
+      baseOpacity = o;
+      ghosts.forEach((g, i) => g.setOpacity(echoOpacity(i)));
+    },
+    setDelay(ms) {
+      echoOffset = ms;
+      ghosts.forEach((g, i) => (g.offsetMs = i * ms));
+    },
     tick(dt, time) {
       if (!loop) return;
       playT += dt * 1000 * rate;
       for (const g of ghosts) {
-        g.seek(loop, playT);
+        g.seek(loop, playT, mirror);
         g.tick(dt, time);
       }
     },

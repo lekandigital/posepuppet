@@ -1,3 +1,39 @@
+# STATUS — V6 Motion Memory 2 (feat/motion-memory-2)
+
+2026-07-12 · V6 COMPLETE — all four outcomes shipped; live creative
+session deferred to FINAL_USER_TEST_PLAN S5.
+
+**LOOP SCHEMA STABILITY DECLARATION (for V7):** loop schema v2 is
+stable as of this commit. The persisted contract — `MotionLoop`
+(v/id/name/kind/createdAt/durationMs/frames/avatar/mode/thumbSvg/bytes),
+`LoopFrame` quantization, `LoopCapture`, the invariants in
+docs/MOTION_MEMORY.md (landmark streams through a Retargeter,
+destructive-on-apply trim, mirror as playback-only, bounded storage,
+DB `posepuppet-memory` v2 with in-place v1 migration) — will not change
+shape under this branch. V7's replay-insertion work may begin against
+`src/memory/{stream,store,trim,energy,mirror,thumbnail}.ts` and
+docs/MOTION_MEMORY.md.
+
+- O1 schema v2 + migration + bounded store (32 MiB / 64 loops, eviction
+  dialog) + library UI: thumbnail cards, inline rename, two-click
+  delete. Real v1 records migrate byte-identically (browser spec).
+- O2 motion-tape trim with live ghost preview + apply; best-last-motion
+  (highest-energy ~5 s of the 12 s ring; energy = summed joint angular
+  speed, documented).
+- O3 playback: duet/echo (v1) + verified MIRROR (right-hand wave
+  replays as true left-hand wave — mean < 5°, max < 12° vs ground-truth
+  mirrored render) + opacity/delay presets, live.
+- O4 motion-tape strip (energy over time, scrub-to-trim) in the editor.
+- Suites: root 120 passed / 5 skipped / 2 failed — the 2 are the
+  detect.spec SwiftShader pair, ENVIRONMENT_BLOCKED (fail identically on
+  the stashed pre-change tree; 2/2 green on the gpu-performance project
+  on :2). +10 new memory specs, 12/12 memory tests green, tsc clean.
+  Evidence: .local/mm2-final2.log, .local/shots/v6, EVAL_NOTES §V6.
+- Not touched: shell/boot (V1), retarget/capability (V5), recording
+  (V7) files; main.ts/index.html edits confined to the Motion Memory
+  block + Memory rail.
+
+
 # STATUS — V1 Runtime + HUD (feat/pose-runtime-hud)
 
 2026-07-12 · V1 COMPLETE — all four outcomes shipped, awaiting the

@@ -1250,3 +1250,80 @@ dark + light.
   gUM rejection is not NotAllowedError, so the HUD shows CAMERA ERROR
   rather than CAMERA DENIED; both carry the keyboard-play message and the
   specs accept both. Real user denials map to 'denied'.
+
+## V6 — Motion Memory 2: loop library, trim, mirror, tape (2026-07-12)
+
+Branch `feat/motion-memory-2`, worktree `~/Dev/wt-motionmem`, port 5178.
+
+### What shipped
+O1 schema v2 + in-place v1 migration + bounded IndexedDB store (32 MiB /
+64 loops, oldest-first eviction dialog) + library overlay (cards with
+deterministic SVG skeleton thumbnails from the highest-energy frame,
+inline rename, two-click delete, duration · avatar · mode · date). O2
+motion-tape trim (drag in/out handles, live trimmed preview on the
+ghost, apply rewrites frames) + best-last-motion grab (highest-energy
+~5 s of the 12 s ring; energy = summed joint angular speed, documented
+in docs/MOTION_MEMORY.md). O3 mirror playback (landmark-space sagittal
+reflection through the Retargeter) + ghost opacity presets (faint/half/
+solid) + echo-delay presets (tight/beat/wide), all live. O4 the
+motion-tape strip itself (energy over time, scrub-to-trim). v1 surfaces
+(ghost duet, echo chorus, instant replay, rail loop list) untouched.
+
+### Verification
+- Unit (tests/memory.spec.ts, +5 specs): v1 round-trip + quantization
+  pins unchanged and green; trim boundary exactness (kept set, re-timing,
+  idempotence, reversed/degenerate handles); energy (stillness ≈ 0, best
+  window covers a 3 s wave inside a 12 s stream, peak inside the wave);
+  mirror data-level (reflection = ground-truth swapped stream within
+  quantization; involution ≤ 2 LSB); mirror on the rig (right-hand-wave
+  loop replayed mirrored matches a live left-hand-wave render: mean < 5°,
+  max < 12°; left arm carries the wave, right arm ~still — handedness
+  proven, not assumed).
+- Browser, real IndexedDB (tests/memory-library.spec.ts, 5 specs):
+  seeded true v1-shape records migrate on DB open (v:2, avatar 'unknown',
+  mode from kind, frames byte-identical, ids/names/timestamps kept;
+  re-open is a no-op); v2 save→reload byte-exact with metadata; storage
+  bound (count + byte caps, decline saves nothing, accept evicts oldest
+  first); eviction dialog behavior; and the full library UI e2e through
+  the real app on the fake webcam — save via ⌘K, card + thumbnail +
+  meta, rename persists across reopen, tape editor, best-5 s snap
+  (kept window asserted ≤ 5 s), drag-to-trim changes the window, apply shrinks
+  the stored loop, mirror toggle, duet playback lights the ghost
+  pipeline, delete, then a best-last-motion grab lands a fresh "best"
+  card.
+- Full root suite (.local/mm2-final2.log): 120 passed / 5 skipped /
+  2 failed — the two failures are the detect.spec SwiftShader pair
+  (pose-fps floor), ENVIRONMENT_BLOCKED per the V1 classification: they
+  fail identically on the stashed pre-change tree (bisected — not a V6
+  regression) and pass 2/2 on the gpu-performance project on display :2
+  (the authoritative environment). All 10 new memory specs and every
+  spec the V6 diff touches are green; morning baseline for reference:
+  110 passed / 5 skipped (.local/mm2-baseline.log). `tsc --noEmit`
+  clean.
+
+### Found-and-fixed during verification
+- bestWindow first cut anchored candidate windows at frame ends and
+  clamped into the loop, which on the ~2 Hz SwiftShader rig shrank an
+  early energy burst into a 0.7 s "best 5 s". Rewritten as a proper
+  sliding-window mean over full-width windows; the UI e2e now asserts
+  keeps = 5.0 s.
+- best-last-motion's frame guard assumed ≥ 30 ring frames, and the ring
+  snapshot itself refused windows under 10 frames — both false limits at
+  1–2 Hz pose, where a real 5 s best window holds ~5 frames. Now a single
+  shared MIN_LOOP_FRAMES = 4 (caught by the library e2e under full-suite
+  load, when detection dropped to ~1 Hz).
+- Delete's two-click confirm window raced slow render loops; 3 s arm
+  window.
+
+### Screenshot board + vision self-review (.local/shots/v6, gitignored)
+library-cards-dark.png, tape-editor-dark.png, tape-editor-light.png,
+evict-dialog-light.png. Review: the library reads as the existing
+instrument language (1 px rules, mono labels, violet Memory hue; cards
+share borders like the avatar grid); the tape strip's energy bars are
+legible over both themes and the trimmed-out region reads clearly
+dimmed; thumbnails read as pose at 68 px. The editor row wraps below
+~700 px width rather than overflowing. Nothing fights the live video —
+the overlay is modal and the stage stays visible around it. Weakest
+point honestly: with very sparse SwiftShader frames the tape bars get
+wide and blocky; on Apple Silicon at 25–30 Hz pose the strip is dense
+(FUTP S5.1 confirms feel).

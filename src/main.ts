@@ -18,9 +18,11 @@ import { createOnboarding } from './ui/onboarding';
 import { createHandMode, HAND_PUPPETS, isHandPuppetId } from './hand/mode';
 import { createVfx } from './stage/vfx';
 import { createAutoCam } from './stage/autocam';
-import { RingBuffer, encodePoseFrame, encodeHandFrame } from './memory/stream';
+import { RingBuffer, encodePoseFrame, encodeHandFrame, MIN_LOOP_FRAMES, type LoopCapture, type LoopMode } from './memory/stream';
 import { createGhostPlayer } from './memory/ghost';
-import { saveLoop, listLoops, loadLoop, deleteLoop } from './memory/store';
+import { listLoops, loadLoop, deleteLoop, finalizeLoop, saveLoopBounded } from './memory/store';
+import { createLibrary, confirmEvictDialog } from './memory/library';
+import { bestWindow } from './memory/energy';
 import { createIntentDetector } from './gesture/intent';
 import { openFlight, defaultFlightUrl } from './bodyinput/flightBridge';
 import { createDirector } from './director/director';
@@ -902,6 +904,17 @@ async function boot() {
     if (ghosts.active) ghosts.setEchoes(echoes);
   };
 
+  // loop library: cards + rename/delete, motion tape (trim / preview /
+  // best 5 s), mirror playback, ghost opacity + echo-delay presets — the
+  // creative layer over the same ghost pipeline (schema v2, memory/store)
+  const library = createLibrary({
+    ghosts,
+    avatarId: () => config.avatar,
+    echoes: () => echoes,
+    ghostState: (on) => ghostBtn.classList.toggle('on', on),
+  });
+  document.getElementById('library-btn')?.addEventListener('click', () => library.open());
+
   // saved loops: tiny local list — save the last 8 s, play any loop on the
   // CURRENT avatar (re-skin), delete. IndexedDB, fully local.
   const loopList = document.getElementById('loop-list');
@@ -946,15 +959,51 @@ async function boot() {
   }
   void refreshLoopList();
 
+  const loopMode = (): LoopMode => (config.mode === 'hand' ? 'hand' : 'character');
+
+  // promote a ring capture to a v2 loop and save under the storage bound
+  // (the eviction prompt is a real dialog — nothing is deleted silently)
+  async function persistLoop(capture: LoopCapture | null): Promise<boolean> {
+    if (!capture) return false;
+    const loop = finalizeLoop(capture, config.avatar, loopMode());
+    const res = await saveLoopBounded(loop, (cands) => confirmEvictDialog(cands));
+    if (res.saved) {
+      void refreshLoopList();
+      void library.refresh();
+    }
+    return res.saved;
+  }
+
   async function saveCurrentLoop(): Promise<void> {
-    const loop = poseRing.snapshot(8, `take ${new Date().toLocaleTimeString()}`);
-    if (!loop) {
+    const capture = poseRing.snapshot(8, `take ${new Date().toLocaleTimeString()}`);
+    if (!capture) {
       coach.set('Memory', 'Perform for a few seconds first, then save.');
       return;
     }
-    await saveLoop(loop);
-    void refreshLoopList();
+    if (await persistLoop(capture)) {
+      coach.set('Memory', 'Loop saved — open the library to trim or re-skin it.');
+    }
   }
+
+  // "best last motion": the highest-energy ~5 s window of the last 12 s
+  // (energy = summed joint angular speed; see docs/MOTION_MEMORY.md)
+  async function grabBestLastMotion(): Promise<void> {
+    const frames = poseRing.peek();
+    if (frames.length < MIN_LOOP_FRAMES) {
+      coach.set('Memory', 'Perform for a few seconds first — I grab your best 5 seconds.');
+      return;
+    }
+    const win = bestWindow(frames, 'pose', 5000);
+    const capture = poseRing.snapshotWindow(win.startMs, win.endMs, `best ${new Date().toLocaleTimeString()}`);
+    if (!capture) {
+      coach.set('Memory', 'Not enough motion captured yet — keep performing.');
+      return;
+    }
+    if (await persistLoop(capture)) {
+      coach.set('Memory', 'Best 5 seconds saved to the library.');
+    }
+  }
+  document.getElementById('best-btn')?.addEventListener('click', () => void grabBestLastMotion());
 
   // ── body-input protocol: derived signals for BodyArcade consumers ──
   // The adapter is absorbed into the runtime (landmarks enter it there and
@@ -1231,6 +1280,10 @@ async function boot() {
       run: () => void instantReplay() },
     { id: 'save-loop', label: 'memory · save last 8 s as loop',
       run: () => void saveCurrentLoop() },
+    { id: 'library', label: 'memory · loop library (trim, mirror, re-skin)', key: 'l',
+      run: () => library.open() },
+    { id: 'best-last', label: 'memory · grab best last motion (5 s)',
+      run: () => void grabBestLastMotion() },
     ...TAKE_SCRIPTS.map((s) => ({
       id: `take-${s.id}`,
       label: `take · ${s.name.toLowerCase()} (${s.shots.length} shots)`,
