@@ -64,6 +64,10 @@ than replacing it.
 
 - Terrain above 60°N comes from coarser DEM sources (DATA_SOURCES.md §2);
   fine at region scale, smooth at ~10 m scale.
+- Offshore cells carry ETOPO1-class bathymetry where present — coarse
+  enough to report absurd depths inside a harbour. A config may floor it
+  (`terrain.clampMinM`); the artifact then carries `clampMinM` +
+  `clampedCells` so the transform is stated, never silent.
 - Building relations with members outside the bbox are dropped and
   counted (`stats.normalize.droppedRelationSeam`).
 - Landuse polygons clipped at the bbox may gain edge-running segments

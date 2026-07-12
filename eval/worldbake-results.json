@@ -1,10 +1,11 @@
 {
-  "generated": "2026-07-12T00:55:22.027Z",
+  "generated": "2026-07-12T01:20:55.012Z",
   "module": "@bodyarcade/worldbake",
   "regions": [
-    "isafjordur"
+    "isafjordur",
+    "friday-harbor"
   ],
-  "checks": 35,
+  "checks": 69,
   "failures": 0,
   "results": [
     {
@@ -17,13 +18,13 @@
       "region": "isafjordur",
       "name": "determinism — re-bake byte-identical to committed artifact",
       "ok": true,
-      "detail": "1153597 bytes"
+      "detail": "1153630 bytes"
     },
     {
       "region": "isafjordur",
       "name": "golden checksum",
       "ok": true,
-      "detail": "74b8275e9d00…"
+      "detail": "6edcdedcc067…"
     },
     {
       "region": "isafjordur",
@@ -207,6 +208,210 @@
     },
     {
       "region": "isafjordur",
+      "name": "transitions present",
+      "ok": true,
+      "detail": "land-to-walk, dock-to-row, dock-to-row, dock-to-row, row-to-dive, row-to-dive"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "committed artifact exists",
+      "ok": true,
+      "detail": "/home/o/Dev/wt-worlddata/packages/world-data/data/worlds/friday-harbor/world.json"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "determinism — re-bake byte-identical to committed artifact",
+      "ok": true,
+      "detail": "1200731 bytes"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "golden checksum",
+      "ok": true,
+      "detail": "2101a9cd8be7…"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "schema round-trip (parse → re-serialize byte-identical)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "schema validates",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "validator refuses missing attribution",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "ODbL attribution line present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "both providers carry licenses",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "input checksums recorded",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "no self-intersecting rings (water, buildings, landuse)",
+      "ok": true,
+      "detail": "1854 rings"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "water area delta within tolerance",
+      "ok": true,
+      "detail": "-0.0078% (tolerance ±1%)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "probe harbour mid (water)",
+      "ok": true,
+      "detail": "(331, 612)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "probe channel north (water)",
+      "ok": true,
+      "detail": "(423, 1179)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "probe town grid (land)",
+      "ok": true,
+      "detail": "(-265, 842)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "probe Brown Island interior (land)",
+      "ok": true,
+      "detail": "(1031, 667)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "probe airfield (land)",
+      "ok": true,
+      "detail": "(-514, -927)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "terrain grid matches encoding",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "terrain min/max consistent",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "terrain probe town rise",
+      "ok": true,
+      "detail": "31.4 m (want 5..80)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "terrain probe airfield (flat)",
+      "ok": true,
+      "detail": "29.7 m (want 5..80)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "terrain probe harbour floor (clamped)",
+      "ok": true,
+      "detail": "-60.0 m (want -60..0)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "walk graph stats truthful",
+      "ok": true,
+      "detail": "4354 nodes, 180 components, largest 3198"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "walkable component covers walk spawn area",
+      "ok": true,
+      "detail": "nearest largest-component node 0 m (max 60)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "walkable component covers A Street",
+      "ok": true,
+      "detail": "nearest largest-component node 0 m (max 60)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "walkable component covers Price Street",
+      "ok": true,
+      "detail": "nearest largest-component node 0 m (max 60)"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "row network: dock-to-row \"dock 1\" reaches the bay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "row network: dock-to-row \"dock 2\" reaches the bay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "row network: dock-to-row \"F Dock\" reaches the bay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "row network: row-to-dive \"open water 1\" reaches the bay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "row network: row-to-dive \"open water 2\" reaches the bay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "friday-harbor",
+      "name": "row network exists over water",
+      "ok": true,
+      "detail": "1332 nodes / 4896 edges"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "collision meshes valid (indices + area match footprints)",
+      "ok": true,
+      "detail": "1744 meshes, 0 skipped by bake"
+    },
+    {
+      "region": "friday-harbor",
+      "name": "spawns include the modes",
+      "ok": true,
+      "detail": "airfield, walk, dock, dock, dock, dive, dive"
+    },
+    {
+      "region": "friday-harbor",
       "name": "transitions present",
       "ok": true,
       "detail": "land-to-walk, dock-to-row, dock-to-row, dock-to-row, row-to-dive, row-to-dive"

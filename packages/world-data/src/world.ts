@@ -39,6 +39,9 @@ export interface WorldTerrain {
   maxElevationM: number;
   seaLevelM: number;
   sourceZoom: number;
+  /** Present only when the bake floored coarse offshore bathymetry. */
+  clampMinM?: number;
+  clampedCells?: number;
   encoding: 'u16-le-base64';
   offsetM: number;
   scaleM: number;
