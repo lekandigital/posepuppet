@@ -25,6 +25,26 @@
   runs incl. baselines), EVAL_NOTES.md §V1, DECISIONS.md §V1.
 - Estimated V1 human time: ~35 min (S1 8 + S2 21 + S3 8 + S11 8, minus
   overlap).
+
+### V3 (Walking Locomotion) environment — S8
+- Branch `feat/walking-locomotion` in `~/Dev/wt-walking` (unmerged). Lane
+  port **5175** (walking graybox dev server; tmux session `ba-walking`).
+- Tunnel from the Mac: `ssh -N -L 5175:127.0.0.1:5175 -i
+  ~/.ssh/pinn_rtx3090 o@192.168.86.152` then open
+  http://localhost:5175/walking/ (live camera mode; `?drive=march&hz=0.9`
+  replays the synthetic closed-loop drive if you want to see the rig
+  without a camera).
+- Camera + lighting: front-lit, ~2.5–3 m back so knees are visible for
+  marching; the weight-shift/seated checks are done close-up on purpose.
+- V3 evidence: eval/walking-results.json (synthetic chain eval + comfort
+  envelope maxima), eval/bodyinput-results.json (gait false-positive rows
+  on every existing fixture), media/walking-v3/ (screenshot board + webm,
+  gitignored), tests/gait.spec.ts + tests/locomotion.spec.ts +
+  apps/walking/tests (all green), EVAL_NOTES.md §V3, DECISIONS.md §V3,
+  packages/locomotion/INTEGRATION.md.
+- Estimated V3 human time: ~13 min (S8.1 6 + S8.2 4 + S8.3 3); S8.4 is an
+  optional recording action (~10 min) whenever convenient.
+
 ## Entry format (every deferred check uses this)
 ID | Feature | Why human-only | Setup | Steps | Expected | Automated
 evidence already collected | Risk if skipped | Est. minutes
@@ -66,7 +86,15 @@ _Entries deferred to V7 Recording v2 completion._
 _Entries deferred to V4 Open World completion._
 
 ### S8  Walking comfort test (explicit nausea check — human-only by nature)
-_Entries deferred to V3 Walking Locomotion / V4 Open World completion._
+_V3 graybox entries below; V4 will append Open World in-context entries._
+
+S8.1 | Marching walk comfort — the explicit nausea check | Vection/nausea judgment is human-only; the automated yaw-rate/acceleration envelopes are proxies, not the answer | V3 tunnel (front matter), http://localhost:5175/walking/, camera allowed, ~2.5–3 m back, knees visible | March in place ~2 min at a comfortable pace along the path; lean to steer through both S-curves; stop/start several times; one fast-march burst; watch the horizon the whole time | Speed follows the march without rubber-banding; turns are smooth and obviously capped (never a snap); the horizon NEVER tilts or bobs; eye height only moves on a deliberate crouch; the corner vignette during turns is subtle, not annoying; no queasiness after 2 min | Comfort caps enforced in-model and property-tested under adversarial input (tests/locomotion.spec.ts); full-chain envelope maxima vs caps in eval/walking-results.json (comfort_adversarial_30s all-pass); closed-loop path-follow spec; media/walking-v3 board + webm with vision self-review (EVAL_NOTES §V3) | A comfort failure inherited by every Open World profile | 6
+
+S8.2 | Weight-shift walking + seated lean-glide (accessibility fallback) | Whether kneeless locomotion feels controllable (not twitchy) is feel judgment | Same, then sit at the desk / step close enough that your legs leave frame | Standing close: shift weight rhythmically side to side → you should walk (HUD SRC reads SWAY); then sit: lean forward to glide, sideways to steer, upright to stop | Weight-shift walking engages within ~2 shifts and stops when you stop; seated glide engages ~1 s after a deliberate forward lean, steers with lateral lean, and never creeps while upright | Sway-substrate synthetic eval row (walking-results); graybox sway + glide specs green; fixture-eval gait negatives hold leans/crouches/sitting at ≤1 step | Desk and seated users cannot walk the Open World | 4
+
+S8.3 | Tracking loss, T-pose recenter, keyboard fallback — live | Physical step-out timing and re-entry feel are room/machine specific | Same setup, mid-walk | Step fully out of frame ~2 s (status → SIGNAL LOST, coach explains, walk eases to a stop); step back in and resume marching (no lurch); hold a T-pose ~1 s (toast: "Neutral recaptured"); tap W/A/S/D anytime — KEYBOARD takes over instantly, body resumes ~1.5 s after keys go quiet; also try it with the camera covered from the start | No snap anywhere: the stop is gentle on a held heading, re-entry blends in ≤ ~0.5 s, recenter toast fires once, keyboard drives immediately including with the camera blocked | Dropout row in eval/walking-results.json (stop ≤ 2.5 s at decel ≤ 1.3 m/s², heading drift < 5°, snap-free recovery under the yaw-accel cap); graybox dropout + camera-denied specs green | Loss-of-control moments poison trust in body walking | 3
+
+S8.4 | USER ACTION — optional gait clips (positive real-clip validation) | Only you can record you; synthetic streams + negative rows carry the automated case meanwhile | Phone, portrait 1080×1920@30, ~3 s still lead-in and tail, FULL body incl. feet, front-lit; drop files in fixtures/walking/ | Record: `march_slow.mp4` (20 steps at ~60 steps/min), `march_fast.mp4` (30 steps at ~120/min), `weight_shift.mp4` (16 deliberate weight shifts, feet planted), `walk_lean_turns.mp4` (steady march with alternating ~4 s lean holds) — counts spoken aloud or noted | After dropping the clips, positive gait rows get added to `node packages/body-input/tools/fixture-eval.mjs` and detected step counts land within ±1 of your labels (the rowing protocol's bar) | Detector thresholds stay tuned only against synthetic + negative footage | 10 (recording) — eval wiring is the agent's follow-up
 
 ### S9  Realistic profile: flight/walk/row, lighting/atmosphere judgment
 _Entries deferred to V4 Open World realistic profile completion._

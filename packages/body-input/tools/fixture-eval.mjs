@@ -12,7 +12,10 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..', '..');
-const BASE = 'http://localhost:5173';
+// PP_PORT: 5173 on a shared box can belong to a DIFFERENT checkout's
+// persistent server (the Dolphin-lane lesson) — lanes pin their own port.
+const PP_PORT = process.env.PP_PORT ?? '5173';
+const BASE = `http://localhost:${PP_PORT}`;
 
 const DURATIONS = {
   lean_lr: 40, lean_fb: 60, crouch_stand: 45, arms_tpose: 42, seated: 40, still: 20,
@@ -46,10 +49,11 @@ const TOP = ['v', 'ts', 'confidence', 'seated', 'stillness', 'neutralConfidence'
 const AXES = ['leanX', 'leanY', 'crouch', 'tallness', 'armsOut', 'armsRaised', 'handsForward', 'handPoint'];
 const STROKE = ['active', 'count', 'rate', 'phase', 'ampL', 'ampR'];
 const SWIM = ['active', 'count', 'rate', 'phase', 'amp'];
+const GAIT = ['active', 'count', 'cadence', 'phase', 'amp', 'shift', 'source'];
 function checkShape(s) {
-  // 'tracking', 'stroke' and 'swim' are the schema's optional additive blocks
+  // 'tracking', 'stroke', 'swim' and 'gait' are the schema's optional additive blocks
   const keys = Object.keys(s)
-    .filter((k) => k !== 'tracking' && k !== 'stroke' && k !== 'swim').sort().join();
+    .filter((k) => k !== 'tracking' && k !== 'stroke' && k !== 'swim' && k !== 'gait').sort().join();
   if (keys !== [...TOP].sort().join()) return `keys ${keys}`;
   if (s.v !== 1) return `v=${s.v}`;
   for (const k of ['ts', 'confidence', 'stillness', 'neutralConfidence']) {
@@ -71,7 +75,44 @@ function checkShape(s) {
       if (!Number.isFinite(s.swim[k])) return `swim.${k} not finite`;
     }
   }
+  if (s.gait !== undefined) {
+    if (Object.keys(s.gait).sort().join() !== [...GAIT].sort().join()) return 'gait keys';
+    if (typeof s.gait.active !== 'boolean') return 'gait.active not boolean';
+    for (const k of ['count', 'cadence', 'phase', 'amp', 'shift']) {
+      if (!Number.isFinite(s.gait[k])) return `gait.${k} not finite`;
+    }
+    if (!['legs', 'sway', 'none'].includes(s.gait.source)) return `gait.source=${s.gait.source}`;
+  }
   return null;
+}
+
+/** Gait NEGATIVE assertion (V3 Walking): none of the existing clips
+ *  contain marching or weight-shift walking, so steps counted here are
+ *  false positives. maxSteps tolerates boundary artifacts where noted.
+ *  Positive gait evals need the march/weight_shift fixtures — OPTIONAL
+ *  per the V3 prompt, tracked in FINAL_USER_TEST_PLAN S8. */
+function gaitNegative(signals, maxSteps, note = '') {
+  const steps = (signals[signals.length - 1]?.gait?.count ?? 0) - (signals[0]?.gait?.count ?? 0);
+  const activeFrames = signals.filter((s) => s.gait?.active).length;
+  const amps = [];
+  const sources = [];
+  let prev = signals[0]?.gait?.count ?? 0;
+  for (const s of signals) {
+    const c = s.gait?.count ?? prev;
+    if (c > prev) {
+      amps.push(s.gait.amp);
+      sources.push(s.gait.source);
+    }
+    prev = Math.max(prev, c);
+  }
+  return {
+    gaitFalsePositives: {
+      pass: steps <= maxSteps,
+      detail: `${steps} gait steps (amps: ${amps.map((a) => a.toFixed(3)).join(', ') || '—'}; src: ${sources.join(',') || '—'}), ${activeFrames} rhythm-active frames on non-walking footage (≤${maxSteps})${note}`,
+      steps,
+      amps,
+    },
+  };
 }
 
 /** Torso-wave (swim) NEGATIVE assertion: none of the existing clips
@@ -243,7 +284,14 @@ function rowingChecks(signals, truth, opts = {}) {
 }
 
 const CHECKS = {
-  lean_lr: (s) => ({ ...bipolarChecks(s, 'leanX', 'leanY'), ...swimNegative(s, 1) }),
+  // gait ≤1 on lean_lr: THE load-bearing walking negative — alternating
+  // lateral leans are the closest natural motion to weight-shift sway;
+  // the maxStepMs gate (1600 ms) is what keeps slow lean alternations
+  // from ever forming a rhythm.
+  lean_lr: (s) => ({
+    ...bipolarChecks(s, 'leanX', 'leanY'), ...swimNegative(s, 1),
+    ...gaitNegative(s, 1, ' — alternating lateral leans must not walk'),
+  }),
   // 0.35 for leanY: signed-window detection at 3.5× its measured noise
   // floor — the depth axis is not magnitude-repeatable enough for 0.45
   // (episode counts flapped run-to-run purely on neutral/loop phase)
@@ -253,7 +301,11 @@ const CHECKS = {
   // frames; in-game effect = one small surge while already pitch-diving).
   // The bound is the measured variance ceiling, not a wish; tightening the
   // floor further without a positive torso-wave fixture risks deafness.
-  lean_fb: (s) => ({ ...bipolarChecks(s, 'leanY', 'leanX', 0.35), ...swimNegative(s, 2, ' — hard alternating leans; isolated pairs, never a rhythm') }),
+  lean_fb: (s) => ({
+    ...bipolarChecks(s, 'leanY', 'leanX', 0.35),
+    ...swimNegative(s, 2, ' — hard alternating leans; isolated pairs, never a rhythm'),
+    ...gaitNegative(s, 1, ' — fore-aft leans; no lateral alternation'),
+  }),
   crouch_stand: (signals) => {
     const runs = episodes(signals, (s) => s.axes.crouch > 0.45, 800);
     const totalMs = signals.filter((s) => s.axes.crouch > 0.45).length * (1000 / 30);
@@ -269,6 +321,9 @@ const CHECKS = {
       // crouch cycles drop chest AND hips together (in-phase) — the
       // anti-phase extent signal must not read them as dolphin kicks
       ...swimNegative(signals, 2, ' — crouch/stand cycles, in-phase'),
+      // both knees bend TOGETHER in a crouch — the knee-lift DIFFERENCE
+      // must stay quiet
+      ...gaitNegative(signals, 2, ' — symmetric crouch cycles; kneeDiff quiet'),
     };
   },
   arms_tpose: (signals) => {
@@ -292,6 +347,8 @@ const CHECKS = {
     return {
       seatedDetected: { pass: frac >= 0.8, detail: `seated ${(frac * 100).toFixed(1)}% after 5 s (≥80%)` },
       noFlapping: { pass: flips <= 2, detail: `${flips} flips (≤2)` },
+      // sitting down / sitting still is not walking
+      ...gaitNegative(signals, 1, ' — sit-down transition; no gait rhythm'),
     };
   },
   still: (signals) => {
@@ -325,6 +382,16 @@ const CHECKS = {
         detail: `${kicks} swim kicks, ${swimActive} rhythm-active frames on still footage (need 0/0); extent-excursion amp p99=${swimAmpP99.toFixed(4)} (measured floor)`,
         swimAmpP99,
       },
+      gaitZero: (() => {
+        const steps = (signals[signals.length - 1]?.gait?.count ?? 0) - (signals[0]?.gait?.count ?? 0);
+        const gaitActive = signals.filter((s) => s.gait?.active).length;
+        const shiftP99 = pctl(signals.map((s) => Math.abs(s.gait?.shift ?? 0)), 0.99);
+        return {
+          pass: steps === 0 && gaitActive === 0,
+          detail: `${steps} gait steps, ${gaitActive} rhythm-active frames on still footage (need 0/0); |shift| p99=${shiftP99.toFixed(4)} (measured floor)`,
+          shiftP99,
+        };
+      })(),
     };
   },
   rowing_slow: (s, playAt) => rowingChecks(s, STROKE_TRUTH.rowing_slow, { playAt }),
@@ -361,7 +428,9 @@ async function serverUp() {
 let devServer = null;
 if (!(await serverUp())) {
   console.log('starting dev server…');
-  devServer = spawn('npm', ['run', 'dev'], { cwd: root, stdio: 'ignore', detached: true });
+  devServer = spawn('npm', ['run', 'dev', '--', '--port', PP_PORT, '--strictPort'], {
+    cwd: root, stdio: 'ignore', detached: true,
+  });
   for (let i = 0; i < 60 && !(await serverUp()); i++) await new Promise((r) => setTimeout(r, 500));
 }
 

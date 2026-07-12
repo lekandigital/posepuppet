@@ -1,5 +1,50 @@
 # Changelog
 
+## V3 — Walking Locomotion (2026-07-12)
+
+Gait detection + comfortable first-person ground movement as a reusable
+package, proven in a graybox and handed to the Open World (V4) with
+integration notes. No town was built; `apps/openworld` is untouched.
+
+### Added
+- `@bodyarcade/body-input` 1.1.0: additive `gait` block — step events
+  from hip/knee alternation, cadence (steps/s), weight-shift axis, and a
+  substrate tag (`legs` = knee-lift difference when legs are framed,
+  `sway` = lateral hip excursion for desk framing / weight-shift walking;
+  one detector, extremum rebase across the substrate switch so the count
+  and rhythm survive reframing). Gait false-positive rows in
+  fixture-eval on every existing clip; 9 new node specs; determinism and
+  the landmark boundary unchanged.
+- `packages/locomotion` 1.0.0: pure deterministic model (cadence→speed
+  with inertia, lean→capped turn, crouch→duck+slow, seated lean-glide,
+  keyboard-wins override, tracking-loss autopilot with gentle stop +
+  snap-free re-entry, T-pose recenter pulse, soft path-shoulder assist
+  behind V4's nav-graph `PathHint` hook — Full Assist default, yields to
+  deliberate lean) + transport/keyboard controller + shared coach/status
+  strings. COMFORT ENFORCED IN THE MODEL: hard caps on speed (2.4 m/s),
+  accel (2.5/3.5 m/s²), yaw rate (45°/s), yaw accel (180°/s²); slew-
+  limited eye height; no pitch/roll/FOV/bob code path exists;
+  `envelope()` reports observed maxima as evidence. INTEGRATION.md is
+  the V4 contract.
+- `apps/walking`: the graybox — flat proving ground with an S-curve path
+  ribbon (its polyline implements the real `PathHint` contract), pose-
+  runtime + shared HUD live mode, deterministic synthetic drivers
+  (`?drive=march|sway|glide`, dropout/T-pose windows), mono engineering
+  readout + comfort vignette + coach line, WASD/camera-denied play.
+  Port 5175, base `/walking/`, own Playwright suite (9 specs).
+- Evals: `eval/walking-results.json` (full-chain synthetic eval:
+  march×3/sway/glide/dropout/adversarial-comfort, written by
+  tests/walking-eval.spec.ts) and gait rows in
+  `eval/bodyinput-results.json`.
+
+### Deferred (honest)
+- Positive real-clip gait validation awaits the optional clips
+  (march_slow/fast, weight_shift, walk_lean_turns) — request + specs in
+  FINAL_USER_TEST_PLAN S8.4; synthetic streams + negative rows carry the
+  automated case meanwhile.
+- The nausea check is human-only by nature → FINAL_USER_TEST_PLAN S8.1
+  with the envelope evidence attached.
+
 ## V1 — PosePuppet Runtime + HUD (2026-07-11)
 
 PosePuppet becomes a system layer: a headless tracking runtime any game

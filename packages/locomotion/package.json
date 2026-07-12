@@ -1,0 +1,11 @@
+{
+  "name": "@bodyarcade/locomotion",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Walking locomotion: gait signals in, comfortable first-person ground movement out. Comfort envelopes enforced in the model, not the consumer.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "sideEffects": false
+}

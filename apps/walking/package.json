@@ -1,0 +1,22 @@
+{
+  "name": "@bodyarcade/walking-graybox",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "V3 Walking graybox — a flat proving ground for @bodyarcade/locomotion: path ribbon, comfort envelopes, synthetic drivers. Not a game; the Open World (V4) is the integration target.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "three": "^0.172.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/three": "^0.172.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}

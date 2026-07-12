@@ -127,6 +127,29 @@ command palette).
   0.63–0.70/positive); with feet hidden it falls back to thigh angle, and
   with knees hidden to an image-space shoulder-drop heuristic.
 
+## Gait block (v1.1, additive — V3 Walking)
+
+`signal.gait = { active, count, cadence, phase, amp, shift, source }` —
+steps from left/right alternation. `cadence` is steps/second; `shift` is
+the weight-shift axis (−1..1, + = weight over the user's own right
+foot); `source` says which substrate measured THIS frame:
+
+- **`legs`** — signed knee-lift difference between the legs, thigh-length
+  units. Marching in place, stepping. Needs knees+hips in frame.
+- **`sway`** — lateral hip-center excursion (shoulder widths, slow-EMA
+  DC-removed). Weight-shift walking; works at desk framing with no legs
+  visible at all.
+- **`none`** — dropout / hips unseen; cadence decays, `shift` eases to 0.
+
+One detector, one rhythm: the substrate switches with framing and the
+extremum tracking rebases across the switch, so count/cadence survive a
+user stepping closer to the camera mid-walk. A step counts at every
+hysteresis-qualified reversal with sane amplitude/timing (minAmp per
+substrate; step interval 220–1600 ms — slow alternating leans live above
+1600 ms half-cycles and can never form a rhythm; the fixture-eval
+negative rows on lean_lr/lean_fb/crouch_stand/seated/still are the
+arbiter). Consumed by `@bodyarcade/locomotion`.
+
 ## Versioning policy
 
 `BodySignal.v` is the schema major. Additive fields (Rowing/Dolphin) bump
