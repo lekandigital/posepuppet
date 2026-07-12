@@ -1,0 +1,11 @@
+{
+  "name": "@bodyarcade/segmentation",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local person segmentation for the recording presentation layer: MediaPipe selfie segmenter (same-origin assets, GPU with CPU/WASM fallback) at reduced resolution/rate, temporal mask smoothing, degradation tiers. All inference stays in the browser; masks never leave the page.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "sideEffects": false
+}
