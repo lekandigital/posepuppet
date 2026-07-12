@@ -3,9 +3,14 @@
 // the take bar, recorder start/stop. Driven hands-free through the
 // gesture/intent seed (raise both arms = start, cross wrists = stop) with
 // keyboard always available (space = next shot, esc = stop).
+//
+// V2 (V7): shots apply per-shot presentation presets (restored when the
+// take ends) and a shot can BE an instant replay — the last seconds in
+// slow motion through Motion Memory, recorded into the same take.
 
 import { LM } from '@bodyarcade/pose-runtime';
 import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
+import type { PresentMode } from '../record/presentation';
 import type { TakeScript } from './scripts';
 
 export interface DirectorDeps {
@@ -15,6 +20,10 @@ export interface DirectorDeps {
   stopRecording(): void;
   ghostOn(): Promise<void>;
   avatarNext(): void;
+  /** slow-motion Motion Memory replay sized to fill `sec` seconds */
+  replay(sec: number): void;
+  /** shot-scoped presentation preset; null restores the user's setting */
+  setPresentation(m: PresentMode | null, skeleton?: boolean): void;
   coach(eyebrow: string, text: string): void;
   /** latest mirrored normalized landmarks (framing check) */
   latestNorm(): LandmarkPoint[] | null;
@@ -87,6 +96,7 @@ export function createDirector(deps: DirectorDeps): Director {
     shotIdx = -1;
     overlay.classList.add('hidden');
     if (shotStatus) shotStatus.textContent = 'READY';
+    deps.setPresentation(null); // the take's presets end with the take
     deps.stopRecording();
   }
 
@@ -101,12 +111,17 @@ export function createDirector(deps: DirectorDeps): Director {
     const shot = script.shots[i];
     setOverlay(`Shot ${i + 1} of ${script.shots.length}`, shot.prompt);
     if (shotStatus) shotStatus.textContent = `SHOT ${i + 1}/${script.shots.length}`;
+    deps.setPresentation(shot.present ?? null, shot.skeleton);
     if (shot.action === 'ghost-on') void deps.ghostOn();
     if (shot.action === 'avatar-next') deps.avatarNext();
+    if (shot.action === 'replay') deps.replay(shot.sec);
     shotTimer = window.setTimeout(() => runShot(i + 1), shot.sec * 1000);
     // hands-free advance: holding the shot's pose still (after a minimum
-    // beat) moves on early — the timer remains the ceiling
+    // beat) moves on early — the timer remains the ceiling. Replay shots
+    // never advance on stillness: the performer SHOULD stand still and
+    // watch, and the replay owns the shot's full duration.
     clearInterval(stillPoll);
+    if (shot.action === 'replay') return;
     const shotStart = performance.now();
     stillPoll = window.setInterval(() => {
       if (performance.now() - shotStart > 1800 && deps.holdingStill()) {

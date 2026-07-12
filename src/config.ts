@@ -24,6 +24,10 @@ export interface Config {
   recPackage: boolean; // title stinger + end card
   recBadge: boolean; // corner mark on the composite
   recGrade: boolean; // grain/vignette grade on the composite
+  // performer presentation (V7): local person-segmentation treatments
+  presentMode: 'raw' | 'blur' | 'cutout' | 'silhouette' | 'chip' | 'stage';
+  presentSkeleton: boolean; // skeleton-ghost overlay on the cutout body
+  presentAutoTier: boolean; // auto quality: degrade segmentation before the fps floor
   onboardingSeen: boolean;
   vfx: boolean; // velocity VFX (rings/sparks/ripples), subtle by default
   autoCam: boolean; // auto-director camera (lean, kicks, idle orbit)
@@ -53,6 +57,9 @@ const DEFAULTS: Config = {
   recPackage: true,
   recBadge: true,
   recGrade: true,
+  presentMode: 'raw',
+  presentSkeleton: false,
+  presentAutoTier: true,
   onboardingSeen: false,
   vfx: true,
   autoCam: true,

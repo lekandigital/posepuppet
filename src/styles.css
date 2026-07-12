@@ -1010,3 +1010,37 @@ body.recording #takebar { background: var(--pane); }
     to { transform: none; opacity: 1; }
   }
 }
+
+/* ── performer presentation (V7): preview + take-bar control ─────── */
+.present-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+.present-preview.hidden { display: none; }
+
+#tb-present { display: flex; align-items: center; gap: 1px; }
+.pm-label {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  margin: 0 5px 0 2px;
+}
+.pm-btn {
+  border: 0;
+  background: transparent;
+  padding: 4px 5px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  font-family: var(--mono);
+}
+.pm-btn:hover { color: var(--ink); }
+.pm-btn.on { color: var(--cyan); text-shadow: 0 0 10px rgba(63, 224, 255, 0.35); }
+.pm-btn.skel { margin-left: 5px; border-left: 1px solid var(--rule); padding-left: 8px; }
+.pm-btn.skel.on { color: var(--violet); text-shadow: 0 0 10px rgba(157, 123, 255, 0.4); }
+/* laptop-small: the control folds away; ⌘K "camera presentation" remains */
+@media (max-width: 1180px) { #tb-present { display: none; } }

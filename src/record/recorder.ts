@@ -5,8 +5,17 @@
 // stinger in, end card out carrying the privacy line, corner badge, and
 // a subtle grain/vignette grade so clips match the interface atmosphere.
 // Everything stays local; the blob never leaves the machine.
+//
+// V7: the camera pane renders through the presentation layer (blur /
+// cutout / silhouette), and two presentations restructure the whole
+// frame — chip (stage full-bleed, performer in a corner body chip) and
+// stage (performer cutout composited onto the stage beside the avatar).
+// The layout follows the presentation's EFFECTIVE mode per frame, so a
+// degraded mask falls back to the classic two-pane composite instead of
+// freezing mid-take.
 
 import { config } from '../config';
+import type { Presentation } from './presentation';
 
 const FPS = 30;
 
@@ -55,6 +64,7 @@ interface Deps {
   video: HTMLVideoElement;
   overlay: HTMLCanvasElement;
   stage: HTMLCanvasElement;
+  presentation: Presentation;
   onState?: (recording: boolean, elapsedSec: number) => void;
   onSaved?: (sizeBytes: number) => void;
 }
@@ -64,6 +74,14 @@ function pickMime(): string {
     if (MediaRecorder.isTypeSupported(m)) return m;
   }
   return '';
+}
+
+/** contain-fit `sw×sh` into a pane rect. */
+function fitRect(pane: PaneRect, sw: number, sh: number): PaneRect {
+  const scale = Math.min(pane.w / sw, pane.h / sh);
+  const w = sw * scale;
+  const h = sh * scale;
+  return { x: pane.x + (pane.w - w) / 2, y: pane.y + (pane.h - h) / 2, w, h };
 }
 
 /** contain-fit `sw×sh` into a pane rect and draw via cb. */
@@ -181,6 +199,11 @@ export function createRecorder(deps: Deps): Recorder {
       canvas.width / 2,
       canvas.height / 2 + Math.round(canvas.width * 0.028),
     );
+    if (takeName) {
+      ctx.fillStyle = '#66748f';
+      ctx.font = `500 ${Math.round(canvas.width * 0.01)}px "JetBrains Mono Variable", monospace`;
+      ctx.fillText(takeName.toUpperCase(), canvas.width / 2, canvas.height / 2 + Math.round(canvas.width * 0.052));
+    }
     ctx.globalAlpha = 1;
   }
 
@@ -199,17 +222,24 @@ export function createRecorder(deps: Deps): Recorder {
     }
     ctx.fillStyle = '#0e0f13';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    const { video, overlay, stage } = deps;
+    const { stage, presentation } = deps;
     const m = config.mirror;
-    fitPane(ctx, layout.camera, video.videoWidth, video.videoHeight, m, (x, y, w, h) =>
-      ctx.drawImage(video, x, y, w, h),
-    );
-    fitPane(ctx, layout.camera, overlay.width, overlay.height, m, (x, y, w, h) =>
-      ctx.drawImage(overlay, x, y, w, h),
-    );
-    fitPane(ctx, layout.stage, stage.width, stage.height, false, (x, y, w, h) =>
-      ctx.drawImage(stage, x, y, w, h),
-    );
+    const mode = presentation.effective();
+    if (mode === 'chip' || mode === 'stage') {
+      // stage-full-bleed presentations: no camera pane at all
+      const full: PaneRect = { x: 0, y: 0, w: canvas.width, h: canvas.height };
+      const fitted = fitRect(full, stage.width, stage.height);
+      fitPane(ctx, full, stage.width, stage.height, false, (x, y, w, h) =>
+        ctx.drawImage(stage, x, y, w, h),
+      );
+      if (mode === 'stage') presentation.drawStagePerson(ctx, fitted, m);
+      else presentation.drawChip(ctx, canvas.width, canvas.height, m);
+    } else {
+      presentation.drawPane(ctx, layout.camera, m);
+      fitPane(ctx, layout.stage, stage.width, stage.height, false, (x, y, w, h) =>
+        ctx.drawImage(stage, x, y, w, h),
+      );
+    }
     drawChrome();
   }
 

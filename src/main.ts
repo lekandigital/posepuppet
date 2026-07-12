@@ -55,6 +55,13 @@ import {
 import { getGeneratedAvatarDef } from './rig/generatedAvatarRegistry';
 import { EvalCollector } from './eval/runner';
 import { createRecorder, createRecordButton, updateRecordButton } from './record/recorder';
+import {
+  createPresentation,
+  PRESENT_MODES,
+  type PresentationStats,
+  type PresentMode,
+} from './record/presentation';
+import { createWorkerSegmenter } from '@bodyarcade/segmentation';
 
 type VisualQaPoseResult = {
   poseName: string;
@@ -75,6 +82,10 @@ declare global {
       lastDetectionAt: number;
       detectionCount: number;
       lastRecording: { size: number; type: string } | null;
+      /** presentation-layer state (segmentation, tiers) for tests/eval */
+      present?: () => PresentationStats;
+      /** Motion Memory ghost playback active (replay/duet) */
+      ghostActive?: () => boolean;
       /** Set by generated-avatar / smoke-mode loading. */
       avatarStatus?: 'loading' | 'loaded' | 'fallback' | 'error';
       avatarWarning?: string;
@@ -772,10 +783,51 @@ async function boot() {
     return;
   }
 
+  // ── performer presentation: local person segmentation (V7) ──
+  // worker-side, CPU delegate (the spike measured XNNPACK faster than the
+  // GPU delegate AND free of GPU-process contention); lazy — the worker
+  // only boots the first time a non-raw mode is chosen
+  const presentation = createPresentation({
+    video,
+    overlay,
+    renderFps: () => stage.renderFps(),
+    coach: (eyebrow, text) => coach.set(eyebrow, text),
+    createSeg: () => createWorkerSegmenter(),
+    autoTier: () => config.presentAutoTier,
+  });
+  presentation.setMode(config.presentMode);
+  presentation.setSkeleton(config.presentSkeleton);
+  window.__PP.present = () => presentation.stats();
+
+  // live preview of the presented camera (hidden while recording — the
+  // composite takes over; chrome hides then anyway)
+  const preview = document.createElement('canvas');
+  preview.id = 'present-preview';
+  preview.className = 'present-preview hidden';
+  document.getElementById('camera-feed')!.append(preview);
+  const previewCtx = preview.getContext('2d')!;
+
+  // take-bar presentation control + config plumbing
+  const pmBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('#tb-present [data-pm]'));
+  const skelBtn = document.getElementById('pm-skel') as HTMLButtonElement | null;
+  function syncPresentButtons(): void {
+    for (const b of pmBtns) b.classList.toggle('on', b.dataset.pm === config.presentMode);
+    skelBtn?.classList.toggle('on', config.presentSkeleton);
+  }
+  for (const b of pmBtns) b.onclick = () => setConfig('presentMode', b.dataset.pm as PresentMode);
+  if (skelBtn) skelBtn.onclick = () => setConfig('presentSkeleton', !config.presentSkeleton);
+  syncPresentButtons();
+  onConfigChange((key) => {
+    if (key === 'presentMode') presentation.setMode(config.presentMode);
+    else if (key === 'presentSkeleton') presentation.setSkeleton(config.presentSkeleton);
+    if (key === 'presentMode' || key === 'presentSkeleton') syncPresentButtons();
+  });
+
   const recorder = createRecorder({
     video,
     overlay,
     stage: stageCanvas,
+    presentation,
     onState: (recording, elapsedSec) => {
       updateRecordButton(recording, elapsedSec);
       hud.setRec(recording, elapsedSec);
@@ -860,9 +912,9 @@ async function boot() {
     ghostBtn.classList.add('on');
   }
 
-  async function instantReplay(): Promise<void> {
+  async function instantReplay(captureSec = 5, rate = 0.4): Promise<void> {
     if (replayActive) return;
-    const loop = poseRing.snapshot(5, 'replay');
+    const loop = poseRing.snapshot(captureSec, 'replay');
     if (!loop) {
       coach.set('Memory', 'Perform for a few seconds first — replay shows your last 5 seconds.');
       return;
@@ -880,11 +932,11 @@ async function boot() {
     await ghosts.start(loop, config.avatar, {
       echoes: 3,
       echoOffsetMs: 120,
-      rate: 0.4,
+      rate,
       placement: 'center',
       baseOpacity: 0.75,
     });
-    const replayMs = (loop.durationMs / 0.4) + 400;
+    const replayMs = (loop.durationMs / rate) + 400;
     setTimeout(() => {
       ghosts.stop();
       avatar.object.visible = config.mode !== 'hand';
@@ -898,6 +950,7 @@ async function boot() {
 
   ghostBtn.onclick = () => void toggleGhost();
   replayBtn.onclick = () => void instantReplay();
+  window.__PP.ghostActive = () => ghosts.active;
   echoSlider.oninput = () => {
     echoes = Number(echoSlider.value);
     if (echoVal) echoVal.textContent = `×${echoes}`;
@@ -1088,6 +1141,10 @@ async function boot() {
       if (!ghosts.active) await toggleGhost();
     },
     avatarNext: () => setConfig('avatar', nextAvatarId(config.avatar)),
+    // replay shot: capture window sized so the slowed playback fills the
+    // shot (rate 0.5 → the shot replays the previous sec/2 seconds)
+    replay: (sec) => void instantReplay(Math.max(1.5, (sec - 0.6) * 0.5), 0.5),
+    setPresentation: (m, skeleton) => presentation.setOverride(m, skeleton),
     coach: (eyebrow, text) => coach.set(eyebrow, text),
     latestNorm: () => latestNorm,
     handTracked: () => performance.now() - handMode.lastDetectionAt() < 1000,
@@ -1297,6 +1354,16 @@ async function boot() {
       run: () => setConfig('recAspect', config.recAspect === '16:9' ? '9:16' : '16:9') },
     { id: 'packaging', label: 'recording · toggle stinger/end card',
       run: () => setConfig('recPackage', !config.recPackage) },
+    { id: 'present', label: 'camera presentation · cycle raw/blur/cutout/silhouette/chip/stage', key: 'x',
+      run: () =>
+        setConfig(
+          'presentMode',
+          PRESENT_MODES[(PRESENT_MODES.indexOf(config.presentMode) + 1) % PRESENT_MODES.length],
+        ) },
+    { id: 'present-skel', label: 'camera presentation · skeleton on cutout · toggle',
+      run: () => setConfig('presentSkeleton', !config.presentSkeleton) },
+    { id: 'present-auto', label: 'camera presentation · auto quality · toggle',
+      run: () => setConfig('presentAutoTier', !config.presentAutoTier) },
     { id: 'poster', label: 'poster · export a designed still', key: 'p',
       run: () => void exportPoster() },
     { id: 'help', label: 'help · how to use (onboarding)',
@@ -1524,6 +1591,24 @@ async function boot() {
     }
     ghosts.tick(dt, time);
     vfx.tick(dt, avatar);
+    // presentation layer: tier controller + live preview of the presented
+    // camera (preview parks while recording — the composite runs instead)
+    const nowMs = performance.now();
+    presentation.tick(nowMs);
+    const previewOn = presentation.requested() !== 'raw' && !recorder.recording;
+    preview.classList.toggle('hidden', !previewOn);
+    if (previewOn && video.videoWidth) {
+      // buffer matches the feed box aspect so the CSS stretch is 1:1
+      const box = preview.parentElement!.getBoundingClientRect();
+      const pw = 640;
+      const ph = Math.max(2, Math.round((pw * box.height) / Math.max(1, box.width)));
+      if (preview.width !== pw || preview.height !== ph) {
+        preview.width = pw;
+        preview.height = ph;
+      }
+      previewCtx.clearRect(0, 0, pw, ph);
+      presentation.drawPane(previewCtx, { x: 0, y: 0, w: pw, h: ph }, config.mirror);
+    }
     autoCam.tick(
       dt,
       avatar.object.position.x,
