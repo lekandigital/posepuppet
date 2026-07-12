@@ -18,7 +18,7 @@
 // Usage: node tools/build-boundary.mjs [configs/san-francisco-bay.json] [--out path] [--sweep]
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 import {
@@ -36,7 +36,9 @@ const round2 = (v) => {
 };
 
 function readRaw(relPath) {
-  const buf = readFileSync(join(PKG_ROOT, relPath));
+  // absolute paths pass through — the worldbake pipeline (tools/worldbake)
+  // feeds this builder coastline caches living outside the package
+  const buf = readFileSync(isAbsolute(relPath) ? relPath : join(PKG_ROOT, relPath));
   return JSON.parse(relPath.endsWith('.gz') ? gunzipSync(buf).toString('utf8') : buf.toString('utf8'));
 }
 
@@ -175,11 +177,19 @@ function assembleCoastlineClip(config, raw, proj) {
     clipped.push(...clipPolylineToConvex(toXY(chain), region));
   }
   const islandRings = [];
+  let droppedWaterSideRings = 0;
   for (const ring of closed) {
     const xy = toXY(ring);
     const outsideIdx = xy.findIndex((p) => !insideConvex(p, region));
     if (outsideIdx === -1) {
-      islandRings.push(xy);
+      // OSM coastline runs with land on the LEFT, so a closed ring that
+      // is an island traverses CCW (positive shoelace) in this frame. A
+      // CW ring encloses WATER (a harbour basin / lagoon seam) — inside
+      // open water it carries no boundary and must not become an island
+      // (measured on Friday Harbor: a CW basin ring swallowed the whole
+      // harbour as a fake island).
+      if (shoelaceSigned(xy) > 0) islandRings.push(xy);
+      else droppedWaterSideRings++;
     } else {
       const rolled = [...xy.slice(outsideIdx), ...xy.slice(0, outsideIdx), xy[outsideIdx]];
       clipped.push(...clipPolylineToConvex(rolled, region));
@@ -216,6 +226,7 @@ function assembleCoastlineClip(config, raw, proj) {
       walkDir,
       droppedWaterRings,
       droppedIslets: islandRings.filter((r) => pointInRing(r[0], outer)).length - holes.length,
+      droppedWaterSideRings,
       regionCorners: region.length,
     },
   };
@@ -351,6 +362,8 @@ export function buildBoundary(config, { sweep = false } = {}) {
       ...(config.mode === 'coastline-clip'
         ? { droppedIslets: meta.droppedIslets, droppedWaterRings: meta.droppedWaterRings, holesSealedBySimplification: holesSealed }
         : {}),
+      // conditional so pre-existing artifacts (SF Bay) stay byte-identical
+      ...(meta.droppedWaterSideRings ? { droppedWaterSideRings: meta.droppedWaterSideRings } : {}),
       areaRawM2: Math.round(areaRawM2),
       areaM2: Math.round(areaM2),
       areaDeltaPct: Math.round(((areaM2 - areaRawM2) / areaRawM2) * 1e6) / 1e4,

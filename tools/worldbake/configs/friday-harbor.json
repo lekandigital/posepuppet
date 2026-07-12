@@ -1,0 +1,42 @@
+{
+  "name": "friday-harbor",
+  "displayName": "Friday Harbor",
+  "bbox": [48.518, -123.04, 48.545, -122.995],
+  "terrain": { "zoom": 13, "cellSizeM": 12, "clampMinM": -60 },
+  "water": {
+    "seed": { "lat": 48.537, "lon": -123.013 },
+    "cuts": [],
+    "islandMinAreaM2": 200,
+    "islandNames": [{ "name": "Brown Island", "lat": 48.5375, "lon": -123.0035 }],
+    "simplify": { "radialPreSpacingM": 5, "minTriangleAreaM2": 30, "minRingVerts": 12, "maxPasses": 8 }
+  },
+  "simplify": {
+    "lineToleranceM2": 1.5,
+    "landuse": { "radialPreSpacingM": 4, "minTriangleAreaM2": 20, "minRingVerts": 8 }
+  },
+  "nav": { "rowSpacingM": 40, "rowMinShoreClearM": 12 },
+  "minimap": { "minTriangleAreaM2": 120 },
+  "spawns": { "divePoints": 2 },
+  "checks": {
+    "maxWaterAreaDeltaPct": 1.0,
+    "probes": [
+      { "name": "harbour mid", "lat": 48.537, "lon": -123.013, "expect": "water" },
+      { "name": "channel north", "lat": 48.5421, "lon": -123.01175, "expect": "water" },
+      { "name": "town grid", "lat": 48.53907, "lon": -123.0211, "expect": "land" },
+      { "name": "Brown Island interior", "lat": 48.5375, "lon": -123.0035, "expect": "land" },
+      { "name": "airfield", "lat": 48.52316, "lon": -123.02448, "expect": "land" }
+    ],
+    "settlementProbes": [
+      { "name": "walk spawn area", "lat": 48.53328, "lon": -123.02074 },
+      { "name": "A Street", "lat": 48.53258, "lon": -123.01515 },
+      { "name": "Price Street", "lat": 48.53318, "lon": -123.02431 }
+    ],
+    "settlementCoverM": 60,
+    "bayProbe": { "lat": 48.543, "lon": -123.003 },
+    "terrainProbes": [
+      { "name": "town rise", "lat": 48.53328, "lon": -123.02074, "minElevM": 5, "maxElevM": 80 },
+      { "name": "airfield (flat)", "lat": 48.52316, "lon": -123.02448, "minElevM": 5, "maxElevM": 80 },
+      { "name": "harbour floor (clamped)", "lat": 48.53894, "lon": -122.99828, "minElevM": -60, "maxElevM": 0 }
+    ]
+  }
+}

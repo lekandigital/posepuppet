@@ -87,7 +87,7 @@ export function loadBoundary(json: unknown): BoundaryData {
   return b;
 }
 
-function pointInRing(x: number, y: number, ring: [number, number][]): boolean {
+export function pointInRing(x: number, y: number, ring: [number, number][]): boolean {
   let inside = false;
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
     const [xi, yi] = ring[i];
@@ -155,3 +155,6 @@ export function projectLatLon(
     (lat - proj.lat0) * DEG * proj.earthRadiusM,
   ];
 }
+
+// World artifact surface (bodyarcade-world/1) — see WORLD_SCHEMA.md.
+export * from './world';

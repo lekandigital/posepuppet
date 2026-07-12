@@ -1,0 +1,41 @@
+{
+  "name": "isafjordur",
+  "displayName": "Ísafjörður",
+  "bbox": [66.05, -23.19, 66.086, -23.09],
+  "terrain": { "zoom": 13, "cellSizeM": 12 },
+  "water": {
+    "seed": { "lat": 66.078, "lon": -23.11 },
+    "cuts": [],
+    "islandMinAreaM2": 200,
+    "simplify": { "radialPreSpacingM": 5, "minTriangleAreaM2": 30, "minRingVerts": 12, "maxPasses": 8 }
+  },
+  "simplify": {
+    "lineToleranceM2": 1.5,
+    "landuse": { "radialPreSpacingM": 4, "minTriangleAreaM2": 20, "minRingVerts": 8 }
+  },
+  "nav": { "rowSpacingM": 40, "rowMinShoreClearM": 12 },
+  "minimap": { "minTriangleAreaM2": 120 },
+  "spawns": { "divePoints": 2 },
+  "checks": {
+    "maxWaterAreaDeltaPct": 1.0,
+    "probes": [
+      { "name": "fjord mouth mid", "lat": 66.08, "lon": -23.11, "expect": "water" },
+      { "name": "Pollurinn", "lat": 66.0705, "lon": -23.13, "expect": "water" },
+      { "name": "Eyri spit (town centre)", "lat": 66.07617, "lon": -23.13031, "expect": "land" },
+      { "name": "west mountainside", "lat": 66.062, "lon": -23.18, "expect": "land" },
+      { "name": "airport runway", "lat": 66.0581, "lon": -23.1353, "expect": "land" }
+    ],
+    "settlementProbes": [
+      { "name": "harbour front", "lat": 66.0745, "lon": -23.125 },
+      { "name": "Urðarvegur (inner town)", "lat": 66.07228, "lon": -23.14311 },
+      { "name": "Engjavegur (spit grid)", "lat": 66.07605, "lon": -23.13117 }
+    ],
+    "settlementCoverM": 60,
+    "bayProbe": { "lat": 66.08, "lon": -23.11 },
+    "terrainProbes": [
+      { "name": "town (near sea level)", "lat": 66.0745, "lon": -23.125, "minElevM": -5, "maxElevM": 40 },
+      { "name": "west fjord wall (plateau)", "lat": 66.07698, "lon": -23.18016, "minElevM": 400, "maxElevM": 900 },
+      { "name": "mid slope above town", "lat": 66.068, "lon": -23.1666, "minElevM": 40, "maxElevM": 300 }
+    ]
+  }
+}
