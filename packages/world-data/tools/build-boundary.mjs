@@ -18,7 +18,7 @@
 // Usage: node tools/build-boundary.mjs [configs/san-francisco-bay.json] [--out path] [--sweep]
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 import {
@@ -36,7 +36,9 @@ const round2 = (v) => {
 };
 
 function readRaw(relPath) {
-  const buf = readFileSync(join(PKG_ROOT, relPath));
+  // absolute paths pass through — the worldbake pipeline (tools/worldbake)
+  // feeds this builder coastline caches living outside the package
+  const buf = readFileSync(isAbsolute(relPath) ? relPath : join(PKG_ROOT, relPath));
   return JSON.parse(relPath.endsWith('.gz') ? gunzipSync(buf).toString('utf8') : buf.toString('utf8'));
 }
 

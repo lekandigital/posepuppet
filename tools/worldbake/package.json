@@ -1,0 +1,12 @@
+{
+  "name": "@bodyarcade/worldbake",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline world bake: OSM + DEM in (cached, checksummed), profile-agnostic world.json out. Owns nothing at runtime — games ship the baked artifact.",
+  "scripts": {
+    "bake": "node worldbake.mjs",
+    "check": "node test/checks.mjs",
+    "render": "node worldbake.mjs --render"
+  }
+}
