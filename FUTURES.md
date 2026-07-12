@@ -109,3 +109,9 @@ the shipped answer for shorelines and pockets; there is no other
 collision geometry by design (no rocks/ruins collision — they are
 dressing, and the PS2 fantasy tolerates swimming through kelp). Judge
 live whether that reads as intended.
+
+- Hand-puppet loop replay: hand-kind Motion Memory loops persist,
+  trim and mirror, but still have no playback surface — the ghost
+  player drives body rigs. V7 (Recording v2) scoped replay-in-take
+  to pose loops; a hand-puppet ghost needs its own puppet-driving
+  player.

@@ -3,21 +3,37 @@
 // time; frames arriving while busy simply are not segmented (the mask
 // consumer treats a stale mask as missing, so a stalled worker can never
 // freeze the performer). Downscaling happens inside createImageBitmap
-// (resizeWidth/Height) so the transfer stays tens of kilobytes. Falls
-// back to the inline segmenter if the worker can't come up.
+// (resizeWidth/Height) so the transfer stays tens of kilobytes.
+//
+// The worker itself is a CLASSIC worker served verbatim from
+// public/seg-worker.js — module workers under the Vite dev server break
+// MediaPipe's dynamic wasm-loader import (rewritten `?import` on a public
+// asset never resolves); the classic worker's importScripts path is
+// untouched by any bundler, so dev and build behave identically. Falls
+// back to the inline segmenter (CPU first — the spike's winner) if the
+// worker can't come up.
 
 import { createSegmenter, type PersonSegmenter, type SegmenterOptions } from './segmenter';
 import { MaskBuffer } from './maskBuffer';
 
 const WORKER_INIT_TIMEOUT_MS = 20_000;
 
+async function inlineFallback(opts: SegmenterOptions): Promise<PersonSegmenter> {
+  if (opts.forceDelegate) return createSegmenter(opts);
+  try {
+    return await createSegmenter({ ...opts, forceDelegate: 'CPU' });
+  } catch {
+    return createSegmenter(opts); // GPU-first auto path as the last resort
+  }
+}
+
 export async function createWorkerSegmenter(opts: SegmenterOptions = {}): Promise<PersonSegmenter> {
   let worker: Worker;
   try {
-    worker = new Worker(new URL('./segWorker.ts', import.meta.url), { type: 'module' });
+    worker = new Worker('/seg-worker.js');
   } catch (err) {
-    console.warn('segmentation: module worker unavailable, segmenting on the main thread', err);
-    return createSegmenter(opts);
+    console.warn('segmentation: worker unavailable, segmenting on the main thread', err);
+    return inlineFallback(opts);
   }
 
   const delegate = await new Promise<'GPU' | 'CPU' | null>((resolve) => {
@@ -26,6 +42,9 @@ export async function createWorkerSegmenter(opts: SegmenterOptions = {}): Promis
       if (ev.data.t === 'ready') {
         clearTimeout(timer);
         resolve(ev.data.delegate ?? 'CPU');
+      } else if (ev.data.t === 'initfail') {
+        clearTimeout(timer);
+        resolve(null);
       }
     };
     worker.onerror = () => {
@@ -45,7 +64,7 @@ export async function createWorkerSegmenter(opts: SegmenterOptions = {}): Promis
   if (delegate === null) {
     console.warn('segmentation: worker failed to initialize, main-thread fallback');
     worker.terminate();
-    return createSegmenter(opts);
+    return inlineFallback(opts);
   }
 
   const buffer = new MaskBuffer();
@@ -66,6 +85,7 @@ export async function createWorkerSegmenter(opts: SegmenterOptions = {}): Promis
   let fpsStart = performance.now();
   let fps = 0;
   let latEma = 0;
+  let intEma = 0;
 
   worker.onmessage = (
     ev: MessageEvent<{ t: string; empty?: boolean; conf?: Float32Array; w?: number; h?: number }>,
@@ -76,6 +96,10 @@ export async function createWorkerSegmenter(opts: SegmenterOptions = {}): Promis
     if (stopped || m.empty || !m.conf) return;
     buffer.ingest(m.conf, m.w!, m.h!);
     const now = performance.now();
+    if (lastMaskWall) {
+      const gap = now - lastMaskWall;
+      intEma = intEma ? intEma * 0.8 + gap * 0.2 : gap;
+    }
     lastMaskWall = now;
     const cost = now - sentAt;
     latEma = latEma ? latEma * 0.9 + cost * 0.1 : cost;
@@ -147,6 +171,7 @@ export async function createWorkerSegmenter(opts: SegmenterOptions = {}): Promis
     stop() {
       stopped = true;
       lastMaskWall = 0;
+      intEma = 0;
       buffer.reset();
     },
     close() {
@@ -155,6 +180,7 @@ export async function createWorkerSegmenter(opts: SegmenterOptions = {}): Promis
       worker.terminate();
     },
     lastMaskAt: () => lastMaskWall,
+    avgIntervalMs: () => intEma,
     setMaxHz(hz) {
       minIntervalMs = hz > 0 ? 1000 / hz : 0;
     },

@@ -1327,3 +1327,127 @@ the overlay is modal and the stage stays visible around it. Weakest
 point honestly: with very sparse SwiftShader frames the tape bars get
 wide and blocky; on Apple Silicon at 25–30 Hz pose the strip is dense
 (FUTP S5.1 confirms feel).
+
+## V7 — Recording v2: Demo Director (2026-07-12)
+
+### What shipped
+- packages/segmentation: local person segmentation for the presentation
+  layer — MediaPipe selfie segmenter (landscape f16) in a classic worker
+  with the CPU/XNNPACK delegate, 256 px working width, MaskBuffer
+  temporal EMA + soft threshold band + bbox + edge-flicker stats.
+  Spike table (.local/seg-spike-{headless,gpu}.json) behind the
+  delegate/worker decision in PLAN.md and DECISIONS.
+- Presentation layer (src/record/presentation.ts): six camera
+  treatments — raw / blur / cutout / silhouette / chip (PiP body chip
+  over a full-bleed stage) / stage (performer cutout ON the stage
+  beside the avatar, contact shadow) — plus a skeleton-ghost toggle;
+  live preview over the camera panel; take-bar CAM control + palette
+  commands; TierController degradation (24 Hz/256 px → 12 Hz/160 px →
+  off with coach line), adaptive mask-freshness gate, debounced
+  effective-mode so composite layouts never flap.
+- Recorder integration: the camera pane renders through the
+  presentation layer; chip/stage restructure the whole frame per
+  EFFECTIVE mode each frame (safe raw fallback mid-take); end card
+  carries the take name; both aspects.
+- Take scripts v2: per-shot `present`/`skeleton` presets (override
+  stack — restored when the take ends), `replay` action = instant
+  replay via Motion Memory ghosts recorded INSIDE the take (slow-mo
+  0.5, capture sized to fill the shot, stillness-advance disabled).
+  New scripts: Cutout duet (signature), Presentation reel; Character
+  take closes on a replay. Countdown/framing/hands-free machinery
+  unchanged.
+- Privacy copy now names segmentation (rail line + README); the
+  receipt logic is untouched and stays truthful — models/wasm/worker
+  all same-origin.
+
+### Verification
+- Suites (full-suite lock, .local/v7-final.log): 129 passed /
+  9 skipped / 3 failed. Two failures are the documented SwiftShader-only
+  detect.spec ENVIRONMENT_BLOCKED pair, identical to the V6 exit
+  baseline (.local/v7-baseline.log). The third — smoke.spec's
+  renderFps > 10 — is a starved-run contention flake (it ran directly
+  after the CPU-heavy segmentation e2es on the shared box): it passes
+  isolated in 8.0 s on the same tree, the same classification V1
+  established for starved producers. tsc clean.
+- New spec (tests/segmentation.spec.ts, 14 tests): TierController drop
+  timing/cooldown/no-oscillation; MaskBuffer EMA at least halves
+  synthetic edge flicker vs raw, band mapping exact, bbox/coverage on a
+  synthetic square; e2e — all five non-raw modes record nonzero
+  playable files at 16:9 and cutout/stage at 9:16 with effective===mode
+  held through the take; Presentation reel applies and restores
+  per-shot presets (raw→blur→cutout→silhouette→stage, then back to the
+  user's raw); the Character-take replay shot drives ghosts inside the
+  take. Existing record/director/smoke specs green post-wiring (8/8).
+- Mask quality (node eval/seg-quality.mjs → eval/seg-quality.json):
+  IoU vs hand-labeled person polygons (labels exclude the facetouch
+  wall shadow + table on purpose): fullbody mean 0.787 (0.752/0.825/
+  0.784 at 2 s/8 s/20 s), facetouch mean 0.816 (0.822/0.810).
+  Smoothed edge flicker: 0.0104 (fullbody), 0.002 (facetouch) — gate
+  < 0.02. All gates pass (frame ≥ 0.45, mean ≥ 0.55).
+- Perf ON/OFF × both aspects, recorder rolling, headed :2 under the
+  display lock (.local/rec-perf.json, 12 s samples):
+
+  | aspect | presentation | render avg (min) | pose Hz | seg |
+  |---|---|---|---|---|
+  | 16:9 | raw (OFF) | 60 (60) | 28.9 | — |
+  | 16:9 | cutout (ON) | 59.9 (58) | 28.9 | 14.5 Hz @ 9.9 ms |
+  | 9:16 | raw (OFF) | 60 (60) | 28.9 | — |
+  | 9:16 | cutout (ON) | 60 (60) | 29.0 | 15.0 Hz @ 10.2 ms |
+
+  Floors (render ≥ 45, pose ≥ 15) hold with segmentation ON at both
+  aspects; the ON cost is ~0 fps render / ~0 Hz pose on this box. The
+  worker's effective mask rate settles ~15 Hz (busy-latch round trip),
+  below the 24 Hz cap — visually smooth for compositing; the tier
+  system remains the guard on weaker machines. Apple Silicon numbers
+  are the human pass (S6), per the cross-platform policy.
+- Evidence takes (eval/demo-takes.mjs, headed :2): one packaged clip
+  per presentation mode + scripted Presentation-reel and Cutout-duet
+  takes + a 9:16 stage clip → .local/takes/v7/*.webm (gitignored —
+  fixture footage), poster frames in .local/shots/v7.
+
+### Found-and-fixed during verification
+- TierController t=0 falsy sentinel (belowSince=0 ambiguous) — caught
+  by its own unit test; sentinels now -1.
+- Module worker + Vite dev broke MediaPipe's wasm-loader import
+  (`?import` rewrite on a public asset) → classic worker from public/
+  (DECISIONS). Found because the first e2e run showed every mode
+  falling back to raw.
+- MPMask.getAsFloat32Array() returns a wasm-heap VIEW — postMessage
+  transfer threw "not detachable" and wedged the one-in-flight latch;
+  fixed with .slice().
+- Fixed 400 ms freshness made slow-but-live segmenters (SwiftShader
+  ~1.4 Hz) read as stalled → adaptive window (max(400, 2.5× measured
+  interval), cap 2 s); real hardware keeps the 400 ms floor.
+
+### Screenshot board + vision self-review (.local/shots/v7, gitignored)
+Poster frames from the evidence takes (mode-*.png), the scripted-take
+posters, and the IoU overlay renders (seg-iou-*.png), reviewed frame by
+frame:
+- mode-stage: the signature works — the performer cutout stands ON the
+  stage floor beside the astronaut, contact shadow under the feet,
+  plausible scale, one scene. Slight edge translucency from the feather
+  reads holographic rather than pasted; acceptable, flagged for the
+  S6.2 human read.
+- mode-chip: the PERFORMER chip (bbox-cropped cutout, hairline border,
+  mono label) sits clear of the stage subject; instrument voice intact.
+- mode-silhouette: the cyan→violet gradient figure reads as a design
+  element, not a segmentation artifact; the crown of the head loses a
+  few pixels to mask smoothing at 256 px on a distant subject — minor,
+  invisible in motion.
+- mode-cutout: clean edges against the glass backdrop; the performer is
+  contain-fit (full camera frame), so a far-away subject reads small —
+  honest framing, the chip/stage modes are the framed alternatives.
+- mode-blur: background defocused, performer sharp; on the blown-out
+  white fixture wall the effect is subtle — expect it to read stronger
+  in a real room (S6.1).
+- seg-iou-facetouch: agreement (green) covers the body; the hard wall
+  shadow shows NO mask-only fringe — the model excludes it, which is
+  what the label gates were designed to catch.
+- Grade/vignette/badge never reduce legibility of the video, overlay,
+  or stage; no template-feel; the signature element is unmistakable.
+- take-cutout-duet (scripted): the "three of you" shot lands — live
+  performer cutout, violet Motion Memory ghost, and the live avatar
+  share the stage floor in one readable scene.
+- mode-stage-vertical (9:16): correct and playable; the landscape stage
+  contain-fits with letterbox bars — honest, but a vertical-crop stage
+  framing would fill the frame better (future polish, not a defect).

@@ -33,8 +33,13 @@ export interface Rect {
   h: number;
 }
 
-/** mask staleness gate: older than this = no mask (worker stall, tier 2) */
+/** mask staleness gate: the floor of the freshness window. The gate's job
+ *  is to catch a STALLED segmenter, not a slow-but-live one — on weak
+ *  machines masks arrive slowly and honestly, so the window widens with
+ *  the measured mask interval (never past MASK_FRESH_CAP_MS). On real
+ *  hardware the interval is ~40 ms and this floor is what applies. */
 const MASK_FRESH_MS = 400;
+const MASK_FRESH_CAP_MS = 2000;
 /** effective-mode debounce so layouts don't flap on brief mask gaps */
 const EFFECTIVE_DEBOUNCE_MS = 600;
 
@@ -65,25 +70,26 @@ const TIER_DEFAULTS: TierOptions = {
  *  only after 4 s comfortably above it) — no oscillation. */
 export class TierController {
   tier: 0 | 1 | 2 = 0;
-  private belowSince = 0;
-  private aboveSince = 0;
+  // -1 = "no window open" (0 is a valid clock reading, not a sentinel)
+  private belowSince = -1;
+  private aboveSince = -1;
   private lastChange = -Infinity;
 
   constructor(private opts: TierOptions = TIER_DEFAULTS) {}
 
   sample(fps: number, now: number): 0 | 1 | 2 {
     if (fps < this.opts.floorFps) {
-      this.aboveSince = 0;
-      if (!this.belowSince) this.belowSince = now;
+      this.aboveSince = -1;
+      if (this.belowSince < 0) this.belowSince = now;
       if (this.tier < 2 && now - this.belowSince >= this.opts.dropAfterMs) {
         this.tier++;
         this.lastChange = now;
-        this.belowSince = 0;
+        this.belowSince = -1;
       }
     } else {
-      this.belowSince = 0;
+      this.belowSince = -1;
       if (fps >= this.opts.recoverFps) {
-        if (!this.aboveSince) this.aboveSince = now;
+        if (this.aboveSince < 0) this.aboveSince = now;
         if (
           this.tier > 0 &&
           now - this.aboveSince >= this.opts.recoverAfterMs &&
@@ -91,10 +97,10 @@ export class TierController {
         ) {
           this.tier--;
           this.lastChange = now;
-          this.aboveSince = 0;
+          this.aboveSince = -1;
         }
       } else {
-        this.aboveSince = 0;
+        this.aboveSince = -1;
       }
     }
     return this.tier;
@@ -102,8 +108,8 @@ export class TierController {
 
   reset(): void {
     this.tier = 0;
-    this.belowSince = 0;
-    this.aboveSince = 0;
+    this.belowSince = -1;
+    this.aboveSince = -1;
     this.lastChange = -Infinity;
   }
 }
@@ -189,7 +195,12 @@ export function createPresentation(deps: PresentationDeps): Presentation {
   const skeletonOn = (): boolean => overrideSkeleton ?? userSkeleton;
 
   function maskFresh(): boolean {
-    return !!seg && performance.now() - seg.lastMaskAt() < MASK_FRESH_MS;
+    if (!seg || !seg.lastMaskAt()) return false;
+    const window = Math.min(
+      MASK_FRESH_CAP_MS,
+      Math.max(MASK_FRESH_MS, seg.avgIntervalMs() * 2.5),
+    );
+    return performance.now() - seg.lastMaskAt() < window;
   }
 
   function ensureSeg(): void {

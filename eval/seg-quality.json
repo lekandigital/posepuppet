@@ -1,0 +1,59 @@
+{
+  "when": "2026-07-12T21:18:38.134Z",
+  "gates": {
+    "frameIoU": 0.45,
+    "meanIoU": 0.55,
+    "flickerMean": 0.02
+  },
+  "model": "selfie_segmenter_landscape f16, CPU/XNNPACK, 256px working width",
+  "fixtures": [
+    {
+      "done": true,
+      "fixture": "facetouch",
+      "frames": [
+        {
+          "tMs": 10000,
+          "iou": 0.822,
+          "maskCoverage": 0.236,
+          "labelCoverage": 0.219
+        },
+        {
+          "tMs": 30000,
+          "iou": 0.81,
+          "maskCoverage": 0.222,
+          "labelCoverage": 0.201
+        }
+      ],
+      "meanIoU": 0.816,
+      "flickerMean": 0.002,
+      "flickerSamples": 122
+    },
+    {
+      "done": true,
+      "fixture": "fullbody",
+      "frames": [
+        {
+          "tMs": 2000,
+          "iou": 0.752,
+          "maskCoverage": 0.145,
+          "labelCoverage": 0.175
+        },
+        {
+          "tMs": 8000,
+          "iou": 0.825,
+          "maskCoverage": 0.127,
+          "labelCoverage": 0.135
+        },
+        {
+          "tMs": 20000,
+          "iou": 0.784,
+          "maskCoverage": 0.136,
+          "labelCoverage": 0.144
+        }
+      ],
+      "meanIoU": 0.787,
+      "flickerMean": 0.0104,
+      "flickerSamples": 130
+    }
+  ]
+}

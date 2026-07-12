@@ -35,6 +35,10 @@ export interface PersonSegmenter {
   readonly mask: HTMLCanvasElement;
   /** wall time of the last ingested mask; 0 before the first */
   lastMaskAt(): number;
+  /** EMA of the gap between ingested masks (ms); 0 before two masks.
+   *  Freshness gates key off this so a slow-but-live segmenter (weak
+   *  machine) is distinguished from a stalled one. */
+  avgIntervalMs(): number;
   setMaxHz(hz: number): void;
   setWorkingWidth(w: number): void;
   segFps(): number;
@@ -101,6 +105,7 @@ export async function createSegmenter(opts: SegmenterOptions = {}): Promise<Pers
   let fpsStart = performance.now();
   let fps = 0;
   let latEma = 0;
+  let intEma = 0;
 
   function segmentOnce(now: number): void {
     if (!video || video.readyState < 2 || closed) return;
@@ -128,6 +133,10 @@ export async function createSegmenter(opts: SegmenterOptions = {}): Promise<Pers
       const m = result.confidenceMasks?.[personIdx];
       if (m) {
         buffer.ingest(m.getAsFloat32Array(), m.width, m.height);
+        if (lastMaskWall) {
+          const gap = now - lastMaskWall;
+          intEma = intEma ? intEma * 0.8 + gap * 0.2 : gap;
+        }
         lastMaskWall = now;
       }
     });
@@ -172,6 +181,7 @@ export async function createSegmenter(opts: SegmenterOptions = {}): Promise<Pers
     stop() {
       stopped = true;
       lastMaskWall = 0;
+      intEma = 0;
       buffer.reset();
     },
     close() {
@@ -180,6 +190,7 @@ export async function createSegmenter(opts: SegmenterOptions = {}): Promise<Pers
       segmenter.close();
     },
     lastMaskAt: () => lastMaskWall,
+    avgIntervalMs: () => intEma,
     setMaxHz(hz) {
       minIntervalMs = hz > 0 ? 1000 / hz : 0;
     },

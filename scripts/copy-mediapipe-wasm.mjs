@@ -14,4 +14,10 @@ if (!existsSync(src)) {
 }
 mkdirSync(dest, { recursive: true });
 cpSync(src, dest, { recursive: true });
+// the classic segmentation worker (public/seg-worker.js) importScripts the
+// CJS bundle — copy it next to the wasm so everything stays same-origin
+cpSync(
+  join(root, 'node_modules', '@mediapipe', 'tasks-vision', 'vision_bundle.cjs'),
+  join(dest, 'vision_bundle.cjs'),
+);
 console.log('copy-mediapipe-wasm: copied wasm runtime to public/mediapipe-wasm');
