@@ -1,0 +1,221 @@
+{
+  "generated": "2026-07-12T00:55:22.027Z",
+  "module": "@bodyarcade/worldbake",
+  "regions": [
+    "isafjordur"
+  ],
+  "checks": 35,
+  "failures": 0,
+  "results": [
+    {
+      "region": "isafjordur",
+      "name": "committed artifact exists",
+      "ok": true,
+      "detail": "/home/o/Dev/wt-worlddata/packages/world-data/data/worlds/isafjordur/world.json"
+    },
+    {
+      "region": "isafjordur",
+      "name": "determinism — re-bake byte-identical to committed artifact",
+      "ok": true,
+      "detail": "1153597 bytes"
+    },
+    {
+      "region": "isafjordur",
+      "name": "golden checksum",
+      "ok": true,
+      "detail": "74b8275e9d00…"
+    },
+    {
+      "region": "isafjordur",
+      "name": "schema round-trip (parse → re-serialize byte-identical)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "schema validates",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "validator refuses missing attribution",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "ODbL attribution line present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "both providers carry licenses",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "input checksums recorded",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "no self-intersecting rings (water, buildings, landuse)",
+      "ok": true,
+      "detail": "1069 rings"
+    },
+    {
+      "region": "isafjordur",
+      "name": "water area delta within tolerance",
+      "ok": true,
+      "detail": "0.0016% (tolerance ±1%)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "probe fjord mouth mid (water)",
+      "ok": true,
+      "detail": "(1353, 1334)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "probe Pollurinn (water)",
+      "ok": true,
+      "detail": "(451, 278)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "probe Eyri spit (town centre) (land)",
+      "ok": true,
+      "detail": "(437, 908)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "probe west mountainside (land)",
+      "ok": true,
+      "detail": "(-1804, -667)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "probe airport runway (land)",
+      "ok": true,
+      "detail": "(212, -1101)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "terrain grid matches encoding",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "terrain min/max consistent",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "terrain probe town (near sea level)",
+      "ok": true,
+      "detail": "16.9 m (want -5..40)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "terrain probe west fjord wall (plateau)",
+      "ok": true,
+      "detail": "788.3 m (want 400..900)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "terrain probe mid slope above town",
+      "ok": true,
+      "detail": "104.6 m (want 40..300)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "walk graph stats truthful",
+      "ok": true,
+      "detail": "2782 nodes, 74 components, largest 2262"
+    },
+    {
+      "region": "isafjordur",
+      "name": "walkable component covers harbour front",
+      "ok": true,
+      "detail": "nearest largest-component node 14 m (max 60)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "walkable component covers Urðarvegur (inner town)",
+      "ok": true,
+      "detail": "nearest largest-component node 0 m (max 60)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "walkable component covers Engjavegur (spit grid)",
+      "ok": true,
+      "detail": "nearest largest-component node 0 m (max 60)"
+    },
+    {
+      "region": "isafjordur",
+      "name": "row network: dock-to-row \"dock 1\" reaches the bay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "row network: dock-to-row \"dock 2\" reaches the bay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "row network: dock-to-row \"dock 3\" reaches the bay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "row network: row-to-dive \"open water 1\" reaches the bay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "row network: row-to-dive \"open water 2\" reaches the bay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "region": "isafjordur",
+      "name": "row network exists over water",
+      "ok": true,
+      "detail": "3506 nodes / 13261 edges"
+    },
+    {
+      "region": "isafjordur",
+      "name": "collision meshes valid (indices + area match footprints)",
+      "ok": true,
+      "detail": "965 meshes, 0 skipped by bake"
+    },
+    {
+      "region": "isafjordur",
+      "name": "spawns include the modes",
+      "ok": true,
+      "detail": "airfield, walk, dock, dock, dock, dive, dive"
+    },
+    {
+      "region": "isafjordur",
+      "name": "transitions present",
+      "ok": true,
+      "detail": "land-to-walk, dock-to-row, dock-to-row, dock-to-row, row-to-dive, row-to-dive"
+    },
+    {
+      "region": "dolphin",
+      "name": "absorbed boundary module: full check suite green",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}
