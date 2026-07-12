@@ -30,13 +30,35 @@ export interface EvalResult {
   pinchJaw?: { r: number; samples: number };
   /** face-touch reach check (frames where the person's wrist was at their
    *  head): does the avatar's wrist reach its own head region without
-   *  passing through it? */
+   *  passing through it? V2 adds per-socket engagement and a capsule-based
+   *  penetration count (signed surface distance, not center distance). */
   faceTouch?: {
     engagedFrames: number;
     reachFrames: number;
     penetrationFrames: number;
     reachRate: number;
     penetrationRate: number;
+    /** engaged/reached frames per named socket (face-touch v2) */
+    sockets?: Record<string, { engaged: number; reached: number }>;
+  };
+  /** hand fusion (V5): finger-curl input ↔ enacted-bone correlation on
+   *  capable rigs, plus the gate state — incapable rigs must show
+   *  gated=true and applyCount=0 */
+  fingerCurl?: { r: number; samples: number; inputRange: number };
+  fusion?: { active: boolean; gated: boolean; applyCount: number; detectFps: number };
+  /** feet v2 (full-body fixtures). Skating = NET SLIDE of an ankle over a
+   *  contiguous planted window (what the eye sees); drift = per-frame
+   *  jitter (servo/roll wobble). Both reported, slide is the contract. */
+  feet?: {
+    plantedFrames: number;
+    meanDriftPx: number;
+    p95DriftPx: number;
+    maxDriftPx: number;
+    windows: number;
+    meanSlidePx: number;
+    p95SlidePx: number;
+    maxSlidePx: number;
+    steps: number;
   };
   /** Predictive Pose Continuity masked-run metrics. posErr compares the
    *  PPC output against same-frame ground truth during PREDICTED, next to
@@ -78,8 +100,27 @@ interface Deps {
   getAvatar: () => Avatar;
   /** avatar head-collider radius (m), from the retargeter's bind pass */
   getHeadRadius?: () => number;
-  /** live face-touch engagement weights from the retargeter */
-  getFaceTouch?: () => { left: { w: number }; right: { w: number } };
+  /** live face-touch engagement + v2 socket/penetration debug */
+  getFaceTouch?: () => {
+    left: { w: number; socket?: string | null; pen?: boolean };
+    right: { w: number; socket?: string | null; pen?: boolean };
+  };
+  /** signed distance (m) of the ENACTED avatar wrist to the head capsule
+   *  surface (< 0 = inside) — face-touch v2 ground truth */
+  getWristCapsuleDistance?: (side: 'left' | 'right') => number;
+  /** feet v2 plant states from the retargeter */
+  getFeetDebug?: () => {
+    left: { planted: boolean; weight: number; plantEvents: number };
+    right: { planted: boolean; weight: number; plantEvents: number };
+  };
+  /** hand fusion gate + per-ENACTED-side fresh input curls (null = stale) */
+  getFusion?: () => {
+    active: boolean;
+    gated: boolean;
+    applyCount: number;
+    detectFps: number;
+    inputCurl: (side: 'left' | 'right') => number | null;
+  };
   /** detection-loop FPS override (hand mode reports the hand detector) */
   getDetectionFps?: () => number;
 }
@@ -106,8 +147,23 @@ export class EvalCollector {
   private ftPenetration = 0;
   private ftWrist = new THREE.Vector3();
   private ftHead = new THREE.Vector3();
+  private ftSockets = new Map<string, { engaged: number; reached: number }>();
   private pjPinch: number[] = [];
   private pjJaw: number[] = [];
+  // hand fusion: input curl ↔ enacted bone curl pairs (capable rigs)
+  private fcInput: number[] = [];
+  private fcEnacted: number[] = [];
+  private fusionSeen: { active: boolean; gated: boolean; applyCount: number; detectFps: number } | null = null;
+  // feet v2: planted-ankle screen drift (px/frame)
+  private feetDrift: number[] = [];
+  private feetPlantedFrames = 0;
+  private feetSteps = 0;
+  private prevAnkle = {
+    left: { x: 0, y: 0, valid: false, startX: 0, startY: 0 },
+    right: { x: 0, y: 0, valid: false, startX: 0, startY: 0 },
+  };
+  private feetSlides: number[] = [];
+  private ankleV = new THREE.Vector3();
 
   // --- PPC masked-run state ---
   private ppcMask: string | null = null;
@@ -272,7 +328,8 @@ export class EvalCollector {
 
     // face-touch reach check: frames where a wrist sits at the head
     // (normalized space, shoulder-width units) → the avatar's wrist must
-    // land at its own head surface, never inside it
+    // land at its own head surface, never inside it. V2: signed distance
+    // to the head CAPSULE where available, plus per-socket bookkeeping.
     const headR = this.deps.getHeadRadius?.() ?? 0.12;
     const ft = this.deps.getFaceTouch?.();
     if (ft) {
@@ -284,12 +341,78 @@ export class EvalCollector {
         const headB = avatar.bones.head;
         if (!wristJ || !headB) continue;
         this.ftEngaged++;
-        wristJ.getWorldPosition(this.ftWrist);
-        headB.getWorldPosition(this.ftHead);
-        const d = this.ftWrist.distanceTo(this.ftHead);
-        if (d <= headR * 2.0) this.ftReach++;
-        if (d < headR * 0.7) this.ftPenetration++;
+        let reached = false;
+        const sd = this.deps.getWristCapsuleDistance?.(side);
+        if (sd !== undefined && Number.isFinite(sd)) {
+          // within ~a radius of the surface = contact reads on camera
+          reached = sd <= headR * 0.9;
+          if (reached) this.ftReach++;
+          if (sd < -headR * 0.12) this.ftPenetration++;
+        } else {
+          wristJ.getWorldPosition(this.ftWrist);
+          headB.getWorldPosition(this.ftHead);
+          const d = this.ftWrist.distanceTo(this.ftHead);
+          reached = d <= headR * 2.0;
+          if (reached) this.ftReach++;
+          if (d < headR * 0.7) this.ftPenetration++;
+        }
+        const socket = ft[side].socket;
+        if (socket) {
+          const s = this.ftSockets.get(socket) ?? { engaged: 0, reached: 0 };
+          s.engaged++;
+          if (reached) s.reached++;
+          this.ftSockets.set(socket, s);
+        }
       }
+    }
+
+    // hand fusion: input curl vs enacted bone curl on capable rigs
+    const fu = this.deps.getFusion?.();
+    if (fu) {
+      this.fusionSeen = { active: fu.active, gated: fu.gated, applyCount: fu.applyCount, detectFps: fu.detectFps };
+      if (fu.active && avatar.fingerCurlEnacted) {
+        for (const side of ['left', 'right'] as const) {
+          const input = fu.inputCurl(side);
+          if (input === null) continue;
+          const enacted = avatar.fingerCurlEnacted(side);
+          if (!Number.isFinite(enacted)) continue;
+          this.fcInput.push(input);
+          this.fcEnacted.push(enacted);
+        }
+      }
+    }
+
+    // feet v2: planted-ankle drift on the stage, in screen px per frame
+    const feet = this.deps.getFeetDebug?.();
+    if (feet) {
+      const cw = this.deps.stage.canvas.clientWidth;
+      const ch = this.deps.stage.canvas.clientHeight;
+      for (const side of ['left', 'right'] as const) {
+        const prev = this.prevAnkle[side];
+        const ankleJ = avatar.joints[`${side}Ankle`];
+        if (!feet[side].planted || !ankleJ) {
+          if (prev.valid) {
+            // window closed: record the NET slide while planted
+            this.feetSlides.push(Math.hypot(prev.x - prev.startX, prev.y - prev.startY));
+          }
+          prev.valid = false;
+          continue;
+        }
+        this.feetPlantedFrames++;
+        ankleJ.getWorldPosition(this.ankleV).project(this.deps.stage.camera);
+        const px = ((this.ankleV.x + 1) / 2) * cw;
+        const py = ((1 - this.ankleV.y) / 2) * ch;
+        if (prev.valid) {
+          this.feetDrift.push(Math.hypot(px - prev.x, py - prev.y));
+        } else {
+          prev.startX = px;
+          prev.startY = py;
+        }
+        prev.x = px;
+        prev.y = py;
+        prev.valid = true;
+      }
+      this.feetSteps = feet.left.plantEvents + feet.right.plantEvents;
     }
   }
 
@@ -313,24 +436,40 @@ export class EvalCollector {
       sync[k as LimbName] = round(v as number);
     }
 
+    const pearson = (xs: number[], ys: number[]): number => {
+      const n = xs.length;
+      const mean = (v: number[]) => v.reduce((a, b) => a + b, 0) / v.length;
+      const mx = mean(xs);
+      const my = mean(ys);
+      let num = 0;
+      let dx = 0;
+      let dy = 0;
+      for (let i = 0; i < n; i++) {
+        const a = xs[i] - mx;
+        const b = ys[i] - my;
+        num += a * b;
+        dx += a * a;
+        dy += b * b;
+      }
+      const denom = Math.sqrt(dx * dy);
+      return denom > 1e-9 ? Math.round((num / denom) * 1000) / 1000 : 0;
+    };
+
     let pinchJaw: EvalResult['pinchJaw'];
     if (this.pjPinch.length > 30) {
-      const n = this.pjPinch.length;
-      const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
-      const mp = mean(this.pjPinch);
-      const mj = mean(this.pjJaw);
-      let num = 0;
-      let dp = 0;
-      let dj = 0;
-      for (let i = 0; i < n; i++) {
-        const a = this.pjPinch[i] - mp;
-        const b = this.pjJaw[i] - mj;
-        num += a * b;
-        dp += a * a;
-        dj += b * b;
-      }
-      const denom = Math.sqrt(dp * dj);
-      pinchJaw = { r: denom > 1e-9 ? Math.round((num / denom) * 1000) / 1000 : 0, samples: n };
+      pinchJaw = { r: pearson(this.pjPinch, this.pjJaw), samples: this.pjPinch.length };
+    }
+
+    let fingerCurl: EvalResult['fingerCurl'];
+    if (this.fcInput.length > 30) {
+      const sorted = [...this.fcInput].sort((a, b) => a - b);
+      const p = (q: number) => sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * q))];
+      fingerCurl = {
+        r: pearson(this.fcInput, this.fcEnacted),
+        samples: this.fcInput.length,
+        // detection must have SEEN real open/close travel, or r is vacuous
+        inputRange: Math.round((p(0.95) - p(0.05)) * 1000) / 1000,
+      };
     }
 
     const faceTouch =
@@ -341,8 +480,33 @@ export class EvalCollector {
             penetrationFrames: this.ftPenetration,
             reachRate: Math.round((this.ftReach / this.ftEngaged) * 1000) / 1000,
             penetrationRate: Math.round((this.ftPenetration / this.ftEngaged) * 1000) / 1000,
+            sockets: this.ftSockets.size ? Object.fromEntries(this.ftSockets) : undefined,
           }
         : undefined;
+
+    let feet: EvalResult['feet'];
+    if (this.feetPlantedFrames > 0) {
+      // close still-open planted windows
+      for (const side of ['left', 'right'] as const) {
+        const prev = this.prevAnkle[side];
+        if (prev.valid) this.feetSlides.push(Math.hypot(prev.x - prev.startX, prev.y - prev.startY));
+      }
+      const d = [...this.feetDrift].sort((a, b) => a - b);
+      const sl = [...this.feetSlides].sort((a, b) => a - b);
+      const r2 = (v: number) => Math.round(v * 100) / 100;
+      const p95 = (xs: number[]) => (xs.length ? xs[Math.min(xs.length - 1, Math.floor(xs.length * 0.95))] : 0);
+      feet = {
+        plantedFrames: this.feetPlantedFrames,
+        meanDriftPx: r2(d.length ? d.reduce((a, b) => a + b, 0) / d.length : 0),
+        p95DriftPx: r2(p95(d)),
+        maxDriftPx: r2(d.length ? d[d.length - 1] : 0),
+        windows: sl.length,
+        meanSlidePx: r2(sl.length ? sl.reduce((a, b) => a + b, 0) / sl.length : 0),
+        p95SlidePx: r2(p95(sl)),
+        maxSlidePx: r2(sl.length ? sl[sl.length - 1] : 0),
+        steps: this.feetSteps,
+      };
+    }
 
     let ppc: EvalResult['ppc'];
     if (this.ppcMask) {
@@ -412,6 +576,9 @@ export class EvalCollector {
       sync,
       pinchJaw,
       faceTouch,
+      fingerCurl,
+      fusion: this.fusionSeen ?? undefined,
+      feet,
       ppc,
       finishedAt: new Date().toISOString(),
     };

@@ -9,6 +9,8 @@
     "preview": "vite preview",
     "postinstall": "node scripts/copy-mediapipe-wasm.mjs && node scripts/fetch-pose-model.mjs",
     "eval": "node eval/run.mjs",
+    "caps:check": "node scripts/capability-report.mjs",
+    "caps:write": "node scripts/capability-report.mjs --write",
     "test": "playwright test",
     "prepare-fixtures": "node scripts/prepare-fixtures.mjs",
     "audit:self-test": "python3 tools/audit_model.py --self-test",

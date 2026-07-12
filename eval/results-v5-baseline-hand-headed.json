@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "date": "2026-07-12T08:38:10.996Z",
+    "machine": "linux x64 — Intel(R) Xeon(R) W-3245 CPU @ 3.20GHz",
+    "mode": "headed",
+    "envThrottled": false,
+    "durationSecPerFixture": 30,
+    "note": "headed run on real hardware; FPS numbers are representative"
+  },
+  "results": [
+    {
+      "fixture": "hand_open_close",
+      "avatar": "robot",
+      "durationSec": 30,
+      "videoFrames": 858,
+      "detectedFrames": 858,
+      "detectionRate": 1,
+      "poseFps": 28.82,
+      "renderFps": 55.34,
+      "droppedFrames": 0,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 32,
+        "t15": 34,
+        "t30": 33
+      },
+      "sync": {},
+      "pinchJaw": {
+        "r": 0.979,
+        "samples": 858
+      },
+      "finishedAt": "2026-07-12T08:37:39.059Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "hand_pinch_point",
+      "avatar": "robot",
+      "durationSec": 30,
+      "videoFrames": 867,
+      "detectedFrames": 866,
+      "detectionRate": 1,
+      "poseFps": 29.13,
+      "renderFps": 56.88,
+      "droppedFrames": 0,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 32,
+        "t15": 35,
+        "t30": 35
+      },
+      "sync": {},
+      "pinchJaw": {
+        "r": 0.875,
+        "samples": 866
+      },
+      "finishedAt": "2026-07-12T08:38:10.726Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    }
+  ]
+}

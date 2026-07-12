@@ -138,9 +138,15 @@ Architecture in `ARCHITECTURE.md`; asset manifest in `ASSETS.md`.
 | avatar | status | note |
 |---|---|---|
 | robot (procedural) | Fingers not supported | mitt hands; face-touch lands at the collar |
-| astronaut (CC0, 100Avatars) | Fingers not supported | mitten gloves; face-touch + body fully supported |
-| erika (CC0, 100Avatars) | Fully supported | articulated fingers — open, fist, point |
+| astronaut (CC0, 100Avatars) | Face-touch limited | mitten mesh over real finger bones (documented demotion); face-touch presses into the helmet — its radius exceeds the arm reach |
+| erika (CC0, 100Avatars) | Fully supported | true per-finger tracking in character mode (V5 hand fusion) |
 | hand / beaky / x-ray | Hand-only | 21-point finger tracking |
+
+Every status above is data, not copy: cards, coach lines, and the finger/
+face-touch/feet gates all read `data/avatar-capabilities.json` — a small
+hand-reviewed manifest whose machine-derived half is regenerated and
+cross-checked by `npm run caps:check` (report-only; a mislabeled entry
+fails the check and the suite).
 
 All shipped assets are redistributable (CC0 / Apache-2.0 / OFL — see
 ASSETS.md).
@@ -193,9 +199,21 @@ eval caught it at 53 penetration frames; now 5).
 - Single camera = depth ambiguity; toward/away movement is a heuristic
   (shoulder width), not measurement.
 - One person, one hand (in hand-only mode) at a time.
-- Finger tracking ships in hand-only mode; Character mode approximates
-  open/fist/point from pose landmarks alone and only rigs with finger
-  geometry (erika) can show it.
+- True finger tracking in Character mode is capability-gated: erika gets
+  per-finger curls from a reduced-rate (12 Hz) hand-landmark stream
+  anchored at the pose wrists; every other rig keeps the pose
+  open/fist/point approximation with an honest label. Wrist ROLL
+  (supination) still doesn't read — declined, not forgotten (palm-normal
+  estimates are unstable under partial occlusion).
+- Planted feet trade a little leg-angle mimicry for zero skating: net
+  planted-foot slide fell 7–27× (18–24 → 0.8–2.5 px per planted window,
+  fullbody clip), while the legs sync angle rose ~0.7–2.5° — the old
+  lower number was measured on feet that slid. Upper-body sync is
+  untouched. `?feet=0` reproduces the old behavior for comparison.
+- The astronaut's face-touch physically cannot stay outside its helmet
+  (capsule radius 0.385 m vs 0.35 m arm reach) — labeled Face-touch
+  limited with the geometry documented in the manifest; erika holds the
+  strict zero-interpenetration capsule contract.
 - The robot's face-touch reads as reach-to-collar — its head floats too
   far from its shoulders; labeled, not hidden.
 - Full-body loops replay wherever the recording had leg tracking;

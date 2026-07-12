@@ -1,5 +1,65 @@
 # Changelog
 
+## V5 — Character Control (2026-07-12)
+
+Character expressiveness on the curated roster, every capability gated by
+a small hand-reviewed manifest. True per-finger control lands ONLY on rigs
+that support it; face-touch gains seven named gestures on a head capsule;
+planted feet stop skating.
+
+### Added
+- `data/avatar-capabilities.json`: the capability manifest — machine-derived
+  `inspection` facts + hand-reviewed `capabilities`/`labels`/`coach` per
+  roster avatar. Drives ALL gating, card chips, limitation notes, and coach
+  lines. New known-good models enter by adding a reviewed entry; there is no
+  automatic pipeline (the AutoRig decision, absorbed).
+- `scripts/capability-report.mjs` (+ `capability-lib.mjs`): report-only
+  regen/check through the real loaders — `npm run caps:check` fails on
+  manifest drift or on a gate that contradicts the rig (mislabel);
+  `caps:write` emits a draft for human review. Never edits the manifest.
+- Hand-landmark fusion (`packages/pose-runtime/src/handFusion.ts`,
+  additive): two-hand 21-point stream anchored to pose wrists by raw-space
+  proximity, capped at 12 Hz, inference skipped entirely unless a pose
+  wrist is visible and the capability gate is open. Per-finger curls (EMA)
+  drive the new `Avatar.applyFingerCurls()` on approved rigs (erika);
+  staleness > 400 ms falls back per side to the pass-2 pose approximation.
+  Incapable rigs never run the hand model at all.
+- Face-touch v2: seven named sockets — cheek L/R, chin, mouth-cover,
+  forehead, temple, under-chin, thinking-pose (dwell) — classified from the
+  wrist offset in the person's own head frame (pose only, no face model),
+  targeted on a per-avatar head CAPSULE fit from real skinned vertices, via
+  the existing two-bone IK with contact + socket-change easing. Targets are
+  constructed on the capsule surface: inside-the-skull contact is
+  impossible by construction, and the eval measures the enacted wrist's
+  signed capsule distance.
+- Feet v2: planted-foot detection (rolling ground line + speed hysteresis)
+  with a root-correction servo that pins planted ankles (kills skating),
+  planted-sole leveling, and a clamped weight-shift hips roll. New skating
+  metric in the eval: planted-ankle screen drift px/frame on fullbody.
+- Eval additions: `fingerCurl` (input↔enacted correlation + input range),
+  per-socket face-touch bookkeeping, capsule penetration counter, `feet`
+  drift block, `fusion` gate state; `eval/run.mjs` gains `--charmode`,
+  `--fusion=0`, `--out=` and now honors PP_PORT when spawning the dev
+  server.
+- Specs: `tests/charcontrol.spec.ts` (capability gating both ways,
+  deterministic seven-socket synthetic sweep on erika AND astronaut with
+  zero-interpenetration assertions, feet plant/lift state machine),
+  `tests/capability-manifest.spec.ts` (manifest ⇄ live-rig ground truth;
+  deliberately mislabeled entries are caught).
+
+### Changed
+- Avatar cards read chips/notes from the manifest (labels can no longer
+  drift from the gates); the setup coach speaks one manifest line per
+  avatar switch.
+- `Avatar` interface: additive `applyFingerCurls`, `describeCapabilities`,
+  `fingerCurlEnacted`, and capsule `headGeometry.halfHeightY`.
+
+### Deliberately not built
+- No rig repair, no FBX mapping/conversion, no per-avatar calibration
+  profiles, no capability product — the manifest is data plus a report
+  script; wrist ROLL from hand landmarks (declined: palm-normal instability
+  under partial occlusion reads worse than the pass-2 wrist swing).
+
 ## V1 — PosePuppet Runtime + HUD (2026-07-11)
 
 PosePuppet becomes a system layer: a headless tracking runtime any game

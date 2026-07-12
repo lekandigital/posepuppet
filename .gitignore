@@ -6,6 +6,7 @@ __pycache__/
 
 # NEVER commit fixtures — personal camera footage (mission non-negotiable)
 fixtures/
+fixtures
 
 # Downloaded/local character source material for audit only.
 # Keep generated reports under model-audits/ trackable.

@@ -1,0 +1,176 @@
+{
+  "meta": {
+    "date": "2026-07-12T16:03:12.000Z",
+    "machine": "linux x64 — Intel(R) Xeon(R) W-3245 CPU @ 3.20GHz",
+    "mode": "headed",
+    "envThrottled": false,
+    "durationSecPerFixture": 30,
+    "note": "headed run on real hardware; FPS numbers are representative"
+  },
+  "results": [
+    {
+      "fixture": "facetouch",
+      "avatar": "vrm:erika",
+      "durationSec": 30,
+      "videoFrames": 876,
+      "detectedFrames": 876,
+      "detectionRate": 1,
+      "poseFps": 29.15,
+      "renderFps": 58.89,
+      "droppedFrames": 24,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 39,
+        "t15": 42,
+        "t30": 38
+      },
+      "sync": {
+        "leftUpperArm": 2.33,
+        "leftForearm": 9.57,
+        "rightUpperArm": 4.08,
+        "rightForearm": 8.01,
+        "torso": 1.15,
+        "rightThigh": 1.47,
+        "leftThigh": 5.07,
+        "upperLimbsMean": 6,
+        "legsMean": 3.27
+      },
+      "faceTouch": {
+        "engagedFrames": 211,
+        "reachFrames": 211,
+        "penetrationFrames": 0,
+        "reachRate": 1,
+        "penetrationRate": 0,
+        "sockets": {
+          "chin": {
+            "engaged": 45,
+            "reached": 45
+          },
+          "thinkingPose": {
+            "engaged": 166,
+            "reached": 166
+          }
+        }
+      },
+      "fingerCurl": {
+        "r": 1,
+        "samples": 1283,
+        "inputRange": 0.312
+      },
+      "fusion": {
+        "active": true,
+        "gated": false,
+        "applyCount": 430,
+        "detectFps": 9.973072703225737
+      },
+      "finishedAt": "2026-07-12T16:02:07.203Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "erika",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "hand_open_close",
+      "avatar": "vrm:erika",
+      "durationSec": 30,
+      "videoFrames": 875,
+      "detectedFrames": 783,
+      "detectionRate": 0.89,
+      "poseFps": 29.13,
+      "renderFps": 58.64,
+      "droppedFrames": 25,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 43,
+        "t15": 42,
+        "t30": 41
+      },
+      "sync": {
+        "leftUpperArm": 34.01,
+        "leftForearm": 46.56,
+        "torso": 18.88,
+        "leftThigh": 131.61,
+        "leftShin": 126.94,
+        "rightThigh": 131.74,
+        "rightShin": 135.2,
+        "rightUpperArm": 79.3,
+        "rightForearm": 115.85,
+        "upperLimbsMean": 68.93,
+        "legsMean": 131.37
+      },
+      "fingerCurl": {
+        "r": 1,
+        "samples": 163,
+        "inputRange": 0.728
+      },
+      "fusion": {
+        "active": true,
+        "gated": false,
+        "applyCount": 44,
+        "detectFps": 0.28308563340410475
+      },
+      "finishedAt": "2026-07-12T16:02:39.301Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "erika",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "hand_pinch_point",
+      "avatar": "vrm:erika",
+      "durationSec": 30,
+      "videoFrames": 879,
+      "detectedFrames": 769,
+      "detectionRate": 0.87,
+      "poseFps": 29.23,
+      "renderFps": 58.94,
+      "droppedFrames": 21,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 39,
+        "t15": 41,
+        "t30": 38
+      },
+      "sync": {
+        "rightUpperArm": 49.08,
+        "rightForearm": 68.18,
+        "torso": 47.44,
+        "rightThigh": 61.16,
+        "leftThigh": 123.21,
+        "leftShin": 94.2,
+        "leftUpperArm": 44.29,
+        "upperLimbsMean": 53.85,
+        "legsMean": 92.86
+      },
+      "faceTouch": {
+        "engagedFrames": 1,
+        "reachFrames": 1,
+        "penetrationFrames": 0,
+        "reachRate": 1,
+        "penetrationRate": 0,
+        "sockets": {
+          "forehead": {
+            "engaged": 1,
+            "reached": 1
+          }
+        }
+      },
+      "fingerCurl": {
+        "r": 0.989,
+        "samples": 38,
+        "inputRange": 0.423
+      },
+      "fusion": {
+        "active": true,
+        "gated": false,
+        "applyCount": 10,
+        "detectFps": 4.281280102696097
+      },
+      "finishedAt": "2026-07-12T16:03:11.364Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "erika",
+      "avatarMismatch": false
+    }
+  ]
+}

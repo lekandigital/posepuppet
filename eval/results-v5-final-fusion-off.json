@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "date": "2026-07-12T16:03:47.392Z",
+    "machine": "linux x64 — Intel(R) Xeon(R) W-3245 CPU @ 3.20GHz",
+    "mode": "headed",
+    "envThrottled": false,
+    "durationSecPerFixture": 30,
+    "note": "headed run on real hardware; FPS numbers are representative"
+  },
+  "results": [
+    {
+      "fixture": "facetouch",
+      "avatar": "vrm:erika",
+      "durationSec": 30,
+      "videoFrames": 887,
+      "detectedFrames": 887,
+      "detectionRate": 1,
+      "poseFps": 29.52,
+      "renderFps": 59.95,
+      "droppedFrames": 12,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 39,
+        "t15": 31,
+        "t30": 32
+      },
+      "sync": {
+        "leftUpperArm": 2.52,
+        "leftForearm": 9.51,
+        "rightUpperArm": 3.99,
+        "rightForearm": 8.13,
+        "torso": 1.06,
+        "rightThigh": 1.46,
+        "leftThigh": 5.12,
+        "upperLimbsMean": 6.04,
+        "legsMean": 3.29
+      },
+      "faceTouch": {
+        "engagedFrames": 234,
+        "reachFrames": 234,
+        "penetrationFrames": 0,
+        "reachRate": 1,
+        "penetrationRate": 0,
+        "sockets": {
+          "chin": {
+            "engaged": 41,
+            "reached": 41
+          },
+          "thinkingPose": {
+            "engaged": 193,
+            "reached": 193
+          }
+        }
+      },
+      "fusion": {
+        "active": false,
+        "gated": true,
+        "applyCount": 0,
+        "detectFps": 0
+      },
+      "finishedAt": "2026-07-12T16:03:46.705Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "erika",
+      "avatarMismatch": false
+    }
+  ]
+}

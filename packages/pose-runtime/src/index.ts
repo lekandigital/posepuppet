@@ -21,8 +21,13 @@ export { createDetector } from './detector';
 export type { DetectorAssets, ModelVariant, PoseDetector } from './detector';
 export { createWorkerDetector } from './workerDetector';
 
-export { createHandDetector, HLM, HAND_CONNECTIONS } from './handDetector';
-export type { HandDetector, HandFrame, HandPoint } from './handDetector';
+export { createHandDetector, createMultiHandDetector, HLM, HAND_CONNECTIONS } from './handDetector';
+export type {
+  HandDetector, HandFrame, HandPoint, MultiHandDetector, MultiHandDetectorOptions,
+} from './handDetector';
+
+export { createHandFusion, fingerCurlsFromWorld } from './handFusion';
+export type { FusedHand, HandFusion, HandFusionOptions } from './handFusion';
 
 export {
   PoseContinuity, PPC, PPC_GROUP_MEMBERS, PPC_GROUP_OF,

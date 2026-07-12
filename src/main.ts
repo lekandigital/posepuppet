@@ -29,13 +29,16 @@ import type { HandPuppetId } from './hand/types';
 import { createPanel, updatePpcStates } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
 import {
+  createHandFusion,
   createPoseRuntime,
   LandmarkSmoother,
   LM,
+  type HandFusion,
   type LandmarkPoint,
   type ModelVariant,
   type PoseRuntime,
 } from '@bodyarcade/pose-runtime';
+import { capsFor, fingersApproved } from './rig/capabilities';
 import { drawSkeleton } from './overlay/skeleton';
 import { MASKS, createMasker } from './eval/masks';
 import { createRobot } from './rig/robot';
@@ -76,6 +79,10 @@ declare global {
       /** Set by generated-avatar / smoke-mode loading. */
       avatarStatus?: 'loading' | 'loaded' | 'fallback' | 'error';
       avatarWarning?: string;
+      /** V5 hand fusion: gate state + proof-of-(non)driving counter */
+      fusionActive?: boolean;
+      fusionGated?: boolean;
+      fingerApplyCount?: number;
     };
     __PPVisualQa?: {
       getDiagnostics: () => {
@@ -205,6 +212,7 @@ async function boot() {
   let avatar: Avatar = createRobot();
   stage.scene.add(avatar.object);
   let retargeter = new Retargeter(avatar);
+  if (params.get('feet') === '0') retargeter.feetEnabled = false; // skating A/B (eval)
   const visualQaRest = new Map<string, THREE.Euler>();
   let visualQaPoseOverride = false;
   let generatedStageNormalization:
@@ -489,6 +497,13 @@ async function boot() {
       applyPose: applyVisualQaPose,
       applyHandState: (side, openness, point) => avatar.applyHandState?.(side, openness, point),
     };
+    // capability report hook (scripts/capability-report.mjs): the CURRENT
+    // avatar's rig facts, read through the real loaders — O1's ground truth
+    (window as unknown as { __PPCaps: () => unknown }).__PPCaps = () => ({
+      id: currentAvatarId,
+      name: avatar.name,
+      report: avatar.describeCapabilities?.() ?? null,
+    });
   }
   installVisualQaHook();
 
@@ -587,6 +602,10 @@ async function boot() {
       installVisualQaHook();
       currentAvatarId = id;
       crossfadeAvatars(prev);
+      // capability manifest drives the fusion gate + a one-shot coach line
+      updateFusionGate();
+      const capLine = capsFor(id).coach;
+      if (capLine && config.mode === 'character') coach.set('Avatar', capLine);
     } catch (err) {
       const def = getAvatarDef(id);
       // error, not warn: eval counts console errors, so a failed load can
@@ -671,7 +690,69 @@ async function boot() {
     lastRecording: null,
     avatarStatus: undefined,
     avatarWarning: undefined,
+    fusionActive: false,
+    fusionGated: true,
+    fingerApplyCount: 0,
   };
+
+  // ── V5 hand fusion: capability-gated true fingers in Character mode ──
+  // The gate is absolute: the hand model only runs for manifest-approved
+  // rigs (mode + wrists-visible checks live inside the fusion). Everyone
+  // else keeps the pass-2 pose approximation and an honest card label.
+  const fusionEnabled = params.get('fusion') !== '0'; // eval A/B kill switch
+  let fusion: HandFusion | null = null;
+  let fusionStarting = false;
+  const fusionFreshMs = { left: 0, right: 0 }; // enacted-side keyed
+
+  function applyFusionState(): void {
+    if (!fusion || !avatar.applyFingerCurls) return;
+    const now = performance.now();
+    for (const rawSide of ['left', 'right'] as const) {
+      const st = fusion.state(rawSide);
+      if (!st || now - st.updatedMs > 400) continue;
+      // raw→enacted mapping: mirroring swaps landmark sides, so a hand
+      // anchored at the RAW left wrist drives the enacted right arm
+      const enacted = config.mirror ? (rawSide === 'left' ? 'right' : 'left') : rawSide;
+      avatar.applyFingerCurls(enacted, st.curls, st.point);
+      retargeter.setExternalHandDrive(enacted, true);
+      fusionFreshMs[enacted] = now;
+      window.__PP.fingerApplyCount!++;
+    }
+  }
+
+  function updateFusionGate(): void {
+    const wantActive =
+      fusionEnabled &&
+      config.mode === 'character' &&
+      fingersApproved(config.avatar) &&
+      Boolean(avatar.applyFingerCurls);
+    window.__PP.fusionGated = !wantActive;
+    window.__PP.fusionActive = wantActive && Boolean(fusion?.running());
+    if (wantActive && !fusion && !fusionStarting) {
+      fusionStarting = true;
+      void (async () => {
+        try {
+          const f = createHandFusion({ maxHz: 12 });
+          await f.start(video);
+          f.onUpdate(applyFusionState);
+          fusion = f;
+        } catch (err) {
+          console.warn('hand fusion unavailable — pose approximation continues', err);
+        } finally {
+          fusionStarting = false;
+          updateFusionGate();
+        }
+      })();
+    }
+    fusion?.setActive(wantActive);
+    if (!wantActive) {
+      retargeter.setExternalHandDrive('left', false);
+      retargeter.setExternalHandDrive('right', false);
+    }
+  }
+  onConfigChange((key) => {
+    if (key === 'mode' || key === 'mirror') updateFusionGate();
+  });
 
   // --- Generated avatar smoke path (test-only) ---
   if (generatedAvatarSlug) {
@@ -828,6 +909,7 @@ async function boot() {
   // settle the initial avatar before detection/eval starts, so eval mode
   // measures the avatar it claims to measure
   if (config.avatar !== 'robot') await setAvatar(config.avatar);
+  updateFusionGate(); // default-avatar boots evaluate the gate here
 
   window.__PP.poseFps = () => runtime.poseFps();
 
@@ -1277,10 +1359,45 @@ async function boot() {
         getAvatar: () => avatar,
         getHeadRadius: () => retargeter.faceTouchDebug.left.headR,
         getFaceTouch: () => retargeter.faceTouchDebug,
+        getWristCapsuleDistance: (side) => retargeter.wristCapsuleDistance(side),
+        getFeetDebug: () => retargeter.feetDebug(),
+        getFusion: () => ({
+          active: Boolean(fusion?.running() && fusion.active()),
+          gated: window.__PP.fusionGated ?? true,
+          applyCount: window.__PP.fingerApplyCount ?? 0,
+          detectFps: fusion?.detectFps() ?? 0,
+          inputCurl: (enacted) => {
+            if (!fusion) return null;
+            const rawSide = config.mirror ? (enacted === 'left' ? 'right' : 'left') : enacted;
+            const st = fusion.state(rawSide);
+            if (!st || performance.now() - st.updatedMs > 400) return null;
+            return (st.curls.index + st.curls.middle + st.curls.ring + st.curls.little) / 4;
+          },
+        }),
         getDetectionFps: () => (config.mode === 'hand' ? handMode.handFps() : runtime.poseFps()),
       })
     : null;
   evalCollector?.start();
+
+  // ── V5 test harness (?chartest=1): deterministic synthetic landmark
+  // drive for the socket-sweep and feet specs. Pauses live detection so
+  // fabricated frames own the retargeter exclusively.
+  if (params.get('chartest') === '1') {
+    (window as unknown as { __PPCharTest: unknown }).__PPCharTest = {
+      isolate: () => runtime.pauseDetection(),
+      drivePose: (world: LandmarkPoint[], norm: LandmarkPoint[], tsMs: number) =>
+        retargeter.updateFromPose(world, norm, tsMs),
+      tick: (dt: number) => {
+        retargeter.tick(dt);
+        avatar.update(dt, dt);
+      },
+      faceTouch: () => JSON.parse(JSON.stringify(retargeter.faceTouchDebug)),
+      feet: () => retargeter.feetDebug(),
+      wristCapsuleDistance: (side: 'left' | 'right') => retargeter.wristCapsuleDistance(side),
+      headRadius: () => retargeter.faceTouchDebug.left.headR,
+      avatarName: () => avatar.name,
+    };
+  }
 
   // Frame tap off the runtime (post-mirror, post-masker, post-PPC): the
   // app-side fan-out — overlay, smoothing → retarget, ring buffer, intents,
@@ -1310,6 +1427,9 @@ async function boot() {
         lmTrace.push({ t: Math.round(f.raw.videoTimeMs), lw: g(15), rw: g(16), le: g(13), re: g(14) });
       }
     }
+
+    // hand fusion anchors + inference gate feed off the RAW pose wrists
+    fusion?.onPoseWrists(f.raw ? f.raw.norm : null);
 
     if (f.world && f.norm) {
       const worldSmooth = smoother.apply(f.world, f.tsMs);
@@ -1468,6 +1588,17 @@ async function boot() {
     } else {
       retargeter.tick(dt);
       avatar.update(dt, time);
+      // fusion staleness: a side that stopped getting hand detections
+      // falls back to the pose approximation within 400 ms (no dead hands)
+      const now = performance.now();
+      for (const side of ['left', 'right'] as const) {
+        if (fusionFreshMs[side] > 0 && now - fusionFreshMs[side] > 400) {
+          retargeter.setExternalHandDrive(side, false);
+          fusionFreshMs[side] = 0;
+        }
+      }
+      window.__PP.fusionActive = Boolean(fusion?.running() && fusion.active());
+      (window.__PP as unknown as { fusionDebug?: unknown }).fusionDebug = fusion?.debug();
     }
     ghosts.tick(dt, time);
     vfx.tick(dt, avatar);

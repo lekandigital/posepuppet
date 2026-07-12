@@ -871,3 +871,92 @@ nothing uploaded".
   gpu-performance project — 2026-07-10 baseline log).
 - pose-runtime is three-free; `bodyFrame.ts` (three-dependent, retarget
   support) moved to src/rig/ instead of the package.
+
+## V5 — Character Control (feat/character-control)
+
+- **Manifest shape**: `data/avatar-capabilities.json` splits each entry into
+  `inspection` (machine-derived rig facts, regenerated/verified by
+  `scripts/capability-report.mjs`) and `capabilities`/`labels`/`coach`
+  (hand-reviewed gates and copy). The check mode cross-validates BOTH: drift
+  between manifest and live rig, and gates that contradict the rig
+  (mislabels). One rule set in `scripts/capability-lib.mjs`, shared by the
+  script and the spec. No AutoRig: the script is report-only, never edits
+  the manifest, and repairs nothing.
+- **Finger-capability rule**: ≥ 4 non-thumb fingers with chains of ≥ 3
+  segments on BOTH hands; promotion to fingers:true additionally requires
+  the chains to exist (a lie is flagged), while a demotion despite passing
+  chains requires a written `fingersNote` (silent demotions are flagged).
+- **The astronaut inspection falsified the pass-2 assumption**: the rig HAS
+  full 3-segment finger chains on both hands — but open/fist screenshots
+  (.local/shots/v5) show the glove mesh is skinned as one mitt that curls
+  as a blob. Erika's fists articulate cleanly. So: erika fingers=true;
+  astronaut stays fingers=false with the documented fingersNote — bones
+  present, mesh can't read them. Exactly the case the reviewed manifest
+  exists for.
+- **Fusion architecture**: hand landmarks stay in the landmark trust domain
+  (`packages/pose-runtime/src/handFusion.ts`, additive module — no runtime
+  interface change, so no RFC). Reduced rate (12 Hz cap), inference skipped
+  entirely unless a pose wrist is visible AND the gate is open — an
+  incapable rig never pays for the second model. Association to pose wrists
+  is geometric (nearest raw-space wrist ≤ 0.18 norm units): MediaPipe's
+  handedness labels flip under mirroring and misfire on webcams.
+- **Fusion drives fingers only**, not wrist orientation: the pass-2 wrist
+  swing (pose index/pinky midpoint + wristGain) survived live gates; a
+  hand-landmark palm-normal twist was considered and declined — the palm
+  normal from three near-planar landmarks is unstable under partial
+  occlusion and a wrong-axis twist reads worse than none. Logged as the honest limitation:
+  wrist roll (supination) still doesn't read; finger curl now does, per
+  finger, on approved rigs.
+- **Pose-approximation fallback stands down per side, not globally**: fusion
+  staleness > 400 ms on one hand returns that hand to the pass-2
+  open/fist/point path while the other keeps true fingers.
+- **Face-touch v2 sockets from pose only**: the wrist offset is expressed in
+  the person's own head frame (ears+nose basis — the same construction
+  updateHead already trusts) and classified against seven fixed directions
+  with hysteresis; thinkingPose is a dwell re-label of a quiet chin/underChin
+  hold. No face-landmark model (scope guard held). Fixed sockets also fix a
+  v1 wobble: the contact point no longer chases wrist detection noise.
+- **Head capsule instead of sphere**: fit from the same skinned-vertex
+  sample vrm.ts already collects (95th-percentile radial + vertical split).
+  A sphere wide enough for the crown pushed cheek/chin contacts visibly off
+  the face. IK targets are constructed ON the capsule surface (+15% skin),
+  so an inside-the-skull target is impossible by construction; the eval
+  measures the ENACTED wrist's signed capsule distance anyway.
+- **Feet v2 took three architectures to be honest** (all measured on
+  fullbody.mp4, headed :2, skating = net planted-ankle slide px/window):
+  (1) a root-correction servo REGRESSED the metric (it oscillates against
+  the root smoothing and the weight-shift roll swings the ankles);
+  (2) a both-planted root freeze merely REDISTRIBUTED the slide into
+  catch-up slides at release (erika measured WORSE than off);
+  (3) what shipped: planted-leg two-bone IK (the face-touch law-of-cosines
+  core reused) pinning each planted ankle to a captured world anchor,
+  plus a foot-aware root X that places the hips over the anchored feet
+  with the person's own hip-over-feet lean. Slide fell from 18–24 px/window
+  (no planting, final-code comparator) to 0.8–2.5 (7–27×). A standing rest leg is already fully
+  extended, so the IK clamps an out-of-reach anchor to 0.995×reach instead
+  of releasing; only a clear overrun (>1.06×reach — a real step) releases
+  the plant. Plant detection: rolling ground line + speed hysteresis on
+  normalized landmarks. Weight shift is a ≤ ~1.7° hips roll (±3° out-skated
+  the planting it was meant to dress), stateful-write so test pose hooks
+  that pose hips directly are never fought.
+- **Accepted trade, documented**: pinning feet costs a little leg-ANGLE
+  mimicry — fullbody legsMean 6.4/7.2/6.5° (baseline, skating feet) →
+  7.1/9.7/7.3° (planted, final run); the ?feet=0 comparator on the final
+  code reproduces the baseline legs numbers exactly. The old low number was measured on feet that
+  slid; you can copy leg angles exactly or pin the feet, not both, when
+  root motion is heuristic. Upper-limb/torso sync holds at baseline
+  everywhere. The astronaut's +2.7° outlier is its cartoon proportions
+  (leg re-scaling least faithful there).
+- **Skating metric v2**: per-frame drift conflates servo/roll jitter with
+  what the eye calls skating; the reported contract metric is NET SLIDE
+  over each contiguous planted window (drift kept as a jitter diagnostic).
+  The ?feet=0 kill switch measures the comparator on identical input.
+- **eval/run.mjs dev-server spawn now honors PP_PORT** (`--port --strictPort`):
+  on lane ports the old plain `npm run dev` landed vite on a port serverUp()
+  never checked (found when the V5 baseline eval failed to start on 5177).
+- **tsconfig gains `resolveJsonModule`** for the manifest import (additive).
+- **facetouch.mp4 socket coverage**: the fixture contains whatever gestures
+  pass 2 recorded; the seven-socket guarantee is carried by a deterministic
+  synthetic landmark sweep (tests/charcontrol.spec.ts) driving the real
+  retargeter; the fixture eval reports the sockets it actually visits.
+  Honest split recorded in EVAL_NOTES.

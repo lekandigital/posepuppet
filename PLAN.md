@@ -1,181 +1,146 @@
-# V1 — PosePuppet Runtime + HUD: plan
+# V5 — Character Control Upgrade: plan + file ownership
 
-Branch `feat/pose-runtime-hud`, worktree `~/Dev/wt-runtime`, tmux `ba-runtime`,
-dev port 5174. Autonomy policy per BODYARCADE_CONTEXT.md v2 — no user gates;
-human-only checks land in FINAL_USER_TEST_PLAN.md S1–S3/S11 with evidence.
+Branch `feat/character-control`, worktree `~/Dev/wt-charcontrol`, tmux
+`ba-char`, port **5177**, display `:2` under the display lock. Prompt:
+docs/BODYARCADE_PROMPT_PACK_V2.md §V5. Autonomy policy per
+BODYARCADE_CONTEXT.md v2 — no user gates; human checks land in
+FINAL_USER_TEST_PLAN.md §S4.
 
-## Audit findings (what exists, where the seams are)
+## Reading of the code (audit result)
 
-**Tracking pipeline (Full App, `src/`).** `src/main.ts` boots:
-camera (`src/camera.ts` — getUserMedia / video-file into one `<video>`) →
-MediaPipe detector (`src/pose/detector.ts`, rVFC-driven, GPU→CPU fallback,
-full/lite hot swap) → mirror (`src/pose/mirror.ts`) → optional eval masker →
-Predictive Pose Continuity (`src/pose/continuity.ts`) → fan-out:
-One-Euro smoothing → retargeter/stage; ring buffers; intent detector; and
-`src/bodyinput/adapter.ts`, the ONLY place landmarks touch
-`@bodyarcade/body-input` — the core derives `BodySignal` and publishes on the
-in-page channel + BroadcastChannel. Hand mode has a parallel detector
-(`src/pose/handDetector.ts`) that the pose detector yields to.
+- The curated roster is `src/rig/avatarRegistry.ts`: robot (procedural),
+  astronaut + erika (VRM, shipped), woody (VRM, local-only optional).
+  `generatedAvatarRegistry.ts` entries are test-only and stay out of the
+  manifest.
+- Retargeting lives in `src/rig/retarget.ts` (direction-swing FK + a
+  face-touch v1 proximity magnetism with two-bone IK and a spherical head
+  collider). Feet are plain direction swings; skating is unaddressed.
+- Hand capability today: pose-only openness/point approximation
+  (`updateHands` → `avatar.applyHandState`), finger chains only exist in
+  `src/rig/vrm.ts` (per-segment curl axes computed from rig geometry).
+- Hand landmarks: `packages/pose-runtime/src/handDetector.ts` (21-point,
+  currently `numHands: 1`, used only by hand-only mode).
+- Eval rig: `?eval=` in-page collector (`src/eval/runner.ts`, sync metric
+  `src/eval/sync.ts`), node runner `eval/run.mjs` → `eval/results.json`.
+  Face-touch reach/penetration and pinch→jaw metrics already exist.
+- Labels: hardcoded card defs in `src/ui/cards.ts` — become manifest-driven.
 
-**Games (completed, consumers only).** Flight/TinySkies
-(`apps/flight/client`, Rowing is its `?row` mode) and standalone Dolphin
-(`apps/dolphin`) never see landmarks: `input/bodyControls.ts` /
-`input/swimControls.ts` subscribe to BroadcastChannel + a postMessage
-envelope, dedupe by `signal.ts`, gate on staleness/confidence, decay to
-autopilot on loss, and keyboard always wins (KEYBOARD_PRIORITY_MS). Both
-apps alias `@bodyarcade/body-input` to package source. Today the producer is
-a PosePuppet tab in companion mode (`src/bodyinput/flightBridge.ts`).
+## File ownership (exact)
 
-**Topology.** One origin: root vite serves the app plus built games at
-`/flight/` and `/dolphin/` (BroadcastChannel is origin-scoped — the Gate-2
-lesson). Model + wasm assets live in root `public/models`,
-`public/mediapipe-wasm` (gitignored, fetched at install).
+**Created (owned):**
+- `data/avatar-capabilities.json` — the manifest
+- `scripts/capability-report.mjs` — report-only regen/check script (Playwright)
+- `src/rig/capabilities.ts` — manifest load + gating API (typed)
+- `src/rig/faceSockets.ts` — face-touch v2 socket classification + anchors
+- `src/rig/feetPlanting.ts` — planted-foot state machine + root correction
+- `packages/pose-runtime/src/handFusion.ts` — reduced-rate hand-landmark
+  fusion anchored at pose wrists (additive package module)
+- `tests/charcontrol.spec.ts` — O2/O3/O4 specs (fixture-driven)
+- `tests/capability-manifest.spec.ts` — manifest ⇄ ground-truth check incl.
+  deliberate-mislabel detection
 
-**Model-variant law (measured, keep):** Fly = lite, Dolphin = lite,
-Rowing = FULL (lite wrist-depth collapse: 2/13 → 13/13 strokes on the
-seated fixture).
+**Modified (owned for this prompt):**
+- `src/rig/retarget.ts` — face-touch v2 (sockets, capsule), feet v2 seams,
+  fusion-driven hand state routing
+- `src/rig/vrm.ts` — capability report, per-finger curl driving, head capsule
+- `src/rig/robot.ts` — capability report, head capsule fields
+- `src/rig/types.ts` — additive `Avatar` interface extensions
+- `src/ui/cards.ts` — labels read from the manifest
+- `src/main.ts` — wiring only: fusion lifecycle, capability hook for the
+  report script, coach capability lines, eval deps (no boot/camera-lifecycle
+  changes; V5 owns shell edits per the pack when touched at all)
+- `src/eval/runner.ts` + `eval/run.mjs` — additive metrics: finger-curl
+  correlation, per-socket face-touch, skating; fusion on/off perf rows
+- `packages/pose-runtime/src/handDetector.ts` — additive options
+  (numHands, maxHz); no interface breaks (RFC not required)
+- `packages/pose-runtime/src/index.ts` — export the new module/types
+- Docs: `PLAN.md` `DECISIONS.md` `EVAL_NOTES.md` `STATUS.md`/`status.md`
+  `README.md` `CHANGELOG.md` `ARCHITECTURE.md` `FINAL_USER_TEST_PLAN.md`
+  (S4 section only)
 
-**Licensing check (first-actions item):** there is no `LICENSE_NOTES.md`.
-The TinySkies permission text lives in `ASSETS.md` § "BodyArcade Flight —
-TinySkies / GlobeFly fork manifest" ("used with permission", link, private
-record gitignored as `PERMISSION.local.md`). Requirement satisfied; noted
-in DECISIONS.md rather than inventing a new file.
+**Not touched (V6/V7/V1 territory):** `src/memory/*`, `src/record/*`,
+`src/director/*`, `src/gesture/*`, `packages/body-input/*`,
+`packages/pose-hud/*`, runtime boot/camera lifecycle
+(`packages/pose-runtime/src/runtime.ts` stays as-is), `apps/*`,
+`playwright.config.ts`, all other test specs.
 
-**Suites.** Root Playwright (fake-webcam y4m + eval rig), `apps/flight/tests`
-(port 5199 + producer), `apps/dolphin/tests` (port 5197 + producer). All
-three must stay green — that is the refactor's contract.
+## Approach per outcome
 
-## Extraction map
+**O1 Manifest.** Additive `Avatar.describeCapabilities()` implemented by the
+existing loaders (robot inline; vrm.ts from its real bone/finger-chain/head
+geometry data). `scripts/capability-report.mjs` boots the real app per
+roster avatar (load-only; no camera needed), reads the report via a window
+hook, and either writes a fresh manifest draft (`--write`) or diffs live
+inspection against `data/avatar-capabilities.json` (`--check`, exits
+non-zero on drift). No standalone tool, no repair, no conversion — the
+script is report-only. Woody is local-only: entry carries
+`"localOnly": true` and the check skips it when the file is absent (stated
+in the report output).
 
-### `packages/pose-runtime` (new; three-free, DOM-light)
+**O2 Hand boost.** `createHandFusion` (pose-runtime, additive): wraps the
+hand detector with `numHands: 2`, detection capped ~12 Hz, run ONLY while
+(a) character mode, (b) manifest says the current avatar is finger-capable,
+(c) pose wrists visible — hands-visible-only inference. Hands are
+associated to pose wrists by proximity in raw image space (handedness
+labels are unreliable mirrored); the app maps raw side → enacted side under
+mirroring. Per-finger curls from joint bend angles (EMA-smoothed) drive a
+new additive `Avatar.applyFingerCurls()` (vrm.ts, reusing the existing
+per-segment curl axes); a clamped palm-twist refinement rides the hand bone
+on capable rigs. Staleness > 400 ms falls back to the pose-approximation
+path (which keeps running for incapable rigs — they are never handed finger
+data; gate asserted by test).
 
-Moved verbatim (history-preserving `git mv`, imports adjusted):
+**O3 Face-touch v2.** Seven named sockets — cheekL, cheekR, chin,
+mouthCover, forehead, temple, underChin, thinkingPose — classified from the
+person's wrist offset expressed in their own head frame (ears+nose basis;
+pose-only, no face-landmark scope). Avatar-side anchors sit on a head
+CAPSULE (fit from the real skinned head vertices in vrm.ts; authored for
+the robot), targeted by the existing two-bone IK with contact easing and
+socket-change easing; per-avatar reach uses bind-time arm lengths, class
+recorded in the manifest. thinkingPose = chin/under-chin dwell (low wrist
+speed ≥ ~0.8 s). Zero-interpenetration is enforced by construction (IK
+target outside the capsule) and measured (capsule-distance penetration
+counter). facetouch.mp4 reports per-socket reach; sockets the fixture
+doesn't visit are covered by a deterministic synthetic landmark sweep in
+`tests/charcontrol.spec.ts` (documented honestly in eval notes).
 
-| from | to |
+**O4 Feet v2.** Per-foot plant detection from landmarks (ankle near ground
+baseline + low velocity + visibility, full-body mode only). While planted,
+the avatar's planted ankle is anchored: measured world drift is subtracted
+from the root (smoothed, capped), killing skating while letting lifted-foot
+steps read as steps. Planted feet level their soles (ankle orientation);
+weight shift adds a small clamped hips roll toward the stance foot. Skating
+metric (mean planted-ankle screen drift px/frame) added to the eval; the
+threshold is set from the measured before/after on fullbody.mp4 and
+asserted in a spec.
+
+**O5 Labels/coach/docs.** `src/ui/cards.ts` chips/notes come from the
+manifest; coach gets manifest-driven capability lines (e.g. finger-capable
+avatar vs not, face-touch class) surfaced once per avatar switch — low-nag.
+README/CHANGELOG/ARCHITECTURE updated; S4 entries written with evidence
+links.
+
+## Verification map (prompt → artifact)
+
+| Check | Artifact |
 |---|---|
-| `src/pose/detector.ts` | `packages/pose-runtime/src/detector.ts` (asset paths become options) |
-| `src/pose/handDetector.ts` | `packages/pose-runtime/src/handDetector.ts` |
-| `src/pose/continuity.ts` | `packages/pose-runtime/src/continuity.ts` |
-| `src/pose/indices.ts` `mirror.ts` `oneEuro.ts` `smoothing.ts` `types.ts` | same names |
-| `src/camera.ts` (capture half) | `packages/pose-runtime/src/camera.ts` |
-
-New composition:
-
-- `src/runtime.ts` — `createPoseRuntime(opts)`: explicit camera ownership +
-  lifecycle (`idle → starting → running / denied / error / external /
-  stopped`), video element supplied (app) or created hidden (games), model
-  variant, mirror/ppc toggles, an eval-harness frame interceptor hook, PPC
-  tracking states → body-input core (absorbs `src/bodyinput/adapter.ts`),
-  publishes `BodySignal` in-page + BroadcastChannel, exposes a trusted
-  in-process `onFrame` tap (Full App retargeting; same trust domain),
-  `preview` state for the HUD, and privacy/tracking state.
-- `src/preview.ts` — `PreviewFrame`: the approved render state that may
-  cross to the HUD: mirrored, 2D-only, quantized skeleton segments +
-  per-limb tracking + coarse confidence. Never serialized onto a transport.
-- `src/election.ts` — one producer per origin: Web Locks
-  (`bodyarcade-pose-producer`) with a listen-for-traffic fallback; a page
-  that finds an active external producer enters `external` and does NOT
-  open the camera (companion mode keeps working, no duplicate pipelines).
-  Per page, `createPoseRuntime` enforces a singleton.
-
-### `packages/pose-hud` (new)
-
-- `mountPoseHud(host, runtime, { position?, safeArea?, collapsed? })` →
-  handle with `expand/collapse/setSafeArea/unmount`.
-- Bottom-left compact square; collapsible to a status pill; hover/focus/
-  click expands; expanded view swaps preview ↔ live camera feed. Full
-  keyboard parity (tabbable, Enter/Space toggle, Esc collapse, arrow swap).
-- Contents: preview figure, mono tracking state (LIVE / REACQ / SIGNAL
-  LOST / KEYBOARD / CAMERA DENIED / REMOTE FEED), privacy line ("LOCAL
-  INFERENCE · NO UPLOADS"), recenter flash. No settings panel.
-- **Preview renderer decision:** 2D-canvas glowing wireframe figure (the
-  existing x-ray puppet language) — NOT a VRM. Games ship their own three
-  versions (0.172 vs 0.184); a VRM preview would bundle a second three +
-  GL context into every game page. "Cheap VRM or simpler" → simpler, in
-  the frozen visual language, near-zero GPU. Degradation tiers:
-  T0 glow skeleton 30 Hz → T1 flat lines 15 Hz → T2 dot silhouette 10 Hz →
-  T3 text-only; auto-drop on sustained frame-budget pressure, test hook to
-  force tiers.
-- Styles injected, `pp-hud-` scoped, token values copied from the app
-  grammar (graphite glass, 1 px rules, mono labels, cyan/blue accents).
-
-### Full App refactor (zero behavior change)
-
-`src/main.ts` consumes the runtime: one `createPoseRuntime` with the app's
-video element; the pipeline order (mirror → masker → PPC → smooth →
-retarget; body-input pre-smoothing) is preserved inside the runtime +
-`onFrame` tap. `src/pose/` and `src/bodyinput/adapter.ts` are deleted;
-`src/pose/bodyFrame.ts` (three-dependent, retarget-only) moves to
-`src/rig/bodyFrame.ts`; layout-only camera helpers stay app-side as
-`src/ui/cameraLayout.ts`. `flightBridge.ts` (companion mode) stays.
-The app also mounts the shared HUD? — no: the Full App keeps its own
-camera panel + chain readout (frozen design); HUD is for games.
-
-### Game retrofits (mount points only)
-
-- `apps/flight/client/src/main.ts`: init runtime (variant: `?row` → full,
-  else lite) + mount HUD with a safe-area hint clearing the rowing strip /
-  flight HUD; game code untouched (`bodyControls`/`rowControls` keep
-  consuming signals exactly as today, now produced in-page).
-- `apps/dolphin/src/main.ts`: same, lite variant, safe-area clearing the
-  dolphin HUD/minimap (HUD bottom-left conflicts with nothing there —
-  verify on screenshot).
-- Both game vite configs: alias `@bodyarcade/pose-runtime`/`pose-hud` to
-  source; dev-only middleware exposing root `public/models` +
-  `public/mediapipe-wasm` (production topology already same-origin).
-- Camera policy: games request the camera at boot (that is what
-  "initialize Runtime directly" means); denied → `denied` state, HUD says
-  keyboard play, game plays on keys (already true). External producer
-  streaming → `external`, no camera grab.
-
-## File ownership (this branch edits nothing else)
-
-- `packages/pose-runtime/**`, `packages/pose-hud/**` (new)
-- `packages/body-input/**` — interface FROZEN; no edits expected
-- root: `src/pose/**` (removed), `src/camera.ts`, `src/bodyinput/**`,
-  `src/main.ts`, `src/ui/cameraLayout.ts` (new), `src/rig/bodyFrame.ts`,
-  import-path touches in `src/{eval,gesture,memory,rig,hand,overlay,ui,director}`,
-  `vite.config.ts`, `tsconfig.json`
-- `apps/flight/client/src/main.ts`, `apps/flight/client/vite.config.ts`,
-  `apps/flight/client/tsconfig.json`, `apps/flight/tests/hud.spec.ts` (new)
-- `apps/dolphin/src/main.ts`, `apps/dolphin/vite.config.ts`,
-  `apps/dolphin/tsconfig.json`, `apps/dolphin/tests/hud.spec.ts` (new)
-- root `tests/` additions (runtime regression, boundary), `eval/` untouched
-- docs: PLAN/DECISIONS/EVAL_NOTES/STATUS/README/FINAL_USER_TEST_PLAN/ASSETS
-
-## Verification plan
-
-1. **Baseline (pre-change):** root + flight + dolphin suites, recorded.
-2. **O1 contract:** same suites green post-extraction; eval fixture spot
-   run unchanged within tolerance.
-3. **Boundary test:** instrument both transports; assert every emitted
-   message passes `assertSignalShape` and contains no 33/21-point
-   landmark-like arrays anywhere in the object graph (deep scan).
-4. **Per game Playwright:** HUD mounts; expands/collapses via mouse AND
-   keyboard; camera-denied (permission denied at browser level) still
-   plays on keyboard; exactly one `getUserMedia` call per page
-   (init-script counter).
-5. **Perf (headed :2, display lock):** per game fps with HUD on/off, pose
-   Hz, preview tier costs; floors 60/45 fps, pose ≥ 15 Hz. SwiftShader
-   numbers never count; headless failures classified ENVIRONMENT_BLOCKED.
-6. **Screenshot board + vision self-review** against the frozen language:
-   HUD collapsed/expanded/denied/lost states × three games + app.
-
-## Milestones
-
-- M0 baseline suites + env (this commit: PLAN)
-- M1 = O1 extraction + app refactor, suites green
-- M2 = O2 pose-hud + preview + tiers + keyboard
-- M3 = O3 flight/rowing/dolphin retrofit + per-game specs
-- M4 = O4 permission flows, boundary/single-pipeline tests, perf table
-- M5 docs + screenshot board + FINAL_USER_TEST_PLAN S1–S3/S11 + STATUS
+| manifest matches ground truth; mislabel caught | `tests/capability-manifest.spec.ts` + `capability-report.mjs --check` |
+| finger-curl correlation on capable rigs | eval `fingerCurl.r` on hand_open_close/hand_pinch_point × erika |
+| incapable rig provably not finger-driven | spec asserting gate closed + zero `applyFingerCurls` on astronaut/robot |
+| seven sockets, zero interpenetration | facetouch.mp4 eval per-socket + synthetic socket sweep spec |
+| skating under threshold | eval `feet` block on fullbody.mp4, asserted in spec |
+| perf ON/OFF | eval rows fusion on/off (headed :2 under display lock), table in EVAL_NOTES |
+| no sync regression | before/after eval on arms/torso/fast/fullbody × robot,astronaut,erika vs the baseline recorded at P0 |
+| suites green | root Playwright suite (baseline: 110 pass + 2 SwiftShader-only ENVIRONMENT_BLOCKED detect specs) |
 
 ## Risks
 
-- `main.ts` re-wiring regressing eval honesty paths → keep pipeline order
-  bit-identical; masked-eval semantics covered by continuity specs.
-- Node: remote default is v12 — all work under nvm node 22 in `ba-runtime`.
-- Headless WebGL throttling → headed :2 under `flock` for anything timed.
-- three version skew → runtime/HUD stay three-free (decision above).
-- Second `getUserMedia` from the app's own video-file/camera toggle →
-  route ALL capture through the runtime; test enforces one consumer.
+- Second MediaPipe graph (hand) beside the pose graph: GPU contention on
+  weak machines — mitigated by 12 Hz cap + visibility + capability gating,
+  and measured; if the ON state misses floors the fusion rate drops first.
+- facetouch.mp4 socket coverage unknown → synthetic sweep is the
+  deterministic backstop; honest split recorded.
+- Hips roll for weight shift interacts with chest/legs frame math —
+  clamped ≤ ~4°, eased, and sync metrics guard it.
+- SwiftShader vs :2: correctness headless anytime; perf only headed on :2
+  under `flock /tmp/bodyarcade-display2.lock`.

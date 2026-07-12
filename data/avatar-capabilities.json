@@ -1,0 +1,99 @@
+{
+  "_readme": [
+    "Capability manifest for the curated avatar roster (V5 Character Control).",
+    "This file is the single source of truth for capability gating and card",
+    "labels — hand-reviewed, small, and diffable on purpose.",
+    "",
+    "  inspection    machine-derived facts read off the loaded rig; verify or",
+    "                regenerate with:  node scripts/capability-report.mjs",
+    "                (--write emits data/avatar-capabilities.draft.json for review;",
+    "                the script is report-only and never edits this file)",
+    "  capabilities  the reviewed gates. fingers:true is the ONLY thing that",
+    "                lets hand-landmark finger data drive a rig. Demoting a rig",
+    "                whose chains pass the bar requires a fingersNote saying why",
+    "                (silent demotions are flagged as mislabels).",
+    "  labels/coach  what the avatar cards and setup coach show.",
+    "",
+    "New user-supplied models enter the roster by adding a reviewed entry here",
+    "after running the report script — there is no automatic pipeline."
+  ],
+  "version": 1,
+  "avatars": {
+    "robot": {
+      "type": "procedural",
+      "inspection": {
+        "bonesMissing": [],
+        "fingerChains": null,
+        "headCollider": { "radius": 0.155, "halfHeight": 0.01 },
+        "reach": { "upper": 0.26, "fore": 0.24 },
+        "feet": true
+      },
+      "capabilities": { "fingers": false, "faceTouch": "limited", "feet": true, "fullBody": true },
+      "labels": {
+        "chip": "Fingers not supported",
+        "chipClass": "warn",
+        "note": "mitt hands; face-touch lands at the collar"
+      },
+      "coach": "The robot has mitt hands — open and fist read, finger detail won't."
+    },
+    "astronaut": {
+      "type": "vrm",
+      "inspection": {
+        "bonesMissing": [],
+        "fingerChains": {
+          "left": { "thumb": 3, "index": 3, "middle": 3, "ring": 3, "little": 3 },
+          "right": { "thumb": 3, "index": 3, "middle": 3, "ring": 3, "little": 3 }
+        },
+        "headCollider": { "radius": 0.385, "halfHeight": 0 },
+        "reach": { "upper": 0.141, "fore": 0.217 },
+        "feet": true
+      },
+      "capabilities": {
+        "fingers": false,
+        "fingersNote": "finger chains exist but the glove mesh is skinned as one mitt — per-finger motion deforms a blob and doesn't read (open/fist screenshots, .local/shots/v5, reviewed 2026-07-12); stays on the pose open/fist approximation",
+        "faceTouch": "limited",
+        "faceTouchNote": "helmet capsule radius (0.385 m) exceeds the arm reach (0.35 m) — the hand physically cannot stay outside the helmet shell, so contact reads pressed into the helmet; the v2 capsule metric exposes what the pass-2 center-distance metric hid",
+        "feet": true,
+        "fullBody": true
+      },
+      "labels": {
+        "chip": "Face-touch limited",
+        "chipClass": "warn",
+        "note": "mitten gloves; face-touch presses into the helmet"
+      },
+      "coach": "The astronaut wears mittens — finger motion won't show; everything else tracks."
+    },
+    "erika": {
+      "type": "vrm",
+      "inspection": {
+        "bonesMissing": [],
+        "fingerChains": {
+          "left": { "thumb": 3, "index": 3, "middle": 3, "ring": 3, "little": 3 },
+          "right": { "thumb": 3, "index": 3, "middle": 3, "ring": 3, "little": 3 }
+        },
+        "headCollider": { "radius": 0.16, "halfHeight": 0 },
+        "reach": { "upper": 0.295, "fore": 0.337 },
+        "feet": true
+      },
+      "capabilities": { "fingers": true, "faceTouch": "full", "feet": true, "fullBody": true },
+      "labels": {
+        "chip": "Fully supported",
+        "chipClass": "ok",
+        "note": "articulated fingers — real finger tracking in character mode"
+      },
+      "coach": "Erika has articulated fingers — keep your hands in frame for finger tracking."
+    },
+    "woody": {
+      "type": "vrm",
+      "localOnly": true,
+      "inspection": null,
+      "capabilities": { "fingers": false, "faceTouch": "limited", "feet": true, "fullBody": true },
+      "labels": {
+        "chip": "Experimental · local",
+        "chipClass": "exp",
+        "note": "local file only — never ships with the app"
+      },
+      "coach": "Woody is a local experimental rig — conservative capabilities apply."
+    }
+  }
+}
