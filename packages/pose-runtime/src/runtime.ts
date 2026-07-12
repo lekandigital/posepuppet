@@ -26,6 +26,7 @@ import {
 import { startCamera, startVideoFile as playVideoFile, stopStream } from './camera';
 import { PoseContinuity, type PpcGroupInfo, type PpcGroupName, type PpcState } from './continuity';
 import { createDetector, type DetectorAssets, type ModelVariant, type PoseDetector } from './detector';
+import { createWorkerDetector } from './workerDetector';
 import { mirrorNorm, mirrorWorld } from './mirror';
 import { electProducer, type ElectionMode, type ProducerElection } from './election';
 import { buildPreviewFrame, createPreviewFrame, type PreviewFrame } from './preview';
@@ -56,6 +57,23 @@ export interface PoseRuntimeOptions {
   model?: ModelVariant; // default 'lite' (games); the app passes its config
   mirror?: boolean; // default true
   ppc?: boolean; // default true
+  /** Detection rate cap in Hz (0/omitted = every presented frame). Heavy
+   *  models on game pages budget the main thread this way — e.g. rowing's
+   *  FULL model at 15 Hz (the pose floor). */
+  maxDetectHz?: number;
+  /** Detect in a Web Worker (game pages): the full model costs ~30–50 ms
+   *  per detection — off the main thread it stops costing game frames.
+   *  Falls back to main-thread detection if the worker can't start. The
+   *  Full App keeps the main-thread path (zero behavior change). */
+  worker?: boolean;
+  /** Worker delegate preference — best-effort: tasks-vision's CPU build
+   *  can fail inside module workers ("ModuleFactory not set"), in which
+   *  case the worker falls back to the other delegate. */
+  workerDelegate?: 'GPU' | 'CPU';
+  /** Camera capture size. Games use a smaller frame (tracking doesn't
+   *  need 720p; per-detection upload/preprocess cost scales with pixels).
+   *  Default 1280×720 (the app's pass-2 behavior). */
+  captureSize?: { width: number; height: number };
   assets?: DetectorAssets;
   /** 'strict' = games (yield to an active producer); 'claim' = Full App. */
   election?: ElectionMode;
@@ -302,7 +320,10 @@ export function createPoseRuntime(opts: PoseRuntimeOptions = {}): PoseRuntime {
   async function ensureDetector(): Promise<PoseDetector> {
     if (detectorInst) return detectorInst;
     setState('loading-model');
-    detectorInst = await createDetector(modelVariant, opts.assets);
+    detectorInst = opts.worker
+      ? await createWorkerDetector(modelVariant, opts.assets, opts.workerDelegate)
+      : await createDetector(modelVariant, opts.assets);
+    if (opts.maxDetectHz) detectorInst.setMaxHz(opts.maxDetectHz);
     return detectorInst;
   }
 
@@ -346,7 +367,7 @@ export function createPoseRuntime(opts: PoseRuntimeOptions = {}): PoseRuntime {
       setState('starting');
       camError = null;
       try {
-        await startCamera(video!);
+        await startCamera(video!, opts.captureSize);
       } catch (err) {
         camError = err instanceof Error ? err.message : String(err);
         election?.release();

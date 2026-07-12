@@ -19,6 +19,7 @@ export { LandmarkSmoother } from './smoothing';
 
 export { createDetector } from './detector';
 export type { DetectorAssets, ModelVariant, PoseDetector } from './detector';
+export { createWorkerDetector } from './workerDetector';
 
 export { createHandDetector, HLM, HAND_CONNECTIONS } from './handDetector';
 export type { HandDetector, HandFrame, HandPoint } from './handDetector';

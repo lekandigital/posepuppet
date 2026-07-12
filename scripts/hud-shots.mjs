@@ -66,10 +66,11 @@ async function hudReady(page) {
   await page.waitForTimeout(400);
   await shot(page, 'flight-hud-collapsed');
 
-  // rowing (safe-area over the rowing strip)
-  await page.goto(`${PP}/flight/?autostart=1&row`);
+  // rowing (safe-area over the rowing strip; ?row without autostart —
+  // autostart boots the plane)
+  await page.goto(`${PP}/flight/?row&seed=31415&calm`);
   await hudReady(page);
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(8000); // boat intro + rowing strip up
   await shot(page, 'rowing-hud-live');
 
   // dolphin

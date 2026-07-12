@@ -26,10 +26,11 @@ export const HUD_CSS = /* css */ `
   font-family: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 10px;
   letter-spacing: 0.04em;
-  background: var(--pph-glass);
+  /* No backdrop-filter: real blur over a live WebGL canvas costs frames
+     (measured ~4 fps on flight) — fake the glass with opacity instead,
+     the pass-2 rule for chrome over live video/canvas regions. */
+  background: rgba(10, 14, 22, 0.92);
   border: 1px solid var(--pph-rule);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   user-select: none;
   transition: width 160ms ease;
 }
@@ -146,13 +147,16 @@ export const HUD_CSS = /* css */ `
   color: var(--pph-ink-3);
 }
 .pp-hud-privacy { color: var(--pph-glow); white-space: nowrap; overflow: hidden; }
+/* compact width fits "LOCAL INFERENCE"; the expanded panel affords the rest */
+.pp-hud[data-size="expanded"] .pp-hud-privacy::after { content: " · NO UPLOADS"; }
 .pp-hud-flash {
+  /* display, not opacity: an invisible span still takes layout width and
+     was squeezing the privacy line into truncation */
+  display: none;
   color: var(--pph-cyan);
-  opacity: 0;
-  transition: opacity 240ms ease;
   white-space: nowrap;
 }
-.pp-hud-flash[data-on="1"] { opacity: 1; }
+.pp-hud-flash[data-on="1"] { display: inline; }
 
 @media (prefers-reduced-motion: reduce) {
   .pp-hud, .pp-hud-stage, .pp-hud-flash { transition: none; }

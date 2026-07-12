@@ -19,6 +19,8 @@ export interface PoseDetector {
   start(video: HTMLVideoElement, onFrame: (frame: PoseFrame | null) => void): void;
   stop(): void;
   setModel(variant: ModelVariant): Promise<void>;
+  /** Cap detection rate (main-thread budget for game pages); 0 = every frame. */
+  setMaxHz(hz: number): void;
   poseFps(): number;
   droppedFrames(): number;
   delegate(): 'GPU' | 'CPU';
@@ -67,6 +69,8 @@ export async function createDetector(
   let lastPresented = -1;
   let lastVideoTime = -1;
   let lastDetectTs = 0;
+  let lastDetectWall = 0;
+  let minIntervalMs = 0;
 
   function detectOnce(now: number, meta?: VideoFrameCallbackMetadata) {
     if (!video || !callback || video.readyState < 2) return;
@@ -74,9 +78,13 @@ export async function createDetector(
       if (lastPresented >= 0) dropped += Math.max(0, meta.presentedFrames - lastPresented - 1);
       lastPresented = meta.presentedFrames;
     }
+    // rate cap: heavy models on game pages detect at a budgeted Hz —
+    // skipped frames simply aren't detections (PPC/staleness handle gaps)
+    if (minIntervalMs > 0 && now - lastDetectWall < minIntervalMs - 1) return;
     const t = video.currentTime;
     if (t === lastVideoTime) return; // never more than once per video frame
     lastVideoTime = t;
+    lastDetectWall = now;
 
     // detectForVideo timestamps must be strictly monotonic.
     const ts = Math.max(now, lastDetectTs + 0.001);
@@ -137,6 +145,9 @@ export async function createDetector(
       landmarker = next;
       currentVariant = v;
       old.close();
+    },
+    setMaxHz(hz) {
+      minIntervalMs = hz > 0 ? 1000 / hz : 0;
     },
     poseFps: () => fps,
     droppedFrames: () => dropped,

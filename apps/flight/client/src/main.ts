@@ -43,6 +43,20 @@ const runtime = createPoseRuntime({
   // strokes on the seated fixture). Flight's torso-scale axes are robust
   // to lite and keep the GPU budget for the game.
   model: rowMode ? "full" : "lite",
+  // Detection runs in a worker (the full model costs ~30-50 ms per
+  // detection — on the main thread that halves the game fps; measured on
+  // :2). Rowing additionally runs the worker on the CPU delegate: the
+  // full model's GPU inference contends with the game's own rendering in
+  // the GPU process (measured: 35 fps GPU-worker vs 57 fps without), and
+  // caps at 15 Hz (plenty for ~0.5 Hz strokes).
+  worker: true,
+  // ?dethz= is a test/eval override for the perf-vs-rate tradeoff curve.
+  // Rowing caps at 15 (the pose floor; strokes are ~0.5 Hz). Effective
+  // rate on the remote GL-ANGLE box is ~13 Hz — bounded by per-inference
+  // time under GPU contention, not by this cap (raising it was measured
+  // to add contention without adding rate).
+  maxDetectHz: Number(bootParams.get("dethz") ?? (rowMode ? 15 : 0)),
+  captureSize: { width: 640, height: 360 }, // tracking needs no 720p; cheaper uploads
   election: "strict",
   forceExternal: bootParams.get("pp") === "companion",
 });

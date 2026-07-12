@@ -1,5 +1,71 @@
 # Changelog
 
+## V1 — PosePuppet Runtime + HUD (2026-07-11)
+
+PosePuppet becomes a system layer: a headless tracking runtime any game
+page initializes directly, a shared HUD overlay, and the Full App
+refactored onto the same runtime with zero behavior change. TinySkies
+Flight, Rowing, and the standalone Dolphin now run body-controlled with
+no PosePuppet tab open.
+
+### Added
+- `packages/pose-runtime`: camera ownership + lifecycle states, pose/hand
+  detection (optional Web Worker offload — the FULL model costs 30–50 ms
+  per detection and must not run on a game's main thread), Predictive
+  Pose Continuity at the fork, body-input emission (the adapter absorbed;
+  landmarks enter body-input inside the runtime and only there), producer
+  election (Web Locks + traffic listen; `?pp=companion` hint from the
+  bridge), capture-size + detection-rate budgeting, quantized 2D
+  `PreviewFrame` state for the HUD.
+- `packages/pose-hud`: compact bottom-left overlay in the frozen visual
+  language — wireframe preview tinted by per-limb PPC state, mono
+  tracking readout, `LOCAL INFERENCE · NO UPLOADS`, camera-feed swap,
+  recenter flash, full keyboard parity (Tab/Enter/Esc/`c`), safe-area
+  mount hint, four degradation tiers with auto load-shedding. No settings
+  panel.
+- Game retrofits (mount points only): flight (lite), rowing (FULL model —
+  the lite wrist-depth collapse stands — at 15 Hz in a worker), dolphin
+  (lite); HUD safe-areas clear the rowing strip and the dolphin ODbL
+  attribution; `?hud=0` and `?dethz=` test escapes.
+- Tests: BodySignal deep-scan boundary spec (landmark-free wire, quantized
+  preview), single-getUserMedia + producer-lock spec, camera-denied specs
+  (`--deny-permission-prompts` — a flagless Playwright launch grants a
+  fake camera), per-game HUD specs (mouse AND keyboard interaction,
+  denied keyboard play, wire scan, tier forcing).
+- `scripts/hud-perf.mjs` (per-game HUD-on/off table → 
+  `eval/runtime-hud-perf.json`), `scripts/hud-shots.mjs` (screenshot
+  board), probe scripts for detection cost / worker GL / capture size.
+
+### Changed
+- Full App boots on `createPoseRuntime` (in-process frame tap; pipeline
+  order bit-identical: mirror → eval masker → PPC → {smooth → retarget,
+  body-input pre-smoothing}); `src/pose/` moved into the package
+  (history-preserving); `src/camera.ts` split (capture → runtime,
+  layout → `src/ui/cameraLayout.ts`).
+- Game suite ports env-parameterized (`FLIGHT_PORT`/`DOLPHIN_PORT`/
+  `PP_PORT`) — hardcoded ports were silently hitting other checkouts'
+  servers.
+- HUD glass is opacity-faked, not `backdrop-filter` — real blur over a
+  live WebGL canvas measured ~4 fps on flight (the pass-2 rule applied).
+
+### Measured (eval/runtime-hud-perf.json, headed :2, RTX 3090 / GL-ANGLE)
+- HUD preview draw cost: ≤ 0.1 ms/frame at every tier; HUD on/off fps
+  delta within run noise on flight and dolphin.
+- Flight ~60 fps @ ~29 Hz pose (lite, worker); Dolphin ~57–60 fps @
+  ~29 Hz (lite, worker).
+- Rowing (FULL model): main-thread detection 30 fps → worker 43 fps;
+  the remainder is GPU-process contention (worker GL verified hardware;
+  zero main-thread long tasks). ~41–43 fps @ ~13–14 Hz on this box vs
+  the 45/15 floors — final floor validation on Apple Silicon per the
+  cross-platform policy; strokes verified traversing the in-page chain
+  (14 on rowing_slow.y4m, matching the old producer-tab spec's range).
+
+### Deliberately skipped
+- No HUD settings panel, no visual redesign, no full PosePuppet stage in
+  games (preview is a 2D wireframe — a VRM preview would ship a second
+  three.js + GL context into every game page).
+- body-input interface untouched (frozen after merge).
+
 ## Predictive Pose Continuity (2026-07-07)
 
 Occlusion handling upgraded from per-bone "hold and decay" to a

@@ -1,5 +1,28 @@
 # STATUS — V1 Runtime + HUD (feat/pose-runtime-hud)
 
+2026-07-12 · V1 COMPLETE — all four outcomes shipped, awaiting the
+consolidated human pass (FINAL_USER_TEST_PLAN S1–S3, S11)
+
+- O1 pose-runtime extracted; Full App behavior-identical (root suite at
+  baseline parity; eval refresh: arms 9.82° vs 9.51°, torso 2.13° vs
+  2.20°, fast 20.14° vs 19.89° at ~29.7 pose fps, 0 errors).
+- O2 pose-hud shipped: x-ray preview, tiers, keyboard parity, privacy
+  line, safe-area mounts. No settings panel, no redesign.
+- O3 TinySkies / Rowing / Dolphin run body-controlled with NO PosePuppet
+  tab (worker detection; rowing keeps FULL model @15 Hz; election yields
+  to a companion producer). Game suites green on :2 (flight 37 specs,
+  dolphin 16).
+- O4 boundary/single-pipeline/camera-denied tests green everywhere; perf
+  table in eval/runtime-hud-perf.json — flight/dolphin ~60 fps @ ~29 Hz;
+  rowing ~41–43 fps @ ~13–14 Hz on the RTX/GL-ANGLE box (root-caused GPU
+  contention; Apple Silicon validation = FUTP S3.2). Screenshot board +
+  vision review in EVAL_NOTES; two visual defects found and fixed
+  (privacy-line truncation, rowing board shot).
+- Docs: README system-layer section, CHANGELOG, DECISIONS, package
+  READMEs, FUTP front matter + S1–S3/S11 entries with evidence links.
+
+# STATUS — V1 Runtime + HUD (feat/pose-runtime-hud)
+
 2026-07-11 · O1 complete
 
 - packages/pose-runtime extracted (detector, hand detector, PPC, mirror,

@@ -3,9 +3,17 @@
 // getUserMedia consumer on a page (enforced by test). Overlay layout /
 // CSS-mirroring helpers stayed app-side (they are app DOM concerns).
 
-export async function startCamera(video: HTMLVideoElement): Promise<MediaStream> {
+export interface CaptureSize {
+  width: number;
+  height: number;
+}
+
+export async function startCamera(
+  video: HTMLVideoElement,
+  size: CaptureSize = { width: 1280, height: 720 },
+): Promise<MediaStream> {
   const stream = await navigator.mediaDevices.getUserMedia({
-    video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
+    video: { width: { ideal: size.width }, height: { ideal: size.height }, facingMode: 'user' },
     audio: false,
   });
   video.srcObject = stream;
