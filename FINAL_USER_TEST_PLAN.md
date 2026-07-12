@@ -86,11 +86,38 @@ S5.5 | Pass-2 loops survive the migration (real v1 data) | The migration spec se
 #### Post-S5 note for the tester
 The duet ghost keeps playing after the library closes (deliberate — you
 perform beside it). `g` or the ghost button stops it. Hand-kind loops
-show “hand loop” on the card and don't replay yet; that surface arrives
-with Recording v2 (V7).
+show “hand loop” on the card and don't replay yet; that surface did not
+land in V7 (Recording v2 focused on presentation + replay-in-take for
+body loops) — hand-puppet loop replay stays future work (FUTURES.md).
 
 ### S6  Recording v2 takes: one per presentation mode; cutout-on-stage
-_Entries deferred to V7 Recording v2 completion._
+
+#### V7 environment — S6.1–S6.5
+- Branch `feat/recording-v2` in `~/Dev/wt-recording` (unmerged; remote
+  dev server runs from this tree). Port **5179**.
+- Tunnel from the Mac: `ssh -N -L 5179:127.0.0.1:5179 -i
+  ~/.ssh/pinn_rtx3090 o@192.168.86.152` then open http://localhost:5179.
+- Camera + lighting: normal webcam session, front-lit, ~2 m back,
+  Character mode. The CAM group sits in the take bar (RAW/BLUR/CUT/SIL/
+  CHIP/STAGE + SKEL); `x` cycles modes; takes via ⌘K "take · …".
+- V7 evidence: eval/seg-quality.json (IoU 0.79–0.82 vs hand labels,
+  flicker ≤ 0.0104), .local/rec-perf.json (floors hold with
+  segmentation ON, both aspects, recorder rolling), .local/takes/v7
+  (one packaged clip per mode + scripted reel/duet takes, gitignored —
+  fixture footage), .local/shots/v7 (poster frames + IoU overlays),
+  tests/segmentation.spec.ts (14 green), EVAL_NOTES §V7, DECISIONS §V7,
+  docs/RECORDING.md.
+- Estimated V7 human time: ~22 min.
+
+S6.1 | Presentation modes on a real person in a real room | The eval measured IoU on fixture footage; edge quality on YOUR hair/clothing/lighting and whether each mode reads as a deliberate look (not a green-screen artifact) is judgment | Tunnel, http://localhost:5179, camera on, Character mode | Cycle `x` through blur → cutout → silhouette → chip → stage while moving normally; watch the live preview over the camera panel; wave fast; step half out of frame and back | Edges stay stable (no boiling halo), hair/hands don't flicker off, blur reads as defocus not smear, silhouette reads as a design element, and a brief mask gap falls back to the plain camera instead of freezing your cutout | Mask IoU 0.79–0.82 + flicker ≤ 0.0104 on fixtures (eval/seg-quality.json); adaptive-freshness + debounce logic unit/e2e tested; per-mode recordings play (.local/takes/v7) | A boiling or laggy cutout kills every clip this pass exists for | 5
+
+S6.2 | The signature: cutout-on-stage beside the avatar | Whether YOU standing on the stage next to your avatar reads as one scene (scale, floor contact, shadow) is pure aesthetics | Same session | Select STAGE; perform ~20 s beside the avatar; toggle SKEL on; record one 15 s take (`r`) | You read as standing ON the stage floor (contact shadow helps), plausibly scaled beside the avatar, both moving in sync since both are you; skeleton overlay reads as intentional | Automated stage-mode takes at 16:9 and 9:16 with effective mode held (segmentation.spec); cutout-duet take recorded (.local/takes/v7/take-cutout-duet.webm) | The pass's headline shot looks pasted-on | 4
+
+S6.3 | Take scripts v2 end-to-end, hands-free | Reading prompts while performing, gesture reliability at distance, and whether per-shot presentation switches feel cinematic or jarring are human checks | Same session, ~2.5 m back, whole upper body in frame | Raise both arms ~1 s → the countdown starts (Character take for your mode); follow the shots; hold still to advance early; watch the final replay shot; then run ⌘K "take · presentation reel" and "take · cutout duet" | Gesture start/advance/stop work from distance; per-shot camera treatments switch cleanly mid-take; the in-take replay plays your last seconds in slow-mo from the side angle and the recorder keeps rolling; your presentation setting is restored after each take | Director/gesture specs green through the new flow (8/8 + reel/replay e2e); scripted-take recordings play with presets applied (.local/takes/v7) | Hands-free takes silently broken = the money-shot workflow is gone | 5
+
+S6.4 | Replay-in-take feel | Slow-mo replay pacing (rate 0.5, side angle) inside a take is a taste judgment the fixture can't make | Same session | In the Character take, shadowbox hard in shot 5, then let the replay shot run; also press `i` outside a take to compare the standalone replay | The replay shows YOUR punches slowed, readable, with trails; it fills its shot without dead air; standalone replay still behaves as in V6 | Replay e2e asserts ghosts active during the shot + nonzero file; instantReplay is the same code path parameterized | A dead or rushed replay wastes the take's climax | 3
+
+S6.5 | Segmentation perf + auto-tier on Apple Silicon | The cross-platform policy: remote RTX numbers never stand in for Metal-ANGLE MediaPipe; also the tier ladder's coach line is a UX read | Same session; engineering view (`d`) open; then ⌘K "camera presentation · auto quality" ON | With cutout active, record a 15 s take; note render fps feel during recording; if your machine dips, watch for the coach's "camera effects paused" line and the return to raw | Smooth ≥ 45 fps recording with cutout ON (RTX box measured 58–60 fps, seg 15 Hz @ 10 ms — Metal should match or beat); if the floor genuinely breaks, the tier ladder degrades gracefully instead of stuttering | .local/rec-perf.json ON/OFF × both aspects; TierController unit-tested; T2 coach line wired | A stuttering flagship recording mode, or a tier system that thrashes | 5
 
 ### S7  Open World low-poly: flight, walking, rowing, dolphin, transitions
 _Entries deferred to V4 Open World completion._

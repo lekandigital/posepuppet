@@ -413,7 +413,7 @@ export function createLibrary(deps: LibraryDeps): Library {
       } else {
         play.textContent = 'hand loop';
         play.disabled = true;
-        play.title = 'hand loops replay through hand puppets — arrives with Recording v2';
+        play.title = 'hand loops don\'t replay yet — the ghost player drives body rigs (FUTURES.md)';
       }
       const edit = document.createElement('button');
       edit.className = 'mml-btn';

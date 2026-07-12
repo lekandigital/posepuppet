@@ -11,8 +11,9 @@ performances, a recording director with hands-free takes, setup guidance,
 honest avatar boundaries, and a seeded architecture for future
 body-controlled play.
 
-**Privacy: all inference runs in your browser. No frame, landmark, or
-recording ever leaves your machine.** No backend, no analytics, no
+**Privacy: all inference — pose, hands, and person segmentation — runs
+in your browser. No frame, landmark, mask, or recording ever leaves your
+machine.** No backend, no analytics, no
 telemetry. The command bar carries a live receipt — `LOCAL · 0 EXTERNAL
 REQUESTS SINCE LOAD` — backed by a real counter that flags any
 cross-origin request the moment it happens. Models, WASM, and fonts are
@@ -121,14 +122,23 @@ Architecture in `ARCHITECTURE.md`; asset manifest in `ASSETS.md`.
   replay** shows the last 5 s in slow motion from a side angle with
   trails; save named loops to IndexedDB and **re-skin** any loop onto any
   roster character. Playback only — nothing is scored, ever.
-- **Recording director** — guided takes (Character, Ghost Duet, Talking
-  Puppet) as shot-by-shot serif prompts over the stage; hands-free
-  control (raise both arms to start, cross wrists to stop) through a
-  gesture layer whose only consumer is take control; pre-take framing
-  check in coach language; **16:9 and 9:16 vertical** composite presets;
-  optional title stinger, privacy end card, corner badge, and grade;
-  pose-poster still export; a caption helper that copies an honest
-  caption after export.
+- **Recording director** — guided takes (Character, Ghost Duet, Cutout
+  Duet, Presentation Reel, Talking Puppet) as shot-by-shot serif prompts
+  over the stage; hands-free control (raise both arms to start, cross
+  wrists to stop) through a gesture layer whose only consumer is take
+  control; pre-take framing check in coach language; **16:9 and 9:16
+  vertical** composite presets; optional title stinger, privacy end
+  card, corner badge, and grade; pose-poster still export; a caption
+  helper that copies an honest caption after export.
+- **Performer presentation (V7)** — local person segmentation turns the
+  camera pane into a produced shot: background **blur**, background
+  **cutout**, luminous **silhouette**, a picture-in-picture **body
+  chip**, and the signature — your **cutout on the stage beside the
+  avatar** — plus an optional skeleton-ghost overlay. Take scripts set
+  presentation per shot, and a shot can be an **instant replay** of your
+  last seconds in slow motion, recorded inside the take. Segmentation
+  degrades itself (rate → resolution → off) before it ever costs the
+  frame-rate floor. See docs/RECORDING.md.
 - **Guidance** — a setup coach that says "Step back so your legs are
   visible" instead of "low hip visibility", capability labels on every
   avatar card, and an engineering view (`d`) with the raw dials.

@@ -1,3 +1,39 @@
+# STATUS — V7 Recording v2: Demo Director (feat/recording-v2)
+
+2026-07-12 · V7 COMPLETE — all three outcomes shipped; recorded-take
+acceptance deferred to FINAL_USER_TEST_PLAN S6 (S6.1–S6.5 written).
+
+- O1 segmentation pipeline: packages/segmentation (selfie segmenter,
+  classic CPU worker — spike-backed: XNNPACK 15.6 ms vs GPU-delegate
+  74.7 ms @256 px, no GPU contention), MaskBuffer EMA smoothing, six
+  presentation modes incl. the cutout-on-stage signature + skeleton
+  ghost, live preview, take-bar CAM control, TierController degradation
+  (24 Hz/256 px → 12 Hz/160 px → off + coach), adaptive mask-freshness
+  gate, debounced effective mode (chip/stage layouts never flap; raw
+  fallback is immediate).
+- O2 take scripts v2: per-shot presentation presets (override stack,
+  restored at take end), replay shots via Motion Memory recorded INSIDE
+  the take (slow-mo 0.5 sized to the shot); Cutout duet + Presentation
+  reel scripts; Character take closes on a replay; countdown/framing/
+  hands-free machinery untouched and green.
+- O3 composite polish + evidence: chip/stage full-bleed layouts at both
+  aspects, end card carries the take name, privacy copy names
+  segmentation (rail + README); eval/seg-quality.mjs (IoU 0.79–0.82 vs
+  hand labels, flicker ≤ 0.0104 — gates pass), eval/rec-perf.mjs
+  (floors hold with seg ON at both aspects while recording: 58–60 fps
+  render, ~29 Hz pose, seg 15 Hz @ 10 ms), eval/demo-takes.mjs (per-mode
+  packaged clips + scripted reel/duet + 9:16 stage clip →
+  .local/takes/v7); docs/RECORDING.md.
+- Suites: root suite green under the full-suite lock except the two
+  documented SwiftShader detect.spec ENVIRONMENT_BLOCKED failures
+  (identical to the V6 exit baseline); +14 segmentation specs; tsc
+  clean. Evidence: .local/v7-final.log, .local/shots/v7, EVAL_NOTES
+  §V7, DECISIONS §V7.
+- Not touched: pose-runtime/memory/rig internals (segmentation is a new
+  parallel package; memory consumed via the existing instantReplay
+  path); V5/V6-owned files untouched.
+
+
 # STATUS — V6 Motion Memory 2 (feat/motion-memory-2)
 
 2026-07-12 · V6 COMPLETE — all four outcomes shipped; live creative

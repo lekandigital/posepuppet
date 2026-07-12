@@ -1,5 +1,24 @@
 # Changelog
 
+## V7 — Recording v2: Demo Director (2026-07-12)
+
+Recording moved from capture to production. Local person segmentation
+(packages/segmentation: MediaPipe selfie segmenter in a classic CPU
+worker) powers six camera presentations — raw, blur, cutout, silhouette,
+picture-in-picture body chip, and the performer cutout ON the stage
+beside the avatar — with a skeleton-ghost overlay, live preview, a
+take-bar control, and a degradation ladder (24 Hz/256 px → 12 Hz/160 px
+→ off) that protects the frame-rate floor. Take scripts v2 set
+presentation per shot and can insert a slow-motion instant replay
+(Motion Memory) into the recording; new Cutout Duet and Presentation
+Reel scripts; the Character take closes on a replay. Both aspect
+presets; end card carries the take name; privacy copy extended to name
+segmentation. Verified: mask IoU 0.79–0.82 vs hand-labeled frames with
+edge flicker ≤ 0.0104 (eval/seg-quality.json); floors hold with
+segmentation ON at both aspects while recording (.local/rec-perf.json);
+14 new specs; hands-free flow unchanged and green.
+
+
 ## V6 — Motion Memory 2: the creative loop library (2026-07-12)
 
 Motion Memory v1 (ring buffer, ghost duet, echo chorus, instant replay,

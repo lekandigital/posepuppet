@@ -914,3 +914,60 @@ nothing uploaded".
 - v1 rail loop-list and ghost/replay/echo controls kept as-is; the
   library is additive (main.ts edits confined to the Motion Memory block
   + two palette entries; index.html to the Memory rail section).
+
+## 2026-07-12 — V7 Recording v2: segmentation lives in a classic CPU worker
+- Delegate: the spike (headed :2, RTX; .local/seg-spike-gpu.json) measured
+  the CPU/XNNPACK delegate FASTER than the GPU delegate for the selfie
+  segmenter (15.6 ms vs 74.7 ms avg @256 px) with far better tails (42 ms
+  vs 415 ms p95) — the GPU delegate contends with the page's own GPU
+  process, the same failure V1 root-caused for worker pose detection. CPU
+  in a dedicated worker = zero main-thread inference and zero GPU
+  contention.
+- Worker form: a CLASSIC worker served verbatim from public/seg-worker.js,
+  not a module worker in the package. Module workers under the Vite dev
+  server rewrite MediaPipe's internal dynamic import of the wasm loader
+  (`?import` on a public asset, which Vite refuses to serve as code) — the
+  worker never initialized in dev. MediaPipe's importScripts path is
+  untouched by any bundler, so dev and build behave identically. The CJS
+  bundle is copied next to the wasm at postinstall.
+- Mask transfer: MPMask.getAsFloat32Array() returns a VIEW over the wasm
+  heap — it must be .slice()d into a detachable buffer before postMessage
+  transfer (found by the first live probe: "ArrayBuffer is not
+  detachable", which also wedged the one-in-flight latch).
+- Mask freshness is adaptive: the staleness gate exists to catch a STALLED
+  worker, not a slow-but-live one. Window = max(400 ms, 2.5× measured mask
+  interval), capped at 2 s; on real hardware the 400 ms floor is what
+  applies (interval ~40 ms). Without this, SwiftShader-class machines
+  (~1.4 Hz masks) could never show any presentation mode even though masks
+  flow honestly — auto-tier still turns segmentation off when the render
+  floor actually suffers, and presentAutoTier=false is an explicit opt-in
+  to "show it regardless".
+- Layout follows the EFFECTIVE mode per frame with a 600 ms debounce and
+  an immediate drop to raw — a chip/stage take whose mask stalls falls
+  back to the classic two-pane composite instead of freezing the
+  performer; entering a masked layout waits out the debounce so layouts
+  never flap.
+- Selfie-segmenter model family (Apache-2.0 Google, same as pose/hand
+  landmarkers) recorded in ASSETS.md; fetched postinstall, served
+  same-origin. Both variants downloaded; landscape ships (square measured
+  2.2× slower on GPU, equal quality on the fixtures).
+- Replay take-steps reuse instantReplay wholesale (parameterized capture
+  window + rate) rather than a parallel path — the replay inside a take is
+  byte-for-byte the replay the button does, sized so rate 0.5 fills the
+  shot. Stillness-advance is disabled during replay shots (the performer
+  is SUPPOSED to hold still and watch).
+- Per-shot presets are an OVERRIDE stack on the presentation layer
+  (setOverride), never writes to config — a crashed/stopped take can't
+  leave the user's presentMode switched.
+- Blur is a downscale-upscale bounce (1/12 scale), not ctx.filter blur
+  over the live pane — the mission's frame-budget warning applies; the
+  bounce reads as defocus for ~zero cost.
+- TierController t=0 falsy-sentinel bug (belowSince=0 meaning both "unset"
+  and "set at t=0") caught by its unit test — same trap the intent
+  detector documented for lastFired. Sentinels are now -1.
+- IoU labels are hand-drawn polygons (eval/seg-labels/*.json, coordinates
+  only — no footage committed) on frames from fullbody/facetouch; the
+  facetouch frames deliberately include a hard wall shadow and foreground
+  table that the labels EXCLUDE, so shadow leakage costs IoU. Gates
+  calibrated for label roughness: frame ≥ 0.45, mean ≥ 0.55 (measured
+  0.79–0.82), flicker < 0.02 (measured 0.002–0.010).
