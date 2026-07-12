@@ -7,7 +7,7 @@ import '@fontsource-variable/fraunces/index.css';
 import './styles.css';
 
 import * as THREE from 'three';
-import { startCamera, startVideoFile, watchLayout, layoutOverlay, setMirrored } from './camera';
+import { watchLayout, layoutOverlay, setMirrored } from './ui/cameraLayout';
 import { createStage } from './stage/scene';
 import { createChain } from './ui/chain';
 import { createReceipt } from './ui/receipt';
@@ -22,22 +22,22 @@ import { RingBuffer, encodePoseFrame, encodeHandFrame } from './memory/stream';
 import { createGhostPlayer } from './memory/ghost';
 import { saveLoop, listLoops, loadLoop, deleteLoop } from './memory/store';
 import { createIntentDetector } from './gesture/intent';
-import { createBodyInputAdapter, type BodyInputAdapter } from './bodyinput/adapter';
-import type { BodyTracking, TrackingState } from '@bodyarcade/body-input';
 import { openFlight, defaultFlightUrl } from './bodyinput/flightBridge';
 import { createDirector } from './director/director';
 import { TAKE_SCRIPTS } from './director/scripts';
 import type { HandPuppetId } from './hand/types';
 import { createPanel, updatePpcStates } from './ui/panel';
 import { config, onConfigChange, setConfig } from './config';
-import { createDetector, type ModelVariant } from './pose/detector';
+import {
+  createPoseRuntime,
+  LandmarkSmoother,
+  LM,
+  type LandmarkPoint,
+  type ModelVariant,
+  type PoseRuntime,
+} from '@bodyarcade/pose-runtime';
 import { drawSkeleton } from './overlay/skeleton';
-import { LM } from './pose/indices';
-import { mirrorNorm, mirrorWorld } from './pose/mirror';
-import { LandmarkSmoother } from './pose/smoothing';
-import { PoseContinuity } from './pose/continuity';
 import { MASKS, createMasker } from './eval/masks';
-import type { LandmarkPoint, PoseFrame } from './pose/types';
 import { createRobot } from './rig/robot';
 import { Retargeter } from './rig/retarget';
 import type { Avatar, BoneName } from './rig/types';
@@ -620,22 +620,43 @@ async function boot() {
   smoother.setParams(config.minCutoff, config.beta);
   smoother.enabled = config.smoothing;
 
-  // Predictive Pose Continuity: sits at the fork so puppeteering AND
-  // body-input inherit it; exact pass-through while landmarks are visible
-  const continuity = new PoseContinuity();
-  continuity.enabled = config.ppc;
+  // PPC eval harness: ?mask=<spec> applies deterministic synthetic occlusion
+  // windows (keyed on video time) between mirroring and continuity — the
+  // same frame provides ground truth for the masked-run metrics
+  const maskName = params.get('mask');
+  const masker = maskName && MASKS[maskName] ? createMasker(MASKS[maskName]) : null;
+  if (maskName && !masker) console.warn(`unknown mask spec: ${maskName}`);
+  const lmTrace: object[] | null = params.has('lmtrace') ? [] : null;
+  if (lmTrace) (window as unknown as { __LMTRACE: object[] }).__LMTRACE = lmTrace;
+
+  // The tracking pipeline lives in @bodyarcade/pose-runtime: camera
+  // ownership, detection, mirroring, Predictive Pose Continuity (at the
+  // fork, so puppeteering AND body-input inherit it), body-input emission.
+  // The app taps frames in-process (same trust domain) and keeps its own
+  // smoothing → retarget path — pipeline order identical to pass 2.
+  const runtime: PoseRuntime = createPoseRuntime({
+    video,
+    model: modelVariant,
+    mirror: config.mirror,
+    ppc: config.ppc,
+    election: 'claim', // the app never yields; games elect strictly
+    interceptor: masker
+      ? (world, norm, videoTimeMs) => {
+          const mr = masker.apply(world, norm, videoTimeMs);
+          return { world: mr.world, norm: mr.norm, meta: mr };
+        }
+      : undefined,
+  });
 
   onConfigChange((key) => {
     if (key === 'minCutoff' || key === 'beta') smoother.setParams(config.minCutoff, config.beta);
     if (key === 'smoothing') smoother.enabled = config.smoothing;
-    if (key === 'ppc') {
-      continuity.enabled = config.ppc;
-      continuity.reset();
-    }
+    if (key === 'ppc') runtime.setPpc(config.ppc);
+    if (key === 'model') void runtime.setModel(config.model);
     if (key === 'mirror') {
       setMirrored(els, config.mirror);
       smoother.reset();
-      continuity.reset();
+      runtime.setMirror(config.mirror);
       retargeter.bind(avatar);
     }
   });
@@ -724,13 +745,18 @@ async function boot() {
   watchLayout(els);
   setMirrored(els, config.mirror);
 
+  // capture + pose model come up through the runtime; detection stays
+  // paused until the initial avatar settles (eval must measure the avatar
+  // it claims to measure — the pass-2 boot order, preserved)
+  runtime.pauseDetection();
   try {
     if (videoSrc) {
-      await startVideoFile(video, videoSrc);
+      await runtime.startVideoFile(videoSrc);
       hud.setLive(false);
       hud.setCam(`FILE ${video.videoWidth}×${video.videoHeight}`);
     } else {
-      await startCamera(video);
+      const st = await runtime.start();
+      if (st !== 'running') throw new Error(runtime.cameraError() ?? `camera unavailable (${st})`);
       hud.setLive(true);
       hud.setCam(`LIVE ${video.videoWidth}×${video.videoHeight}`);
     }
@@ -773,13 +799,12 @@ async function boot() {
   let fileMode = false;
   fileBtn.onclick = () => {
     if (fileMode) {
-      void startCamera(video).then(() => {
+      void runtime.start().then(() => {
         fileMode = false;
         fileBtn.textContent = 'load video';
         hud.setLive(true);
         hud.setCam(`LIVE ${video.videoWidth}×${video.videoHeight}`);
-        smoother.reset();
-        continuity.reset();
+        smoother.reset(); // continuity resets inside the runtime
         layoutOverlay(els);
       });
     } else {
@@ -789,13 +814,12 @@ async function boot() {
   fileInput.onchange = () => {
     const f = fileInput.files?.[0];
     if (!f) return;
-    void startVideoFile(video, f).then(() => {
+    void runtime.startVideoFile(f).then(() => {
       fileMode = true;
       fileBtn.textContent = '↩ camera';
       hud.setLive(false);
       hud.setCam(`FILE ${video.videoWidth}×${video.videoHeight}`);
       smoother.reset();
-      continuity.reset();
       layoutOverlay(els);
     });
   };
@@ -805,11 +829,7 @@ async function boot() {
   // measures the avatar it claims to measure
   if (config.avatar !== 'robot') await setAvatar(config.avatar);
 
-  statusEl.textContent = 'loading pose model…';
-  statusEl.classList.remove('hidden');
-  const detector = await createDetector(modelVariant);
-  statusEl.classList.add('hidden');
-  window.__PP.poseFps = () => detector.poseFps();
+  window.__PP.poseFps = () => runtime.poseFps();
 
   // every boot asset (model, wasm, fonts, avatar) is now in — from here on
   // the privacy receipt counts every network request, truthfully
@@ -937,15 +957,22 @@ async function boot() {
   }
 
   // ── body-input protocol: derived signals for BodyArcade consumers ──
-  // (landmarks go in here and only here; transports carry BodySignal only)
-  const bodyInput = createBodyInputAdapter();
-  (window as unknown as { __BI: BodyInputAdapter }).__BI = bodyInput;
+  // The adapter is absorbed into the runtime (landmarks enter it there and
+  // only there; transports carry BodySignal only). __BI keeps the stable
+  // test/debug surface: in-page source, core, last signal, tuner toggle.
+  const bodyInput = {
+    source: runtime.signals,
+    core: runtime.core,
+    lastSignal: () => runtime.lastSignal(),
+    toggleTuner: (host: HTMLElement) => runtime.toggleTuner(host),
+  };
+  (window as unknown as { __BI: typeof bodyInput }).__BI = bodyInput;
 
   // BodyArcade Flight entry: opens the game (same-origin /flight/) with
   // body signals streaming; PosePuppet drops to the lite model and pauses
   // its stage renderer while the game window is open (perf budget).
   const startFlight = () =>
-    openFlight(bodyInput, {
+    openFlight(runtime.signals, {
       setStageSuspended: (v) => stage.setSuspended(v),
       useLiteModel: () => {
         const prev = config.model;
@@ -972,7 +999,7 @@ async function boot() {
   // Fly's torso-scale axes are robust to lite and keep it (approved feel).
   const startRow = () =>
     openFlight(
-      bodyInput,
+      runtime.signals,
       {
         setStageSuspended: (v) => stage.setSuspended(v),
       },
@@ -985,7 +1012,7 @@ async function boot() {
   // depth), so the LITE model is safe here — same companion mode as Fly.
   const startSwim = () =>
     openFlight(
-      bodyInput,
+      runtime.signals,
       {
         setStageSuspended: (v) => stage.setSuspended(v),
         useLiteModel: () => {
@@ -1241,130 +1268,82 @@ async function boot() {
         bodyInput.toggleTuner(host);
       } },
   ]);
-  onConfigChange((key) => {
-    if (key === 'model') void detector.setModel(config.model);
-  });
 
   const evalCollector = evalFixture
     ? new EvalCollector(evalFixture, evalDuration, {
         stage,
-        detector,
+        detector: runtime.detector()!,
         video,
         getAvatar: () => avatar,
         getHeadRadius: () => retargeter.faceTouchDebug.left.headR,
         getFaceTouch: () => retargeter.faceTouchDebug,
-        getDetectionFps: () => (config.mode === 'hand' ? handMode.handFps() : detector.poseFps()),
+        getDetectionFps: () => (config.mode === 'hand' ? handMode.handFps() : runtime.poseFps()),
       })
     : null;
   evalCollector?.start();
 
-  // reusable mirror buffers — no per-frame allocation
-  const mNorm: LandmarkPoint[] = [];
-  const mWorld: LandmarkPoint[] = [];
-
-  // per-limb PPC states → body-input signal (additive tracking block);
-  // reused object, refreshed per pose frame
-  const ppcTracking: BodyTracking = {
-    torso: 'visible', head: 'visible', leftArm: 'visible',
-    rightArm: 'visible', leftLeg: 'visible', rightLeg: 'visible',
-  };
-  function currentTracking(): BodyTracking {
-    for (const s of continuity.states()) {
-      ppcTracking[s.name] = s.state.toLowerCase() as TrackingState;
-    }
-    return ppcTracking;
-  }
-
-  // PPC eval harness: ?mask=<spec> applies deterministic synthetic occlusion
-  // windows (keyed on video time) between mirroring and continuity — the
-  // same frame provides ground truth for the masked-run metrics
-  const maskName = params.get('mask');
-  const masker = maskName && MASKS[maskName] ? createMasker(MASKS[maskName]) : null;
-  if (maskName && !masker) console.warn(`unknown mask spec: ${maskName}`);
-  const lmTrace: object[] | null = params.has('lmtrace') ? [] : null;
-  if (lmTrace) (window as unknown as { __LMTRACE: object[] }).__LMTRACE = lmTrace;
-
-  function onPoseFrame(frame: PoseFrame | null) {
+  // Frame tap off the runtime (post-mirror, post-masker, post-PPC): the
+  // app-side fan-out — overlay, smoothing → retarget, ring buffer, intents,
+  // eval. Body-input emission already happened inside the runtime.
+  runtime.onFrame((f) => {
     // the camera overlay always draws the RAW detection — predicted
     // landmarks never appear over the real video (honesty line)
-    drawSkeleton(overlayCtx, frame ? frame.norm : null, overlay.width, overlay.height);
+    drawSkeleton(overlayCtx, f.raw ? f.raw.norm : null, overlay.width, overlay.height);
 
-    const tMs = frame ? frame.wallTimeMs : performance.now();
-    let world: LandmarkPoint[] | null = null;
-    let norm: LandmarkPoint[] | null = null;
-    if (frame) {
-      window.__PP.lastDetectionAt = frame.wallTimeMs;
+    if (f.raw) {
+      window.__PP.lastDetectionAt = f.raw.wallTimeMs;
       window.__PP.detectionCount++;
-      norm = config.mirror ? mirrorNorm(frame.norm, mNorm) : frame.norm;
-      world = config.mirror ? mirrorWorld(frame.world, mWorld) : frame.world;
     }
 
     // diagnostic trace (?lmtrace=1): raw pre-PPC landmark behavior for the
     // wrists/elbows — used to characterize what the detector really emits
     // during behind-torso occlusion (bounded; eval/debug only)
-    if (lmTrace && world && frame) {
+    if (lmTrace && f.truthWorld && f.raw) {
+      const w = f.truthWorld;
       const g = (i: number) => ({
-        v: Math.round(world![i].visibility * 100) / 100,
-        x: Math.round(world![i].x * 1000) / 1000,
-        y: Math.round(world![i].y * 1000) / 1000,
-        z: Math.round(world![i].z * 1000) / 1000,
+        v: Math.round(w[i].visibility * 100) / 100,
+        x: Math.round(w[i].x * 1000) / 1000,
+        y: Math.round(w[i].y * 1000) / 1000,
+        z: Math.round(w[i].z * 1000) / 1000,
       });
       if (lmTrace.length < 6000) {
-        lmTrace.push({ t: Math.round(frame.videoTimeMs), lw: g(15), rw: g(16), le: g(13), re: g(14) });
+        lmTrace.push({ t: Math.round(f.raw.videoTimeMs), lw: g(15), rw: g(16), le: g(13), re: g(14) });
       }
     }
 
-    const truthWorld = world;
-    const truthNorm = norm;
-    let masked: number[] = [];
-    let maskDropped = false;
-    if (masker && world && norm && frame) {
-      const mr = masker.apply(world, norm, frame.videoTimeMs);
-      world = mr.world;
-      norm = mr.norm;
-      masked = mr.masked;
-      maskDropped = mr.dropped;
-    }
-
-    // Predictive Pose Continuity: may briefly carry the stream through an
-    // occlusion (≤ 400 ms, decaying confidence) or synthesize through a
-    // short full dropout; null once faded — every consumer inherits it
-    const cont = continuity.apply(world, norm, tMs);
-
-    if (cont) {
-      const worldSmooth = smoother.apply(cont.world, tMs);
-      retargeter.updateFromPose(worldSmooth, cont.norm, tMs);
-      poseRing.push(encodePoseFrame(worldSmooth, cont.norm, tMs));
-      latestNorm = cont.norm;
-      intents.onLandmarks(cont.norm, tMs);
-      bodyInput.onPoseFrame(cont.world, cont.norm, tMs, config.ppc ? currentTracking() : undefined);
+    if (f.world && f.norm) {
+      const worldSmooth = smoother.apply(f.world, f.tsMs);
+      retargeter.updateFromPose(worldSmooth, f.norm, f.tsMs);
+      poseRing.push(encodePoseFrame(worldSmooth, f.norm, f.tsMs));
+      latestNorm = f.norm;
+      intents.onLandmarks(f.norm, f.tsMs);
     } else {
       retargeter.updateFromPose(null, null);
       latestNorm = null;
-      intents.onLandmarks(null, tMs);
-      bodyInput.onPoseFrame(null, null, tMs, config.ppc ? currentTracking() : undefined);
+      intents.onLandmarks(null, f.tsMs);
     }
 
     // detection honesty: a synthesized dropout frame is NOT a detection.
     // Masked runs sample sync against the TRUTH stream — the metric is
     // "did the puppet keep matching the real person while blind"
     if (masker) {
-      evalCollector?.onPoseFrame(frame ? truthNorm : null);
-      if (frame && truthWorld && truthNorm) {
+      const mr = (f.interceptor ?? null) as { masked: number[]; dropped: boolean } | null;
+      evalCollector?.onPoseFrame(f.raw ? f.truthNorm : null);
+      if (f.raw && f.truthWorld && f.truthNorm) {
         evalCollector?.onPpcFrame(
-          masker.spec.name, config.ppc, truthWorld, truthNorm, cont?.world ?? null,
-          masked, maskDropped, continuity.states(),
+          masker.spec.name, config.ppc, f.truthWorld, f.truthNorm, f.world,
+          mr?.masked ?? [], mr?.dropped ?? false, f.states,
         );
       }
     } else {
-      evalCollector?.onPoseFrame(frame && cont ? cont.norm : null);
+      evalCollector?.onPoseFrame(f.raw && f.norm ? f.norm : null);
     }
-  }
+  });
 
   // in hand mode the pose detector never starts (it would hallucinate a
   // body from the hand and pollute eval sync rows); switching back to
   // character mode starts it via applyMode
-  if (config.mode !== 'hand') detector.start(video, onPoseFrame);
+  if (config.mode !== 'hand') runtime.resumeDetection();
 
   // ── hand-only mode: a first-class mode beside Character ─────────────
   const stageLabel = document.getElementById('stage-label');
@@ -1391,7 +1370,7 @@ async function boot() {
     modeHandBtn.setAttribute('aria-pressed', String(hand));
     document.body.classList.toggle('hand-mode', hand);
     if (hand) {
-      detector.stop();
+      runtime.pauseDetection();
       avatar.object.visible = false;
       handMode.object.visible = true;
       stage.setTreatment('hand');
@@ -1404,7 +1383,7 @@ async function boot() {
       avatar.object.visible = true;
       stage.setTreatment('character');
       drawSkeleton(overlayCtx, null, overlay.width, overlay.height);
-      detector.start(video, onPoseFrame);
+      runtime.resumeDetection();
       hud.setSource('pose');
     }
     syncStageLabel();
@@ -1502,13 +1481,13 @@ async function boot() {
     if (hudAccum > 0.25) {
       hudAccum = 0;
       hud.setRenderFps(stage.renderFps());
-      hud.setPoseFps(config.mode === 'hand' ? handMode.handFps() : detector.poseFps());
+      hud.setPoseFps(config.mode === 'hand' ? handMode.handFps() : runtime.poseFps());
       hud.setRig(config.mode === 'hand' ? (handMode.lastDetectionAt() > 0 ? 1 : 0) : retargeter.activeBoneCount());
       hud.tick(window.__PP.lastDetectionAt, window.__PP.videoReady);
-      updatePpcStates(continuity.states());
+      updatePpcStates(runtime.ppcStates());
       visibilityCoach(performance.now());
 
-      const fps = detector.poseFps();
+      const fps = runtime.poseFps();
       const live = window.__PP.videoReady && performance.now() - window.__PP.lastDetectionAt < 1500;
       if (!tunerOffered && config.model === 'full' && live && fps > 0 && fps < 22) {
         lowFpsSec += 0.25;

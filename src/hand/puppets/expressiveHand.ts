@@ -5,7 +5,7 @@
 // avatars this pass).
 
 import * as THREE from 'three';
-import { HLM, HAND_CONNECTIONS, type HandFrame } from '../../pose/handDetector';
+import { HLM, HAND_CONNECTIONS, type HandFrame } from '@bodyarcade/pose-runtime';
 import type { HandPuppet } from '../types';
 import { normToStage } from '../palm';
 

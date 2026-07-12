@@ -16,7 +16,7 @@ test("flight render fps baseline (headed)", async () => {
   test.setTimeout(180_000);
 
   const browser = await chromium.launch({ headless: false });
-  const page = await browser.newPage({ baseURL: "http://localhost:5199" });
+  const page = await browser.newPage({ baseURL: `http://localhost:${process.env.FLIGHT_PORT ?? "5199"}` });
 
   await page.goto("/");
   await expect(page.locator("#btn-fly")).toBeVisible({ timeout: 20_000 });
@@ -203,7 +203,7 @@ test("rowing session: boat fps under stroke input (headed)", async () => {
   test.setTimeout(180_000);
 
   const browser = await chromium.launch({ headless: false });
-  const page = await browser.newPage({ baseURL: "http://localhost:5199" });
+  const page = await browser.newPage({ baseURL: `http://localhost:${process.env.FLIGHT_PORT ?? "5199"}` });
 
   await page.goto("/?row");
   await page.waitForFunction(

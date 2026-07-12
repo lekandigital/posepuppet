@@ -4,8 +4,8 @@
 // - browser take flow: a guided script runs shot-by-shot and the recorder
 //   produces a nonzero file; both aspect presets record nonzero files
 import { test, expect } from '@playwright/test';
-import { LM } from '../src/pose/indices';
-import type { LandmarkPoint } from '../src/pose/types';
+import { LM } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
 import { createIntentDetector } from '../src/gesture/intent';
 
 const lm = (x: number, y: number, z: number, visibility = 1): LandmarkPoint => ({ x, y, z, visibility });

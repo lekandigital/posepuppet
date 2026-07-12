@@ -6,11 +6,11 @@
 import * as THREE from 'three';
 import type { Stage } from '../stage/scene';
 import type { Avatar } from '../rig/types';
-import type { PoseDetector } from '../pose/detector';
-import type { LandmarkPoint } from '../pose/types';
+import type { PoseDetector } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
 import { sampleLimbAngles, SyncAccumulator, type LimbName } from './sync';
-import { PPC_GROUP_OF, type PpcGroupInfo } from '../pose/continuity';
-import { LM } from '../pose/indices';
+import { PPC_GROUP_OF, type PpcGroupInfo } from '@bodyarcade/pose-runtime';
+import { LM } from '@bodyarcade/pose-runtime';
 
 export interface EvalResult {
   fixture: string;

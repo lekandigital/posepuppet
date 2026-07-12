@@ -8,7 +8,7 @@ import {
   HAND_CONNECTIONS,
   type HandDetector,
   type HandFrame,
-} from '../pose/handDetector';
+} from '@bodyarcade/pose-runtime';
 import type { HandPuppet, HandPuppetDef, HandPuppetId } from './types';
 import { createExpressiveHand } from './puppets/expressiveHand';
 import { createBeaky } from './puppets/beaky';

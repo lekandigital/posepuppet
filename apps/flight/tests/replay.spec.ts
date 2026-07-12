@@ -20,7 +20,7 @@ import { resolve } from "node:path";
  * there.
  */
 
-const FLIGHT = "http://localhost:5199";
+const FLIGHT = `http://localhost:${process.env.FLIGHT_PORT ?? "5199"}`;
 
 test("recorded intent tape replays within documented tolerance", async () => {
   test.setTimeout(180_000);

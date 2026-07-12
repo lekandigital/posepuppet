@@ -3,7 +3,7 @@
 
 import { config, setConfig, resetConfig, type Config } from '../config';
 import type { BoneName } from '../rig/types';
-import type { PpcGroupInfo } from '../pose/continuity';
+import type { PpcGroupInfo } from '@bodyarcade/pose-runtime';
 
 /** Calibration hooks the panel drives; implemented by main over the live
  *  retargeter so avatar swaps keep working. */

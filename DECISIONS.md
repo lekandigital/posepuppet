@@ -832,3 +832,42 @@ lighting/fog/palette). Ambient audio: SKIPPED (optional). (10) The
 in-app ODbL credit renders in two places — under the minimap (with the
 bay name) and in the standing HUD attribution line with "all local,
 nothing uploaded".
+
+## V1 — Runtime + HUD (feat/pose-runtime-hud)
+
+- Lane port 5174 is occupied by an unrelated project's dev server
+  (aero-twitter-glass-lab, up since Jul 10, bound 0.0.0.0). Per process
+  safety it was left running; this lane uses PP_PORT=5184,
+  FLIGHT_PORT=5189, DOLPHIN_PORT=5187. Game suite ports were hardcoded and
+  are now env-parameterized — the first dolphin "baseline" was silently
+  hitting ANOTHER checkout's 5197 server (same commit, so results held,
+  but the hazard is fixed).
+- LICENSE_NOTES.md does not exist as a file; the TinySkies permission text
+  lives in ASSETS.md § "BodyArcade Flight — TinySkies/GlobeFly fork
+  manifest" (private record gitignored). The V1 audit item is satisfied
+  there — no new file invented.
+- HUD preview: 2D-canvas x-ray wireframe, NOT a VRM. Games ship their own
+  three versions (0.172 vs the app's 0.184); a VRM preview would bundle a
+  second three + GL context into every game page — the exact GPU cost the
+  budget forbids. "Cheap VRM or simpler" → simpler, in the frozen visual
+  language, with degradation tiers built in.
+- Producer election: traffic listen (BroadcastChannel + relay envelope) +
+  Web Locks (`bodyarcade-pose-producer`). Games elect 'strict' (yield to
+  an active producer); the Full App 'claim' (two app tabs each running a
+  camera is pre-extraction behavior and stays). The bridge appends
+  `?pp=companion` so a game opened FROM PosePuppet never opens a second
+  camera even cross-origin.
+- Full App consumes the composed runtime with an in-process onFrame tap
+  (same trust domain — retargeting needs landmarks). Smoothing stays
+  app-side because body-input takes PRE-smoothing landmarks; pipeline
+  order preserved exactly (mirror → masker → PPC → {smooth→retarget,
+  body-input}).
+- Rowing keeps the FULL pose model in the game-owned runtime (lite
+  wrist-depth collapse: 2/13 → 13/13 strokes, pass-2 measurement); flight
+  and dolphin run lite.
+- Game suites baseline on DISPLAY=:2 headed (xvfb software-GL fails their
+  timing/feel specs); the root suite's two detect.spec failures under
+  SwiftShader are pre-existing ENVIRONMENT_BLOCKED (they pass in the
+  gpu-performance project — 2026-07-10 baseline log).
+- pose-runtime is three-free; `bodyFrame.ts` (three-dependent, retarget
+  support) moved to src/rig/ instead of the package.

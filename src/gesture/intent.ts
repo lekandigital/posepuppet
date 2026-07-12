@@ -4,8 +4,8 @@
 // stop). Future body-controlled play could add intents here — as types
 // only, per the mission's DO-NOT-BUILD list (no games, no scoring).
 
-import { LM } from '../pose/indices';
-import type { LandmarkPoint } from '../pose/types';
+import { LM } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
 
 export type Intent =
   | 'take:start' // both wrists held above the head for ~1 s

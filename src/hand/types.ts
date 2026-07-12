@@ -3,7 +3,7 @@
 // — no scoring, no game state, ever.
 
 import type * as THREE from 'three';
-import type { HandFrame } from '../pose/handDetector';
+import type { HandFrame } from '@bodyarcade/pose-runtime';
 
 export interface HandPuppet {
   name: string;

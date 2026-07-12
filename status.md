@@ -1,3 +1,19 @@
+# STATUS — V1 Runtime + HUD (feat/pose-runtime-hud)
+
+2026-07-11 · O1 complete
+
+- packages/pose-runtime extracted (detector, hand detector, PPC, mirror,
+  smoothing, camera ownership, body-input emission, producer election,
+  HUD preview state); Full App boots on it — pipeline order preserved.
+- packages/pose-hud written (2D x-ray preview, tiers, keyboard access);
+  game retrofits staged next (O2/O3 verification).
+- Baselines recorded pre-change: root 105 pass / 2 SwiftShader
+  ENVIRONMENT_BLOCKED (pass on GPU project), flight-on-:2 26 pass /
+  1 driver console-error flake (offline.spec), dolphin 12 pass.
+- Lane ports: PP 5184, flight 5189, dolphin 5187 (5174 squatted by an
+  unrelated server — DECISIONS.md).
+- Next: O2/O3 game suite runs on :2, permission flows, perf table, docs.
+
 ## 2026-07-07 (GATE 2 APPROVED — Predictive Pose Continuity accepted)
 Gate: focused live retest passed all five items — slow hand exit predicted and returned smoothly; head stable through face crossings; behind-torso punch no longer whips or collapses; full dropout settles upright with no bend/spin; re-entries clean. Lekan: "the result now feels acceptable for Predictive Pose Continuity — I approve USER GATE 2"
 WebM observation resolved: hands-free take gesture (both wrists overhead ~1 s) started a take; finished takes auto-download locally by design (pass-2 feature, not a PPC bug; nothing leaves the machine)

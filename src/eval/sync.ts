@@ -4,8 +4,8 @@
 // Landmarks passed in must be in the same mirror space the avatar enacts.
 
 import * as THREE from 'three';
-import { LM } from '../pose/indices';
-import type { LandmarkPoint } from '../pose/types';
+import { LM } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
 import type { Avatar, JointName } from '../rig/types';
 
 export type LimbName =

@@ -4,8 +4,8 @@
 // the int16 quantization error. Runs in node like the other unit suites.
 import { test, expect } from '@playwright/test';
 import * as THREE from 'three';
-import { LM } from '../src/pose/indices';
-import type { LandmarkPoint } from '../src/pose/types';
+import { LM } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
 import { createRobot } from '../src/rig/robot';
 import { Retargeter } from '../src/rig/retarget';
 import {

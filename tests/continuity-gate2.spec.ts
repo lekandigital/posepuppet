@@ -8,9 +8,9 @@
 // (6) repeated dropout cycles → no cumulative rotational drift.
 import { test, expect } from '@playwright/test';
 import * as THREE from 'three';
-import { LM } from '../src/pose/indices';
-import type { LandmarkPoint } from '../src/pose/types';
-import { PoseContinuity, PPC } from '../src/pose/continuity';
+import { LM } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
+import { PoseContinuity, PPC } from '@bodyarcade/pose-runtime';
 import { createRobot } from '../src/rig/robot';
 import { Retargeter } from '../src/rig/retarget';
 

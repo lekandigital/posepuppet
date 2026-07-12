@@ -4,6 +4,7 @@
 // load same-origin; nothing touches the network.
 
 import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
+import type { DetectorAssets } from './detector';
 
 export interface HandPoint {
   x: number;
@@ -61,11 +62,11 @@ export interface HandDetector {
   dispose(): void;
 }
 
-async function buildLandmarker(delegate: 'GPU' | 'CPU') {
-  const fileset = await FilesetResolver.forVisionTasks('/mediapipe-wasm');
+async function buildLandmarker(delegate: 'GPU' | 'CPU', assets: DetectorAssets) {
+  const fileset = await FilesetResolver.forVisionTasks(assets.wasmBase ?? '/mediapipe-wasm');
   return HandLandmarker.createFromOptions(fileset, {
     baseOptions: {
-      modelAssetPath: '/models/hand_landmarker.task',
+      modelAssetPath: `${assets.modelsBase ?? '/models'}/hand_landmarker.task`,
       delegate,
     },
     runningMode: 'VIDEO',
@@ -76,15 +77,15 @@ async function buildLandmarker(delegate: 'GPU' | 'CPU') {
   });
 }
 
-export async function createHandDetector(): Promise<HandDetector> {
+export async function createHandDetector(assets: DetectorAssets = {}): Promise<HandDetector> {
   let delegate: 'GPU' | 'CPU' = 'GPU';
   let landmarker: HandLandmarker;
   try {
-    landmarker = await buildLandmarker('GPU');
+    landmarker = await buildLandmarker('GPU', assets);
   } catch (err) {
     console.warn('hand: GPU delegate failed, falling back to CPU/WASM', err);
     delegate = 'CPU';
-    landmarker = await buildLandmarker('CPU');
+    landmarker = await buildLandmarker('CPU', assets);
   }
 
   let stopped = false;

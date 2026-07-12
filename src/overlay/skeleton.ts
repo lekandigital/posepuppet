@@ -1,8 +1,8 @@
 // 2D skeleton overlay drawn in raw video pixel coordinates. The canvas is
 // CSS-mirrored together with the video, so no coordinate flipping here.
 
-import { CONNECTIONS, LM } from '../pose/indices';
-import type { LandmarkPoint } from '../pose/types';
+import { CONNECTIONS, LM } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
 
 const VIS_MIN = 0.5;
 

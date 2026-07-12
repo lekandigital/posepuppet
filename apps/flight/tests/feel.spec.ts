@@ -9,7 +9,7 @@ import { resolve } from "node:path";
  * (crouch_stand.y4m → altitude follows stature). Headed: see body.spec.ts.
  */
 
-const FLIGHT = "http://localhost:5199";
+const FLIGHT = `http://localhost:${process.env.FLIGHT_PORT ?? "5199"}`;
 const POSEPUPPET = `http://localhost:${process.env.PP_PORT ?? "5173"}`;
 const repoRoot = resolve(__dirname, "../../..");
 const crouchClip = resolve(repoRoot, "fixtures", "flight", "crouch_stand.y4m");

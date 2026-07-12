@@ -1,33 +1,13 @@
-// Webcam capture + overlay layout. The video is displayed mirrored via CSS;
-// the overlay canvas is laid out to exactly cover the video's content rect
-// (object-fit: contain math done here) and mirrored the same way, so overlay
-// drawing happens in raw video pixel coordinates and always lines up.
+// Camera panel layout: the overlay canvas is laid out to exactly cover the
+// video's content rect (object-fit: contain math done here) and mirrored
+// the same way, so overlay drawing happens in raw video pixel coordinates
+// and always lines up. Capture itself (getUserMedia / video files) lives in
+// @bodyarcade/pose-runtime — the runtime is the page's only capture owner.
 
 export interface CameraElements {
   video: HTMLVideoElement;
   overlay: HTMLCanvasElement;
   pane: HTMLElement;
-}
-
-export async function startCamera(video: HTMLVideoElement): Promise<MediaStream> {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
-    audio: false,
-  });
-  video.srcObject = stream;
-  await video.play();
-  return stream;
-}
-
-/** Plays a local video file through the same pipeline instead of the webcam. */
-export async function startVideoFile(video: HTMLVideoElement, src: string | File): Promise<void> {
-  if (video.srcObject) {
-    (video.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
-    video.srcObject = null;
-  }
-  video.src = typeof src === 'string' ? src : URL.createObjectURL(src);
-  video.loop = true;
-  await video.play();
 }
 
 /** Computes the object-fit:contain rect of the video inside its pane and

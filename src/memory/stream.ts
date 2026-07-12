@@ -6,8 +6,8 @@
 // small enough for IndexedDB without ceremony. Playback only — never
 // scored, never gamified.
 
-import type { LandmarkPoint } from '../pose/types';
-import type { HandPoint } from '../pose/handDetector';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
+import type { HandPoint } from '@bodyarcade/pose-runtime';
 
 export type LoopKind = 'pose' | 'hand';
 
