@@ -136,6 +136,9 @@ export default defineConfig({
       '@bodyarcade/pose-hud': fileURLToPath(
         new URL('./packages/pose-hud/src/index.ts', import.meta.url),
       ),
+      '@bodyarcade/segmentation': fileURLToPath(
+        new URL('./packages/segmentation/src/index.ts', import.meta.url),
+      ),
     },
   },
   server: {
