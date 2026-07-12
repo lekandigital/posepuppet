@@ -1250,3 +1250,95 @@ dark + light.
   gUM rejection is not NotAllowedError, so the HUD shows CAMERA ERROR
   rather than CAMERA DENIED; both carry the keyboard-play message and the
   specs accept both. Real user denials map to 'denied'.
+
+## V5 — Character Control (feat/character-control, 2026-07-12)
+
+All numbers below: headed Chromium on the NVIDIA :2 display under the
+display lock, 30 s per run, RTX box (cross-platform policy: final feel/perf
+validation remains Apple Silicon — S4). Baseline = pre-change tree at
+ffd555fd (eval/results-v5-baseline-headed.json); final =
+eval/results-v5-final-headed.json (copied to eval/results.json).
+
+### Suite
+- Baseline: 110 passed / 2 failed / 5 skipped — the two failures are the
+  documented pre-existing SwiftShader-only detect specs (ENVIRONMENT_BLOCKED).
+- Final: 116 passed / same 2 / 5 skipped — +6 V5 specs (capability gating
+  both directions, seven-socket sweeps on erika AND astronaut, feet state
+  machine, manifest ground truth + mislabel catches). One intermediate full
+  run had a one-off smoke.spec failure under SwiftShader suite load; it
+  passed in isolation and in the final full rerun (.local/v5-suite2.log) —
+  classified flake, not V5-attributable. Logs: .local/v5-*.log.
+
+### Sync (upper limbs °, baseline → final; lower is better)
+| fixture | robot | astronaut | erika |
+|---|---|---|---|
+| arms | 10.67 → 10.63 | 12.40 → 12.66 | 10.74 → 10.63 |
+| torso | 2.21 → 2.20 | 2.71 → 2.67 | 2.67 → 2.49 |
+| fast | 20.35 → 20.65 | 24.47 → 23.81 | 18.04 → 18.51 |
+| fullbody | 6.56 → 6.76 | 8.49 → 8.57 | 7.15 → 7.12 |
+All within run-to-run noise — no upper-body sync regression from fusion,
+sockets, or feet. facetouch-clip upper rose on robot (6.36 → 7.98) and
+astronaut (10.02 → 12.55) only: socket-anchored contact deliberately
+overrides raw wrist direction while engaged (the feature); erika improved
+(6.17 → 5.82). fullbody legsMean carries the documented planted-feet trade:
+6.36/7.23/6.45 → 7.08/9.71/7.34 (see O4 below and DECISIONS §V5).
+
+### O2 hand fusion (erika = the one manifest-approved rig)
+- fingerCurl input↔enacted correlation r = 1.00 on every run with real
+  input travel (inputRange 0.30–0.73; hand_open_close 0.73 — genuine
+  open/close cycles). Detection ~10 Hz against the 12 Hz cap.
+- ON vs OFF (erika, facetouch): pose 28.5 vs 29.5 fps, render 58.4 vs
+  60.0 — fusion costs ~1 pose fps / ~1.6 render fps here; floors hold.
+- Incapable rigs provably not driven: fusionGated=true,
+  fingerApplyCount=0 (spec-asserted on astronaut; robot has no chains).
+- Found via SwiftShader: hand detections must be stamped at detection
+  COMPLETION (detectForVideo is synchronous, ~1 s on CPU) or staleness
+  windows discard fresh results — fixed in the multi-hand path.
+
+### O3 face-touch v2
+- Synthetic seven-socket sweep (deterministic landmark drive through the
+  real retargeter): all seven classified + engaged on erika AND astronaut;
+  ZERO capsule interpenetration frames on erika (faceTouch "full");
+  astronaut re-labeled "limited" — helmet capsule r=0.385 m exceeds its
+  0.35 m arm reach, so the shell is geometrically unholdable (worst forced
+  depth ~0.84 r at the forehead; manifest faceTouchNote documents it).
+- facetouch.mp4 visits chin + thinkingPose (the fixture's actual gestures,
+  ~230 engaged frames/side/run — the dwell re-label works on real footage);
+  fast.mp4 brushes cheeks/mouthCover during shadowboxing with 0 penetration
+  frames on robot/erika (velocity gate holds).
+- Penetration metric is now SIGNED CAPSULE SURFACE DISTANCE of the enacted
+  wrist (stricter than pass-2's center-distance test, which is what had
+  hidden the astronaut geometry).
+
+### O4 feet v2 — skating (fullbody.mp4, net planted-ankle slide px/window)
+| state | robot | astronaut | erika |
+|---|---|---|---|
+| planting OFF (?feet=0, final code: results-v5-final-feet-off.json) | 24.0 | 21.9 | 17.9 |
+| planted-leg IK + foot-aware root (shipped: results-v5-final-headed.json) | 0.91 | 0.81 | 2.52 |
+7–27× reduction; per-frame jitter 0.25–0.45 px (was 1.2–2.4). The OFF row
+reproduces baseline legsMean exactly (6.31/7.17/6.40) — the legs-angle
+delta is fully attributable to the planting, nothing else. Contract
+threshold: mean slide < 5 px/window with planting on — met on all three.
+Journey (servo → freeze → IK) and the accepted legs-angle trade (legsMean
+6.36/7.23/6.45 → 7.08/9.71/7.34° — the baseline number was measured on
+sliding feet) in DECISIONS §V5. Plant/lift/replant state machine
+spec-covered; steps still relocate (7–10 windows ≈ the clip's step count).
+
+### Hand-only mode regression (untouched territory)
+pinch→jaw r: 0.979 / 0.867–0.875 (open_close / pinch_point) — identical to
+baseline; pose ~29.5 fps.
+
+### O1 manifest
+caps:check green against the live roster (robot, astronaut, erika; woody
+skipped as localOnly-absent). The regen run FALSIFIED the pass-2 mitten
+assumption: the astronaut has full 3-segment chains on both hands — vision
+review of open/fist screenshots (.local/shots/v5) shows the glove mesh
+curls as one blob, so the gate stays fingers=false as a DOCUMENTED
+demotion (fingersNote). Rules catch both promotion lies and silent
+demotions (spec-injected mislabels on erika and robot are caught).
+
+### Vision self-review
+Open/fist boards (.local/shots/v5): erika articulates clean fists;
+astronaut curls a single mitt — the manifest decision is visible in the
+pixels. Frozen visual language untouched: V5's only UI deltas are
+manifest-fed chip/note text and coach lines.

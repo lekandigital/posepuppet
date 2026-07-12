@@ -12,6 +12,14 @@ import { LM } from '@bodyarcade/pose-runtime';
 import { BodyFrame, mpToThree } from './bodyFrame';
 import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
 import type { Avatar, BoneName, JointName } from './types';
+import {
+  FaceSocketTracker,
+  capsuleSignedDistance,
+  capsuleSurfacePoint,
+  socketDirection,
+  type FaceSocketId,
+} from './faceSockets';
+import { FeetPlanting } from './feetPlanting';
 import { config } from '../config';
 
 const VIS_ON = 0.55;
@@ -141,9 +149,35 @@ export class Retargeter {
   // face-touch: per-avatar geometry captured at bind + per-side engagement
   private armLen = { left: { upper: 0.26, fore: 0.24 }, right: { upper: 0.26, fore: 0.24 } };
   private headRadius = 0.12;
+  /** capsule half-height along head-local Y (0 = sphere) */
+  private headHalfHeight = 0;
   private faceTouch = { left: 0, right: 0 }; // smoothed engagement weight
-  /** debug/eval: last avatar-space wrist→head distance per side (m), -1 = n/a */
-  readonly faceTouchDebug = { left: { w: 0, dist: -1, headR: 0.12 }, right: { w: 0, dist: -1, headR: 0.12 } };
+  /** face-touch v2: per-side socket classification + eased IK target */
+  private sockets = { left: new FaceSocketTracker(), right: new FaceSocketTracker() };
+  private socketTarget = { left: new THREE.Vector3(), right: new THREE.Vector3() };
+  private socketTargetSet = { left: false, right: false };
+  private lastPoseMs = 0;
+  /** debug/eval: engagement, avatar wrist→capsule signed distance (m),
+   *  active socket, penetration flag — per side; dist -1 = n/a */
+  readonly faceTouchDebug = {
+    left: { w: 0, dist: -1, headR: 0.12, socket: null as FaceSocketId | null, pen: false },
+    right: { w: 0, dist: -1, headR: 0.12, socket: null as FaceSocketId | null, pen: false },
+  };
+  // feet v2: planted-foot lock + weight shift (full-body mode)
+  private feet = new FeetPlanting();
+  private legLen = { left: { thigh: 0.4, shin: 0.38 }, right: { thigh: 0.4, shin: 0.38 } };
+  /** eval A/B (?feet=0): detection + metric stay live, enactment goes off
+   *  — measures the pre-V5 skating behavior on identical input */
+  feetEnabled = true;
+  private hipsNode: THREE.Object3D | null = null;
+  private hipsRest = new THREE.Quaternion();
+  private hipsRollTarget = 0;
+  private hipsRoll = 0;
+  private hipsRollActive = false;
+
+  /** hand-state routing: true = an external driver (hand-landmark fusion)
+   *  owns this side's finger state; pose approximation stands down */
+  private externalHandDrive = { left: false, right: false };
   // idle-life clock (micro weight shifts while tracking is lost)
   private idleT = 0;
 
@@ -246,10 +280,28 @@ export class Retargeter {
         };
       }
     }
+    // leg segment lengths for the planted-foot IK
+    for (const side of ['left', 'right'] as const) {
+      const hip = this.avatar.joints[`${side}Hip` as JointName];
+      const knee = this.avatar.joints[`${side}Knee` as JointName];
+      const ankle = this.avatar.joints[`${side}Ankle` as JointName];
+      if (hip && knee && ankle) {
+        hip.getWorldPosition(tmpV1);
+        knee.getWorldPosition(tmpV2);
+        ankle.getWorldPosition(tmpV3);
+        this.legLen[side] = {
+          thigh: Math.max(0.05, tmpV1.distanceTo(tmpV2)),
+          shin: Math.max(0.05, tmpV2.distanceTo(tmpV3)),
+        };
+      }
+    }
+
     const headNode = this.avatar.bones.head;
+    this.headHalfHeight = 0;
     if (this.avatar.headGeometry) {
-      // real geometry (robot: authored; VRM: skinned-vertex estimate)
+      // real geometry (robot: authored; VRM: skinned-vertex capsule fit)
       this.headRadius = this.avatar.headGeometry.radius;
+      this.headHalfHeight = this.avatar.headGeometry.halfHeightY ?? 0;
     } else if (headNode) {
       const box = new THREE.Box3().setFromObject(headNode);
       if (!box.isEmpty()) {
@@ -259,6 +311,22 @@ export class Retargeter {
     }
     this.faceTouchDebug.left.headR = this.headRadius;
     this.faceTouchDebug.right.headR = this.headRadius;
+    for (const side of ['left', 'right'] as const) {
+      this.sockets[side].reset();
+      this.socketTargetSet[side] = false;
+      this.faceTouchDebug[side].socket = null;
+      this.faceTouchDebug[side].pen = false;
+    }
+
+    // feet v2 + weight shift state
+    this.feet.reset();
+    this.hipsNode = this.avatar.bones.hips ?? null;
+    if (this.hipsNode) this.hipsRest.copy(this.hipsNode.quaternion);
+    this.hipsRollTarget = 0;
+    this.hipsRoll = 0;
+    this.hipsRollActive = false;
+    this.externalHandDrive.left = false;
+    this.externalHandDrive.right = false;
 
     // Hand bones: rest direction from the bone's position relative to its
     // parent. In T-pose, the hand continues along the forearm axis, so
@@ -280,6 +348,8 @@ export class Retargeter {
 
   /** frame timestamp for velocity estimation (frame time, not wall time) */
   private frameMs = 0;
+  /** seconds between the last two pose frames (socket dwell timing) */
+  private poseDt = 0.033;
 
   /** Per pose frame. Pass null when nothing was detected. frameMs is the
    *  FRAME timestamp — wall time for live capture, loop-local time for
@@ -288,8 +358,11 @@ export class Retargeter {
    *  garbage velocities: found by the Motion Memory round-trip test). */
   updateFromPose(world: LandmarkPoint[] | null, norm: LandmarkPoint[] | null, frameMs?: number): void {
     this.frameMs = frameMs ?? this.frameMs + 33.3; // assume ~30fps when untimed
+    this.poseDt = this.lastPoseMs > 0 ? THREE.MathUtils.clamp((this.frameMs - this.lastPoseMs) / 1000, 0.01, 0.2) : 0.033;
+    this.lastPoseMs = this.frameMs;
     if (!world || !norm) {
       for (const st of this.states.values()) st.confident = false;
+      this.feet.updateDetection(null, null, this.frameMs);
       return;
     }
 
@@ -353,6 +426,8 @@ export class Retargeter {
     }
 
     if (bodyOk) this.updateFaceTouch(world);
+    if (config.bodyMode === 'full') this.updateFeet(norm);
+    else this.feet.updateDetection(null, null, this.frameMs);
 
     // confidence transitions for occlusion recovery: a regained bone blends
     // from where it was held back to live over REACQ_SEC — never snaps
@@ -661,7 +736,12 @@ export class Retargeter {
         const hs = this.handStates[side];
         hs.openness += (raw - hs.openness) * 0.25; // EMA — no flicker
         hs.point = (dIndex - dPinky) / forearm > POINT_GAP && hs.openness < 0.75;
-        this.avatar.applyHandState?.(side, hs.openness, hs.point);
+        // fusion routing: when hand-landmark fusion drives this side's
+        // fingers (capability-gated, set by the app), the pose
+        // approximation stands down instead of fighting it
+        if (!this.externalHandDrive[side]) {
+          this.avatar.applyHandState?.(side, hs.openness, hs.point);
+        }
       }
     }
   }
@@ -712,35 +792,74 @@ export class Retargeter {
       ft[side] += (w - ft[side]) * 0.3; // contact easing
       dbg.w = ft[side];
       dbg.dist = -1;
-      if (ft[side] < 0.02) continue;
+      if (ft[side] < 0.02) {
+        dbg.socket = null;
+        dbg.pen = false;
+        this.socketTargetSet[side] = false;
+        continue;
+      }
 
-      // avatar-side IK target: head surface point in the direction the
-      // person's wrist sits relative to their head (mirrored space ≈ stage)
       const headNode = this.avatar.bones.head;
       const shoulderJ = this.avatar.joints[`${side}Shoulder` as JointName];
       if (!headNode || !shoulderJ) continue;
+
+      // v2: classify the wrist offset in the PERSON'S head frame (ears +
+      // nose basis — same construction as updateHead) into a named socket.
+      // Fixed sockets keep the contact glued to the face where v1's raw
+      // wrist direction wobbled with detection noise, and a turned head
+      // carries its sockets with it.
       mpToThree(world[wristIdx], tmpV1);
       const dirOff = tmpV1.sub(headP);
       if (dirOff.lengthSq() < 1e-6) dirOff.set(side === 'left' ? 1 : -1, 0, 0.3);
       dirOff.normalize();
-      // bias the contact onto the PERSON'S front hemisphere (their face
-      // normal from ears→nose) — forcing camera-z here put the contact on
-      // the wrong side whenever the body was turned (Gate-3 live finding)
+      // head basis: hx right→left ear, hz facing (biased by nose), hy up
+      mpToThree(world[LM.leftEar], tmpV2);
+      mpToThree(world[LM.rightEar], tmpV3);
+      const hx = tmpV2.sub(tmpV3).normalize().clone();
       const nose = world[LM.nose];
+      let hz: THREE.Vector3;
       if (nose.visibility > VIS_OFF) {
         mpToThree(nose, tmpV2);
-        tmpV2.sub(headP).normalize(); // person's face normal (mirrored space)
-        const d = dirOff.dot(tmpV2);
-        if (d < 0.2) dirOff.addScaledVector(tmpV2, 0.2 - d).normalize();
+        hz = tmpV2.sub(headP).normalize().clone();
       } else {
-        dirOff.z = Math.abs(dirOff.z) * 0.6 + 0.25;
-        dirOff.normalize();
+        hz = new THREE.Vector3(0, 0, 1); // mirrored space faces the camera
       }
+      const hy = new THREE.Vector3().crossVectors(hz, hx).normalize();
+      hz = new THREE.Vector3().crossVectors(hx, hy).normalize();
+      // wrist offset in head-frame components
+      tmpV2.set(dirOff.dot(hx), dirOff.dot(hy), dirOff.dot(hz));
+      if (tmpV2.z < 0.05) tmpV2.z = 0.05; // contacts live on the face, not inside the skull
+      tmpV2.normalize();
+      const socket = this.sockets[side].classify(tmpV2, side, foreSt.velAngle, this.poseDt);
+      dbg.socket = socket;
 
+      // socket's canonical direction back to world through the head basis
+      socketDirection(socket, tmpV2.x < 0, tmpV3);
+      const sockWorld = new THREE.Vector3()
+        .addScaledVector(hx, tmpV3.x)
+        .addScaledVector(hy, tmpV3.y)
+        .addScaledVector(hz, tmpV3.z)
+        .normalize();
+
+      // avatar-side IK target: the socket's point on the head CAPSULE, a
+      // skin's width outside the surface — inside-the-skull targets are
+      // impossible by construction
       const headGeo = this.avatar.headGeometry;
       headNode.getWorldPosition(tmpV2);
       if (headGeo) headNode.localToWorld(tmpV2.copy(headGeo.centerLocal));
-      const target = tmpV2.clone().addScaledVector(dirOff, this.headRadius * 1.18);
+      const capC = tmpV2.clone();
+      const capAxis = tmpV3.set(0, 1, 0).applyQuaternion(headNode.getWorldQuaternion(tmpQ1)).normalize().clone();
+      const rawTarget = new THREE.Vector3();
+      capsuleSurfacePoint(capC, capAxis, this.headHalfHeight, this.headRadius, sockWorld, 0.15, rawTarget);
+      // socket-change easing: the enacted target glides between sockets
+      const stgt = this.socketTarget[side];
+      if (!this.socketTargetSet[side]) {
+        stgt.copy(rawTarget);
+        this.socketTargetSet[side] = true;
+      } else {
+        stgt.lerp(rawTarget, Math.min(1, this.poseDt * 9));
+      }
+      const target = stgt.clone();
       const S = shoulderJ.getWorldPosition(new THREE.Vector3());
 
       // two-bone IK (law of cosines), pole pushes the elbow down-and-out
@@ -775,10 +894,177 @@ export class Retargeter {
       const forePredParentQ = upperParentQ.multiply(upperSt.liveTarget); // upper node IS the forearm's parent
       this.blendDirIntoTarget(foreSt, dirFore, ft[side], forePredParentQ);
 
-      // eval/debug: where would the avatar wrist land relative to its head
-      // center (tmpV2 still holds it)
-      dbg.dist = elbow.addScaledVector(dirFore, L2).distanceTo(tmpV2);
+      // eval/debug: signed distance of the IK-predicted wrist to the head
+      // capsule SURFACE (< 0 would be inside — construction forbids it)
+      dbg.dist = capsuleSignedDistance(
+        elbow.addScaledVector(dirFore, L2), capC, capAxis, this.headHalfHeight, this.headRadius,
+      );
+      dbg.pen = dbg.dist < -this.headRadius * 0.12;
     }
+  }
+
+  /** Signed distance (m) of the avatar's ENACTED wrist joint to the head
+   *  capsule surface — the eval's interpenetration ground truth. NaN when
+   *  the rig lacks the joints. */
+  wristCapsuleDistance(side: 'left' | 'right'): number {
+    const wristJ = this.avatar.joints[`${side}Wrist` as JointName];
+    const headNode = this.avatar.bones.head;
+    if (!wristJ || !headNode) return Number.NaN;
+    const headGeo = this.avatar.headGeometry;
+    headNode.getWorldPosition(tmpV2);
+    if (headGeo) headNode.localToWorld(tmpV2.copy(headGeo.centerLocal));
+    tmpV3.set(0, 1, 0).applyQuaternion(headNode.getWorldQuaternion(tmpQ1)).normalize();
+    wristJ.getWorldPosition(tmpV1);
+    return capsuleSignedDistance(tmpV1, tmpV2, tmpV3, this.headHalfHeight, this.headRadius);
+  }
+
+  /** Feet v2 (full-body mode): plant detection from normalized landmarks,
+   *  planted-sole leveling, anchor drift → root correction, weight shift. */
+  private updateFeet(norm: LandmarkPoint[]): void {
+    const foot = (ankleIdx: number, toeIdx: number) => {
+      const a = norm[ankleIdx];
+      const t = norm[toeIdx];
+      const vis = Math.min(a.visibility, t.visibility);
+      return vis > 0 ? { x: (a.x + t.x) / 2, y: Math.max(a.y, t.y), visibility: vis } : null;
+    };
+    const lf = foot(LM.leftAnkle, LM.leftFootIndex);
+    const rf = foot(LM.rightAnkle, LM.rightFootIndex);
+    this.feet.updateDetection(lf, rf, this.frameMs);
+
+    for (const side of ['left', 'right'] as const) {
+      if (!this.feetEnabled) break; // A/B: no sole leveling either
+      const w = this.feet.plantedWeight(side);
+      const st = this.states.get(`${side}Foot` as BoneName);
+      if (!st || w < 0.02 || !st.confident) continue;
+      // planted sole levels out: world orientation back toward the bind
+      // rest (standing flat), expressed in the CURRENT parent frame
+      st.node.parent!.getWorldQuaternion(tmpQ1).invert();
+      tmpQ2.copy(tmpQ1).multiply(st.restWorld).multiply(st.correction);
+      st.liveTarget.slerp(tmpQ2, w * 0.85);
+    }
+
+    if (!this.feetEnabled) return; // A/B: no anchoring, no weight shift
+
+    // planted-leg IK: aim each planted leg's ankle at its captured world
+    // anchor (two-bone, same law-of-cosines core as face-touch). This is
+    // what actually kills skating — the feet decouple from root sway. A
+    // reach overrun (a real step or big root move) releases the plant.
+    for (const side of ['left', 'right'] as const) {
+      const w = this.feet.plantedWeight(side);
+      if (!this.feet.isPlanted(side) && w < 0.02) continue;
+      const hipJ = this.avatar.joints[`${side}Hip` as JointName];
+      const ankleJ = this.avatar.joints[`${side}Ankle` as JointName];
+      const upperSt = this.states.get(`${side}UpperLeg` as BoneName);
+      const lowerSt = this.states.get(`${side}LowerLeg` as BoneName);
+      if (!hipJ || !ankleJ || !upperSt || !lowerSt) continue;
+      if (!upperSt.restDirParentLocal || !lowerSt.restDirParentLocal) continue;
+
+      const anchor = this.feet.anchorFor(side, ankleJ.getWorldPosition(tmpV1));
+      if (!anchor) continue;
+      const H = hipJ.getWorldPosition(new THREE.Vector3());
+      const L1 = this.legLen[side].thigh;
+      const L2 = this.legLen[side].shin;
+      const toA = anchor.clone().sub(H);
+      let d = toA.length();
+      // a standing rest leg is already ~fully extended (d ≈ L1+L2), so a
+      // tight reach check would release every frame. Instead: clamp the
+      // effective target within reach (a lean away leaves the ankle a hair
+      // short of the anchor — bounded residual, not a skate), and release
+      // only on a clear overrun, which is a real step/relocation.
+      if (d > (L1 + L2) * 1.06) {
+        this.feet.forceRelease(side);
+        continue;
+      }
+      const maxD = (L1 + L2) * 0.995;
+      if (d > maxD) d = maxD;
+      const dirHA = toA.multiplyScalar(1 / Math.max(toA.length(), 1e-6));
+      const cosA = THREE.MathUtils.clamp((L1 * L1 + d * d - L2 * L2) / (2 * L1 * Math.max(d, 1e-6)), -1, 1);
+      // (d is the clamped distance; dirHA keeps the true direction)
+      const alpha = Math.acos(cosA);
+      // pole: knees bend toward the camera (+z), never backwards
+      const pole = new THREE.Vector3(0, 0, 1);
+      const axis = new THREE.Vector3().crossVectors(dirHA, pole);
+      if (axis.lengthSq() < 1e-6) axis.set(1, 0, 0);
+      axis.normalize();
+      const dirThigh = dirHA.clone().applyQuaternion(tmpQ1.setFromAxisAngle(axis, alpha));
+      const knee = H.clone().addScaledVector(dirThigh, L1);
+      const dirShin = anchor.clone().sub(knee).normalize();
+      const upperParentQ = upperSt.node.parent!.getWorldQuaternion(new THREE.Quaternion());
+      this.blendDirIntoTarget(upperSt, dirThigh, w, upperParentQ);
+      const lowerPredParentQ = upperParentQ.multiply(upperSt.liveTarget);
+      this.blendDirIntoTarget(lowerSt, dirShin, w, lowerPredParentQ);
+      upperSt.confident = true; // IK owns the leg while planted
+      lowerSt.confident = true;
+    }
+
+    // foot-aware root X: with ankles pinned by the IK, the ROOT must place
+    // the hips over the feet with the PERSON'S own hip-over-feet lean, or
+    // the avatar's leg angles diverge from the person's (the generic
+    // root-motion heuristic cost ~5-9° of legs sync when feet were pinned
+    // — measured 2026-07-12). lean = normalized hip offset over the ankle
+    // midpoint, re-scaled by THIS rig's leg length.
+    const lhN = norm[LM.leftHip];
+    const rhN = norm[LM.rightHip];
+    if (
+      lf && rf && Math.min(lhN.visibility, rhN.visibility) > VIS_ON &&
+      (this.feet.isPlanted('left') || this.feet.isPlanted('right'))
+    ) {
+      const la2 = this.avatar.joints.leftAnkle;
+      const ra2 = this.avatar.joints.rightAnkle;
+      if (la2 && ra2) {
+        const ankleMidX =
+          (la2.getWorldPosition(tmpV1).x + ra2.getWorldPosition(tmpV2).x) / 2;
+        const hipXn = (lhN.x + rhN.x) / 2;
+        const footXn = (lf.x + rf.x) / 2;
+        const legHn = Math.max(Math.abs((lf.y + rf.y) / 2 - (lhN.y + rhN.y) / 2), 0.08);
+        const lean = THREE.MathUtils.clamp((hipXn - footXn) / legHn, -0.6, 0.6);
+        const Lw = (this.legLen.left.thigh + this.legLen.left.shin +
+                    this.legLen.right.thigh + this.legLen.right.shin) / 2;
+        const desiredRootX = ankleMidX + lean * Lw * 0.9 - this.rootRest.x;
+        this.rootTarget.x = THREE.MathUtils.clamp(desiredRootX, -0.6, 0.6);
+      }
+    }
+
+    // weight shift: hips roll toward the stance foot (subtle, clamped)
+    const lh = norm[LM.leftHip];
+    const rh = norm[LM.rightHip];
+    if (lf && rf && Math.min(lh.visibility, rh.visibility) > VIS_ON) {
+      const shift = this.feet.weightShift((lh.x + rh.x) / 2, lf.x, rf.x);
+      // mirrored norm x grows to stage right (world +x): weight over the
+      // stage-right foot tips the pelvis top slightly left — reads as a
+      // hip pop, never a lean (chest enactment re-aims above it)
+      // small and slow: the roll swings the ANKLES (hips is the leg
+      // parent) — at ±3° it out-skated the planting it was meant to dress
+      this.hipsRollTarget = shift === null ? 0 : shift * -0.03; // ≤ ~1.7°
+    } else {
+      this.hipsRollTarget = 0;
+    }
+  }
+
+  /** Hand-state routing: an external driver (hand-landmark fusion) owns
+   *  this side's finger state; the pose approximation stands down until
+   *  released (fusion staleness flips it back). */
+  setExternalHandDrive(side: 'left' | 'right', on: boolean): void {
+    this.externalHandDrive[side] = on;
+  }
+
+  /** Feet debug/eval surface. */
+  feetDebug(): {
+    left: { planted: boolean; weight: number; plantEvents: number };
+    right: { planted: boolean; weight: number; plantEvents: number };
+  } {
+    return {
+      left: {
+        planted: this.feet.isPlanted('left'),
+        weight: this.feet.plantedWeight('left'),
+        plantEvents: this.feet.plantEvents('left'),
+      },
+      right: {
+        planted: this.feet.isPlanted('right'),
+        weight: this.feet.plantedWeight('right'),
+        plantEvents: this.feet.plantEvents('right'),
+      },
+    };
   }
 
   /** Swing st toward pointing its limb axis along dirWorld, blended by w.
@@ -904,7 +1190,27 @@ export class Retargeter {
       }
     }
 
-    // root: heavily smoothed, never skates
+    // feet v2: planted-anchor correction + weight-shift hips roll
+    this.feet.tick(dt);
+    if (this.hipsNode) {
+      const kh = 1 - Math.exp(-3 * dt);
+      this.hipsRoll += (this.hipsRollTarget - this.hipsRoll) * kh;
+      // stateful write: hips are otherwise untouched by the retargeter
+      // (test hooks pose them directly) — only own the node while a roll
+      // is actually enacted, restoring rest exactly once on release
+      if (Math.abs(this.hipsRoll) > 1e-3) {
+        tmpQ1.setFromEuler(tmpE.set(0, 0, this.hipsRoll));
+        this.hipsNode.quaternion.copy(this.hipsRest).multiply(tmpQ1);
+        this.hipsRollActive = true;
+      } else if (this.hipsRollActive) {
+        this.hipsNode.quaternion.copy(this.hipsRest);
+        this.hipsRollActive = false;
+      }
+    }
+
+    // root: heavily smoothed, never skates — the pass-2 path, untouched.
+    // Feet v2 does NOT correct the root: planted-leg IK pins the ankles
+    // while the root keeps tracking the person (hips sway over the feet).
     const kr = 1 - Math.exp(-6 * dt);
     tmpV1.copy(this.rootRest).add(this.rootTarget);
     this.avatar.object.position.lerp(tmpV1, kr);

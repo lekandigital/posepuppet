@@ -7,7 +7,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { VRMLoaderPlugin, VRMUtils, type VRM } from '@pixiv/three-vrm';
-import type { Avatar, BoneName, JointName } from './types';
+import type { Avatar, AvatarCapabilityReport, BoneName, FingerCurls, FingerName, JointName } from './types';
 
 /** humanoid bone → our BoneName (VRM names match ours for the driven set) */
 const VRM_BONES: BoneName[] = [
@@ -93,7 +93,7 @@ export async function loadVrmAvatar(url: string): Promise<Avatar> {
   // head-LOCAL space + a radius. (A bbox of the head node finds nothing on
   // skinned meshes — that gap put the astronaut's contact target inside
   // its helmet, found at the Gate-3 live test.)
-  let headGeometry: { centerLocal: THREE.Vector3; radius: number } | undefined;
+  let headGeometry: { centerLocal: THREE.Vector3; radius: number; halfHeightY?: number } | undefined;
   const headBone = vrm.humanoid.getRawBoneNode('head');
   if (headBone) {
     gltf.scene.updateWorldMatrix(true, true);
@@ -132,12 +132,29 @@ export async function loadVrmAvatar(url: string): Promise<Avatar> {
       const centroid = new THREE.Vector3();
       for (const p of pts) centroid.add(p);
       centroid.divideScalar(pts.length);
-      // radius: 95th percentile distance (outlier-tolerant)
-      const dists = pts.map((p) => p.distanceTo(centroid)).sort((a, b) => a - b);
-      const radius = THREE.MathUtils.clamp(dists[Math.floor(dists.length * 0.95)], 0.08, 0.4);
+      // capsule fit (face-touch v2): heads are taller than wide — a sphere
+      // wide enough for the crown pushed cheek/chin contacts visibly off
+      // the face. Split the extent into a radial part (95th percentile
+      // horizontal distance in head-local space) and a vertical half-height.
       const centerLocal = headBone.worldToLocal(centroid.clone());
-      headGeometry = { centerLocal, radius };
-      console.info(`[VRM] head collider: r=${radius.toFixed(3)}m from ${pts.length} sampled vertices`);
+      const lp = new THREE.Vector3();
+      const radials: number[] = [];
+      const verts: number[] = [];
+      for (const p of pts) {
+        headBone.worldToLocal(lp.copy(p)).sub(centerLocal);
+        radials.push(Math.hypot(lp.x, lp.z));
+        verts.push(Math.abs(lp.y));
+      }
+      radials.sort((a, b) => a - b);
+      verts.sort((a, b) => a - b);
+      const radius = THREE.MathUtils.clamp(radials[Math.floor(radials.length * 0.95)], 0.08, 0.4);
+      const yExtent = verts[Math.floor(verts.length * 0.95)];
+      const halfHeightY = THREE.MathUtils.clamp(yExtent - radius, 0, 0.25);
+      headGeometry = { centerLocal, radius, halfHeightY };
+      console.info(
+        `[VRM] head collider: capsule r=${radius.toFixed(3)}m h/2=${halfHeightY.toFixed(3)}m ` +
+        `from ${pts.length} sampled vertices`,
+      );
     }
   }
   // finger chains for open/fist/point approximations (where the rig has
@@ -146,7 +163,7 @@ export async function loadVrmAvatar(url: string): Promise<Avatar> {
   // lying in the palm plane — instead of assuming a per-convention axis
   // (which bent the astronaut's fingers backwards live).
   type FingerSeg = { node: THREE.Object3D; rest: THREE.Quaternion; axis: THREE.Vector3 };
-  type FingerChain = { segs: FingerSeg[]; isThumb: boolean };
+  type FingerChain = { segs: FingerSeg[]; isThumb: boolean; finger: FingerName };
   const fingerChains: Record<'left' | 'right', FingerChain[]> = { left: [], right: [] };
   gltf.scene.updateWorldMatrix(true, true);
   for (const side of ['left', 'right'] as const) {
@@ -199,7 +216,9 @@ export async function loadVrmAvatar(url: string): Promise<Avatar> {
         const axisLocal = axisW.applyQuaternion(parentWorldInv).normalize();
         segs.push({ node, rest: node.quaternion.clone(), axis: axisLocal });
       }
-      if (segs.length) fingerChains[side].push({ segs, isThumb: finger === 'Thumb' });
+      if (segs.length) {
+        fingerChains[side].push({ segs, isThumb: finger === 'Thumb', finger: finger.toLowerCase() as FingerName });
+      }
     }
   }
   const curlQ = new THREE.Quaternion();
@@ -220,11 +239,9 @@ export async function loadVrmAvatar(url: string): Promise<Avatar> {
     applyHandState(side, openness, point) {
       const chains = fingerChains[side];
       if (!chains.length) return;
-      for (let f = 0; f < chains.length; f++) {
-        const chain = chains[f];
-        // pointing: index (first non-thumb chain) stays extended
-        const isIndex = !chain.isThumb && f === (chains[0]?.isThumb ? 1 : 0);
-        const ext = point && isIndex ? 1 : openness;
+      for (const chain of chains) {
+        // pointing: index stays extended
+        const ext = point && chain.finger === 'index' ? 1 : openness;
         const maxCurl = chain.isThumb ? 0.45 : 1.05; // rad at the proximal joint
         for (let i = 0; i < chain.segs.length; i++) {
           const seg = chain.segs[i];
@@ -233,6 +250,71 @@ export async function loadVrmAvatar(url: string): Promise<Avatar> {
           seg.node.quaternion.copy(seg.rest).multiply(curlQ);
         }
       }
+    },
+    applyFingerCurls(side, curls: FingerCurls, point) {
+      // true per-finger driving (hand-landmark fusion, V5): same per-segment
+      // curl axes as applyHandState, but each finger gets its own value
+      const chains = fingerChains[side];
+      if (!chains.length) return;
+      for (const chain of chains) {
+        let curl = curls[chain.finger];
+        if (point && chain.finger === 'index') curl = 0;
+        const maxCurl = chain.isThumb ? 0.5 : 1.35; // rad at the proximal joint
+        for (let i = 0; i < chain.segs.length; i++) {
+          const seg = chain.segs[i];
+          const segCurl = curl * maxCurl * (i === 0 ? 1 : 0.75);
+          curlQ.setFromAxisAngle(seg.axis, segCurl);
+          seg.node.quaternion.copy(seg.rest).multiply(curlQ);
+        }
+      }
+    },
+    fingerCurlEnacted(side) {
+      const chains = fingerChains[side];
+      let sum = 0;
+      let n = 0;
+      for (const chain of chains) {
+        if (chain.isThumb) continue;
+        const seg = chain.segs[0];
+        sum += Math.min(1, seg.rest.angleTo(seg.node.quaternion) / 1.35);
+        n++;
+      }
+      return n ? sum / n : Number.NaN;
+    },
+    describeCapabilities(): AvatarCapabilityReport {
+      const chainReport = (side: 'left' | 'right') => {
+        const out: Partial<Record<FingerName, number>> = {};
+        for (const chain of fingerChains[side]) out[chain.finger] = chain.segs.length;
+        return out;
+      };
+      const hasChains = fingerChains.left.length > 0 || fingerChains.right.length > 0;
+      root.updateWorldMatrix(true, true);
+      const box = new THREE.Box3().setFromObject(root);
+      const armSeg = (side: 'left' | 'right') => {
+        const s = joints[`${side}Shoulder` as JointName]?.getWorldPosition(new THREE.Vector3());
+        const e = joints[`${side}Elbow` as JointName]?.getWorldPosition(new THREE.Vector3());
+        const w = joints[`${side}Wrist` as JointName]?.getWorldPosition(new THREE.Vector3());
+        return s && e && w
+          ? { upper: s.distanceTo(e), fore: e.distanceTo(w) }
+          : { upper: 0, fore: 0 };
+      };
+      const ALL: BoneName[] = [
+        'hips', 'chest', 'neck', 'head',
+        'leftUpperArm', 'leftLowerArm', 'leftHand',
+        'rightUpperArm', 'rightLowerArm', 'rightHand',
+        'leftUpperLeg', 'leftLowerLeg', 'leftFoot',
+        'rightUpperLeg', 'rightLowerLeg', 'rightFoot',
+      ];
+      return {
+        bonesPresent: ALL.filter((b) => bones[b]),
+        bonesMissing: ALL.filter((b) => !bones[b]),
+        fingerChains: hasChains ? { left: chainReport('left'), right: chainReport('right') } : null,
+        headCollider: headGeometry
+          ? { radius: headGeometry.radius, halfHeight: headGeometry.halfHeightY ?? 0 }
+          : null,
+        armLen: { left: armSeg('left'), right: armSeg('right') },
+        height: box.isEmpty() ? 0 : box.getSize(new THREE.Vector3()).y,
+        feet: Boolean(bones.leftFoot && bones.rightFoot),
+      };
     },
     update(dt) {
       if (canBlink) {

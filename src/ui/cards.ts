@@ -1,10 +1,13 @@
 // Avatar cards in the right rail: preview glyph, name, capability chip.
 // Click selects (writes config); cards reflect config changes from any
-// source (button cycle, palette, URL). Capability metadata stays simple —
-// a label per avatar, no audit machinery (P6 fills these out).
+// source (button cycle, palette, URL). Chips and limitation notes come
+// from the capability manifest (data/avatar-capabilities.json) — the same
+// reviewed data that gates finger fusion and face-touch, so a card can
+// never promise what the gate refuses (V5).
 
 import { config, setConfig, onConfigChange } from '../config';
 import { type AvatarId, isAvatarAvailable } from '../rig/avatarRegistry';
+import { capsFor } from '../rig/capabilities';
 
 interface CardDef {
   id: AvatarId;
@@ -16,18 +19,19 @@ interface CardDef {
   note: string;
 }
 
-const CARDS: CardDef[] = [
-  // honest labels (Gate-3 live findings): neither default avatar has
-  // movable finger geometry; the robot's face-touch reads reach-to-collar
-  { id: 'robot', label: 'robot', glyph: '◼', chip: 'Fingers not supported', chipClass: 'warn',
-    note: 'mitt hands; face-touch lands at the collar' },
-  { id: 'astronaut', label: 'astronaut', glyph: '▲', chip: 'Fingers not supported', chipClass: 'warn',
-    note: 'mitten gloves; face-touch and body fully supported' },
-  { id: 'erika', label: 'erika', glyph: '⬟', chip: 'Fully supported', chipClass: 'ok',
-    note: 'articulated fingers — open, fist, and point read' },
-  { id: 'woody', label: 'woody', glyph: '◆', chip: 'Experimental · local', chipClass: 'exp',
-    note: 'local file only — never ships with the app' },
-];
+const GLYPHS: Record<AvatarId, string> = { robot: '◼', astronaut: '▲', erika: '⬟', woody: '◆' };
+
+const CARDS: CardDef[] = (['robot', 'astronaut', 'erika', 'woody'] as AvatarId[]).map((id) => {
+  const caps = capsFor(id);
+  return {
+    id,
+    label: id,
+    glyph: GLYPHS[id],
+    chip: caps.labels.chip,
+    chipClass: caps.labels.chipClass,
+    note: caps.labels.note,
+  };
+});
 
 let listenerInstalled = false;
 

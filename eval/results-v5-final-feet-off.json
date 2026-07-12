@@ -1,0 +1,173 @@
+{
+  "meta": {
+    "date": "2026-07-12T16:05:26.228Z",
+    "machine": "linux x64 — Intel(R) Xeon(R) W-3245 CPU @ 3.20GHz",
+    "mode": "headed",
+    "envThrottled": false,
+    "durationSecPerFixture": 30,
+    "note": "headed run on real hardware; FPS numbers are representative"
+  },
+  "results": [
+    {
+      "fixture": "fullbody",
+      "avatar": "robot",
+      "durationSec": 30,
+      "videoFrames": 888,
+      "detectedFrames": 888,
+      "detectionRate": 1,
+      "poseFps": 29.6,
+      "renderFps": 60.11,
+      "droppedFrames": 12,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 32,
+        "t15": 29,
+        "t30": 27
+      },
+      "sync": {
+        "leftUpperArm": 3.27,
+        "leftForearm": 6.63,
+        "rightUpperArm": 2.6,
+        "rightForearm": 13.61,
+        "torso": 2.33,
+        "leftThigh": 6.09,
+        "leftShin": 7.1,
+        "rightThigh": 5.33,
+        "rightShin": 6.73,
+        "upperLimbsMean": 6.53,
+        "legsMean": 6.31
+      },
+      "fusion": {
+        "active": false,
+        "gated": true,
+        "applyCount": 0,
+        "detectFps": 0
+      },
+      "feet": {
+        "plantedFrames": 1661,
+        "meanDriftPx": 2.4,
+        "p95DriftPx": 7.3,
+        "maxDriftPx": 21.17,
+        "windows": 7,
+        "meanSlidePx": 24.03,
+        "p95SlidePx": 69,
+        "maxSlidePx": 69,
+        "steps": 7
+      },
+      "finishedAt": "2026-07-12T16:04:21.567Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "robot",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "fullbody",
+      "avatar": "vrm:astronaut",
+      "durationSec": 30,
+      "videoFrames": 879,
+      "detectedFrames": 879,
+      "detectionRate": 1,
+      "poseFps": 29.25,
+      "renderFps": 59.95,
+      "droppedFrames": 20,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 41,
+        "t15": 32,
+        "t30": 30
+      },
+      "sync": {
+        "leftUpperArm": 2.93,
+        "leftForearm": 8.96,
+        "rightUpperArm": 3.61,
+        "rightForearm": 18.81,
+        "torso": 2.28,
+        "leftThigh": 6.69,
+        "leftShin": 8.44,
+        "rightThigh": 6,
+        "rightShin": 7.56,
+        "upperLimbsMean": 8.58,
+        "legsMean": 7.17
+      },
+      "fusion": {
+        "active": false,
+        "gated": true,
+        "applyCount": 0,
+        "detectFps": 0
+      },
+      "feet": {
+        "plantedFrames": 1646,
+        "meanDriftPx": 1.15,
+        "p95DriftPx": 3.52,
+        "maxDriftPx": 23.39,
+        "windows": 7,
+        "meanSlidePx": 21.86,
+        "p95SlidePx": 57.44,
+        "maxSlidePx": 57.44,
+        "steps": 7
+      },
+      "finishedAt": "2026-07-12T16:04:53.624Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "astronaut",
+      "avatarMismatch": false
+    },
+    {
+      "fixture": "fullbody",
+      "avatar": "vrm:erika",
+      "durationSec": 30,
+      "videoFrames": 877,
+      "detectedFrames": 877,
+      "detectionRate": 1,
+      "poseFps": 29.17,
+      "renderFps": 56.81,
+      "droppedFrames": 23,
+      "delegate": "GPU",
+      "memoryMB": {
+        "t0": 39,
+        "t15": 43,
+        "t30": 46
+      },
+      "sync": {
+        "leftUpperArm": 2.84,
+        "leftForearm": 7.31,
+        "rightUpperArm": 3.43,
+        "rightForearm": 14.81,
+        "torso": 2.31,
+        "leftThigh": 6.31,
+        "leftShin": 7.45,
+        "rightThigh": 5.33,
+        "rightShin": 6.5,
+        "upperLimbsMean": 7.1,
+        "legsMean": 6.4
+      },
+      "fingerCurl": {
+        "r": 1,
+        "samples": 1325,
+        "inputRange": 0.54
+      },
+      "fusion": {
+        "active": true,
+        "gated": false,
+        "applyCount": 453,
+        "detectFps": 9.99300489609623
+      },
+      "feet": {
+        "plantedFrames": 1640,
+        "meanDriftPx": 2.29,
+        "p95DriftPx": 7.14,
+        "maxDriftPx": 27.93,
+        "windows": 8,
+        "meanSlidePx": 17.85,
+        "p95SlidePx": 49.66,
+        "maxSlidePx": 49.66,
+        "steps": 8
+      },
+      "finishedAt": "2026-07-12T16:05:25.687Z",
+      "consoleErrors": [],
+      "mode": "headed",
+      "avatarRequested": "erika",
+      "avatarMismatch": false
+    }
+  ]
+}

@@ -117,3 +117,25 @@ Test topology note: all suite configs and spec constants take PP_PORT
 (default 5173). On shared boxes another checkout may own 5173 with a
 persistent dev server, and reuseExistingServer would silently test the
 wrong tree — dolphin-branch runs pin PP_PORT=5273 --strictPort.
+
+## V5 Character Control (apps/posepuppet retarget layer + pose-runtime fusion)
+
+- `data/avatar-capabilities.json` — the reviewed capability manifest. All
+  gating (finger fusion, face-touch class, feet, card labels, coach lines)
+  reads it through `src/rig/capabilities.ts`; nothing re-derives capability
+  at runtime. `scripts/capability-report.mjs` (+ shared rules in
+  `capability-lib.mjs`) regenerates/checks the machine half through the real
+  loaders — report-only by design (no AutoRig).
+- Hand fusion: `packages/pose-runtime/src/handFusion.ts` wraps a two-hand
+  `createMultiHandDetector` (rate-capped, `shouldDetect` budget gate).
+  Landmarks stay in the in-page trust domain; nothing new crosses the
+  body-input boundary. The app (`src/main.ts`) anchors detected hands to
+  RAW pose wrists, maps raw→enacted under mirroring, and drives
+  `Avatar.applyFingerCurls()` on manifest-approved rigs only; staleness
+  falls back per side to the pose approximation inside `retarget.ts`.
+- Face-touch v2: `src/rig/faceSockets.ts` classifies the wrist offset in
+  the person's head frame into seven named sockets and builds IK targets ON
+  the avatar's head capsule (fit from skinned vertices in `vrm.ts`).
+- Feet v2: `src/rig/feetPlanting.ts` — plant detection on normalized
+  landmarks; planted-ankle drift feeds a root-correction servo
+  (translation-only; limb chains and sync metrics untouched).

@@ -3,7 +3,7 @@
 // attributable. Rest pose: standing, arms hanging at the sides.
 
 import * as THREE from 'three';
-import type { Avatar, BoneName, JointName } from './types';
+import type { Avatar, AvatarCapabilityReport, BoneName, JointName } from './types';
 
 const BODY = new THREE.MeshStandardMaterial({ color: 0x9aa6bd, roughness: 0.45, metalness: 0.55 });
 const DARK = new THREE.MeshStandardMaterial({ color: 0x2b303c, roughness: 0.6, metalness: 0.4 });
@@ -177,8 +177,29 @@ export function createRobot(): Avatar {
     object: root,
     bones,
     joints,
-    // skull sphere (r=0.13 at +0.13 above the head pivot); antenna excluded
-    headGeometry: { centerLocal: new THREE.Vector3(0, 0.13, 0.01), radius: 0.155 },
+    // skull sphere (r=0.13 at +0.13 above the head pivot); antenna excluded.
+    // Near-spherical → tiny capsule half-height.
+    headGeometry: { centerLocal: new THREE.Vector3(0, 0.13, 0.01), radius: 0.155, halfHeightY: 0.01 },
+    describeCapabilities(): AvatarCapabilityReport {
+      const ALL: BoneName[] = [
+        'hips', 'chest', 'neck', 'head',
+        'leftUpperArm', 'leftLowerArm', 'leftHand',
+        'rightUpperArm', 'rightLowerArm', 'rightHand',
+        'leftUpperLeg', 'leftLowerLeg', 'leftFoot',
+        'rightUpperLeg', 'rightLowerLeg', 'rightFoot',
+      ];
+      root.updateWorldMatrix(true, true);
+      const box = new THREE.Box3().setFromObject(root);
+      return {
+        bonesPresent: ALL.filter((b) => bones[b]),
+        bonesMissing: ALL.filter((b) => !bones[b]),
+        fingerChains: null, // mitt hands — no finger bones by construction
+        headCollider: { radius: 0.155, halfHeight: 0.01 },
+        armLen: { left: { upper: 0.26, fore: 0.24 }, right: { upper: 0.26, fore: 0.24 } },
+        height: box.isEmpty() ? 0 : box.getSize(new THREE.Vector3()).y,
+        feet: Boolean(bones.leftFoot && bones.rightFoot),
+      };
+    },
     applyHandState(side, openness) {
       // no fingers on the robot: an open hand reads as a flatter, wider
       // mitt; a fist as a tight ball

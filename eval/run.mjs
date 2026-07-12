@@ -19,6 +19,13 @@ const headless = argv.includes('--headless');
 const dur = Number((argv.find((a) => a.startsWith('--dur=')) ?? '--dur=60').split('=')[1]);
 // --avatar=robot | vrm | robot,vrm (one results entry per fixture × avatar)
 const avatars = (argv.find((a) => a.startsWith('--avatar=')) ?? '--avatar=robot').split('=')[1].split(',');
+// V5: run hand_* fixtures in CHARACTER mode (hand-fusion eval) instead of
+// the hand-only default; --fusion=0 measures the fusion-off state; --out=
+// writes an extra copy beside results.json
+const charmode = argv.includes('--charmode');
+const fusionOff = argv.includes('--fusion=0');
+const feetOff = argv.includes('--feet=0');
+const outName = (argv.find((a) => a.startsWith('--out=')) ?? '').split('=')[1] || null;
 const names = argv.filter((a) => !a.startsWith('--'));
 const fixtures = names.length ? names : ['arms', 'torso', 'fast'];
 const BASE = `http://localhost:${process.env.PP_PORT ?? '5173'}`;
@@ -35,7 +42,13 @@ async function serverUp() {
 let devServer = null;
 if (!(await serverUp())) {
   console.log('starting dev server…');
-  devServer = spawn('npm', ['run', 'dev'], { cwd: root, stdio: 'ignore', detached: true });
+  // honor the lane port (PP_PORT): without --strictPort a squatted default
+  // port silently lands vite somewhere serverUp() never looks
+  devServer = spawn(
+    'npm',
+    ['run', 'dev', '--', '--port', process.env.PP_PORT ?? '5173', '--strictPort'],
+    { cwd: root, stdio: 'ignore', detached: true },
+  );
   for (let i = 0; i < 60 && !(await serverUp()); i++) {
     await new Promise((r) => setTimeout(r, 500));
   }
@@ -104,7 +117,10 @@ try {
     page.on('pageerror', (e) => consoleErrors.push(String(e)));
 
     let extra = fixture.startsWith('fullbody') ? '&body=full' : '';
-    if (fixture.startsWith('hand_')) extra = '&mode=hand&puppet=beaky';
+    if (fixture.startsWith('hand_') && !charmode) extra = '&mode=hand&puppet=beaky';
+    if (charmode) extra += '&mode=character';
+    if (fusionOff) extra += '&fusion=0';
+    if (feetOff) extra += '&feet=0';
     await page.goto(`${BASE}/?eval=${fixture}&dur=${dur}&avatar=${avatar}${extra}`);
     const handle = await page.waitForFunction(() => window.__EVAL_RESULT, undefined, {
       timeout: (dur + 120) * 1000,
@@ -122,6 +138,8 @@ try {
       `  detection ${(result.detectionRate * 100).toFixed(1)}%  pose ${result.poseFps}fps  ` +
         `render ${result.renderFps}fps  upperLimbs ${result.sync.upperLimbsMean ?? '—'}°  ` +
         (result.pinchJaw ? `pinch→jaw r=${result.pinchJaw.r} (n=${result.pinchJaw.samples})  ` : '') +
+        (result.fingerCurl ? `fingerCurl r=${result.fingerCurl.r} range=${result.fingerCurl.inputRange}  ` : '') +
+        (result.feet ? `feetSlide ${result.feet.meanSlidePx}px/win jitter ${result.feet.meanDriftPx}px (n=${result.feet.plantedFrames})  ` : '') +
         `errors ${consoleErrors.length}`,
     );
     if (result.avatarMismatch) {
@@ -153,3 +171,7 @@ const out = {
 mkdirSync(here, { recursive: true });
 writeFileSync(resolve(here, 'results.json'), JSON.stringify(out, null, 2));
 console.log(`wrote eval/results.json (${results.length} fixtures)`);
+if (outName) {
+  writeFileSync(resolve(here, outName), JSON.stringify(out, null, 2));
+  console.log(`also wrote eval/${outName}`);
+}
