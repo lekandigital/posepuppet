@@ -871,3 +871,46 @@ nothing uploaded".
   gpu-performance project — 2026-07-10 baseline log).
 - pose-runtime is three-free; `bodyFrame.ts` (three-dependent, retarget
   support) moved to src/rig/ instead of the package.
+
+## V6 — Motion Memory 2 (2026-07-12)
+
+- Loop schema v2 keeps v1's landmark-stream frames untouched and adds
+  metadata only (avatar, mode, thumbSvg, bytes, `v: 2`); DB 1→2 migration
+  rewrites v1 records in place with `avatar: 'unknown'` (v1 never stored
+  it — inventing one would be a lie on the card).
+- Trim is destructive-on-apply (frames rewritten, re-timed from 0), not
+  marker-based: every playback path and V7 consumer stays version-blind
+  about editing state, and boundary exactness is trivially testable.
+  Live preview happens on a transient trimmed copy before apply.
+- Mirror is implemented in landmark space (negate world x, reflect norm
+  x, swap L/R landmark pairs) rather than as per-bone quaternion surgery:
+  fed through the Retargeter it IS the sagittal-plane quaternion
+  reflection, with handedness correct by construction. Verified against
+  a ground-truth mirrored render (right-hand wave → true left-hand wave,
+  mean < 5° / max < 12°) on an asymmetric synthetic wave stream — the
+  repo has no asymmetric-gesture video fixture; the live check is FUTP
+  S5.2.
+- Energy = summed joint angular speed over 8 pose joints (elbows,
+  shoulders, hips, knees interior angles) / 5 finger-bend angles for
+  hands; visibility ≤ 0.3 mutes a joint for the frame. Chosen over
+  landmark velocity so occlusion jitter and root translation don't read
+  as "best motion".
+- bestWindow candidates are always exactly ~5 s wide inside the loop —
+  first cut anchored windows at frame ends and clamped, which shrank an
+  early energy burst to a 0.7 s sliver on the 2 Hz SwiftShader rig
+  (caught by the UI e2e, fixed with a sliding-window mean).
+- Hand-kind loops persist, migrate, thumbnail and mirror at the data
+  level, but keep v1's no-replay-surface status (the ghost player drives
+  body rigs); the library card says so honestly. Hand-puppet replay
+  belongs to V7's recording work.
+- Storage bound: 32 MiB / 64 loops with an explicit oldest-first
+  eviction dialog. The store never deletes silently and never saves past
+  the cap on a declined prompt.
+- MIN_LOOP_FRAMES = 4 is the shared snapshot minimum (was 10 in v1): on
+  a 1–2 Hz-pose machine a legitimate 5 s best-motion window holds only
+  ~5 frames — the full-suite e2e caught the 10-frame guard refusing it.
+  Sparse loops play (steppy but honest); empty rings still coach instead
+  of saving junk.
+- v1 rail loop-list and ghost/replay/echo controls kept as-is; the
+  library is additive (main.ts edits confined to the Motion Memory block
+  + two palette entries; index.html to the Memory rail section).

@@ -1,181 +1,124 @@
-# V1 — PosePuppet Runtime + HUD: plan
+# PLAN — V6 Motion Memory 2 (feat/motion-memory-2)
 
-Branch `feat/pose-runtime-hud`, worktree `~/Dev/wt-runtime`, tmux `ba-runtime`,
-dev port 5174. Autonomy policy per BODYARCADE_CONTEXT.md v2 — no user gates;
-human-only checks land in FINAL_USER_TEST_PLAN.md S1–S3/S11 with evidence.
+Lane: worktree `../wt-motionmem`, tmux `ba-mm2`, port 5178, display :2 (light).
+Scope: upgrade Motion Memory v1 into the creative loop library. Playback only.
 
-## Audit findings (what exists, where the seams are)
+## Reading of v1 (audit)
 
-**Tracking pipeline (Full App, `src/`).** `src/main.ts` boots:
-camera (`src/camera.ts` — getUserMedia / video-file into one `<video>`) →
-MediaPipe detector (`src/pose/detector.ts`, rVFC-driven, GPU→CPU fallback,
-full/lite hot swap) → mirror (`src/pose/mirror.ts`) → optional eval masker →
-Predictive Pose Continuity (`src/pose/continuity.ts`) → fan-out:
-One-Euro smoothing → retargeter/stage; ring buffers; intent detector; and
-`src/bodyinput/adapter.ts`, the ONLY place landmarks touch
-`@bodyarcade/body-input` — the core derives `BodySignal` and publishes on the
-in-page channel + BroadcastChannel. Hand mode has a parallel detector
-(`src/pose/handDetector.ts`) that the pose detector yields to.
+v1 is small and sound: `src/memory/stream.ts` (quantized landmark loop +
+ring buffer), `src/memory/store.ts` (IndexedDB, DB `posepuppet-memory` v1),
+`src/memory/ghost.ts` (ghost player: duet/echo/replay through a second
+Retargeter). The critical v1 design decision carries the whole pass: a loop
+stores the retargeting pipeline's INPUT (quantized mirrored/smoothed
+landmarks), not per-bone quaternions — replaying through any avatar's own
+Retargeter makes re-skin exact by construction. Every v2 feature builds on
+that; nothing is rewritten.
 
-**Games (completed, consumers only).** Flight/TinySkies
-(`apps/flight/client`, Rowing is its `?row` mode) and standalone Dolphin
-(`apps/dolphin`) never see landmarks: `input/bodyControls.ts` /
-`input/swimControls.ts` subscribe to BroadcastChannel + a postMessage
-envelope, dedupe by `signal.ts`, gate on staleness/confidence, decay to
-autopilot on loss, and keyboard always wins (KEYBOARD_PRIORITY_MS). Both
-apps alias `@bodyarcade/body-input` to package source. Today the producer is
-a PosePuppet tab in companion mode (`src/bodyinput/flightBridge.ts`).
+## Loop schema v2 (RFC — becomes the stable contract V7 depends on)
 
-**Topology.** One origin: root vite serves the app plus built games at
-`/flight/` and `/dolphin/` (BroadcastChannel is origin-scoped — the Gate-2
-lesson). Model + wasm assets live in root `public/models`,
-`public/mediapipe-wasm` (gitignored, fetched at install).
+```ts
+interface LoopFrame { t: number; q: Int16Array }   // unchanged from v1
 
-**Model-variant law (measured, keep):** Fly = lite, Dolphin = lite,
-Rowing = FULL (lite wrist-depth collapse: 2/13 → 13/13 strokes on the
-seated fixture).
+interface MotionLoop {
+  v: 2;                       // v1 records have no `v` field
+  id: string;                 // unchanged (v1 ids survive migration)
+  name: string;
+  kind: 'pose' | 'hand';
+  createdAt: number;          // epoch ms
+  durationMs: number;
+  frames: LoopFrame[];        // v1 quantization, unchanged
+  avatar: string;             // avatar id at capture; 'unknown' when migrated
+  mode: 'character' | 'hand'; // app mode at capture; derived from kind on migration
+  thumbSvg: string;           // deterministic SVG skeleton, highest-energy frame
+  bytes: number;              // storage accounting (frame buffers + fixed overhead)
+}
+```
 
-**Licensing check (first-actions item):** there is no `LICENSE_NOTES.md`.
-The TinySkies permission text lives in `ASSETS.md` § "BodyArcade Flight —
-TinySkies / GlobeFly fork manifest" ("used with permission", link, private
-record gitignored as `PERMISSION.local.md`). Requirement satisfied; noted
-in DECISIONS.md rather than inventing a new file.
+Invariants (the part V7 may rely on):
+- `frames` stay quantized landmark streams; playback is always
+  landmarks → Retargeter. Never quaternions, never video.
+- Trim is destructive-on-apply: applying a trim rewrites `frames`
+  (re-timed from 0) and `durationMs`. No trim markers in the schema, so
+  every consumer stays version-blind about editing state.
+- Mirror is a playback option, never stored data.
+- Derived data (energy curve) is computed on demand, never persisted;
+  the thumbnail is the one precomputed derivative (for library cards).
+- Storage is bounded: total bytes cap + loop-count cap enforced at save
+  with oldest-first eviction after an explicit user prompt.
 
-**Suites.** Root Playwright (fake-webcam y4m + eval rig), `apps/flight/tests`
-(port 5199 + producer), `apps/dolphin/tests` (port 5197 + producer). All
-three must stay green — that is the refactor's contract.
+Migration: IndexedDB version 1→2. `onupgradeneeded` rewrites v1 records in
+place: `v:2`, `avatar:'unknown'`, `mode` from `kind`, computed `thumbSvg`
+and `bytes`. Ids, names, timestamps, frames untouched — old loops keep
+playing bit-identically.
 
-## Extraction map
+## Energy metric (documented here + docs/MOTION_MEMORY.md)
 
-### `packages/pose-runtime` (new; three-free, DOM-light)
+Per frame i (decoded world landmarks), energy
+`E_i = Σ_j |θ_j(i) − θ_j(i−1)| / Δt` — summed joint angular speed (rad/s)
+over the tracked joint set: pose = interior angles at both elbows,
+shoulders, hips, knees (8 joints); hand = the 5 finger-bend angles
+(wrist→MCP→tip) plus palm-normal rotation. Uses:
+- thumbnail frame = argmax `E_i`
+- best-last-motion = argmax mean energy over a sliding ~5 s window
+- motion-tape strip = the `E_i` curve over time
 
-Moved verbatim (history-preserving `git mv`, imports adjusted):
+## Mirror (sagittal reflection)
 
-| from | to |
-|---|---|
-| `src/pose/detector.ts` | `packages/pose-runtime/src/detector.ts` (asset paths become options) |
-| `src/pose/handDetector.ts` | `packages/pose-runtime/src/handDetector.ts` |
-| `src/pose/continuity.ts` | `packages/pose-runtime/src/continuity.ts` |
-| `src/pose/indices.ts` `mirror.ts` `oneEuro.ts` `smoothing.ts` `types.ts` | same names |
-| `src/camera.ts` (capture half) | `packages/pose-runtime/src/camera.ts` |
+Implemented in landmark space, where the loops live: negate world x,
+reflect norm x (x→1−x), and swap every left/right landmark index pair.
+Fed through the Retargeter this produces exactly the sagittal-plane
+quaternion reflection on the rig — with correct handedness by
+construction rather than by per-bone axis fixes. Verified with an
+asymmetric-gesture fixture stream: a right-hand wave must replay as a
+true left-hand wave (bone-trajectory sync metric against a ground-truth
+left-wave render). Hand-kind loops mirror by the same x reflection.
 
-New composition:
+## File ownership (V6-exclusive)
 
-- `src/runtime.ts` — `createPoseRuntime(opts)`: explicit camera ownership +
-  lifecycle (`idle → starting → running / denied / error / external /
-  stopped`), video element supplied (app) or created hidden (games), model
-  variant, mirror/ppc toggles, an eval-harness frame interceptor hook, PPC
-  tracking states → body-input core (absorbs `src/bodyinput/adapter.ts`),
-  publishes `BodySignal` in-page + BroadcastChannel, exposes a trusted
-  in-process `onFrame` tap (Full App retargeting; same trust domain),
-  `preview` state for the HUD, and privacy/tracking state.
-- `src/preview.ts` — `PreviewFrame`: the approved render state that may
-  cross to the HUD: mirrored, 2D-only, quantized skeleton segments +
-  per-limb tracking + coarse confidence. Never serialized onto a transport.
-- `src/election.ts` — one producer per origin: Web Locks
-  (`bodyarcade-pose-producer`) with a listen-for-traffic fallback; a page
-  that finds an active external producer enters `external` and does NOT
-  open the camera (companion mode keeps working, no duplicate pipelines).
-  Per page, `createPoseRuntime` enforces a singleton.
+- `src/memory/*` — stream/store/ghost (extended) + new `energy.ts`,
+  `mirror.ts`, `thumbnail.ts`, `trim.ts`, `library.ts`
+- `tests/memory.spec.ts` (extended), `tests/memory-library.spec.ts` (new)
+- `docs/MOTION_MEMORY.md` (new)
 
-### `packages/pose-hud` (new)
+Shared files, additive memory-scoped edits only (declared for V1/V5 rebase):
+- `src/main.ts` — ONLY inside the existing “Motion Memory UI” block plus
+  memory entries in the palette command array. No shell/boot/camera/
+  retarget/record edits.
+- `index.html` — ONLY the Memory rail section / memory buttons.
+- `src/styles.css` — one appended `.mml-*` block.
 
-- `mountPoseHud(host, runtime, { position?, safeArea?, collapsed? })` →
-  handle with `expand/collapse/setSafeArea/unmount`.
-- Bottom-left compact square; collapsible to a status pill; hover/focus/
-  click expands; expanded view swaps preview ↔ live camera feed. Full
-  keyboard parity (tabbable, Enter/Space toggle, Esc collapse, arrow swap).
-- Contents: preview figure, mono tracking state (LIVE / REACQ / SIGNAL
-  LOST / KEYBOARD / CAMERA DENIED / REMOTE FEED), privacy line ("LOCAL
-  INFERENCE · NO UPLOADS"), recenter flash. No settings panel.
-- **Preview renderer decision:** 2D-canvas glowing wireframe figure (the
-  existing x-ray puppet language) — NOT a VRM. Games ship their own three
-  versions (0.172 vs 0.184); a VRM preview would bundle a second three +
-  GL context into every game page. "Cheap VRM or simpler" → simpler, in
-  the frozen visual language, near-zero GPU. Degradation tiers:
-  T0 glow skeleton 30 Hz → T1 flat lines 15 Hz → T2 dot silhouette 10 Hz →
-  T3 text-only; auto-drop on sustained frame-budget pressure, test hook to
-  force tiers.
-- Styles injected, `pp-hud-` scoped, token values copied from the app
-  grammar (graphite glass, 1 px rules, mono labels, cyan/blue accents).
+Not touched: `src/record/*`, `src/director/*` (V7), `src/rig/*`,
+capability metadata (V5), runtime/boot/camera (V1), `packages/*`.
 
-### Full App refactor (zero behavior change)
+## Outcomes → implementation
 
-`src/main.ts` consumes the runtime: one `createPoseRuntime` with the app's
-video element; the pipeline order (mirror → masker → PPC → smooth →
-retarget; body-input pre-smoothing) is preserved inside the runtime +
-`onFrame` tap. `src/pose/` and `src/bodyinput/adapter.ts` are deleted;
-`src/pose/bodyFrame.ts` (three-dependent, retarget-only) moves to
-`src/rig/bodyFrame.ts`; layout-only camera helpers stay app-side as
-`src/ui/cameraLayout.ts`. `flightBridge.ts` (companion mode) stays.
-The app also mounts the shared HUD? — no: the Full App keeps its own
-camera panel + chain readout (frozen design); HUD is for games.
+- O1 schema v2 + migration + bounded store; library overlay: cards with
+  SVG thumbnail, name (inline rename), duration · avatar · mode · date,
+  play/delete.
+- O2 trim: in/out handles on the motion tape, live ghost preview of the
+  trimmed range, apply rewrites frames; “best last motion” grabs the
+  highest-energy ~5 s window from the 12 s ring (and a “best 5 s” snap
+  inside the editor).
+- O3 playback: duet / echo chorus (existing) + mirror toggle on any
+  playback; ghost opacity presets and echo-delay presets, live.
+- O4 motion-tape strip: energy-over-time canvas, scrub-to-trim; docs;
+  FINAL_USER_TEST_PLAN S5 entries; STATUS.md schema-stability declaration.
 
-### Game retrofits (mount points only)
+## Verification map
 
-- `apps/flight/client/src/main.ts`: init runtime (variant: `?row` → full,
-  else lite) + mount HUD with a safe-area hint clearing the rowing strip /
-  flight HUD; game code untouched (`bodyControls`/`rowControls` keep
-  consuming signals exactly as today, now produced in-page).
-- `apps/dolphin/src/main.ts`: same, lite variant, safe-area clearing the
-  dolphin HUD/minimap (HUD bottom-left conflicts with nothing there —
-  verify on screenshot).
-- Both game vite configs: alias `@bodyarcade/pose-runtime`/`pose-hud` to
-  source; dev-only middleware exposing root `public/models` +
-  `public/mediapipe-wasm` (production topology already same-origin).
-- Camera policy: games request the camera at boot (that is what
-  "initialize Runtime directly" means); denied → `denied` state, HUD says
-  keyboard play, game plays on keys (already true). External producer
-  streaming → `external`, no camera grab.
-
-## File ownership (this branch edits nothing else)
-
-- `packages/pose-runtime/**`, `packages/pose-hud/**` (new)
-- `packages/body-input/**` — interface FROZEN; no edits expected
-- root: `src/pose/**` (removed), `src/camera.ts`, `src/bodyinput/**`,
-  `src/main.ts`, `src/ui/cameraLayout.ts` (new), `src/rig/bodyFrame.ts`,
-  import-path touches in `src/{eval,gesture,memory,rig,hand,overlay,ui,director}`,
-  `vite.config.ts`, `tsconfig.json`
-- `apps/flight/client/src/main.ts`, `apps/flight/client/vite.config.ts`,
-  `apps/flight/client/tsconfig.json`, `apps/flight/tests/hud.spec.ts` (new)
-- `apps/dolphin/src/main.ts`, `apps/dolphin/vite.config.ts`,
-  `apps/dolphin/tsconfig.json`, `apps/dolphin/tests/hud.spec.ts` (new)
-- root `tests/` additions (runtime regression, boundary), `eval/` untouched
-- docs: PLAN/DECISIONS/EVAL_NOTES/STATUS/README/FINAL_USER_TEST_PLAN/ASSETS
-
-## Verification plan
-
-1. **Baseline (pre-change):** root + flight + dolphin suites, recorded.
-2. **O1 contract:** same suites green post-extraction; eval fixture spot
-   run unchanged within tolerance.
-3. **Boundary test:** instrument both transports; assert every emitted
-   message passes `assertSignalShape` and contains no 33/21-point
-   landmark-like arrays anywhere in the object graph (deep scan).
-4. **Per game Playwright:** HUD mounts; expands/collapses via mouse AND
-   keyboard; camera-denied (permission denied at browser level) still
-   plays on keyboard; exactly one `getUserMedia` call per page
-   (init-script counter).
-5. **Perf (headed :2, display lock):** per game fps with HUD on/off, pose
-   Hz, preview tier costs; floors 60/45 fps, pose ≥ 15 Hz. SwiftShader
-   numbers never count; headless failures classified ENVIRONMENT_BLOCKED.
-6. **Screenshot board + vision self-review** against the frozen language:
-   HUD collapsed/expanded/denied/lost states × three games + app.
-
-## Milestones
-
-- M0 baseline suites + env (this commit: PLAN)
-- M1 = O1 extraction + app refactor, suites green
-- M2 = O2 pose-hud + preview + tiers + keyboard
-- M3 = O3 flight/rowing/dolphin retrofit + per-game specs
-- M4 = O4 permission flows, boundary/single-pipeline tests, perf table
-- M5 docs + screenshot board + FINAL_USER_TEST_PLAN S1–S3/S11 + STATUS
-
-## Risks
-
-- `main.ts` re-wiring regressing eval honesty paths → keep pipeline order
-  bit-identical; masked-eval semantics covered by continuity specs.
-- Node: remote default is v12 — all work under nvm node 22 in `ba-runtime`.
-- Headless WebGL throttling → headed :2 under `flock` for anything timed.
-- three version skew → runtime/HUD stay three-free (decision above).
-- Second `getUserMedia` from the app's own video-file/camera toggle →
-  route ALL capture through the runtime; test enforces one consumer.
+- save→reload→replay within v1 tolerance — browser spec against real
+  IndexedDB (Chromium), replay compared via the existing round-trip metric.
+- migration on real v1 records — seed DB v1 with v1-shaped records (the
+  v1 writer preserved in the test), reopen through v2, assert fields +
+  bit-identical frames + replay tolerance.
+- mirror handedness — unit spec: asymmetric right-hand wave, mirrored
+  replay vs ground-truth left-wave render, mean/max bone-angle bounds;
+  plus left/right bone role swap asserted.
+- trim boundary exactness — unit spec: exact kept-frame set, re-timing,
+  duration, idempotence.
+- deterministic thumbnails — same loop → identical SVG string, twice,
+  and across reload.
+- storage bound — small injected caps; save past cap prompts, eviction
+  removes oldest first, refusal keeps store intact.
+- suites green — full root Playwright suite on 5178 (SwiftShader),
+  diffed against the pre-change baseline (.local/mm2-baseline.log).

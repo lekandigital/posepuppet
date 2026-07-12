@@ -1,5 +1,48 @@
 # Changelog
 
+## V6 — Motion Memory 2: the creative loop library (2026-07-12)
+
+Motion Memory v1 (ring buffer, ghost duet, echo chorus, instant replay,
+re-skin, IndexedDB loops) grows into a small creative layer. Playback
+only — nothing scores anything.
+
+### Added
+- Loop schema v2 + in-place v1 migration (DB `posepuppet-memory` 1→2):
+  avatar/mode at capture, deterministic SVG skeleton thumbnail from the
+  loop's highest-energy frame, byte accounting. Old loops keep playing
+  bit-identically. Contract documented in `docs/MOTION_MEMORY.md`;
+  declared stable for V7 in status.md.
+- Loop library overlay (`l`, ⌘K, or the Memory rail button): thumbnail
+  cards with inline rename, two-click delete, duration · avatar · mode ·
+  date, storage readout.
+- Motion-tape editor: energy-over-time strip (energy = summed joint
+  angular speed, documented), drag in/out handles to trim with live
+  ghost preview, best-5 s snap, apply-trim (exact boundary contract).
+- "Best last motion": one action grabs the highest-energy ~5 s window
+  of the last 12 s ring (rail button + ⌘K).
+- Mirror playback: sagittal-plane reflection in landmark space through
+  the Retargeter — a right-hand wave replays as a true left-hand wave
+  (verified against a ground-truth mirrored render, mean < 5°).
+- Ghost opacity presets (faint/half/solid) and echo-delay presets
+  (tight/beat/wide), applied live to running playback.
+- Bounded storage: 32 MiB / 64 loops with an oldest-first eviction
+  dialog — the store never deletes silently and never grows unbounded.
+
+### Verification
+Root suite 120 passed / 5 skipped, plus the two pre-existing
+detect.spec SwiftShader environment failures (unchanged on the
+pre-change tree; green on the GPU project — see EVAL_NOTES §V6).
+New coverage (+10 specs): v1-record migration on real
+IndexedDB, save→reload byte exactness, storage-bound eviction, trim
+boundary exactness, energy/best-window properties, rig-level mirror
+handedness, deterministic thumbnails, and a full library UI e2e on the
+fake-webcam fixture.
+
+### Limits
+Hand-kind loops persist, migrate and mirror at the data level but have
+no replay surface yet (arrives with Recording v2). Live creative-session
+checks recorded as FINAL_USER_TEST_PLAN S5.
+
 ## V1 — PosePuppet Runtime + HUD (2026-07-11)
 
 PosePuppet becomes a system layer: a headless tracking runtime any game
