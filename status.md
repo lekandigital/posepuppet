@@ -170,6 +170,13 @@ Docs shipped: README + CHANGELOG + ARCHITECTURE + FUTURES (pipeline water seam +
 Blockers: only the consolidated live session (not requested now, per instruction)
 Next: Lekan’s live swim per FINAL_USER_TEST_PLAN.md; branch not merged, not pushed
 
+## 2026-07-11 (V2 world-data — pipeline shipped, two regions baked, all checks green)
+tools/worldbake + bodyarcade-world/1 schema shipped: terrain, water (sea via the absorbed Dolphin boundary builder + lakes), waterways, roads/paths, buildings, landuse, boundaries, aeroways, collision meshes, walk+row nav graphs, minimap, data-derived spawns + mode transitions; offline-first with committed sha256-checksummed caches
+Ísafjörður baked as the working default (REGION_CANDIDATES.md: 3 candidates scored on live Overpass counts; terrain variance decided it); Friday Harbor baked second purely from the README as the doc proof; region swap stays a cheap re-bake until V4 realistic art (deadline recorded in FINAL_USER_TEST_PLAN front matter)
+Verification: 69 golden-file checks green (byte-identical re-bakes, schema round-trip, attribution refusal, geometry sanity, nav reachability, collision area parity) in eval/worldbake-results.json; boundary suite 31 green; SF Bay artifact byte-identical; standalone dolphin builds; tsc green
+Blockers: none
+Next: V4 consumes data/worlds/isafjordur/world.json read-only; optional region override open until V4 realistic art pass
+
 ## 2026-07-12 (V3 Walking Locomotion — package + graybox complete, remote pass green)
 Gait shipped in @bodyarcade/body-input 1.1.0 (additive `gait` block): knee-lift-difference marching + lateral-hip-sway weight-shift substrates through ONE reversal detector with substrate rebase; step events, cadence Hz, weight-shift axis; 9 new gait specs green; existing body-input suite green with the block on the wire; fixture-eval gains gait false-positive rows on every clip (0 steps everywhere, first measured run) + PP_PORT parameterization (5173/5184 squatted).
 packages/locomotion shipped: pure deterministic model with comfort enforced at the output (speed 2.4 / accel 2.5–3.5 / yaw 45°/s / yaw-accel 180°/s² caps, slewed eye height, no bob/tilt/FOV code path, envelope() evidence), cadence→speed, lean→turn, crouch duck, seated lean-glide, keyboard-wins, loss autopilot with snap-free re-entry, T-pose recenter pulse, nav-graph PathHint assist (Full default, lean-yield); controller on the proven transport discipline; shared coach/status strings; INTEGRATION.md = the V4 contract.

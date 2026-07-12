@@ -102,3 +102,6 @@ CLAUDE.local.md
 .env.remote.local
 REMOTE_SETUP_REPORT.local.md
 FABLE_REMOTE_HANDOFF.local.md
+
+# worldbake terrain-tile cache: committed inputs for reproducible bakes
+!tools/worldbake/cache/**/*.png
