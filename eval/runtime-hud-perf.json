@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-07-12T03:39:21.966Z",
+  "display": ":2",
+  "fixture": "/home/o/Dev/wt-runtime/.local/cache/fake-camera/fullbody.y4m",
+  "seconds": 15,
+  "games": {
+    "flight": {
+      "hudOn": {
+        "fps": 57.6,
+        "longFramePct": 2.9,
+        "state": "running",
+        "poseHz": 27.6,
+        "hud": {
+          "tier0DrawMs": 0.105,
+          "tier1DrawMs": 0.076,
+          "tier2DrawMs": 0.048,
+          "pageFpsSeen": 60
+        }
+      },
+      "hudOff": {
+        "fps": 60,
+        "longFramePct": 0.1,
+        "state": "running",
+        "poseHz": 29,
+        "hud": null
+      }
+    },
+    "rowing": {
+      "hudOn": {
+        "fps": 40.5,
+        "longFramePct": 41.7,
+        "state": "running",
+        "poseHz": 13.1,
+        "hud": {
+          "tier0DrawMs": 0.055,
+          "tier1DrawMs": 0.059,
+          "tier2DrawMs": 0.05,
+          "pageFpsSeen": 37
+        }
+      },
+      "hudOff": {
+        "fps": 30.5,
+        "longFramePct": 71.6,
+        "state": "running",
+        "poseHz": 13.5,
+        "hud": null
+      }
+    },
+    "dolphin": {
+      "hudOn": {
+        "fps": 58.9,
+        "longFramePct": 1.9,
+        "state": "running",
+        "poseHz": 29,
+        "hud": {
+          "tier0DrawMs": 0.098,
+          "tier1DrawMs": 0.049,
+          "tier2DrawMs": 0.06,
+          "pageFpsSeen": 60
+        }
+      },
+      "hudOff": {
+        "fps": 59.8,
+        "longFramePct": 0.4,
+        "state": "running",
+        "poseHz": 28,
+        "hud": null
+      }
+    }
+  }
+}

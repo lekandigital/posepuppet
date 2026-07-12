@@ -73,7 +73,7 @@ export function mountPoseHud(runtime: PoseRuntime, opts: PoseHudOptions = {}): P
       <button class="pp-hud-swap" data-testid="pp-hud-swap" aria-label="Show camera feed">CAM</button>
     </div>
     <footer class="pp-hud-foot">
-      <span class="pp-hud-privacy" title="All inference runs in this page — nothing is uploaded.">LOCAL INFERENCE · NO UPLOADS</span>
+      <span class="pp-hud-privacy" title="All inference runs in this page — nothing is uploaded.">LOCAL INFERENCE</span>
       <span class="pp-hud-flash" data-on="0">RECENTERED ✓</span>
     </footer>
   `;

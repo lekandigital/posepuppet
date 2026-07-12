@@ -1168,3 +1168,85 @@ Evidence:
 - New tests green: runtime-boundary (BodySignal deep-scan landmark-free;
   PreviewFrame quantized 2D), runtime-app (single getUserMedia consumer +
   producer Web Lock held; camera-denied honest status, no page errors).
+
+
+---
+
+## V1 O2–O4 — HUD, game retrofits, perf, evidence (2026-07-11)
+
+### Suites (all under the locks; game suites headed on :2)
+- Root: 110 passed / 5 skipped / 2 failed — the same two `detect.spec.ts`
+  SwiftShader-only failures as the pre-extraction baseline
+  (ENVIRONMENT_BLOCKED; both pass in the gpu-performance project).
+- Flight: 37 specs — green including the 6 new `hud.spec.ts` tests; the
+  one batch-run miss (rowing closed-loop p75 0.108 vs 0.12, a documented
+  flap) re-ran green twice; the baseline `offline.spec` failure was a
+  driver flake (passes now).
+- Dolphin: 16/16 including 4 new HUD tests.
+- Boundary: BodySignal deep-scan landmark-free at unit level and on the
+  live broadcast wire in both games; PreviewFrame quantized 2D (no depth,
+  no raw visibility floats); one getUserMedia consumer per page (app,
+  flight, dolphin); producer Web Lock held while capturing.
+
+### Perf (eval/runtime-hud-perf.json; headed :2, RTX 3090 / Linux GL-ANGLE)
+| game | fps HUD on | fps HUD off | pose Hz | preview draw |
+|---|---|---|---|---|
+| flight (lite, worker) | ~57–60 | ~57–60 | ~29 | ≤0.11 ms any tier |
+| rowing (FULL, worker, 15 Hz cap) | ~41–43 † | ~30–48 † | ~13–14 | ≤0.09 ms |
+| dolphin (lite, worker) | ~57–59 | ~55–60 | ~29 | ≤0.10 ms |
+
+† run-to-run wobble on this box exceeds the HUD delta (one run measured
+HUD-on FASTER than off). Rowing near-misses the 45/15 floors here; the
+chain was root-caused, not hand-waved: main-thread FULL detection = 30 fps
+with 38 long tasks/8 s → worker detection = 43 fps with ZERO long tasks →
+the residual is GPU-process contention between full-model inference and
+the game's rendering (worker GL verified hardware NVIDIA via
+UNMASKED_RENDERER probe; capture verified 640×360; CPU delegate in module
+workers fails upstream — "ModuleFactory not set"). Per the repo's
+cross-platform policy the final floor validation is Apple Silicon
+(Metal-ANGLE MediaPipe is materially faster) — FINAL_USER_TEST_PLAN S3.2.
+Flight and dolphin hold the floors with margin. Fix ladder applied and
+measured: worker offload (+13 fps), backdrop-filter removed from the HUD
+(+4 fps on flight), 640×360 capture, 15 Hz rowing cap.
+
+### Rowing signal quality through the NEW in-page chain
+`scripts/rowing-inpage-probe.mjs`: rowing_slow.y4m → in-page runtime
+(640×360, FULL model in worker, 15 Hz) → 14 strokes delivered to the
+boat, on-water for the full 60 s window — matching the producer-tab
+closed-loop spec's environment range on this box (its own ENVIRONMENT
+gates accept ≥8 as chain-proof; ≥16 as full quality; runs at 14 were
+measured there too).
+
+### Eval refresh (retargeting parity, headed :2 GPU — like the baseline)
+| fixture | upperLimbs° committed | upperLimbs° post-V1 | pose fps | errors |
+|---|---|---|---|---|
+| arms | 9.51 | 9.82 | 29.6 | 0 |
+| torso | 2.20 | 2.13 | 29.7 | 0 |
+| fast | 19.89 | 20.14 | 29.7 | 0 |
+Deltas within run noise; detection 100% everywhere. (A SwiftShader-xvfb
+run first showed 24°/4°/40° at pose 3.7 fps — the runner itself flagged
+the environment throttle; starved detection inflates screen-space sync
+error. Recorded here so nobody mistakes that artifact for a regression.)
+
+### Screenshot board + vision self-review (.local/shots/v1, gitignored —
+fixture footage)
+Board: flight live/expanded/camera-feed/collapsed/denied, rowing live
+(boat + strip), dolphin live/expanded/denied, app post-extraction
+dark + light.
+- Language: graphite glass, 1 px rules, mono labels, cyan-as-live-signal
+  — reads as the same instrument family as the app and the game strips;
+  no redesign, no template smell. The x-ray wireframe is instantly
+  legible as "you".
+- Live video legibility: HUD is opaque-glass (no backdrop blur — perf),
+  labels pass contrast on every background sampled.
+- Safe areas verified visually: rowing strip clear at y=118; dolphin ODbL
+  attribution clear at y=64 (the credit must never be covered).
+- Fixed from review: privacy line truncation ("LOCAL INFERI") — the
+  hidden recenter flash reserved layout width; now display-gated, line
+  reads LOCAL INFERENCE (compact) / + · NO UPLOADS (expanded). Rowing
+  board shot originally captured the plane (autostart overrides ?row) —
+  re-shot with the boat + strip visible.
+- Honest cosmetic note: under Chromium's --deny-permission-prompts the
+  gUM rejection is not NotAllowedError, so the HUD shows CAMERA ERROR
+  rather than CAMERA DENIED; both carry the keyboard-play message and the
+  specs accept both. Real user denials map to 'denied'.

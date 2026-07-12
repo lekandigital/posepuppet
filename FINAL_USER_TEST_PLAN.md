@@ -1,22 +1,57 @@
 # FINAL USER TEST PLAN — one consolidated human pass
 ## Front matter
 - Environment prep (branch/merge state, hardware, camera, lighting, ports)
-- Region decision deadline status (§14)
+- Region decision deadline status (§14): open — no region baked yet (V2
+  in flight); the override window stays open until V4\x27s realistic art
+  pass begins.
 - Estimated total time; recommended order (below)
 - Evidence index: links to eval/results.json, screenshot boards,
   recordings, per-prompt EVAL_NOTES
+
+### V1 (Runtime + HUD) environment — S1–S3, S11
+- Branch `feat/pose-runtime-hud` in `~/Dev/wt-runtime` (unmerged; remote
+  dev server runs from this tree). Lane ports: PosePuppet **5184**
+  (5174 is squatted by an unrelated server — DECISIONS.md), flight suite
+  5189, dolphin suite 5187.
+- Tunnel from the Mac: `ssh -N -L 5184:127.0.0.1:5184 -i
+  ~/.ssh/pinn_rtx3090 o@192.168.86.152` then open http://localhost:5184
+  (app), /flight/, /flight/?row, /dolphin/.
+- Camera + lighting: normal webcam session, front-lit, ~2–3 m back for
+  full-body modes; games ask for the camera on load (that is the V1
+  behavior under test).
+- V1 evidence: eval/runtime-hud-perf.json (perf table),
+  eval/results.json (post-extraction eval refresh), .local/shots/v1
+  (screenshot board, gitignored — fixture footage), .local/*.log (suite
+  runs incl. baselines), EVAL_NOTES.md §V1, DECISIONS.md §V1.
+- Estimated V1 human time: ~35 min (S1 8 + S2 21 + S3 8 + S11 8, minus
+  overlap).
 ## Entry format (every deferred check uses this)
 ID | Feature | Why human-only | Setup | Steps | Expected | Automated
 evidence already collected | Risk if skipped | Est. minutes
 ## Sections (recommended order)
 ### S1  PosePuppet full app regression feel (post-runtime-extraction)
-_Entries deferred to V1 Runtime+HUD completion._
+
+S1.1 | Full App puppeteering feel after the runtime extraction | Feel/latency judgment is human-only | Mac + Chrome, tunnel `ssh -N -L 5184:127.0.0.1:5184 …`, open http://localhost:5184 | Puppeteer normally for ~3 min: arms, leans, wrist rotations, a face-touch, hand-only mode swap, avatar switch, ghost duet, one recorded take | Identical to pass-2 feel: same latency, same smoothing, no new stutter or drift; camera panel, overlay, engineering view all behave as before | Root suite 110P post-extraction with the SAME two SwiftShader-only failures as the pre-extraction baseline (.local/o1-root.log vs .local/baseline.log); gpu-performance detect specs 2/2; pipeline order preserved by construction (EVAL_NOTES V1 O1) | A subtle retarget/smoothing regression ships in the flagship app | 5
+
+S1.2 | Camera/file toggling + model swap through the runtime | Device-level camera re-acquisition timing is machine-specific | Same as S1.1 | "load video" a clip, back to camera; toggle full/lite model via ⌘K; toggle mirror | Every switch recovers tracking within ~2 s, no stuck black video, no double camera light | runtime start()/startVideoFile() paths covered by suite (avatar/detect/record specs green); single-gUM test | Camera lifecycle bug annoys every session | 3
 
 ### S2  Runtime + HUD across TinySkies / Rowing / standalone Dolphin (expand/collapse, keyboard access, camera-denied keyboard play)
-_Entries deferred to V1 Runtime+HUD completion._
+
+S2.1 | Body control with NO PosePuppet tab | The V1 headline; trust needs a human witness | Tunnel, open http://localhost:5184/flight/ directly (fresh tab, nothing else open); allow camera | Fly with the body per the flight profiles; then http://localhost:5184/flight/?row and row seated; then http://localhost:5184/dolphin/ and swim | All three games fully body-controlled with only the game tab open; HUD bottom-left shows LIVE + pose Hz | Per-game hud.spec: page pipeline drives signals (dolphin kick counter advances from fixture cam); topology specs green | The core promise of V1 unverified live | 8
+
+S2.2 | HUD interaction feel: expand/collapse, camera swap, keyboard parity | Overlay ergonomics are judgment | Any game running | Hover the HUD (expands), click stage (camera feed), Tab to it, Enter/Space collapse+open, `c` swap, Esc collapse | Interactions feel instant, never steal game keys, camera feed is mirrored and smooth; collapsed pill is unobtrusive during play | hud.spec mouse+keyboard assertions green in flight and dolphin | Fiddly overlay annoys every session | 4
+
+S2.3 | Safe-area: HUD never overlaps game controls | Layout collisions are visual | Rowing (?row) — the busiest bottom edge | Row; watch the rowing feedback strip and the HUD together; collapse and expand | HUD sits clear of the rowing strip; nothing critical is ever occluded in any game | Screenshot board .local/shots/v1 (rowing-hud-live.png etc.) + vision self-review in EVAL_NOTES | HUD covers the stroke pulse exactly when needed | 2
+
+S2.4 | Camera denied → keyboard play | Permission UX + real denial flow is browser-chrome-level | Fresh Chrome profile or site-settings camera=Block for localhost:5184 | Open each game with camera blocked; play on keys (flight WASD, rowing arrows, dolphin W/A/S/D/Shift) | Game plays normally; HUD reads CAMERA DENIED · KEYBOARD CONTROLS ACTIVE; no prompts loop, no console spam | Per-game denied specs green (--deny-permission-prompts); runtime-app denied spec | Camera-shy users bounce off the games | 4
+
+S2.5 | Companion mode still clean (opened FROM PosePuppet) | Double-camera light is only visible physically | Open http://localhost:5184, ⌘K → fly/row/swim | Check the game works AND the camera light pattern: only the PosePuppet tab owns the camera; game HUD shows REMOTE FEED | One camera light, one pipeline; closing PosePuppet lets the game offer START CAMERA | Election unit path + ?pp=companion forceExternal; existing topology specs (producer tab + game) green | Two pipelines burn CPU and trust | 3
 
 ### S3  TinySkies flight feel re-check (nothing regressed)
-_Entries deferred to V1 Runtime+HUD completion._
+
+S3.1 | Flight feel identical to the Gate-3-approved baseline | Feel is frozen (gate-approved values untouched — verify no interaction regression from the in-page runtime) | Tunnel, http://localhost:5184/flight/, camera allowed | Fly the Superman profile ~3 min: banks, climbs, dives, boost, dropout (step out of frame), re-entry, T-pose recenter | Exactly the approved feel; autopilot decay/re-entry unchanged; recenter toast unchanged; ~60 fps with the HUD up | Flight suite on :2 green post-retrofit (body/feel/replay/row specs); perf table eval/runtime-hud-perf.json: flight ~58-60 fps @ ~29 Hz pose in-page | Silent feel regression in the accepted game | 5
+
+S3.2 | Rowing fps floor on Apple Silicon (the one open perf number) | The remote GL-ANGLE box near-misses the 45/15 floors for rowing's FULL model (41-43 fps @ 13-14 Hz, GPU-process contention — root-caused in EVAL_NOTES); the repo's cross-platform policy says final perf validation is Apple Silicon | Tunnel, http://localhost:5184/flight/?row, camera allowed, Activity Monitor or the fps readout | Row seated ~2 min; note the fps feel and any stutter during pulls | Smooth ≥45 fps rowing with strokes registering (Metal-ANGLE MediaPipe is materially faster than the Linux GL path); if it stutters, report it — the fallback lever is the in-page detection rate | Perf table + probe chain in EVAL_NOTES (main-thread 30 fps → worker 43 fps → residual is GPU contention, zero long tasks); strokes verified through the in-page chain (14 on rowing_slow.y4m) | Shipping a rowing floor miss nobody measured on the target hardware | 3
 
 ### S4  Character Control live: fingers on capable avatar, all seven face-touch targets, feet planting, capability labels truthful
 _Entries deferred to V5 Character Control completion._
@@ -40,7 +75,12 @@ _Entries deferred to V4 Open World realistic profile completion._
 _Entries deferred to V4 Open World fantasy-game profile completion._
 
 ### S11 Privacy: network-zero receipt, local-inference messaging, HUD privacy state accuracy
-_Entries deferred to V1 Runtime+HUD completion._
+
+S11.1 | Privacy receipt still truthful post-extraction | Reading the receipt against DevTools is a human check | App open with DevTools Network tab | Confirm "LOCAL · 0 EXTERNAL REQUESTS SINCE LOAD" stays 0 through a full session (takes, ghosts, model swap) | Zero external requests; receipt never lies | Receipt is unchanged code; suite green; models/wasm load same-origin (design) | Trust feature silently broken | 2
+
+S11.2 | HUD "LOCAL INFERENCE · NO UPLOADS" accuracy on game pages | The claim spans the whole page, not just the runtime | Game page + DevTools Network | Play each game 2 min with the Network tab filtered to non-localhost | No off-origin requests at all (flight offline.spec asserts this for flight); HUD line always visible when open | flight offline.spec (zero off-origin) green on :2; boundary tests: wire carries derived signals only, landmark-free deep scan | A "local" claim that is false anywhere kills the story | 3
+
+S11.3 | HUD tracking/privacy states match reality | State-vs-reality can only be eyeballed | Any game live | Cover the camera (SIGNAL LOST), step out (REACQUIRING→LOST), deny camera (CAMERA DENIED), open via PosePuppet (REMOTE FEED) | Every displayed state matches what is physically true, within ~1 s | hud.spec state assertions; screenshot board denied/live/remote states | HUD that lies about tracking is worse than no HUD | 3
 
 ---
 ## Completed-mode human-only checks (preserved from completed branches)

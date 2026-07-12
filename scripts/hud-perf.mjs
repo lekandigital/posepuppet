@@ -53,19 +53,19 @@ async function measure(browser, { name, url, ready, drive }) {
     const sep = url.includes('?') ? '&' : '?';
     await page.goto(`${PP}${url}${hudOn ? '' : `${sep}hud=0`}`);
     await ready(page);
-    if (hudOn) {
-      // wait for the page pipeline to actually track
-      await page
-        .waitForFunction(
-          () => {
-            const rt = window.__POSE_RT;
-            return rt && rt.state() === 'running' && rt.poseFps() > 5;
-          },
-          undefined,
-          { timeout: 60_000 },
-        )
-        .catch(() => {});
-    }
+    // wait for the page pipeline to actually track in BOTH configs —
+    // hud=0 removes the overlay, not the runtime; the on/off comparison
+    // must be steady-state vs steady-state
+    await page
+      .waitForFunction(
+        () => {
+          const rt = window.__POSE_RT;
+          return rt && rt.state() === 'running' && rt.poseFps() > 5;
+        },
+        undefined,
+        { timeout: 60_000 },
+      )
+      .catch(() => {});
     await drive?.(page);
     await page.waitForTimeout(2000);
     const sample = await page.evaluate(rafSample, SECONDS);

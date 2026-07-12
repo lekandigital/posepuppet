@@ -27,6 +27,40 @@ npm run dev   # → http://localhost:5173, allow camera
 
 Press `⌘K` for the command palette. First run shows a short onboarding.
 
+## PosePuppet as a system layer — Runtime + HUD (V1)
+
+PosePuppet is split into three layers. Games get body control without the
+full app open in another tab:
+
+- **`packages/pose-runtime`** — headless tracking any page initializes
+  directly: camera ownership + lifecycle, MediaPipe pose/hand detection
+  (optionally in a Web Worker so heavy models never cost game frames),
+  Predictive Pose Continuity, derived-signal emission over
+  `@bodyarcade/body-input`, producer election (one tracking pipeline per
+  page, one producer per origin — Web Locks + traffic listen), and the
+  HUD's preview state. Raw landmarks never leave the runtime on a
+  transport; games receive derived `BodySignal`s only (enforced by test).
+- **`packages/pose-hud`** — the shared console-system overlay every
+  BodyArcade game mounts: compact bottom-left panel with a live wireframe
+  preview (2D x-ray language), mono tracking state, an explicit
+  `LOCAL INFERENCE · NO UPLOADS` line, camera-feed swap, full keyboard
+  parity, and load-shedding preview tiers. No settings panel.
+- **The Full App** (this repo's root) — unchanged in role: the creative
+  puppet instrument, now booting on the same runtime.
+
+Open `/flight/`, `/flight/?row`, or `/dolphin/` directly and allow the
+camera — the page tracks you itself. Deny the camera and every game stays
+fully playable on the keyboard (the HUD says so). Opening a game from
+PosePuppet (⌘K → fly/row/swim) keeps the single-camera companion topology:
+the game's runtime detects the active producer and consumes its feed
+instead of opening a second camera.
+
+Perf discipline: numbers in `eval/runtime-hud-perf.json` (HUD preview
+draw ≤ 0.1 ms; flight/dolphin hold ~60 fps with in-page tracking at
+~29 Hz on the remote rig; rowing's FULL-model requirement costs GPU-
+process contention there — ~41–43 fps at ~13–14 Hz — with final
+validation on Apple Silicon per the repo's cross-platform policy).
+
 ## BodyArcade Flight — your body flies a plane
 
 [TinySkies / GlobeFly](https://github.com/dannylimanseta/tinyskies) by

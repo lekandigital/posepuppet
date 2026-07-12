@@ -17,12 +17,15 @@ const params = new URLSearchParams(location.search);
 // depth), so the LITE model is safe here — GPU budget goes to the game.
 const runtime = createPoseRuntime({
   model: 'lite',
+  worker: true, // detection off the game's main thread (V1 perf law)
+  captureSize: { width: 640, height: 360 },
   election: 'strict',
   forceExternal: params.get('pp') === 'companion',
 });
 if (params.get('hud') !== '0') {
-  // bottom-left clears the dolphin HUD strip (top) and minimap (top-right)
-  const hud = mountPoseHud(runtime, { safeArea: { x: 12, y: 12 }, title: 'SWIM' });
+  // bottom-left, raised above the ODbL attribution panel (bottom-left 12px
+  // — the credit must stay visible; licensing non-negotiable)
+  const hud = mountPoseHud(runtime, { safeArea: { x: 12, y: 64 }, title: 'SWIM' });
   // test/eval surface (tier forcing, preview cost) — same convention as __DOLPHIN
   (window as unknown as { __PP_HUD: typeof hud }).__PP_HUD = hud;
 }
