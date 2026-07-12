@@ -4,9 +4,9 @@
 // constraints, no-snap re-entry, monotone confidence decay, full-dropout
 // synthesis, determinism, and no NaN under a chaotic stream.
 import { test, expect } from '@playwright/test';
-import { LM } from '../src/pose/indices';
-import type { LandmarkPoint } from '../src/pose/types';
-import { PoseContinuity, PPC, type PpcGroupInfo } from '../src/pose/continuity';
+import { LM } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
+import { PoseContinuity, PPC, type PpcGroupInfo } from '@bodyarcade/pose-runtime';
 
 const DT = 100 / 3; // ms per pose frame (~30 fps)
 

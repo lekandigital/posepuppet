@@ -2,10 +2,10 @@
 // frame, and retargeter decay. These run in node inside the Playwright runner.
 import { test, expect } from '@playwright/test';
 import * as THREE from 'three';
-import { mpToThree, BodyFrame } from '../src/pose/bodyFrame';
-import { mirrorWorld, mirrorNorm } from '../src/pose/mirror';
-import { LM } from '../src/pose/indices';
-import type { LandmarkPoint } from '../src/pose/types';
+import { mpToThree, BodyFrame } from '../src/rig/bodyFrame';
+import { mirrorWorld, mirrorNorm } from '@bodyarcade/pose-runtime';
+import { LM } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
 import { createRobot } from '../src/rig/robot';
 import { Retargeter } from '../src/rig/retarget';
 import { matchBonesByName } from '../src/rig/vrm';

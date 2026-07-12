@@ -17,7 +17,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
  * eval/dolphin-results.json.
  */
 
-const DOLPHIN = 'http://localhost:5197/dolphin/';
+const DOLPHIN = `http://localhost:${process.env.DOLPHIN_PORT ?? '5197'}/dolphin/`;
 
 const results: Record<string, unknown> = { generatedAt: new Date().toISOString() };
 

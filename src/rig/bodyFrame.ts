@@ -5,8 +5,8 @@
 // directions in this frame is what keeps torso turns from corrupting limbs.
 
 import * as THREE from 'three';
-import { LM } from './indices';
-import type { LandmarkPoint } from './types';
+import { LM } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
 
 export function mpToThree(p: { x: number; y: number; z: number }, out: THREE.Vector3): THREE.Vector3 {
   return out.set(p.x, -p.y, -p.z);

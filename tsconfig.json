@@ -14,8 +14,10 @@
     "types": ["vite/client"],
     "paths": {
       "@bodyarcade/body-input": ["./packages/body-input/src/index.ts"],
+      "@bodyarcade/pose-runtime": ["./packages/pose-runtime/src/index.ts"],
+      "@bodyarcade/pose-hud": ["./packages/pose-hud/src/index.ts"],
       "@bodyarcade/world-data": ["./packages/world-data/src/index.ts"]
     }
   },
-  "include": ["src", "packages/body-input/src", "packages/world-data/src"]
+  "include": ["src", "packages/body-input/src", "packages/pose-runtime/src", "packages/pose-hud/src", "packages/world-data/src"]
 }

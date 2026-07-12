@@ -1,6 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 const PP_PORT = process.env.PP_PORT ?? '5173';
+const GAME_PORT = process.env.DOLPHIN_PORT ?? '5197';
 
 // BodyArcade Dolphin suite — separate from PosePuppet's root suite and the
 // Flight suite so all three stay independently green. Port 5197 avoids
@@ -13,13 +14,13 @@ export default defineConfig({
   workers: 1,
   reporter: [['list']],
   use: {
-    baseURL: 'http://localhost:5197',
+    baseURL: `http://localhost:${GAME_PORT}`,
     viewport: { width: 1280, height: 720 },
   },
   webServer: [
     {
-      command: 'npm run dev -- --port 5197 --strictPort',
-      url: 'http://localhost:5197/dolphin/',
+      command: `npm run dev -- --port ${GAME_PORT} --strictPort`,
+      url: `http://localhost:${GAME_PORT}/dolphin/`,
       reuseExistingServer: !process.env.CI,
       timeout: 30_000,
     },

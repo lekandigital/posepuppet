@@ -1144,3 +1144,27 @@ five harness truths, all fixed without touching a threshold:
 
 Remaining human-only checks are consolidated in FINAL_USER_TEST_PLAN.md
 (Rowing section) for a single final session.
+
+---
+
+## V1 O1 — pose-runtime extraction (2026-07-11)
+
+The tracking pipeline moved out of apps/posepuppet into
+packages/pose-runtime (git-mv history preserved): detector, hand
+detector, PoseContinuity, mirror, One Euro smoothing bank, capture
+ownership, plus the absorbed body-input adapter. The Full App boots on
+`createPoseRuntime` with an in-process frame tap; pipeline order is
+unchanged (mirror → eval masker → PPC → {smooth → retarget, body-input
+pre-smoothing}).
+
+Evidence:
+- Root suite post-extraction: 110 passed / 5 skipped / 2 failed — the two
+  failures are tests/detect.spec.ts under SwiftShader, identical to the
+  pre-extraction baseline (ENVIRONMENT_BLOCKED; they pass on the
+  gpu-performance project post-extraction: 2/2 in .local logs).
+- Baselines recorded first: root 105P/2F/5S (same two), flight on :2
+  26P/1F/4S (offline.spec THREE MeshDepthMaterial console error — driver
+  flake, pre-existing code), dolphin 12P.
+- New tests green: runtime-boundary (BodySignal deep-scan landmark-free;
+  PreviewFrame quantized 2D), runtime-app (single getUserMedia consumer +
+  producer Web Lock held; camera-denied honest status, no page errors).

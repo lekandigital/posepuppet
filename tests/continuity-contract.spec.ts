@@ -5,9 +5,9 @@
 // and this test is the enforcement. Pure node, deterministic.
 import { test, expect } from '@playwright/test';
 import { createBodyInputCore } from '@bodyarcade/body-input';
-import { LM } from '../src/pose/indices';
-import type { LandmarkPoint } from '../src/pose/types';
-import { PoseContinuity } from '../src/pose/continuity';
+import { LM } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
+import { PoseContinuity } from '@bodyarcade/pose-runtime';
 
 const DT = 100 / 3; // ~30 fps
 const FLIGHT_MIN_CONFIDENCE = 0.35; // apps/flight bodyControls.ts, Gate-3-frozen

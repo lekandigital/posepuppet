@@ -4,8 +4,8 @@
 // gesture/intent seed (raise both arms = start, cross wrists = stop) with
 // keyboard always available (space = next shot, esc = stop).
 
-import { LM } from '../pose/indices';
-import type { LandmarkPoint } from '../pose/types';
+import { LM } from '@bodyarcade/pose-runtime';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
 import type { TakeScript } from './scripts';
 
 export interface DirectorDeps {

@@ -1,0 +1,11 @@
+{
+  "name": "@bodyarcade/pose-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Headless PosePuppet tracking runtime: camera ownership + lifecycle, pose/hand detection, Predictive Pose Continuity, body-input emission, producer election, HUD preview state. Raw landmarks never cross the transport boundary.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "sideEffects": false
+}

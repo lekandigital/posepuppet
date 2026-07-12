@@ -14,8 +14,10 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "types": ["vite/client"],
     "paths": {
-      "@bodyarcade/body-input": ["../../../packages/body-input/src/index.ts"]
+      "@bodyarcade/body-input": ["../../../packages/body-input/src/index.ts"],
+      "@bodyarcade/pose-runtime": ["../../../packages/pose-runtime/src/index.ts"],
+      "@bodyarcade/pose-hud": ["../../../packages/pose-hud/src/index.ts"]
     }
   },
-  "include": ["src", "../shared", "../../../packages/body-input/src"]
+  "include": ["src", "../shared", "../../../packages/body-input/src", "../../../packages/pose-runtime/src", "../../../packages/pose-hud/src"]
 }

@@ -12,8 +12,8 @@
 // Specs are data. Window times must sit inside the source clip duration
 // (arms 12.3 s, fast 12.4 s, fullbody 34.5 s, facetouch 65.3 s).
 
-import type { LandmarkPoint } from '../pose/types';
-import { PPC_GROUP_MEMBERS, type PpcGroupName } from '../pose/continuity';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
+import { PPC_GROUP_MEMBERS, type PpcGroupName } from '@bodyarcade/pose-runtime';
 
 export type MaskGroup = PpcGroupName | 'all';
 

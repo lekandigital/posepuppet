@@ -7,6 +7,14 @@ import type { PoseFrame } from './types';
 
 export type ModelVariant = 'full' | 'lite';
 
+/** Same-origin asset roots; the defaults match the PosePuppet topology
+ *  (root public/ serves both, and games under /flight/ · /dolphin/ share
+ *  the origin — game dev servers map the same paths in middleware). */
+export interface DetectorAssets {
+  wasmBase?: string; // default '/mediapipe-wasm'
+  modelsBase?: string; // default '/models'
+}
+
 export interface PoseDetector {
   start(video: HTMLVideoElement, onFrame: (frame: PoseFrame | null) => void): void;
   stop(): void;
@@ -16,11 +24,11 @@ export interface PoseDetector {
   delegate(): 'GPU' | 'CPU';
 }
 
-async function buildLandmarker(variant: ModelVariant, delegate: 'GPU' | 'CPU') {
-  const fileset = await FilesetResolver.forVisionTasks('/mediapipe-wasm');
+async function buildLandmarker(variant: ModelVariant, delegate: 'GPU' | 'CPU', assets: DetectorAssets) {
+  const fileset = await FilesetResolver.forVisionTasks(assets.wasmBase ?? '/mediapipe-wasm');
   return PoseLandmarker.createFromOptions(fileset, {
     baseOptions: {
-      modelAssetPath: `/models/pose_landmarker_${variant}.task`,
+      modelAssetPath: `${assets.modelsBase ?? '/models'}/pose_landmarker_${variant}.task`,
       delegate,
     },
     runningMode: 'VIDEO',
@@ -31,15 +39,18 @@ async function buildLandmarker(variant: ModelVariant, delegate: 'GPU' | 'CPU') {
   });
 }
 
-export async function createDetector(variant: ModelVariant = 'full'): Promise<PoseDetector> {
+export async function createDetector(
+  variant: ModelVariant = 'full',
+  assets: DetectorAssets = {},
+): Promise<PoseDetector> {
   let delegate: 'GPU' | 'CPU' = 'GPU';
   let landmarker: PoseLandmarker;
   try {
-    landmarker = await buildLandmarker(variant, 'GPU');
+    landmarker = await buildLandmarker(variant, 'GPU', assets);
   } catch (err) {
     console.warn('pose: GPU delegate failed, falling back to CPU/WASM', err);
     delegate = 'CPU';
-    landmarker = await buildLandmarker(variant, 'CPU');
+    landmarker = await buildLandmarker(variant, 'CPU', assets);
   }
 
   let stopped = false;
@@ -121,7 +132,7 @@ export async function createDetector(variant: ModelVariant = 'full'): Promise<Po
     },
     async setModel(v) {
       if (v === currentVariant) return;
-      const next = await buildLandmarker(v, delegate);
+      const next = await buildLandmarker(v, delegate, assets);
       const old = landmarker;
       landmarker = next;
       currentVariant = v;

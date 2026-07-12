@@ -15,6 +15,8 @@
     "resolveJsonModule": true,
     "paths": {
       "@bodyarcade/body-input": ["../../packages/body-input/src/index.ts"],
+      "@bodyarcade/pose-runtime": ["../../packages/pose-runtime/src/index.ts"],
+      "@bodyarcade/pose-hud": ["../../packages/pose-hud/src/index.ts"],
       "@bodyarcade/world-data": ["../../packages/world-data/src/index.ts"]
     }
   },

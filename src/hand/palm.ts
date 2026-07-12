@@ -2,7 +2,7 @@
 // and a lightly smoothed view of the landmarks in stage space.
 
 import * as THREE from 'three';
-import { HLM, type HandFrame, type HandPoint } from '../pose/handDetector';
+import { HLM, type HandFrame, type HandPoint } from '@bodyarcade/pose-runtime';
 
 /** Map a normalized hand landmark into stage space: x mirrored to match
  *  the mirrored camera view, y flipped (image y-down), z scaled. The hand

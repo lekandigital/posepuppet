@@ -6,7 +6,7 @@ import { test, expect, type Page } from "@playwright/test";
  * LocalWorldProvider and the "nothing phones home" non-negotiable.
  */
 
-const ORIGIN = "http://localhost:5199";
+const ORIGIN = `http://localhost:${process.env.FLIGHT_PORT ?? "5199"}`;
 
 function trackRequests(page: Page) {
   const offOrigin: string[] = [];

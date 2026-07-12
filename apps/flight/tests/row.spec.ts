@@ -13,7 +13,7 @@ import { resolve } from "node:path";
  * ?row is the entry under test: the game starts straight on the water.
  */
 
-const FLIGHT = "http://localhost:5199";
+const FLIGHT = `http://localhost:${process.env.FLIGHT_PORT ?? "5199"}`;
 
 async function waitForBoat(page: Page) {
   await page.waitForFunction(

@@ -130,6 +130,12 @@ export default defineConfig({
       '@bodyarcade/body-input': fileURLToPath(
         new URL('./packages/body-input/src/index.ts', import.meta.url),
       ),
+      '@bodyarcade/pose-runtime': fileURLToPath(
+        new URL('./packages/pose-runtime/src/index.ts', import.meta.url),
+      ),
+      '@bodyarcade/pose-hud': fileURLToPath(
+        new URL('./packages/pose-hud/src/index.ts', import.meta.url),
+      ),
     },
   },
   server: {

@@ -1,0 +1,11 @@
+{
+  "name": "@bodyarcade/pose-hud",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared BodyArcade tracking HUD: compact console-system overlay every game mounts — preview figure, tracking + privacy state, keyboard-accessible expand/collapse. PosePuppet visual language; no settings panel.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "sideEffects": false
+}

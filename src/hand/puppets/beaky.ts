@@ -4,7 +4,7 @@
 // mesh. A lip-sync puppet for voiceover takes.
 
 import * as THREE from 'three';
-import type { HandFrame } from '../../pose/handDetector';
+import type { HandFrame } from '@bodyarcade/pose-runtime';
 import type { HandPuppet } from '../types';
 import { PalmState } from '../palm';
 

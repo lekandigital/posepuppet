@@ -8,9 +8,9 @@
 // go invisible hold their last target and relax toward rest over ~0.7 s.
 
 import * as THREE from 'three';
-import { LM } from '../pose/indices';
-import { BodyFrame, mpToThree } from '../pose/bodyFrame';
-import type { LandmarkPoint } from '../pose/types';
+import { LM } from '@bodyarcade/pose-runtime';
+import { BodyFrame, mpToThree } from './bodyFrame';
+import type { LandmarkPoint } from '@bodyarcade/pose-runtime';
 import type { Avatar, BoneName, JointName } from './types';
 import { config } from '../config';
 
