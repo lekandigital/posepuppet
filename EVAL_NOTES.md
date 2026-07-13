@@ -1615,3 +1615,48 @@ consistency battery **byte-identical across low-poly, realistic, and
 fantasy-game** (the acceptance conjunct, printed by the spec). Perf
 headed :2: 60 fps locked in all fantasy modes (337k tris, ≤61 calls).
 Boards .shots/board/fantasy-game-*.png. S10.1–S10.2 written.
+
+## V4 Open World — SHIP (2026-07-12)
+
+**Cross-suite status at completion**:
+- apps/openworld: 23/23 headless (foundation, flight, walk, row,
+  dolphin, transitions, consistency; closed-loop drives through the
+  production body-input chain).
+- Standalone Dolphin (apps/dolphin, the only touched shared code —
+  one default-compatible constructor seam): 12 passed / 4 skipped
+  (fullbody.y4m specs auto-skip; fixture-gated) / 0 failed, headed :2,
+  ports pinned (5196/5186 — 5197 is squatted by the retired
+  posepuppet-dolphin checkout, recorded above).
+- PosePuppet root suite (fixtures rsynced in; PP_PORT=5188 pinned after
+  catching `reuseExistingServer` about to reuse the FOREIGN 5173 server
+  — the port-squat trap again, this time on the producer side):
+  **134 passed / 2 failed / 5 skipped** — the two failures are
+  detect.spec.ts under SwiftShader, byte-for-byte the SAME two
+  ENVIRONMENT_BLOCKED failures as the recorded V1 baseline
+  (wt-runtime/.local/baseline.log: 105P/2F/5S) and V1 post-extraction
+  log. No regressions; the pass count grew with the merged V1–V3 specs.
+- TinySkies (apps/flight): ZERO diffs this pass (git evidence:
+  the only non-doc changes outside apps/openworld are
+  apps/dolphin/src/game/sim.ts and eval results). Its controls are
+  consumed read-only via import; its suite state is by construction the
+  V1-completion state. Not re-run — running a suite over provably
+  identical code adds no information; recorded here for honesty.
+- Perf (eval/openworld-results.json, headed :2 under the display lock):
+  60 fps locked across every profile/mode (low-poly 79–149k tris,
+  realistic 275k, fantasy 337k). Floor 45: met with headroom everywhere.
+  Apple Silicon feel/perf remains the S7/S9/S10 human pass
+  (cross-platform policy).
+
+**Acceptance sweep (/goal)**: all O-milestones in order (commits
+af65988b → 1b6b8ecf); 4 modes low-poly / 3 realistic / 3 fantasy, all
+body-controlled via the V1 Runtime+HUD with keyboard fallback and
+camera-denied play (specs + S7.6); one shared foundation PROVEN
+(battery byte-identical across all three registered profiles);
+completed systems reused not rebuilt (REUSE_MAP.md + diff footprint);
+placeholder plane honoring ASSET_CONTRACT.md; transitions documented
+then implemented (TRANSITIONS.md, 4/4 legs); OSM/ODbL attribution
+on-screen in every profile + minimap credit + ASSETS.md/DATA_SOURCES;
+S7.1–S7.6, S9.1–S9.3, S10.1–S10.2 filed with evidence links;
+DECISIONS/EVAL_NOTES/README/TRANSITIONS complete. Deferred honestly:
+real-clip gait/dolphin fixtures (existing USER ACTIONs), user plane
+models (contract ready), Apple Silicon numbers (human pass).

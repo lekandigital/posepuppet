@@ -188,3 +188,12 @@ widget removed), `client/vite.config.ts` + `client/tsconfig.json`
 | files | class | notes |
 |---|---|---|
 | `apps/dolphin/**` | original | all geometry, shaders, world dressing and UI are procedural/code — no third-party or imported assets of any kind; the only external data is the boundary (see the world-data section above) |
+
+## V4 Open World (apps/openworld)
+
+| Asset | Source | License / status |
+|---|---|---|
+| Placeholder plane, rowboat, sailboats, windmill, lighthouse, trees, clouds/smoke/firefly sprites | Procedural, authored in-code this pass | Original — no third-party material |
+| Ísafjörður world artifact (`packages/world-data/data/worlds/isafjordur/world.json`) | OpenStreetMap contributors (ODbL) + Mapzen/AWS Terrain Tiles (SRTM ©NASA; GMTED2010 ©USGS; ETOPO1 ©NOAA) | Attribution baked into the artifact and rendered on-screen in every profile; details in DATA_SOURCES.md |
+| Dolphin mesh / PS2 underwater art | Reused from apps/dolphin (procedural, original — see its entry) | Unchanged |
+| User plane models | none received yet | Enter via apps/openworld/ASSET_CONTRACT.md; per-model ASSETS.md entry + licensing stop-review before commit |

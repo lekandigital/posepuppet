@@ -194,3 +194,9 @@ Next: V4 integrates packages/locomotion into the Open World low-poly profile per
 - O2–O7 complete: four modes body-controlled in low-poly (reused controls, zero rebuilds), transitions live, dolphin standalone stays green.
 - Suite 23/23; perf 60 fps locked on :2 across all modes; S7.1–S7.6 written.
 - Next: O8 realistic profile.
+
+## V4 Open World — 2026-07-12 (ship)
+- O1–O9 complete in order. 23/23 openworld; dolphin standalone 12P/4S; root suite 134P/2F/5S — the 2 are the recorded SwiftShader-only baseline failures; TinySkies untouched (zero diffs).
+- One shared foundation proven: consistency battery byte-identical across low-poly/realistic/fantasy.
+- 60 fps locked on :2 in every profile/mode. S7/S9/S10 human passes filed with evidence.
+- Tree clean at HEAD; branch feat/openworld unmerged, awaiting Lekan.
