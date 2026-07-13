@@ -922,3 +922,18 @@ media/m0-smoke.png shows the split screen working — person clearly visible
 left, empty dark stage right, LIVE badge and privacy footer present. No pose
 detection yet, so nothing to judge on motion. Stage reads dark but the
 ground disc and grid are visible; lighting will matter once the robot is in.
+
+## Final verification summary (commands → logs)
+
+- Root suite under the fullsuite lock (`USE_SWIFTSHADER=1 PP_PORT=5185
+  npx playwright test`): **134 passed, 2 failed, 5 skipped** — the two
+  failures are the documented pre-existing SwiftShader-only detect specs
+  (ENVIRONMENT_BLOCKED), re-confirmed **2/2 green on the gpu-performance
+  tier** on :2 this run. Log: .local/root-suite-v3.log. The 134 include
+  the 24 new V3 specs (gait 9, locomotion 10, walking-eval 5).
+- Walking graybox suite (`apps/walking && npx playwright test`): 9/9.
+- Fixture eval headed on :2 under the display lock (PP_PORT=5185):
+  ALL GREEN incl. the new gait rows. Log: .local/fixture-eval-headed.log;
+  artifact: eval/bodyinput-results.json.
+- Chain eval artifact: eval/walking-results.json (all-pass).
+- Typecheck: `npx tsc --noEmit` clean at root and in apps/walking.
