@@ -1016,3 +1016,5 @@ without adding a runtime or bake-time network dependency.
 - 2026-07-12 — Profile law: profiles receive WorldRuntime read-only + a scene; all geographic queries live in WorldRuntime/modes. Cross-profile consistency = `battery()` (49-point grid of ground/water/SDF/hint/nav queries + spawns/transitions) asserted identical under every profile.
 
 - 2026-07-12 — O2: flight departure heading auto-picks the runway direction pointing into the region (baked headings are bidirectional); region-edge containment is a blended yaw assist (never overrides player authority fully, never a wall). Placeholder plane is procedural/original — no ASSETS.md licensing entry needed beyond noting it.
+
+- 2026-07-12 — O5: SwimSim parameterized (boundary/scale/spawn/depthFn, defaults byte-identical — standalone suite 12P/4S green); region dolphin swims at worldScale 1 (real metres) over real bathymetry; sea-class polygons only (no pond dolphins). Dolphin suite must pin DOLPHIN_PORT+PP_PORT — 5197 is squatted by the retired posepuppet-dolphin checkout.

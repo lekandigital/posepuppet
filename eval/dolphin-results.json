@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-07-11T19:50:17.212Z",
+  "generatedAt": "2026-07-13T00:52:39.821Z",
   "cadenceCoupling": [
     {
       "rateHz": 0.4,
-      "speed": 7.668887694051683
+      "speed": 7.663277739224214
     },
     {
       "rateHz": 0.9,
-      "speed": 15.70560054119442
+      "speed": 15.708548892736255
     }
   ],
-  "glideSpeedAfter3s": 10.986631109771189,
-  "burstPeakSpeed": 17.144285760642717,
+  "glideSpeedAfter3s": 9.17007348925224,
+  "burstPeakSpeed": 17.00736460365116,
   "containment": {
-    "minShoreDist": 18.84275531015767,
-    "minSpeedWhileBursting": 20.810665237690976,
+    "minShoreDist": 18.90427218875561,
+    "minSpeedWhileBursting": 20.71848898508592,
     "maxDecelPer200ms": 0
   },
   "breach": {
@@ -22,13 +22,13 @@
     "splashes": 1
   },
   "dropout": {
-    "maxPitchStepRad": 0.0893260367988219,
+    "maxPitchStepRad": 0.08966926551969356,
     "trackingDuringLoss": "autopilot"
   },
   "replayDigest": "-658.577955,-6.000000,-1086.323794,0.500000,16.000000,240,0|-637",
   "perf": {
-    "fps": 60.00983767830792,
-    "simHz": 120.01967535661583,
-    "gpuRun": true
+    "fps": 60.00393468424168,
+    "simHz": 120.00786936848336,
+    "gpuRun": false
   }
 }

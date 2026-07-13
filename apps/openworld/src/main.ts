@@ -21,6 +21,7 @@ import { createFlycam, type Flycam } from './modes/flycam';
 import { FlightMode } from './modes/flight';
 import { WalkMode } from './modes/walk';
 import { RowMode } from './modes/row';
+import { DolphinMode } from './modes/dolphin';
 import type { GameMode } from './modes/types';
 import { SCRIPTS, startBodyDrive } from './drive/bodyDrive';
 
@@ -79,6 +80,10 @@ if (requestedMode === 'flyover') {
 } else if (requestedMode === 'row') {
   mode = new RowMode(modeCtx);
   mode.enter();
+} else if (requestedMode === 'dolphin' && profile.modes.includes('dolphin')) {
+  // dolphin is a low-poly content-pack entry — other profiles fall through
+  mode = new DolphinMode(modeCtx);
+  mode.enter();
 } else {
   mode = new FlightMode(modeCtx);
   mode.enter();
@@ -121,7 +126,7 @@ function frame(now: number): void {
   }
   mode?.update(dtS, timeS);
   profile.update(dtS, timeS, camera);
-  renderer.render(scene, camera);
+  if (!mode?.render?.(renderer)) renderer.render(scene, camera);
   frames++;
   if (now - fpsWindowStart >= 1000) {
     fps = Math.round((frames * 1000) / (now - fpsWindowStart));
@@ -169,6 +174,13 @@ window.addEventListener('beforeunload', () => stopDrive?.());
   row: () => (mode instanceof RowMode ? mode.state() : null),
   rowTeleport: (x: number, z: number, yawDeg: number, speed?: number) => {
     if (mode instanceof RowMode) mode.teleport(x, z, yawDeg, speed);
+  },
+  dolphin: () => (mode instanceof DolphinMode ? mode.state() : null),
+  dolphinTest: {
+    setIntent: (p: unknown) => { if (mode instanceof DolphinMode) mode.setTestIntent(p as never); },
+    teleport: (x: number, z: number, y?: number) => { if (mode instanceof DolphinMode) mode.teleport(x, z, y); },
+    setYaw: (yaw: number) => { if (mode instanceof DolphinMode) mode.setYaw(yaw); },
+    setAssist: (a: string) => { if (mode instanceof DolphinMode) mode.setAssist(a as never); },
   },
   flightTeleport: (x: number, z: number, yawDeg: number, y?: number) => {
     if (mode instanceof FlightMode) mode.teleport(x, z, yawDeg, y);

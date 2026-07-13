@@ -42,6 +42,9 @@ export default defineConfig({
   plugins: [poseAssets()],
   resolve: {
     alias: {
+      // ONE three.js in the bundle: reused dolphin sources (outside this
+      // package dir) must resolve to the same copy this app uses
+      'three': fileURLToPath(new URL('./node_modules/three', import.meta.url)),
       '@bodyarcade/body-input': fileURLToPath(
         new URL('../../packages/body-input/src/index.ts', import.meta.url),
       ),

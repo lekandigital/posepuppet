@@ -1465,3 +1465,36 @@ way at the end); shore guard (teleported at 4 m/s straight down the SDF
 gradient with ArrowUp held: never leaves water across 12 s, never
 trapped dead). Vision: ROWING · 4.1 M/S · CADENCE 45 SPM over the fjord.
 Suite green; tsc clean. Polish note: hull reads crate-like stern-on (O7).
+
+## V4 Open World — O5 Low-poly Dolphin (2026-07-12)
+
+**The one permitted seam adaptation**: `SwimSim` (apps/dolphin) gained a
+default-compatible options object — boundary / worldScale / spawn seed /
+depthFn — with every default reproducing the standalone app exactly.
+Renderer (seabed/surface/shimmer), decor, dolphin mesh, chase camera and
+swim controls are imported UNCHANGED. openworld constructs the sim with
+the region's real sea polygons (same ring convention, converted to the
+boundary shape), worldScale 1 (the fjord plays at real metres — the
+gate-approved impulse-and-glide feel constants carry over), the baked
+dive spawn, and REAL bathymetry (the shared carved heightfield — the
+same seabed the sim collides with is the one the PS2 world mesh draws,
+preserving the what-you-see-is-what-you-collide-with law). Dolphin is a
+low-poly content-pack entry; other profiles fall through to flight.
+
+**Verification**: openworld dolphin.spec 4/4 — dive spawn in open fjord
+water with sim/world agreement on depth and containment; keyboard
+parity (Shift kicks, A/D turns, W dives); closed-loop torso-wave drive
+through the real chain (kicks counted, travel, dive below −4 m, roll
+turns, in-water every sample); containment burst straight down the SDF
+gradient (never exits the polygon, never wall-stops). **Standalone suite
+stays green**: 12 passed / 4 skipped (fullbody.y4m fixture absent in
+this worktree — SKIP_EXPECTED per policy), 0 failed, headed on :2.
+
+**Gotcha rediscovered**: port 5197 was squatted by the RETIRED
+posepuppet-dolphin checkout's persistent vite (running since Jul 11);
+`reuseExistingServer` silently ran the suite against the OLD tree and
+"failed" the V1 denied-HUD spec (pp-hud predates that tree). Baselined
+the failure against the unpatched sim (identical), identified the
+squatter via /proc/PID/cwd, re-ran on DOLPHIN_PORT=5196 from this tree:
+all green. The V1 lane's port-squat lesson holds: always pin BOTH ports.
+eval/dolphin-results.json refreshed by the suite run on this tree.
