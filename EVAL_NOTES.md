@@ -1517,3 +1517,40 @@ to FULL for wrist depth — V1's measured lesson). Minimal selector chips
 **Verification**: transitions.spec 4/4 (dock round-trip, dive
 round-trip, a flown braking approach to the airfield landing, selector
 gating). Full openworld suite 21/21 after the ModeManager refactor.
+
+## V4 Open World — O7 Consolidated low-poly verification (2026-07-12)
+
+**Fixture matrix (closed loop, per mode)**: flight lap (lean phases →
+heading phases), walk route (march + lean turns + envelope caps
+in-world), row circuit (real StrokeDetector → surges/steering/cruise),
+dolphin swim (torso wave → kicks/dive/roll), plus loss/reacquire and
+containment per mode, plus all transition legs. apps/openworld suite
+**23/23 green** (missing real fixtures never block: the drives are
+deterministic landmark streams through the production body-input chain;
+real-clip validation rides FINAL_USER_TEST_PLAN S7).
+
+**Cross-profile consistency**: `battery()` (spawns/transitions/49-point
+ground/water/SDF/hint/nav grid/attribution) asserted byte-identical
+across every REGISTERED profile; the spec reads the registry so O8/O9
+join automatically. Currently proves [low-poly]; the mode/content
+matrix spec pins dolphin = low-poly only.
+
+**Perf (headed :2 under the display lock, RTX box)** —
+eval/openworld-results.json: all five low-poly views (flight/walk/row/
+dolphin/flyover, all under synthetic drive) hold a locked **60 fps**
+(vsync) at 79k–149k triangles, 5–24 draw calls. Floor 45 fps: met with
+headroom. Pose-runtime cost is V1's measured table
+(eval/runtime-hud-perf.json); Apple Silicon numbers remain the S7
+human pass per cross-platform policy.
+
+**Vision review (board: .shots/board/low-poly-*.png)**: geography
+recognizably Ísafjörður (fjord, spit street grid, runway peninsula);
+polish applied this round — airfield corridor flattened in shared
+terrain conditioning (was jagged teeth), aeroway ribbons width-by-class
+(was a merged 30 m blob), roads lightened for legibility. Remaining
+honest nits: buildings step into steep slopes; the rowboat reads
+crate-like stern-on; breach view above water is fog-void (inherited
+from the standalone dolphin's underwater-only art).
+
+**S7 entries written** (S7.1–S7.6, ~25 min) + V4 environment block in
+FINAL_USER_TEST_PLAN front matter.
