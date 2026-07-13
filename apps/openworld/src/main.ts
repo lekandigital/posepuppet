@@ -15,6 +15,7 @@ import { mountPoseHud } from '@bodyarcade/pose-hud';
 import worldJson from '../../../packages/world-data/data/worlds/isafjordur/world.json';
 import { WorldRuntime } from './world/runtime';
 import { createLowPolyProfile } from './profiles/lowpoly';
+import { createRealisticProfile } from './profiles/realistic';
 import type { WorldProfile, ProfileId } from './profiles/types';
 import { createChrome } from './ui/chrome';
 import { createSelector } from './ui/selector';
@@ -47,6 +48,7 @@ camera.rotation.order = 'YXZ';
 // --- profile ------------------------------------------------------------
 const PROFILES: Partial<Record<ProfileId, () => WorldProfile>> = {
   'low-poly': createLowPolyProfile,
+  'realistic': createRealisticProfile,
 };
 const requestedProfile = (params.get('profile') ?? 'low-poly') as ProfileId;
 const profile = (PROFILES[requestedProfile] ?? createLowPolyProfile)();
