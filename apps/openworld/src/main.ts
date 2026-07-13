@@ -20,6 +20,7 @@ import { createChrome } from './ui/chrome';
 import { createFlycam, type Flycam } from './modes/flycam';
 import { FlightMode } from './modes/flight';
 import { WalkMode } from './modes/walk';
+import { RowMode } from './modes/row';
 import type { GameMode } from './modes/types';
 import { SCRIPTS, startBodyDrive } from './drive/bodyDrive';
 
@@ -74,6 +75,9 @@ if (requestedMode === 'flyover') {
   chrome.setMode('flyover');
 } else if (requestedMode === 'walk') {
   mode = new WalkMode(modeCtx);
+  mode.enter();
+} else if (requestedMode === 'row') {
+  mode = new RowMode(modeCtx);
   mode.enter();
 } else {
   mode = new FlightMode(modeCtx);
@@ -162,6 +166,10 @@ window.addEventListener('beforeunload', () => stopDrive?.());
   triangles: () => renderer.info.render.triangles,
   flight: () => (mode instanceof FlightMode ? mode.state() : null),
   walk: () => (mode instanceof WalkMode ? mode.state() : null),
+  row: () => (mode instanceof RowMode ? mode.state() : null),
+  rowTeleport: (x: number, z: number, yawDeg: number, speed?: number) => {
+    if (mode instanceof RowMode) mode.teleport(x, z, yawDeg, speed);
+  },
   flightTeleport: (x: number, z: number, yawDeg: number, y?: number) => {
     if (mode instanceof FlightMode) mode.teleport(x, z, yawDeg, y);
   },

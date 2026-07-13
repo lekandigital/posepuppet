@@ -1442,3 +1442,26 @@ CADENCE 109 · SRC LEGS, minimap arrow tracking. Suite green; tsc clean.
 
 Residual polish (O7): major-road ribbons read overwide at street level;
 buildings on steep slopes sink into the hillside.
+
+## V4 Open World — O4 Low-poly Rowing (2026-07-12)
+
+**Reuse, verbatim**: `RowingControls` imported from apps/flight —
+stroke→impulse queue, lean/asymmetry steering profiles (Gate-2 expo
+fix), cruise arm/latch, loss autopilot, keyboard priority,
+steeringIntent. Owned here: metre-scale hull (impulse-and-glide: banked
+surge with 0.3 s attack, τ7 s proportional drag — the completed feel
+ratios), speed-coupled carve yaw (the 360°-pivot fix pattern), shore
+guard from the world SDF + bathymetry (soft inward push + heading bias
+toward deep water; safety NOT intent-scaled — the coxswain lesson; no
+course-follow: the fjord is open water, not a corridor), dock spawn
+snapped to the row lattice facing off-shore, procedural rowboat with
+stroke-pulsed oars, low chase camera, minimap.
+
+**Verification**: row.spec.ts 3/3 — dock spawn in rowable water (sdf>0.5)
++ arrows keyboard parity + glide-never-hard-stop; closed-loop stroke
+circuit (synthetic wrist sweeps through the real StrokeDetector →
+strokes counted, boat travels, lean phases steer both ways, still under
+way at the end); shore guard (teleported at 4 m/s straight down the SDF
+gradient with ArrowUp held: never leaves water across 12 s, never
+trapped dead). Vision: ROWING · 4.1 M/S · CADENCE 45 SPM over the fjord.
+Suite green; tsc clean. Polish note: hull reads crate-like stern-on (O7).
