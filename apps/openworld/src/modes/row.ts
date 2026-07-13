@@ -101,6 +101,15 @@ export class RowMode implements GameMode {
     this.ctx.chrome.setMode('row');
   }
 
+  /** Transition entry: hull at a specific point, bow off-shore. */
+  enterAt(x: number, z: number): void {
+    this.x = x;
+    this.z = z;
+    const g = this.sdfGradient(x, z);
+    this.yawDeg = Math.atan2(g[0], -g[1]) / DEG;
+    this.speed = 0;
+  }
+
   /** SDF gradient (points toward deeper water), normalized. */
   private sdfGradient(x: number, z: number): [number, number] {
     const world = this.ctx.world;
