@@ -19,6 +19,7 @@ import type { WorldProfile, ProfileId } from './profiles/types';
 import { createChrome } from './ui/chrome';
 import { createFlycam, type Flycam } from './modes/flycam';
 import { FlightMode } from './modes/flight';
+import { WalkMode } from './modes/walk';
 import type { GameMode } from './modes/types';
 import { SCRIPTS, startBodyDrive } from './drive/bodyDrive';
 
@@ -71,6 +72,9 @@ const requestedMode = params.get('mode') ?? 'flight';
 if (requestedMode === 'flyover') {
   flycam = createFlycam(world, camera);
   chrome.setMode('flyover');
+} else if (requestedMode === 'walk') {
+  mode = new WalkMode(modeCtx);
+  mode.enter();
 } else {
   mode = new FlightMode(modeCtx);
   mode.enter();
@@ -89,6 +93,7 @@ if (params.get('hud') !== '0' && !driveName) {
   });
   runtime.onState((s) => {
     cameraDenied = s === 'denied' || s === 'error';
+    if (mode instanceof WalkMode) mode.cameraDenied = cameraDenied;
   });
   const poseHud = mountPoseHud(runtime, { safeArea: { x: 12, y: 96 }, title: 'WORLD' });
   (window as unknown as { __PP_HUD: typeof poseHud }).__PP_HUD = poseHud;
@@ -156,6 +161,7 @@ window.addEventListener('beforeunload', () => stopDrive?.());
   drawCalls: () => renderer.info.render.calls,
   triangles: () => renderer.info.render.triangles,
   flight: () => (mode instanceof FlightMode ? mode.state() : null),
+  walk: () => (mode instanceof WalkMode ? mode.state() : null),
   flightTeleport: (x: number, z: number, yawDeg: number, y?: number) => {
     if (mode instanceof FlightMode) mode.teleport(x, z, yawDeg, y);
   },

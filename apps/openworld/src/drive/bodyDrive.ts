@@ -35,6 +35,8 @@ export interface FigureOpts {
   strokePhase?: number | null;
   /** torso wave for dolphin kicks: chest/hip anti-phase bob */
   wavePhase?: number | null;
+  /** marching-in-place phase (full L-R cycle = 2pi) — gait source */
+  marchPhase?: number | null;
   seated?: boolean;
   crouch01?: number;
 }
@@ -91,6 +93,18 @@ export function figureFrame(tsMs: number, o: FigureOpts = {}): BodyInputFrame {
     world[LM.rightKnee] = lm(-0.1, 0.05, -0.4, 0.9);
     world[LM.leftAnkle] = lm(0.1, 0.5, -0.4, 0.9);
     world[LM.rightAnkle] = lm(-0.1, 0.5, -0.4, 0.9);
+  } else if (o.marchPhase !== null && o.marchPhase !== undefined) {
+    // marching legs: rigid 0.45 m thigh rotating about the hip — the
+    // exact geometry the gait detector was tuned on (walking graybox)
+    const thigh = 0.45;
+    const maxRad = (70 * Math.PI) / 180;
+    const ph = o.marchPhase;
+    const thetaUserLeft = Math.max(0, Math.sin(ph)) * maxRad;
+    const thetaUserRight = Math.max(0, -Math.sin(ph)) * maxRad;
+    world[LM.leftKnee] = lm(0.1, thigh * Math.cos(thetaUserRight), -thigh * Math.sin(thetaUserRight), 0.95);
+    world[LM.rightKnee] = lm(-0.1, thigh * Math.cos(thetaUserLeft), -thigh * Math.sin(thetaUserLeft), 0.95);
+    world[LM.leftAnkle] = lm(0.1, 0.9, 0, 0.95);
+    world[LM.rightAnkle] = lm(-0.1, 0.9, 0, 0.95);
   } else {
     world[LM.leftKnee] = lm(0.1, 0.45 - crouchDrop, 0, 0.95);
     world[LM.rightKnee] = lm(-0.1, 0.45 - crouchDrop, 0, 0.95);
@@ -155,6 +169,22 @@ export const SCRIPTS: Record<string, ScriptFrame> = {
     if (t < 26) return { strokePhase: 2 * Math.PI * RATE * t, leanDeg: 10 };
     if (t < 31) return {}; // rest — cruise should hold
     return { strokePhase: 2 * Math.PI * RATE * t };
+  },
+  // walking route: march, lean-turn left, march, lean-turn right, stop
+  walkroute: (t) => {
+    const M = 2 * Math.PI * 0.9;
+    if (t < 8) return { marchPhase: M * t };
+    if (t < 14) return { marchPhase: M * t, leanDeg: -10 };
+    if (t < 20) return { marchPhase: M * t };
+    if (t < 26) return { marchPhase: M * t, leanDeg: 10 };
+    if (t < 30) return {}; // stop marching -> walk eases to a stop
+    return { marchPhase: M * t };
+  },
+  // walking with a dropout mid-march
+  walkloss: (t) => {
+    const M = 2 * Math.PI * 0.9;
+    if (t >= 8 && t < 11) return 'lost';
+    return { marchPhase: M * t };
   },
   // dolphin: kick waves, dive lean, surface lean, roll turns
   swim: (t) => {

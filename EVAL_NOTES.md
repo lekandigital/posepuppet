@@ -1418,3 +1418,27 @@ polish: runway strip jagged over conditioned terrain (O7 item —
 flatten under aeroways).
 
 **Suite**: openworld 7/7 green headless; tsc clean.
+
+## V4 Open World — O3 Low-poly Walking (2026-07-12)
+
+**Reuse, verbatim**: V3's `@bodyarcade/locomotion` integrated exactly
+per its INTEGRATION.md — controller (transports + WASD + keyboard
+priority), model (comfort caps enforced at output), WALK_STATUS/
+coachLine strings. Owned here: PathHint served from the baked nav.walk
+largest component (WorldRuntime, heading-oriented edge direction),
+terrain ground clamp as the render-side offset, settlement spawn facing
+along the local path, comfort-vignette overlay, and the shared minimap
+(artifact minimap vectors: water/roads/runways/spawns + player arrow +
+in-tile OSM credit).
+
+**Verification**: walk.spec.ts 3/3 — spawn lands ON the network
+(|lateral| < 4 m) + keyboard walk with eye height 1.0–1.9 m above
+ground and zero camera tilt; closed-loop march (synthetic gait through
+the real chain: mode reaches `walk`, travels, lean phases turn left
+then right, package envelope caps hold in-world ≤45°/s yaw ≤2.4 m/s);
+mid-march dropout (autopilot appears, tilt stays zero every sample,
+walking resumes). Vision review: street-level shot with WALKING ·
+CADENCE 109 · SRC LEGS, minimap arrow tracking. Suite green; tsc clean.
+
+Residual polish (O7): major-road ribbons read overwide at street level;
+buildings on steep slopes sink into the hillside.
