@@ -214,6 +214,46 @@ export class WorldRuntime {
         shoreDists[i] = shoreDist;
       }
     }
+    // Flatten the airfield: cells within the aeroway corridor ease to the
+    // corridor's mean height (a runway is graded in reality; the coarse
+    // DEM says otherwise). Data-derived: corridor = baked aeroway
+    // polylines + 30 m. Shared geography — every profile and the landing
+    // transition see the same apron.
+    const aeroGrid = new SegmentGrid(this.world.bbox, 60);
+    for (const a of this.world.layers.aeroways) {
+      for (let i = 0; i < a.pts.length - 1; i++) {
+        aeroGrid.add(a.pts[i][0], a.pts[i][1], a.pts[i + 1][0], a.pts[i + 1][1]);
+      }
+    }
+    if (aeroGrid.segs.length > 0) {
+      const CORRIDOR = 30;
+      let sum = 0;
+      let n = 0;
+      const hits: { i: number; w: number }[] = [];
+      for (let gy = 0; gy < t.height; gy++) {
+        const wy = t.originY + gy * t.cellSizeM;
+        for (let gx = 0; gx < t.width; gx++) {
+          const wx = t.originX + gx * t.cellSizeM;
+          const hit = aeroGrid.nearest(wx, wy, CORRIDOR * 2);
+          if (!hit) continue;
+          const i = gy * t.width + gx;
+          if (hit.dist <= CORRIDOR) {
+            sum += this.heights[i];
+            n++;
+          }
+          // falloff weight: 1 inside the corridor → 0 at 2× corridor
+          const w = hit.dist <= CORRIDOR ? 1 : 1 - (hit.dist - CORRIDOR) / CORRIDOR;
+          hits.push({ i, w });
+        }
+      }
+      if (n > 0) {
+        const apron = Math.max(this.seaLevel + 1.2, sum / n);
+        for (const { i, w } of hits) {
+          this.heights[i] = this.heights[i] * (1 - w) + apron * w;
+        }
+      }
+    }
+
     // Round the shoreline lip: a 3×3 mean over cells within ~3 cells of
     // the shore kills the near-vertical faces where cap meets carve
     // without touching ridge lines inland.

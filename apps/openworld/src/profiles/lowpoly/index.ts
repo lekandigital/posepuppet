@@ -20,11 +20,11 @@ export const LP = {
   grassHigh: 0x8fbf74,
   rock: 0x8d8f96,
   snow: 0xeef3f6,
-  road: 0x4a4e58,
+  road: 0x5d626e,
   path: 0x9a8f76,
   building: 0xdfe3e8,
   buildingRoof: 0xb4534b,
-  runway: 0x3c4048,
+  runway: 0x4a4f5a,
   pier: 0x7a6a52,
 } as const;
 
@@ -257,7 +257,14 @@ export function createLowPolyProfile(): WorldProfile {
       if (roads) built.push(roads);
       const paths = buildRibbons(ctx.world, ctx.world.world.layers.paths, LP.path, 0.2, 1.8);
       if (paths) built.push(paths);
-      const runways = buildRibbons(ctx.world, ctx.world.world.layers.aeroways, LP.runway, 0.3, 30);
+      const runways = buildRibbons(
+        ctx.world,
+        ctx.world.world.layers.aeroways.map((a) => ({
+          pts: a.pts,
+          widthM: a.widthM ?? (a.class === 'runway' ? 18 : 9),
+        })),
+        LP.runway, 0.3, 18,
+      );
       if (runways) built.push(runways);
 
       const buildings = buildBuildings(ctx.world);

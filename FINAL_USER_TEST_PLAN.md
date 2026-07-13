@@ -49,6 +49,26 @@
 - Estimated V3 human time: ~13 min (S8.1 6 + S8.2 4 + S8.3 3); S8.4 is an
   optional recording action (~10 min) whenever convenient.
 
+### V4 (Open World) environment — S7, S9, S10
+- Branch `feat/openworld` in `~/Dev/wt-openworld` (unmerged). Lane port
+  **5176** (tmux `ba-openworld`; `cd ~/Dev/wt-openworld/apps/openworld
+  && npm run dev -- --port 5176 --strictPort`).
+- Tunnel from the Mac: `ssh -N -L 5176:127.0.0.1:5176 -i
+  ~/.ssh/pinn_rtx3090 o@192.168.86.152` then open
+  http://localhost:5176/openworld/ — profile + mode selectable in-page
+  (top-left chips) or via `?profile=low-poly&mode=flight|walk|row|dolphin`.
+  `?drive=flylap|walkroute|rowcircuit|swim` replays the synthetic
+  closed-loop drives without a camera.
+- Camera + lighting: same as the per-mode conventions — flight standing
+  ~2 m back arms visible; walking ~2.5–3 m back knees visible; rowing
+  seated is fine (the row page loads the FULL pose model); dolphin
+  ~2.5–3 m back hips visible.
+- V4 evidence: eval/openworld-results.json (headed :2 perf per
+  profile/mode), apps/openworld/.shots/board/ (screenshot boards),
+  apps/openworld tests (23 green), apps/openworld/TRANSITIONS.md +
+  REUSE_MAP.md + PLAN.md, EVAL_NOTES.md §V4, DECISIONS.md §V4.
+- Estimated V4 low-poly human time: ~25 min (S7.1–S7.6).
+
 ## Entry format (every deferred check uses this)
 ID | Feature | Why human-only | Setup | Steps | Expected | Automated
 evidence already collected | Risk if skipped | Est. minutes
@@ -87,7 +107,18 @@ _Entries deferred to V6 Motion Memory 2 completion._
 _Entries deferred to V7 Recording v2 completion._
 
 ### S7  Open World low-poly: flight, walking, rowing, dolphin, transitions
-_Entries deferred to V4 Open World completion._
+
+S7.1 | Region flight feel (reused TinySkies controls over Ísafjörður) | Feel is the frozen Gate-2/3 contract; only a human can certify no interaction regression from the new plane dynamics | V4 tunnel, http://localhost:5176/openworld/?mode=flight, camera allowed, stand ~2 m back | Fly ~3 min with the Superman profile (arms out): takeoff happens on its own; bank both ways along the fjord walls, climb over the plateau rim, dive to the water, hands-forward boost, cross a region edge on purpose (soft turn-back should carry you home), step out of frame mid-turn and back in | The approved flight FEEL: same lean response and autopilot decay as TinySkies; the region reads as Ísafjörður from the air (fjord, spit, runway); turn-back is gentle, never a wall; re-entry never snaps | flight.spec 4/4 (closed-loop lean lap, loss/reacquire, containment never exits); perf 60 fps headed :2; board low-poly-flight.png | A feel regression in the most-approved control system ships into the new flagship surface | 5
+
+S7.2 | Walking the settlement (V3 locomotion in-world) | Nausea/comfort is human-only (S8.1 is the graybox twin; this is the in-context check) | Same, ?mode=walk, ~2.5–3 m back, knees visible | March through the settlement ~2 min; lean-steer through a street corner; stop dead; weight-shift with legs out of frame; step out of frame mid-walk and back | Horizon NEVER tilts or bobs; eye height only moves on a deliberate crouch; streets/buildings read as a place; assist keeps you near the walkable line without fighting deliberate leans; dropout eases to a stop and resumes without a lurch | walk.spec 3/3 (network spawn, closed-loop march + lean turns + envelope caps in-world, dropout with zero tilt every sample); locomotion package suite (V3) green | A comfort failure in the flagship walking surface poisons every profile | 4
+
+S7.3 | Rowing the fjord (completed Rowing logic + SDF shore guard) | Stroke registration strength and coxswain-yield are feel judgments (the Gate-2 lessons) | Same, ?mode=row (page loads the FULL pose model), seated is fine | Row ~2 min seated: steady strokes, one-sided lean holds, rest mid-water (cruise should hold), then row deliberately at the shore and stop fighting | Every pull surges the boat; cruise holds momentum on rest; a held lean carves and is never reversed; near the shore the water pushes back and steers you out — never beached, never trapped; keyboard arrows take over instantly anytime | row.spec 3/3 (closed-loop stroke circuit through the real StrokeDetector, cruise, shore-guard never-beach); RowingControls reused byte-identical | The rowing Gate-2 round-2 fixes silently regress in the new water | 4
+
+S7.4 | Dolphin in the fjord (PS2 dolphin, real bathymetry) | Kick-rhythm connectedness and containment feel are the Dolphin gate's human checks, re-run in the new sea | Same, ?mode=dolphin, ~2.5–3 m back, hips visible | Swim ~3 min: kick waves to cruise, dive/surface leans, banked turns, one breach attempt (sprint + hard back-lean near the surface), one run at the shore, step out of frame ~2 s mid-swim | The SF-gate feel in the fjord: kicks surge with your rhythm, glide is long, containment is water that pushes back (no wall), the breach fires with commitment, dropout levels out and never banks up kicks | dolphin.spec 4/4 (real-bathymetry agreement, closed-loop torso-wave, containment burst); STANDALONE dolphin suite 12P/4S green post-seam | The adapted seam subtly changes the accepted dolphin feel | 4
+
+S7.5 | Transitions: fly → land → walk → dock → row → dive → dolphin → surface | The full loop's continuity-of-place is a lived judgment; the fade rhythm can only be felt | Same, start in ?mode=flight | Fly to the airfield, land (low + slow, press F when offered); walk to a dock (minimap shows docks), F to row; row to a dive point, F to dive; surface near the point, F back to the boat | Each handoff: the coach offers it only when genuinely there; the veil names the incoming mode; you arrive WHERE you were (apron/dock/dive point); the whole loop needs no keyboard except F; nothing snaps or teleports visibly | transitions.spec 4/4 (all legs incl. a flown landing approach; dolphin leg gated to low-poly); TRANSITIONS.md documents the honest-handoff law | A broken handoff strands the four modes as four separate demos | 5
+
+S7.6 | Camera denied + HUD truthfulness in the Open World | Permission UX is browser-chrome-level; HUD-vs-reality needs eyes | Fresh profile or site-settings camera=Block for localhost:5176 | Open each mode with the camera blocked; play each on keys (flight WASD+arrows, walk WASD, row arrows, dolphin WASD/Shift); then allow the camera and cover it mid-play | Every mode fully playable on keys with camera blocked; HUD reads CAMERA DENIED · keyboard states match reality within ~1 s; the privacy line (LOCAL INFERENCE · NO UPLOADS) is visible whenever the HUD is open | Runtime+HUD mount spec green; per-mode keyboard-parity specs green; V1 denied-path specs cover the shared runtime | Camera-shy users bounce off the entire Open World | 3
 
 ### S8  Walking comfort test (explicit nausea check — human-only by nature)
 _V3 graybox entries below; V4 will append Open World in-context entries._

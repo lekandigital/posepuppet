@@ -189,3 +189,8 @@ Next: V4 integrates packages/locomotion into the Open World low-poly profile per
 - Bathymetry/coastal DEM gaps found by vision review and fixed in the shared geographic authority (DECISIONS.md V4).
 - Suite: openworld 3/3 green headless; tsc clean.
 - Next: O2 low-poly flight (reused TinySkies control modules + placeholder plane).
+
+## V4 Open World — 2026-07-12 (later)
+- O2–O7 complete: four modes body-controlled in low-poly (reused controls, zero rebuilds), transitions live, dolphin standalone stays green.
+- Suite 23/23; perf 60 fps locked on :2 across all modes; S7.1–S7.6 written.
+- Next: O8 realistic profile.
