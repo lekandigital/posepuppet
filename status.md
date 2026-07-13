@@ -183,3 +183,9 @@ packages/locomotion shipped: pure deterministic model with comfort enforced at t
 apps/walking graybox proven: closed-loop synthetic drives through the REAL chain (landmarks→gait→signal→controller→model→camera) — 9/9 specs (path-follow, dropout gentle-stop/recover, sway, glide, T-pose toast, keyboard-wins, vignette bounds, camera-denied keyboard play, live boot on fake webcam); eval/walking-results.json all-pass (march×3 step/cadence/speed tracking, sway, glide, dropout stop≤2.5 s @ ≤1.3 m/s² heading drift <5°, adversarial 30 s comfort maxima under caps); media/walking-v3 board + webm, vision review caught + fixed an invisible (backface-culled) path ribbon.
 Blockers: none automated; S8 human items written (comfort/nausea, weight-shift+seated feel, live loss/recenter/keyboard) + optional gait clip specs (S8.4).
 Next: V4 integrates packages/locomotion into the Open World low-poly profile per INTEGRATION.md; branch not merged, not pushed.
+
+## V4 Open World — 2026-07-12
+- O1 Foundation complete: WorldRuntime + profile system + low-poly v1 render of Ísafjörður on port 5176; Runtime+HUD mounted; ASSET_CONTRACT.md written.
+- Bathymetry/coastal DEM gaps found by vision review and fixed in the shared geographic authority (DECISIONS.md V4).
+- Suite: openworld 3/3 green headless; tsc clean.
+- Next: O2 low-poly flight (reused TinySkies control modules + placeholder plane).

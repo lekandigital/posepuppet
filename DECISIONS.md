@@ -1005,3 +1005,12 @@ without adding a runtime or bake-time network dependency.
   catch this class of defect.
 - fixtures/ for eval runs copied from the wt-runtime worktree (private,
   gitignored, never committed) rather than re-recorded.
+
+## V4 Open World
+
+- 2026-07-12 — V4 lane: `apps/openworld` standalone vite app, base `/openworld/`, port 5176 (walking-app pattern: poseAssets middleware mirrors PosePuppet public/ for same-origin model/wasm). No root vite.config changes needed for O1–O9.
+- 2026-07-12 — openworld tsconfig sets `noUnusedLocals/noUnusedParameters: false` (only): the reused TinySkies control modules compile under flight's own config and carry one unused const; every other strict flag stays on. The alternative (editing apps/flight) violates reuse law.
+- 2026-07-12 — Fjord bathymetry is synthesized: the DEM carries no water depths at 66°N (open-water dive point read +44.5 m; 914/125584 cells below −0.5 m). WorldRuntime carves water cells to `seaLevel − (1.5 + 0.16·shoreSDF)` (capped 45 m, floored by real DEM depths where present) — the completed Dolphin's SDF-depth precedent, deterministic, computed once in the shared geographic authority so every profile/mode sees one seabed. Documented as a limitation, not hidden.
+- 2026-07-12 — Coastal conditioning: same coarse DEM renders the ~3 m town spit as 20–40 m cliff-walled plateaus; land heights are clamped to `seaLevel + 3 + 0.45·shoreDist` and the shoreline lip gets a 3×3 mean within 3 cells of the shore. Mountains ≥1 km inland untouched.
+- 2026-07-12 — Walk PathHint uses ONLY the largest nav.walk component (2262/2782 nodes; 74 components would strand the assist on spurs) and orients edge direction by the traveler's heading (modes feed `setHintHeading`) since graph edges have no canonical travel direction. Half-widths mapped per edge class.
+- 2026-07-12 — Profile law: profiles receive WorldRuntime read-only + a scene; all geographic queries live in WorldRuntime/modes. Cross-profile consistency = `battery()` (49-point grid of ground/water/SDF/hint/nav queries + spawns/transitions) asserted identical under every profile.
