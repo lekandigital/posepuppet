@@ -14,6 +14,7 @@
     "types": ["vite/client"],
     "resolveJsonModule": true,
     "paths": {
+      "three": ["./node_modules/@types/three"],
       "@bodyarcade/body-input": ["../../packages/body-input/src/index.ts"],
       "@bodyarcade/pose-runtime": ["../../packages/pose-runtime/src/index.ts"],
       "@bodyarcade/pose-hud": ["../../packages/pose-hud/src/index.ts"],

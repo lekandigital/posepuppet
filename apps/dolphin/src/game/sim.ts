@@ -121,13 +121,33 @@ export interface SimState {
   time: number;
 }
 
+/** Region seam (V4 Open World): the sim was built for the SF bay artifact;
+ *  a region may supply its own boundary polygons, scale, spawn seed and a
+ *  real-bathymetry depth function. Defaults reproduce the standalone app
+ *  byte-identically (the suite asserts replay determinism over it). */
+export interface SwimSimOptions {
+  boundary?: BoundaryData;
+  /** boundary metres -> game metres (default SIM.WORLD_SCALE). */
+  worldScale?: number;
+  /** spawn seed in BOUNDARY coordinates (default: SF Central Bay). */
+  spawnBoundaryXY?: [number, number];
+  /** seabed depth override in GAME coordinates/metres (default: SDF+noise). */
+  depthFn?: (x: number, z: number) => number;
+}
+
 export class SwimSim {
   readonly boundary: BoundaryData;
   state: SimState;
   assist: AssistMode = 'full';
+  private readonly worldScale: number;
+  private readonly spawnSeed: [number, number];
+  private readonly depthFn: ((x: number, z: number) => number) | null;
 
-  constructor() {
-    this.boundary = loadBoundary(boundaryJson);
+  constructor(opts: SwimSimOptions = {}) {
+    this.boundary = opts.boundary ?? loadBoundary(boundaryJson);
+    this.worldScale = opts.worldScale ?? SIM.WORLD_SCALE;
+    this.spawnSeed = opts.spawnBoundaryXY ?? [-10100, 16700];
+    this.depthFn = opts.depthFn ?? null;
     this.state = this.spawnState();
   }
 
@@ -136,7 +156,7 @@ export class SwimSim {
    *  metres of shore clearance) — a seed grazing a pier is a config bug
    *  this refuses to inherit (the first pick sat 1 m off the Marina). */
   private spawnState(): SimState {
-    let [sx, sz] = this.toGame(-10100, 16700); // Central Bay, Alcatraz–Berkeley reach
+    let [sx, sz] = this.toGame(this.spawnSeed[0], this.spawnSeed[1]); // default: Central Bay
     for (let r = 0; !(this.inWater(sx, sz) && this.shoreDistance(sx, sz) > 60) && r < 200; r++) {
       sx += 15;
     }
@@ -150,16 +170,16 @@ export class SwimSim {
 
   /** boundary metres → game metres (game z = −boundary y so north = −z). */
   toGame(bx: number, by: number): [number, number] {
-    return [bx * SIM.WORLD_SCALE, -by * SIM.WORLD_SCALE];
+    return [bx * this.worldScale, -by * this.worldScale];
   }
   toBoundary(x: number, z: number): [number, number] {
-    return [x / SIM.WORLD_SCALE, -z / SIM.WORLD_SCALE];
+    return [x / this.worldScale, -z / this.worldScale];
   }
 
   /** Signed distance to shore in GAME metres (+ = water). */
   shoreDistance(x: number, z: number): number {
     const [bx, by] = this.toBoundary(x, z);
-    return signedDistanceToShore(this.boundary, bx, by) * SIM.WORLD_SCALE;
+    return signedDistanceToShore(this.boundary, bx, by) * this.worldScale;
   }
 
   inWater(x: number, z: number): boolean {
@@ -167,8 +187,10 @@ export class SwimSim {
     return pointInWater(this.boundary, bx, by);
   }
 
-  /** Local seabed depth (game metres, positive down): SDF + value noise. */
+  /** Local seabed depth (game metres, positive down): SDF + value noise,
+   *  or the region's real bathymetry when supplied. */
   depthAt(x: number, z: number): number {
+    if (this.depthFn) return this.depthFn(x, z);
     const d = Math.max(0, this.shoreDistance(x, z));
     const base = SIM.DEPTH_MIN + SIM.DEPTH_SDF_GAIN * Math.sqrt(d) * 4;
     const n = valueNoise2(x * 0.011, z * 0.011) * 6 + valueNoise2(x * 0.047, z * 0.047) * 2;
