@@ -1554,3 +1554,32 @@ from the standalone dolphin's underwater-only art).
 
 **S7 entries written** (S7.1–S7.6, ~25 min) + V4 environment block in
 FINAL_USER_TEST_PLAN front matter.
+
+## V4 Open World — O8 Realistic profile (2026-07-12)
+
+**Same data, same controls, new renderer** (src/profiles/realistic):
+subarctic lighting (low warm sun + cool fill + ACES tone mapping),
+full-resolution smooth terrain with slope/elevation/noise materials
+(wet sand, valley moss, upland heath, exposed rock on slope, worn snow
+above a noisy line, fine tonal grain), gradient sky dome, specular
+fjord water with world-space swell (moving sun-glitter path), instanced
+birch stands scattered deterministically on the baked forest landuse
+(clearings from value noise, ≤4000 instances, 1 draw call), Icelandic
+painted building walls/roofs (deterministic per id), asphalt/gravel
+road treatment, distance haze. No realistic dolphin (content matrix).
+The region default is now locked per the front-matter deadline: the
+realistic pass is hand-tuned to Ísafjörður.
+
+**Vision-review rounds (3)**: view-space ripple aliased into a moiré
+dot blob → world-space low-frequency swell; grid-regular glint →
+cross-coupled incommensurate phases (reads as natural glitter); murky
+shaded slopes → lifted hemisphere/fill. Honest artifact kept: the sea
+is bbox-clipped, so from high ground the world visibly ends at a
+straight edge — recorded, S9.3 judges whether a horizon skirt is worth
+a FUTURES note.
+
+**Verification**: suite 23/23 with realistic registered — the
+consistency battery now PROVES low-poly ≡ realistic geography
+byte-identically (the spec output names both). Perf headed :2: 60 fps
+locked, all modes, 275k triangles. Boards .shots/board/realistic-*.png.
+S9.1–S9.3 written.

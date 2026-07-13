@@ -1018,3 +1018,5 @@ without adding a runtime or bake-time network dependency.
 - 2026-07-12 — O2: flight departure heading auto-picks the runway direction pointing into the region (baked headings are bidirectional); region-edge containment is a blended yaw assist (never overrides player authority fully, never a wall). Placeholder plane is procedural/original — no ASSETS.md licensing entry needed beyond noting it.
 
 - 2026-07-12 — O5: SwimSim parameterized (boundary/scale/spawn/depthFn, defaults byte-identical — standalone suite 12P/4S green); region dolphin swims at worldScale 1 (real metres) over real bathymetry; sea-class polygons only (no pond dolphins). Dolphin suite must pin DOLPHIN_PORT+PP_PORT — 5197 is squatted by the retired posepuppet-dolphin checkout.
+
+- 2026-07-12 — O8: profiles duplicate mesh-building code on purpose (art packs stay decoupled; geography still only from WorldRuntime — the battery spec is the guarantee). Realistic reuses the completed dolphin's RNG-free valueNoise2 for all scatter/mottle determinism.
