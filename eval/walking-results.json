@@ -1,6 +1,6 @@
 {
   "generatedBy": "tests/walking-eval.spec.ts (V3 Walking synthetic-stream eval)",
-  "generatedAt": "2026-07-12T14:50:46.146Z",
+  "generatedAt": "2026-07-13T02:11:34.809Z",
   "note": "Synthetic-stream chain: landmarks → body-input gait → controller → locomotion. Real-clip validation deferred (clips optional; see FINAL_USER_TEST_PLAN S8).",
   "comfortCaps": {
     "maxSpeed": 2.4,
