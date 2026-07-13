@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-13T01:35:58.340Z",
+  "generated": "2026-07-13T01:55:59.469Z",
   "note": "Headed DISPLAY=:2 (RTX box) under the display lock; synthetic closed-loop drives; pose runtime OFF in these rows (its measured cost lives in eval/runtime-hud-perf.json — V1). Floors: 45 fps game.",
   "runs": [
     {
@@ -90,6 +90,46 @@
       "fpsMax": 60,
       "triangles": 275420,
       "drawCalls": 8,
+      "driven": "none"
+    },
+    {
+      "profile": "fantasy-game",
+      "mode": "flight",
+      "fpsMedian": 60,
+      "fpsMin": 60,
+      "fpsMax": 60,
+      "triangles": 336846,
+      "drawCalls": 34,
+      "driven": "flylap"
+    },
+    {
+      "profile": "fantasy-game",
+      "mode": "walk",
+      "fpsMedian": 60,
+      "fpsMin": 60,
+      "fpsMax": 60,
+      "triangles": 336756,
+      "drawCalls": 20,
+      "driven": "walkroute"
+    },
+    {
+      "profile": "fantasy-game",
+      "mode": "row",
+      "fpsMedian": 60,
+      "fpsMin": 60,
+      "fpsMax": 60,
+      "triangles": 336810,
+      "drawCalls": 16,
+      "driven": "rowcircuit"
+    },
+    {
+      "profile": "fantasy-game",
+      "mode": "flyover",
+      "fpsMedian": 60,
+      "fpsMin": 60,
+      "fpsMax": 60,
+      "triangles": 337164,
+      "drawCalls": 61,
       "driven": "none"
     }
   ]

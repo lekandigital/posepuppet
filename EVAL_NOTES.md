@@ -1583,3 +1583,35 @@ consistency battery now PROVES low-poly ≡ realistic geography
 byte-identically (the spec output names both). Perf headed :2: 60 fps
 locked, all modes, 275k triangles. Boards .shots/board/realistic-*.png.
 S9.1–S9.3 written.
+
+## V4 Open World — O9 Fantasy-game profile (2026-07-12)
+
+**The whimsical diorama** (src/profiles/fantasy) — LAST, after O1–O8
+verified, per the strict order: golden-hour dusk (peach horizon → soft
+blue, warm sun + lavender fill/bounce, ACES 1.12), painterly meadow
+bands with warm noise patches and lavender rock, cream-snow caps, milky
+pastel water with a soft moving sheen, cream lanes instead of asphalt,
+cozy paint-box houses (+15% height exaggeration, never a tower) with
+GLOWING WINDOWS (one additive Points batch), chimney smoke over a dozen
+homes, fluffy two-blob trees on the baked forest polygons + meadow
+strays (~4k instances), drifting cloud puffs, three circling bird
+flocks, five sailboats drifting on far-from-shore row-lattice nodes,
+restrained fireflies over the settlement meadows, and ONE larger
+magical focal point: a faint breathing aurora ribbon over the fjord
+mouth. Landmarks placed FROM DATA: windmill on the highest ground
+within 350 m of the walk spawn; lighthouse on the coastline vertex
+nearest the region mouth. No franchise anything; all geometry
+procedural/original. No fantasy dolphin.
+
+**Vision round**: the aurora read as a hard diagonal "beam" edge-on
+from the settlement — pushed further out over the mouth, opacity
+0.14→0.09, breathing 0.07±0.03. Charm read after the fix: flyover =
+soft diorama with recognizable fjord/spit/runway; walk = glowing
+windows + smoke + pastel water (the strongest clip); flight = cream
+lanes + fluffy foreground tree + town on the ridge.
+
+**Verification**: suite 23/23 with all three profiles registered —
+consistency battery **byte-identical across low-poly, realistic, and
+fantasy-game** (the acceptance conjunct, printed by the spec). Perf
+headed :2: 60 fps locked in all fantasy modes (337k tris, ≤61 calls).
+Boards .shots/board/fantasy-game-*.png. S10.1–S10.2 written.
