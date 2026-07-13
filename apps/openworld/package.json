@@ -1,0 +1,22 @@
+{
+  "name": "@bodyarcade/openworld",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "V4 Open World — one compact real-world region (Ísafjörður), three renderer profiles over the same baked data, four body-controlled modes. Expansion beside TinySkies.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "three": "^0.172.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/three": "^0.172.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}

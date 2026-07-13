@@ -1314,3 +1314,73 @@ dark + light.
   artifact: eval/bodyinput-results.json.
 - Chain eval artifact: eval/walking-results.json (all-pass).
 - Typecheck: `npx tsc --noEmit` clean at root and in apps/walking.
+
+## V4 Open World — O1 Foundation (2026-07-12)
+
+**What shipped**: `apps/openworld` boots the baked Ísafjörður region
+(`bodyarcade-world/1`) through a new `WorldRuntime` (the single
+geographic authority: terrain/bathymetry, water containment, shore SDF
+via segment spatial hash, nav.walk PathHint on the largest component,
+nav.row adjacency, spawns/transitions in scene space, region-edge
+distance) with the profile contract (renderer+content packs, geography
+forbidden) and the low-poly profile v1: decimated flat-shaded terrain
+with elevation/seabed palette, real water polygons triangulated at sea
+level, road/path/runway ribbons draped on terrain, extruded buildings
+(walls + baked ear-clip roofs), fog + hemisphere/sun. Runtime+HUD
+mounted exactly as apps/walking (no PosePuppet tab; camera-denied =
+keyboard path). Attribution lines from the artifact render on-screen.
+Flyover/freecam camera for verification. ASSET_CONTRACT.md emitted.
+
+**Data-reality fixes (vision-review driven, 3 rounds)**: first capture
+showed no sea — the DEM has no fjord bathymetry (+44.5 m at the
+open-water dive spawn), so the fjord rendered as a green plateau over
+the water sheet. Fixed in WorldRuntime (shared by all profiles):
+SDF-synthesized bathymetry carve, coastal slope conditioning
+(cliff-walled 20–40 m "town spit" plateaus → ≤ 3 + 0.45·d envelope),
+3×3 shoreline-lip blur. Screenshots `apps/openworld/.shots/`
+(flyover-* → carved-* → coast-* → blur-*): fjord now dominant, town
+spit + settlement + airfield + road network recognizable. Residual:
+runway-ribbon edge faces at the airfield shore — O7 polish item.
+
+**Verification**: `apps/openworld` suite 3/3 green headless
+(foundation.spec.ts — battery/geography sanity incl. SDF-sign vs
+containment agreement at 49 grid points, render load > 50k triangles +
+frame advance + chrome/attribution, Runtime+HUD mount reaching a legal
+state with no camera). tsc clean. Headless SwiftShader fps 25–28 during
+flyover (correctness runs only; perf floors measured headed on :2 at
+O7).
+
+## V4 Open World — O1 Foundation (2026-07-12)
+
+**What shipped**: `apps/openworld` boots the baked Ísafjörður region
+(`bodyarcade-world/1`) through a new `WorldRuntime` (the single
+geographic authority: terrain/bathymetry, water containment, shore SDF
+via segment spatial hash, nav.walk PathHint on the largest component,
+nav.row adjacency, spawns/transitions in scene space, region-edge
+distance) with the profile contract (renderer+content packs, geography
+forbidden) and the low-poly profile v1: decimated flat-shaded terrain
+with elevation/seabed palette, real water polygons triangulated at sea
+level, road/path/runway ribbons draped on terrain, extruded buildings
+(walls + baked ear-clip roofs), fog + hemisphere/sun. Runtime+HUD
+mounted exactly as apps/walking (no PosePuppet tab; camera-denied =
+keyboard path). Attribution lines from the artifact render on-screen.
+Flyover/freecam camera for verification. ASSET_CONTRACT.md emitted.
+
+**Data-reality fixes (vision-review driven, 3 rounds)**: first capture
+showed no sea — the DEM has no fjord bathymetry (+44.5 m at the
+open-water dive spawn), so the fjord rendered as a green plateau over
+the water sheet. Fixed in WorldRuntime (shared by all profiles):
+SDF-synthesized bathymetry carve, coastal slope conditioning
+(cliff-walled 20–40 m "town spit" plateaus → ≤ 3 + 0.45·d envelope),
+3×3 shoreline-lip blur. Screenshots `apps/openworld/.shots/`
+(flyover-* → carved-* → coast-* → blur-*): fjord now dominant, town
+spit + settlement + airfield + road network recognizable. Residual:
+runway-ribbon edge faces at the airfield shore — O7 polish item.
+
+**Verification**: `apps/openworld` suite 3/3 green headless
+(foundation.spec.ts — battery/geography sanity incl. SDF-sign vs
+containment agreement at 49 grid points, render load > 50k triangles +
+frame advance + chrome/attribution, Runtime+HUD mount reaching a legal
+state with no camera). tsc clean. Headless SwiftShader fps 25–28 during
+flyover (correctness runs only; perf floors measured headed on :2 at
+O7).
