@@ -1498,3 +1498,22 @@ the failure against the unpatched sim (identical), identified the
 squatter via /proc/PID/cwd, re-ran on DOLPHIN_PORT=5196 from this tree:
 all green. The V1 lane's port-squat lesson holds: always pin BOTH ports.
 eval/dolphin-results.json refreshed by the suite run on this tree.
+
+## V4 Open World — O6 Transitions (2026-07-12)
+
+**Architecture documented first** (apps/openworld/TRANSITIONS.md): the
+honest fade + spawn handoff over the BAKED transition points, with the
+rejected seamless-mounting alternative recorded. ModeManager owns the
+active mode, a 180 ms veil naming the incoming mode, per-frame
+eligibility (coach line offers the handoff), and the uniform F trigger
+(the flight controller's `interact` convention). Legs: flight→walk
+(landing: near + <18 m AGL + <30 m/s), walk↔row (docks, boat spawns on
+the row lattice bow off-shore), row↔dolphin (dive points, low-poly only
+— the offer simply never appears in profiles without the dolphin),
+walk→flight (airfield). Pose model follows the mode (rowing hot-swaps
+to FULL for wrist depth — V1's measured lesson). Minimal selector chips
+(profile + mode) added; unregistered profiles listed disabled.
+
+**Verification**: transitions.spec 4/4 (dock round-trip, dive
+round-trip, a flown braking approach to the airfield landing, selector
+gating). Full openworld suite 21/21 after the ModeManager refactor.

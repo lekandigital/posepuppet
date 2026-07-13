@@ -51,6 +51,14 @@ export class WalkMode implements GameMode {
     this.ctx.chrome.setMode('walk');
   }
 
+  /** Transition entry: place the walker at a specific point. */
+  enterAt(x: number, z: number, yawDeg: number): void {
+    this.ctx.world.setHintHeading(yawDeg);
+    const hint = this.ctx.world.walkHint(x, z);
+    const yaw = hint ? Math.atan2(hint.dirX, -hint.dirZ) / DEG : yawDeg;
+    this.loco.teleport(x, z, yaw);
+  }
+
   update(_dtS: number, _timeS: number): void {
     const now = performance.now();
     const world = this.ctx.world;
