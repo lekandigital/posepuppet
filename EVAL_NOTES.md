@@ -1384,3 +1384,37 @@ frame advance + chrome/attribution, Runtime+HUD mount reaching a legal
 state with no camera). tsc clean. Headless SwiftShader fps 25–28 during
 flyover (correctness runs only; perf floors measured headed on :2 at
 O7).
+
+## V4 Open World — O2 Low-poly Flight (2026-07-12)
+
+**Reuse, verbatim**: `BodyFlightControls` (Gate-2/3-approved profiles/
+assists/boost/autopilot/recenter/keyboard-priority) and `FlightControls`
+(keyboard) imported from `apps/flight` via alias — zero diffs under
+apps/flight. Owned here: metre-scale plane dynamics over the real
+terrain (arcade constants; TinySkies bank/turn-smoothing feel constants
+kept), scripted takeoff from the baked airfield spawn (departure
+direction auto-picked toward the region interior — runways are
+bidirectional), ground/sea soft floor, ceiling, region-edge soft
+turn-back (yaw assist ramping (1−d/650 m)^1.5 to 60°/s, blended with
+player input — never a wall, never an exit), spring chase camera,
+procedural placeholder plane honoring ASSET_CONTRACT node names (prop,
+aileron_L/R, elevator, rudder, gear auto-hide).
+
+**Closed-loop verification**: synthetic landmark figures pumped through
+a real `createBodyInputCore` + real BroadcastChannel sink (the walking
+graybox pattern, new figure generator with lean/arms/stroke/wave
+options) — the exact production chain the reused controller consumes.
+flight.spec.ts 4/4: airfield spawn + takeoff + keyboard steering/climb;
+body lap (sustained left-turn phase then right-turn phase extracted
+from the sampled heading trace); tracking-loss → autopilot decay →
+snap-free reacquire; containment (aimed straight at the east edge:
+never leaves by >60 m, never wall-stops, ends >150 m back inside).
+
+**Vision review caught what specs could not**: the plane flew
+TAIL-FIRST (rotation.y = π−yaw instead of −yaw) with pitch inverted;
+fixed, re-shot: tail-on chase view, left bank in the left-lean phase,
+takeoff over the runway strip. Shots: .shots/flight2-*.png. Residual
+polish: runway strip jagged over conditioned terrain (O7 item —
+flatten under aeroways).
+
+**Suite**: openworld 7/7 green headless; tsc clean.
