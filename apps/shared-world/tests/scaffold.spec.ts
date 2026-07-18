@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { createHash } from 'node:crypto';
-import { readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -145,8 +145,10 @@ test('stock demo boots clean, paints WebGL2, and sustains 58+ fps', async ({ pag
   });
 
   // Committed-artifact convention (Track A F12): results to repo-root eval/.
-  const results = {
-    checkpoint: '00-scaffold-stock-demo',
+  // Since checkpoint 01 this file is shared with the pool suite — merge
+  // under the `stock` key instead of overwriting (the assertions above are
+  // unchanged from checkpoint 00; this is artifact bookkeeping only).
+  const stock = {
     timestamp: new Date().toISOString(),
     url: '/shared-world/?view=stock',
     viewport: { width: 1728, height: 1080 },
@@ -155,15 +157,16 @@ test('stock demo boots clean, paints WebGL2, and sustains 58+ fps', async ({ pag
     chromeVersion: browser.version(),
     fps: { buckets, median, min, windowSeconds: 10 },
     simHz: null,
-    simHzNote: 'not applicable — no sim exists at checkpoint 00 (stock demo only)',
+    simHzNote: 'not applicable — the stock view has no sim (fidelity reference)',
     consoleErrors: consoleErrors.length,
     paintedPixels: painted,
   };
   mkdirSync(join(REPO_ROOT, 'eval'), { recursive: true });
-  writeFileSync(
-    join(REPO_ROOT, 'eval', 'shared-world-results.json'),
-    JSON.stringify(results, null, 2) + '\n',
-  );
+  const resultsPath = join(REPO_ROOT, 'eval', 'shared-world-results.json');
+  const existing = existsSync(resultsPath)
+    ? (JSON.parse(readFileSync(resultsPath, 'utf8')) as Record<string, unknown>)
+    : {};
+  writeFileSync(resultsPath, JSON.stringify({ ...existing, stock }, null, 2) + '\n');
 
   expect(median, `median fps ${median} (buckets: ${buckets.join(',')})`).toBeGreaterThanOrEqual(58);
 });

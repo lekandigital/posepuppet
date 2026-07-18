@@ -105,3 +105,9 @@ FABLE_REMOTE_HANDOFF.local.md
 
 # worldbake terrain-tile cache: committed inputs for reproducible bakes
 !tools/worldbake/cache/**/*.png
+
+# shared-world app assets are tracked (licensed dolphin GLB + license file
+# ship in-repo; overrides the global *.glb and public/models/ ignores)
+!apps/shared-world/public/
+!apps/shared-world/public/models/
+!apps/shared-world/public/models/**

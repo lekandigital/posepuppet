@@ -1,5 +1,5 @@
 {
-  "checkpoint": "00-scaffold-stock-demo",
+  "checkpoint": "01-dolphin-in-the-pool",
   "timestamp": "2026-07-18T05:37:35.848Z",
   "url": "/shared-world/?view=stock",
   "viewport": {
@@ -32,5 +32,123 @@
   "simHz": null,
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
-  "paintedPixels": 508275
+  "paintedPixels": 508275,
+  "generatedAt": "2026-07-18T06:46:27.642Z",
+  "pool": {
+    "modelLengthM": 2.8968250546579615,
+    "bootConsoleErrors": 0,
+    "brake": {
+      "fromSpeed": 4.798977070379794,
+      "speedAfter1200ms": 0.0018427005293321324
+    },
+    "cadenceCoupling": [
+      {
+        "rateHz": 0.4,
+        "speed": 2.424070791588653
+      },
+      {
+        "rateHz": 0.9,
+        "speed": 4.907432368091075
+      }
+    ],
+    "glideSpeedAfter3s": 2.8523822993209973,
+    "burst": {
+      "peakSpeed": 9,
+      "msToExceed8": 1085
+    },
+    "sustainedMaxSpeed": 5,
+    "dropout": {
+      "maxPitchStepRad": 0.08102982498576905,
+      "trackingDuringLoss": "autopilot"
+    },
+    "replayDigest": "7.240747,-2.500000,0.714485,0.543055,5.000000,240,0|4.525521,-5.",
+    "firstFrameAnimation": {
+      "actionRunning": true,
+      "base": "SwimForward"
+    },
+    "perf": {
+      "fps": {
+        "buckets": [
+          59,
+          60,
+          60,
+          60,
+          60,
+          60,
+          61,
+          60,
+          60,
+          60
+        ],
+        "median": 60,
+        "min": 59,
+        "windowSeconds": 10
+      },
+      "simHzSamples": [
+        120.00786936848314,
+        120.03148366784735,
+        119.97600479904021,
+        119.99999999999989,
+        119.99606570276397,
+        120.00786936848314,
+        119.99606570276376,
+        119.99606570276397,
+        120.09056009449753,
+        119.92804317409549
+      ],
+      "viewport": {
+        "width": 1728,
+        "height": 1080
+      },
+      "devicePixelRatio": 1,
+      "renderResolution": {
+        "width": 1728,
+        "height": 1080
+      },
+      "chromeVersion": "150.0.7871.125",
+      "usedJSHeapBytes": 17695076
+    },
+    "turnShaping": {
+      "slowYawRateRadS": 2.427043212465448,
+      "slowSpeed": 0.000043713038412737184,
+      "fastYawRateRadS": 1.5488852023803588,
+      "fastSpeed": 9
+    }
+  },
+  "containmentBatteryNote": "NOT ported at pool scale (walls are the vendored demo pool); returns re-pointed at cp04B",
+  "stock": {
+    "timestamp": "2026-07-18T06:46:41.755Z",
+    "url": "/shared-world/?view=stock",
+    "viewport": {
+      "width": 1728,
+      "height": 1080
+    },
+    "devicePixelRatio": 1,
+    "renderResolution": {
+      "width": 1398,
+      "height": 1080
+    },
+    "chromeVersion": "150.0.7871.125",
+    "fps": {
+      "buckets": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        121
+      ],
+      "median": 120,
+      "min": 120,
+      "windowSeconds": 10
+    },
+    "simHz": null,
+    "simHzNote": "not applicable — the stock view has no sim (fidelity reference)",
+    "consoleErrors": 0,
+    "paintedPixels": 508275
+  }
 }
