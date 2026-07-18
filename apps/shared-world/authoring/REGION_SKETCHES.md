@@ -221,5 +221,27 @@ placeholder categories of Implementation Master §8.3. (Stated per checkpoint
 
 ## APPROVED LAYOUT
 
-*(To be filled from the user's decision at this gate and recorded verbatim at
-the start of Checkpoint 04A. Empty until then.)*
+Approved by the user 2026-07-18 at the Checkpoint 03 decision gate. The
+user's decision, verbatim:
+
+> I approve **Sketch C — Twin Bay** as the authoritative region layout.
+>
+> Record the following decision verbatim for the start of Checkpoint 04A:
+>
+> * Chosen layout: **C — Twin Bay**
+> * Redlines: **none**
+> * Include the optional second cave in the trench's west wall: **yes**
+> * Include an E2 vertical shaft: **no**
+> * Optional discovery: **a ring of ambiguous monolith stones on the trench rim**
+> * Spawn location: **keep the default spawn in the north-bay lagoon center**
+>
+> The headland cave should remain the main bay-to-bay loop shortcut. The
+> second cave should remain a smaller optional trench-wall discovery, not
+> another major route.
+
+Checkpoint 04A therefore bakes **Sketch C (seed 60418003)** exactly as
+drawn, with: both caves (headland cave (−420, 30) as the primary bay-to-bay
+loop shortcut; trench-W-wall cave (450, −30) as a smaller optional
+discovery, not a major route), **no** E2 shaft, the discovery site (390, 290)
+realized as a ring of ambiguous monolith stones on the trench rim, and the
+spawn at the north-bay lagoon center (−180, −380).
