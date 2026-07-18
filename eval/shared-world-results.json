@@ -1,0 +1,36 @@
+{
+  "checkpoint": "00-scaffold-stock-demo",
+  "timestamp": "2026-07-18T04:54:35.403Z",
+  "url": "/shared-world/?view=stock",
+  "viewport": {
+    "width": 1728,
+    "height": 1080
+  },
+  "devicePixelRatio": 1,
+  "renderResolution": {
+    "width": 1398,
+    "height": 1080
+  },
+  "chromeVersion": "149.0.7827.55",
+  "fps": {
+    "buckets": [
+      120,
+      121,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120
+    ],
+    "median": 120,
+    "min": 120,
+    "windowSeconds": 10
+  },
+  "simHz": null,
+  "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
+  "consoleErrors": 0,
+  "paintedPixels": 508275
+}

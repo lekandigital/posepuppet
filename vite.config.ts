@@ -5,6 +5,7 @@ import { extname, join, normalize, resolve } from 'node:path';
 
 const FLIGHT_DIST = fileURLToPath(new URL('./apps/flight/client/dist', import.meta.url));
 const DOLPHIN_DIST = fileURLToPath(new URL('./apps/dolphin/dist', import.meta.url));
+const SHARED_WORLD_DIST = fileURLToPath(new URL('./apps/shared-world/dist', import.meta.url));
 
 /**
  * BodyArcade Flight is a separate app (own three.js, own build) but must
@@ -52,6 +53,61 @@ function dolphinStatic(): Plugin {
             res.setHeader('Content-Type', 'text/plain; charset=utf-8');
             return res.end(
               'BodyArcade Dolphin is not built yet.\n\nRun:  npm run dolphin:build\n',
+            );
+          }
+          res.statusCode = 404;
+          return res.end('not found');
+        }
+        res.setHeader('Content-Type', MIME[extname(file)] ?? 'application/octet-stream');
+        createReadStream(file).pipe(res);
+      });
+    },
+  };
+}
+
+/**
+ * BodyArcade Shared World: same origin-sharing pattern as dolphinStatic, one
+ * route prefix only (the app keeps every asset under its base).
+ *   /shared-world/ → apps/shared-world/dist (base: '/shared-world/')
+ * MIME map extends the dolphin one with .glb (the dolphin asset, checkpoint
+ * 01) and the vendored jeantimex demo's asset types (.jpg sky/tiles,
+ * .gltf/.bin duck model).
+ */
+function sharedWorldStatic(): Plugin {
+  const MIME: Record<string, string> = {
+    '.html': 'text/html; charset=utf-8',
+    '.js': 'text/javascript',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.svg': 'image/svg+xml',
+    '.png': 'image/png',
+    '.ico': 'image/x-icon',
+    '.glb': 'model/gltf-binary',
+    '.gltf': 'model/gltf+json',
+    '.bin': 'application/octet-stream',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+  };
+  return {
+    name: 'bodyarcade-shared-world-static',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const url = (req.url ?? '').split('?')[0]!;
+        let rel: string | null = null;
+        if (url === '/shared-world' || url === '/shared-world/') rel = 'index.html';
+        else if (url.startsWith('/shared-world/')) rel = url.slice('/shared-world/'.length);
+        if (rel === null) return next();
+        const file = normalize(join(SHARED_WORLD_DIST, decodeURIComponent(rel)));
+        if (!file.startsWith(resolve(SHARED_WORLD_DIST))) {
+          res.statusCode = 403;
+          return res.end('forbidden');
+        }
+        if (!existsSync(file) || !statSync(file).isFile()) {
+          if (!existsSync(SHARED_WORLD_DIST)) {
+            res.statusCode = 503;
+            res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+            return res.end(
+              'BodyArcade Shared World is not built yet.\n\nRun:  npm run shared-world:build\n',
             );
           }
           res.statusCode = 404;
@@ -124,7 +180,7 @@ function flightStatic(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [flightStatic(), dolphinStatic()],
+  plugins: [flightStatic(), dolphinStatic(), sharedWorldStatic()],
   resolve: {
     alias: {
       '@bodyarcade/body-input': fileURLToPath(
