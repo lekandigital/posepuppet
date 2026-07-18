@@ -29,6 +29,8 @@ export interface DolphinActor {
   group: THREE.Group;
   /** nose-to-fluke world extent along +Z, SwimForward frame 0, metres */
   measuredLengthM: number;
+  /** posed skinned-mesh AABB in world space (cp02 coverage-band probe) */
+  worldBounds(): THREE.Box3;
   clipNames: string[];
   /** name of the current base AnimationAction */
   activeActionName(): string;
@@ -133,6 +135,10 @@ export async function loadDolphin(url: string): Promise<DolphinActor> {
   return {
     group,
     measuredLengthM,
+    worldBounds(): THREE.Box3 {
+      mesh.computeBoundingBox();
+      return mesh.boundingBox!.clone().applyMatrix4(mesh.matrixWorld);
+    },
     clipNames: clips.map((c) => c.name),
     activeActionName: () => baseName,
     actionRunning: () => base.isRunning() || jump.isRunning(),

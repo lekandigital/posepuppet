@@ -1,5 +1,5 @@
 {
-  "checkpoint": "01-dolphin-in-the-pool",
+  "checkpoint": "02-pool-camera",
   "timestamp": "2026-07-18T05:37:35.848Z",
   "url": "/shared-world/?view=stock",
   "viewport": {
@@ -33,32 +33,32 @@
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
   "paintedPixels": 508275,
-  "generatedAt": "2026-07-18T06:46:27.642Z",
+  "generatedAt": "2026-07-18T09:52:08.279Z",
   "pool": {
     "modelLengthM": 2.8968250546579615,
     "bootConsoleErrors": 0,
     "brake": {
-      "fromSpeed": 4.798977070379794,
-      "speedAfter1200ms": 0.0018427005293321324
+      "fromSpeed": 4.801977093672951,
+      "speedAfter1200ms": 0.001046898986860198
     },
     "cadenceCoupling": [
       {
         "rateHz": 0.4,
-        "speed": 2.424070791588653
+        "speed": 2.4239462335584565
       },
       {
         "rateHz": 0.9,
-        "speed": 4.907432368091075
+        "speed": 4.909250851258097
       }
     ],
-    "glideSpeedAfter3s": 2.8523822993209973,
+    "glideSpeedAfter3s": 2.888285652584222,
     "burst": {
       "peakSpeed": 9,
-      "msToExceed8": 1085
+      "msToExceed8": 1083
     },
     "sustainedMaxSpeed": 5,
     "dropout": {
-      "maxPitchStepRad": 0.08102982498576905,
+      "maxPitchStepRad": 0.07963411040347323,
       "trackingDuringLoss": "autopilot"
     },
     "replayDigest": "7.240747,-2.500000,0.714485,0.543055,5.000000,240,0|4.525521,-5.",
@@ -69,32 +69,32 @@
     "perf": {
       "fps": {
         "buckets": [
-          59,
-          60,
-          60,
-          60,
-          60,
-          60,
-          61,
-          60,
-          60,
-          60
+          120,
+          120,
+          120,
+          120,
+          120,
+          121,
+          120,
+          120,
+          120,
+          120
         ],
-        "median": 60,
-        "min": 59,
+        "median": 120,
+        "min": 120,
         "windowSeconds": 10
       },
       "simHzSamples": [
-        120.00786936848314,
-        120.03148366784735,
-        119.97600479904021,
-        119.99999999999989,
-        119.99606570276397,
-        120.00786936848314,
-        119.99606570276376,
-        119.99606570276397,
-        120.09056009449753,
-        119.92804317409549
+        120.00396707329166,
+        120.00396707329166,
+        119.98800119987997,
+        120.02777502231918,
+        119.97600479904033,
+        119.98800119987997,
+        120.07541927160852,
+        119.95201919232312,
+        119.99206664022218,
+        120.00396707329176
       ],
       "viewport": {
         "width": 1728,
@@ -106,18 +106,18 @@
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 17695076
+      "usedJSHeapBytes": 18545401
     },
     "turnShaping": {
-      "slowYawRateRadS": 2.427043212465448,
-      "slowSpeed": 0.000043713038412737184,
-      "fastYawRateRadS": 1.5488852023803588,
+      "slowYawRateRadS": 2.439555799319956,
+      "slowSpeed": 0.000049211769383126674,
+      "fastYawRateRadS": 1.5634077531780477,
       "fastSpeed": 9
     }
   },
   "containmentBatteryNote": "NOT ported at pool scale (walls are the vendored demo pool); returns re-pointed at cp04B",
   "stock": {
-    "timestamp": "2026-07-18T06:46:41.755Z",
+    "timestamp": "2026-07-18T09:52:21.932Z",
     "url": "/shared-world/?view=stock",
     "viewport": {
       "width": 1728,
@@ -131,24 +131,204 @@
     "chromeVersion": "150.0.7871.125",
     "fps": {
       "buckets": [
+        121,
         120,
         120,
         120,
         120,
+        113,
+        121,
         120,
         120,
-        120,
-        120,
-        120,
-        121
+        120
       ],
       "median": 120,
-      "min": 120,
+      "min": 113,
       "windowSeconds": 10
     },
     "simHz": null,
     "simHzNote": "not applicable — the stock view has no sim (fidelity reference)",
     "consoleErrors": 0,
     "paintedPixels": 508275
+  },
+  "camera02": {
+    "cruiseCoverage": {
+      "samples": 44,
+      "widthFrac": {
+        "median": 0.10009363672993235,
+        "min": 0.09762043612019866,
+        "max": 0.10686308411854947
+      },
+      "centerHeightFrac": {
+        "median": 0.436947320715199,
+        "min": 0.4234264664572378,
+        "max": 0.44415627421187215
+      },
+      "followDistM": 6.7972266217552315
+    },
+    "burstCoverage": {
+      "samples": 21,
+      "state": "FastTravel (bands relaxed per cp02 §8.1)",
+      "widthFrac": {
+        "median": 0.0765468117823229
+      },
+      "followDistM": 8.167170100465324
+    },
+    "hoverCoverage": {
+      "state": "SlowHover (bands relaxed per cp02 §8.1)",
+      "followDistM": 3.4785054263316635,
+      "widthFrac": {
+        "median": 0.294083855534343
+      }
+    },
+    "bandStatesSeen": [
+      "NormalFollow"
+    ],
+    "stepTurn": {
+      "peakAzimuthErrorRad": 1.279915982294135,
+      "t90S": 0.28
+    },
+    "stopTest": {
+      "dolphinStoppedAtMs": 319,
+      "finalFollowDistM": 3.478505574142614,
+      "minFollowDistAfterStopM": 3.478505574142614,
+      "distErrorAtStopPlus1200msM": 0.03142019369742943
+    },
+    "wallTest": {
+      "minWallClearanceM": 0.7500000000000018,
+      "maxLosBlockedS": 0,
+      "statesSeen": [
+        "NormalFollow",
+        "FastTravel",
+        "Obstructed"
+      ]
+    },
+    "fidelityShots": {
+      "dir": "media/shared-world-cp02/",
+      "note": "visual A/B is manual (cp02 §9); automated check = files exist and are nonzero",
+      "shots": {
+        "c-above-lip": {
+          "eyeDemo": [
+            0.27350893540720433,
+            0.04685603042143138,
+            -0.7315328774211524
+          ],
+          "eyeMetres": [
+            2.0513170155540323,
+            0.35142022816073537,
+            -5.486496580658643
+          ],
+          "fov": 45,
+          "canvas": {
+            "w": 1398,
+            "h": 1080
+          },
+          "stockBytes": 1286119,
+          "poolBytes": 1076518
+        },
+        "c-below-lip": {
+          "eyeDemo": [
+            0.2266335264379627,
+            -0.04686705045391987,
+            -0.6061589010554085
+          ],
+          "eyeMetres": [
+            1.6997514482847202,
+            -0.351502878404399,
+            -4.5461917579155635
+          ],
+          "fov": 45,
+          "canvas": {
+            "w": 1398,
+            "h": 1080
+          },
+          "stockBytes": 1286110,
+          "poolBytes": 1378621
+        },
+        "d-snell-window": {
+          "eyeDemo": [
+            0.059915438689813125,
+            -0.9700538129292477,
+            -0.1602511201378291
+          ],
+          "eyeMetres": [
+            0.44936579017359846,
+            -7.275403596969358,
+            -1.2018834010337183
+          ],
+          "fov": 45,
+          "canvas": {
+            "w": 1398,
+            "h": 1080
+          },
+          "stockBytes": 1346770,
+          "poolBytes": 1347142
+        }
+      }
+    },
+    "replayDigestVsCp01": "identical (first 64 chars compared against committed artifact)",
+    "recenter": {
+      "azimuthErrorBeforeRad": 0.11169503907548961,
+      "azimuthErrorAfterRad": 0.07141621102101148
+    },
+    "waterline": {
+      "breachReEntries": 4,
+      "cameraSurfaceCrossings": 8,
+      "antiShimmerEngagements": 8,
+      "maxFrameStepM": 0.5585666758822982,
+      "statesSeen": {
+        "NormalFollow": 534,
+        "Airborne": 410,
+        "SurfaceTransition": 290,
+        "ReEntryRecovery": 187,
+        "Obstructed": 468,
+        "FastTravel": 50
+      }
+    },
+    "perf": {
+      "script": "porpoise 16 s (cruise cadence + nose-up breach cycles, ≥ 2 waterline crossing pairs)",
+      "fps": {
+        "buckets": [
+          120,
+          120,
+          121,
+          121,
+          120,
+          121,
+          120,
+          121,
+          120,
+          120
+        ],
+        "median": 120,
+        "min": 120,
+        "windowSeconds": 10
+      },
+      "simHzSamples": [
+        105.11701705672351,
+        120.0039670732917,
+        120.08733624454145,
+        119.91605875886881,
+        120.00396707329166,
+        120.01586986708989,
+        119.98800119987997,
+        120.09925558312655,
+        119.9040767386092,
+        119.49810794662409,
+        120.00396707329176,
+        120.00396707329155,
+        120.00396707329176,
+        119.98800119987997,
+        120.00396707329176,
+        120.00396707329155
+      ],
+      "cameraUpdateUsAvg": 31.40495902250621,
+      "viewport": {
+        "width": 1728,
+        "height": 1080
+      },
+      "chromeVersion": "150.0.7871.125",
+      "usedJSHeapBytes": 23295560
+    }
   }
 }

@@ -33,7 +33,9 @@ test.afterAll(async () => {
     JSON.stringify(
       {
         ...existing,
-        checkpoint: '01-dolphin-in-the-pool',
+        // suite-current checkpoint stamp (assertions below are cp01's,
+        // unchanged; the cp02 camera suite lives in camera.spec.ts)
+        checkpoint: '02-pool-camera',
         generatedAt: new Date().toISOString(),
         pool: { ...(existing.pool as object | undefined), ...results },
         containmentBatteryNote:
