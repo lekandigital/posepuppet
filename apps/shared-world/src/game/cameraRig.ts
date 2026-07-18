@@ -26,7 +26,7 @@
 
 import * as THREE from 'three';
 import type { SimState } from './sim';
-import { CameraCollision } from './cameraCollision';
+import { CameraCollision, type CameraCollisionLike } from './cameraCollision';
 
 export type CameraStateName =
   | 'NormalFollow'
@@ -158,7 +158,7 @@ export interface CameraEvalState {
 
 export class CameraRig {
   readonly camera: THREE.PerspectiveCamera;
-  readonly collision: CameraCollision;
+  readonly collision: CameraCollisionLike;
 
   private state: CameraStateName = 'NormalFollow';
   private stateTime = 0;
@@ -204,8 +204,14 @@ export class CameraRig {
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpErr = new THREE.Vector3();
 
-  constructor(aspect: number, collision = new CameraCollision(7.5, 7.5, RIG.COLLISION_RADIUS)) {
-    this.camera = new THREE.PerspectiveCamera(RIG.FOV, aspect, RIG.NEAR, RIG.FAR);
+  constructor(
+    aspect: number,
+    collision: CameraCollisionLike = new CameraCollision(7.5, 7.5, RIG.COLLISION_RADIUS),
+    // far plane: 900 in the pool, 2500 in the region (Master §7.5 —
+    // additive cp04B parameter; the pool default is unchanged)
+    far: number = RIG.FAR,
+  ) {
+    this.camera = new THREE.PerspectiveCamera(RIG.FOV, aspect, RIG.NEAR, far);
     this.collision = collision;
   }
 

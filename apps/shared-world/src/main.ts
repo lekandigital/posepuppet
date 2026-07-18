@@ -13,6 +13,11 @@
  *  - `region-preview` (Checkpoint 04A): graybox terrain preview of the baked
  *    authored region — an engineering view (no water, no pose runtime, no
  *    camera access), explicitly not the game look.
+ *  - `region` (Checkpoint 04B): THE GAME VIEW — the approved dolphin swims
+ *    the baked Twin Bay region under the jeantimex water (app-owned
+ *    container-swap copies; 512² player-following sim window). Same body
+ *    input/pose-runtime boot as the pool; append &debug=1 for the cp04B
+ *    instrument overlay.
  */
 
 const params = new URLSearchParams(location.search);
@@ -30,14 +35,33 @@ async function mountPool() {
   // minimal instrument overlay instead
   document.getElementById('help')?.remove();
   document.getElementById('help-toggle')?.remove();
-  mountPoolOverlay();
+  mountPoolOverlay('pool-overlay');
 
   const { startPoolGame } = await import('./game/game');
   await startPoolGame(document.getElementById('app')!);
+  await bootPoseRuntime();
+}
 
-  // PosePuppet runtime boot (Master §3.2, per 493dd24:apps/dolphin/src/main.ts):
-  // the page owns its tracking pipeline; keyboard play fully survives a
-  // denied/absent camera. LITE model — GPU budget goes to the water.
+async function mountRegion() {
+  await import('../vendor/threejs-water/src/styles.css');
+  document.getElementById('help')?.remove();
+  document.getElementById('help-toggle')?.remove();
+  mountPoolOverlay('region-overlay');
+
+  const { startRegionGame } = await import('./game/regionGame');
+  await startRegionGame(document.getElementById('app')!, {
+    debug: params.get('debug') === '1',
+  });
+  await bootPoseRuntime();
+}
+
+/**
+ * PosePuppet runtime boot (Master §3.2, per 493dd24:apps/dolphin/src/main.ts):
+ * the page owns its tracking pipeline; keyboard play fully survives a
+ * denied/absent camera. LITE model — GPU budget goes to the water. Shared
+ * verbatim by the pool and region game views.
+ */
+async function bootPoseRuntime() {
   const { createPoseRuntime } = await import('@bodyarcade/pose-runtime');
   const runtime = createPoseRuntime({
     model: 'lite',
@@ -55,9 +79,9 @@ async function mountPool() {
   void runtime.start();
 }
 
-function mountPoolOverlay() {
+function mountPoolOverlay(id: string) {
   const el = document.createElement('div');
-  el.id = 'pool-overlay';
+  el.id = id;
   el.style.cssText =
     'position:fixed;left:12px;top:12px;z-index:10;color:#e8f4fa;' +
     'font:12px/1.7 ui-monospace,Menlo,monospace;text-shadow:0 1px 3px rgba(0,0,0,.6);' +
@@ -90,6 +114,8 @@ if (view === 'stock') {
   void mountCreditsView();
 } else if (view === 'region-preview') {
   void mountRegionPreviewView();
+} else if (view === 'region') {
+  void mountRegion();
 } else {
   if (view !== 'pool') {
     console.warn(`[shared-world] unknown view "${view}" — mounting pool`);
