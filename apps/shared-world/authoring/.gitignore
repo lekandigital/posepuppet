@@ -1,0 +1,4 @@
+# The repo root .gitignore ignores *.png globally (private-fixture hygiene).
+# The region sketches are committed authoring artifacts of Checkpoint 03 —
+# re-include them here (this file lives inside the authoring scope).
+!region-sketches/*.png
