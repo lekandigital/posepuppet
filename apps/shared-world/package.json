@@ -1,0 +1,24 @@
+{
+  "name": "@bodyarcade/shared-world",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "BodyArcade Shared World — one bounded fictional region, Ecco-inspired dolphin exploration on the jeantimex/threejs-water pipeline. Checkpoint 00: pristine vendored stock demo.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "lil-gui": "^0.21.0",
+    "three": "^0.184.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/three": "^0.184.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.4.3",
+    "vite-plugin-glsl": "^1.3.0"
+  }
+}
