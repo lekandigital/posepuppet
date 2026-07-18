@@ -32,7 +32,7 @@ export type CameraStateName =
   | 'NormalFollow'
   | 'SlowHover'
   | 'FastTravel'
-  | 'TerrainCompressed' // stub — no terrain in the pool; trigger arrives at cp05 (BVH)
+  | 'TerrainCompressed' // live at cp05 in the region (opt-in; pool keeps the cp02 stub)
   | 'Obstructed'
   | 'SurfaceTransition'
   | 'Airborne'
@@ -89,6 +89,12 @@ export const RIG = {
   // never moves faster than this, so the camera path stays continuous
   // (< 1.2 m frame-to-frame at 50 fps) even through emergency recenters.
   MAX_CAM_SPEED: 55,        // m/s
+  // --- TerrainCompressed (cp05 §6; opt-in — region only, pool untouched) ---
+  COMPRESS_RATIO: 0.6,      // engage when resolved/target distance < 60 %…
+  COMPRESS_SUSTAIN_S: 0.5,  // …sustained longer than 0.5 s
+  COMPRESS_FACTOR: 0.6,     // distance/height parameter set reduced 40 %
+  COMPRESS_RELEASE_RATIO: 0.8, // [DERIVED hysteresis, flagged] release above 80 %…
+  COMPRESS_RELEASE_S: 0.5,     // …sustained 0.5 s [DERIVED, flagged]
 } as const;
 
 const T90_TO_SMOOTH = 2 / 3.8897; // see damping-form note above
@@ -154,6 +160,14 @@ export interface CameraEvalState {
   emergencyCount: number;
   /** rolling mean rig CPU cost per update, µs (measured by the caller) */
   updateUsAvg: number;
+  /** cp05: resolved/desired chase-distance ratio (1 = uncompressed) */
+  compressionRatio: number;
+  /** cp05: cross-faded TerrainCompressed parameter factor (1 → 0.6) */
+  compressFactor: number;
+  /** cp05: TerrainCompressed engagement count */
+  terrainCompressedCount: number;
+  /** cp05: BVH clearance at the resolved camera point, m (region only) */
+  bvhClearanceM: number;
 }
 
 export class CameraRig {
@@ -194,6 +208,15 @@ export class CameraRig {
   private rollRad = 0;
   private initialized = false;
 
+  // --- TerrainCompressed (cp05; inert unless terrainCompression is on) ---
+  private readonly terrainCompression: boolean;
+  private compressT = 0;
+  private releaseT = 0;
+  private compressed = false;
+  private compressFactor = 1;
+  private compressedCount = 0;
+  private compressionRatio = 1;
+
   /** rolling rig CPU cost, written by the caller (game loop) */
   updateUsAvg = 0;
 
@@ -210,9 +233,13 @@ export class CameraRig {
     // far plane: 900 in the pool, 2500 in the region (Master §7.5 —
     // additive cp04B parameter; the pool default is unchanged)
     far: number = RIG.FAR,
+    // cp05: TerrainCompressed is region-only; the pool rig stays exactly
+    // the approved cp02 behavior (the state remains a stub there)
+    opts: { terrainCompression?: boolean } = {},
   ) {
     this.camera = new THREE.PerspectiveCamera(RIG.FOV, aspect, RIG.NEAR, far);
     this.collision = collision;
+    this.terrainCompression = opts.terrainCompression ?? false;
   }
 
   /** R key: ease the camera directly behind facing over RECENTER_S. */
@@ -259,6 +286,14 @@ export class CameraRig {
 
     // state parameter cross-fade (t90 0.3 s, inside the 0.2–0.5 band)
     const kx = 1 - Math.exp((-dt * LN10) / RIG.STATE_XFADE_T90);
+
+    // cp05 TerrainCompressed: the distance/height parameter set blends down
+    // 40 % while engaged (cross-faded — no parameter pops); inert (factor 1)
+    // unless the region enabled the state.
+    const compressTarget = this.compressed ? RIG.COMPRESS_FACTOR : 1;
+    this.compressFactor += (compressTarget - this.compressFactor) * kx;
+    distTarget *= this.compressFactor;
+
     this.distGoal += (distTarget - this.distGoal) * kx;
 
     // follow-distance spring (t90 0.6 s)
@@ -275,7 +310,7 @@ export class CameraRig {
     const fz = Math.cos(s.yaw);
     const desired = this.tmpDesired.set(
       d.x - fx * this.dist,
-      d.y + RIG.HEIGHT,
+      d.y + RIG.HEIGHT * this.compressFactor,
       d.z - fz * this.dist,
     );
     // waterline discipline (carried cp01 virtue): while swimming, the eye
@@ -286,10 +321,54 @@ export class CameraRig {
     if (air) desired.y = Math.max(desired.y, RIG.SHIMMER_MIN_Y + 0.15);
     else desired.y = Math.min(desired.y, -RIG.SHIMMER_MIN_Y);
 
-    // --- pool-wall collision on the desired point (dolly-in on block) ---
+    // --- collision on the desired point (pool walls / region BVH
+    // sphere-cast; dolly-in on block) ---
+    const desiredLenPre = desired.distanceTo(d);
     const resolved = this.collision.resolve(d, desired);
     const obstructed = resolved.obstructed;
     desired.copy(resolved.pos);
+
+    // --- cp05 TerrainCompressed engage/release (region only) ---
+    // The ratio is always measured against the UNCOMPRESSED chase geometry
+    // (a second probe cast while engaged), so the metric is stable across
+    // the engage/release boundary and cannot self-release in a corridor.
+    if (this.terrainCompression) {
+      if (this.compressFactor > 0.999) {
+        this.compressionRatio =
+          desiredLenPre > 1e-4 ? desired.distanceTo(d) / desiredLenPre : 1;
+      } else {
+        const distU = this.dist / this.compressFactor;
+        const probe = this.tmpV.set(
+          d.x - fx * distU,
+          Math.min(d.y + RIG.HEIGHT, air ? Infinity : -RIG.SHIMMER_MIN_Y),
+          d.z - fz * distU,
+        );
+        const probeLen = probe.distanceTo(d);
+        const probeResolved = this.collision.resolve(d, probe);
+        this.compressionRatio =
+          probeLen > 1e-4 ? probeResolved.pos.distanceTo(d) / probeLen : 1;
+      }
+      if (!this.compressed) {
+        if (this.compressionRatio < RIG.COMPRESS_RATIO) {
+          this.compressT += dt;
+          if (this.compressT > RIG.COMPRESS_SUSTAIN_S) {
+            this.compressed = true;
+            this.compressedCount++;
+            this.releaseT = 0;
+          }
+        } else {
+          this.compressT = 0;
+        }
+      } else if (this.compressionRatio > RIG.COMPRESS_RELEASE_RATIO) {
+        this.releaseT += dt;
+        if (this.releaseT > RIG.COMPRESS_RELEASE_S) {
+          this.compressed = false;
+          this.compressT = 0;
+        }
+      } else {
+        this.releaseT = 0;
+      }
+    }
 
     // --- LOS timer (convex pool: constant-clear; consumed for real at cp05) ---
     this.losBlockedS = this.collision.losClear(this.camPos, d) ? 0 : this.losBlockedS + dt;
@@ -375,7 +454,7 @@ export class CameraRig {
     const toAim = aimTarget.sub(this.camPos).normalize(); // aimTarget is a temp — consumed here
     this.aimErrorRad = Math.acos(THREE.MathUtils.clamp(fwd.dot(toAim), -1, 1));
 
-    // --- state reporting (priority order; TerrainCompressed is a cp05 stub) ---
+    // --- state reporting (priority order; TerrainCompressed live at cp05) ---
     const next: CameraStateName = this.emergency
       ? 'EmergencyRecenter'
       : this.surfaceT > 0
@@ -384,13 +463,15 @@ export class CameraRig {
           ? 'Airborne'
           : this.reentryT > 0
             ? 'ReEntryRecovery'
-            : obstructed
-              ? 'Obstructed'
-              : speed < RIG.HOVER_SPEED
-                ? 'SlowHover'
-                : speed > RIG.FAST_SPEED
-                  ? 'FastTravel'
-                  : 'NormalFollow';
+            : this.compressed
+              ? 'TerrainCompressed'
+              : obstructed
+                ? 'Obstructed'
+                : speed < RIG.HOVER_SPEED
+                  ? 'SlowHover'
+                  : speed > RIG.FAST_SPEED
+                    ? 'FastTravel'
+                    : 'NormalFollow';
     if (next !== this.state) {
       this.state = next;
       this.stateTime = 0;
@@ -457,6 +538,11 @@ export class CameraRig {
       losBlockedS: this.losBlockedS,
       emergencyCount: this.emergencyCount,
       updateUsAvg: this.updateUsAvg,
+      compressionRatio: this.compressionRatio,
+      compressFactor: this.compressFactor,
+      terrainCompressedCount: this.compressedCount,
+      bvhClearanceM:
+        (this.collision as { lastClearanceM?: number }).lastClearanceM ?? Infinity,
     };
   }
 }

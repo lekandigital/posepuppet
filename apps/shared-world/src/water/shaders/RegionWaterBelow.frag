@@ -27,6 +27,7 @@ uniform vec3 eye;
 varying vec3 vPosition;
 
 #include ./RegionContainer.glsl;
+#include ./RegionTerrainTint.glsl;
 #include ./RegionWallColor.glsl;
 
 /**

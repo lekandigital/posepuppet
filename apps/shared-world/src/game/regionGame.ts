@@ -21,8 +21,17 @@ import { RegionRenderer } from '../water/RegionRenderer';
 import { WorldData } from '../world/WorldData';
 import { RegionSampler } from '../world/RegionSampler';
 import { SwimSim, SIM, NEUTRAL_INTENT, type AssistMode, type SwimIntent } from './sim';
+import type { WorldSampler } from './worldSampler';
 import { CameraRig, RIG, type CameraEvalState } from './cameraRig';
 import { RegionCameraCollision } from './regionCameraCollision';
+import { TerrainBvh } from './terrainBvh';
+import {
+  TILES,
+  CELLS_PER_TILE,
+  LOD_STEPS,
+  LOD_DISTANCES_M,
+  SKIRT_DROP_M,
+} from '../water/RegionTerrainPass';
 import { loadDolphin } from './dolphinActor';
 import { createSwimControls } from '../input/swimControls';
 import { CREDITS_ATTRIBUTION } from '../credits';
@@ -128,11 +137,14 @@ export async function startRegionGame(
   sim.state.wvx = Math.sin(spawn.yaw) * sim.state.speed;
   sim.state.wvz = Math.cos(spawn.yaw) * sim.state.speed;
   const controls = createSwimControls();
-  const cam = new CameraRig(
-    innerWidth / innerHeight,
-    new RegionCameraCollision(data, RIG.COLLISION_RADIUS),
-    REGION_FAR,
-  );
+  // cp05: BVH camera collision (presentation-only — the sim never touches
+  // it); spawn neighborhood prebuilt so the first frames pay no build cost
+  const bvh = new TerrainBvh(data);
+  for (let k = 0; k < 9; k++) bvh.prefetch(spawn.x, spawn.z);
+  const camCollision = new RegionCameraCollision(data, bvh, RIG.COLLISION_RADIUS);
+  const cam = new CameraRig(innerWidth / innerHeight, camCollision, REGION_FAR, {
+    terrainCompression: true,
+  });
 
   const resize = () => {
     webglRenderer.setSize(innerWidth, innerHeight);
@@ -298,6 +310,33 @@ export async function startRegionGame(
       },
       gpuHeightProbe: (pts: [number, number][]) => gpuHeightProbe(pts),
       simTexProbe: () => water.probeSimTexture(),
+      // --- cp05 terrain instrumentation ---
+      terrain: {
+        constants: {
+          tiles: TILES,
+          cellsPerTile: CELLS_PER_TILE,
+          tileSizeM: regionRenderer.terrain.tileSizeM,
+          lodSteps: [...LOD_STEPS],
+          lodDistancesM: [...LOD_DISTANCES_M],
+          skirtDropM: SKIRT_DROP_M,
+        },
+        buildMs: regionRenderer.terrain.buildMs,
+        stats: () => regionRenderer.terrain.terrainStats(),
+        lodMap: () => regionRenderer.terrain.lodMap(),
+        tiles: () =>
+          regionRenderer.terrain.tiles.map((t) => ({
+            i: t.i,
+            j: t.j,
+            minH: t.minH,
+            maxH: t.maxH,
+            protected: t.protected,
+            protectReason: t.protectReason,
+            lod: t.lod,
+            visible: t.visible,
+          })),
+        bvhStats: () => ({ ...bvh.stats }),
+        cameraClearanceM: () => camCollision.lastClearanceM,
+      },
     },
     test: {
       /** fixed-camera fidelity-shot mode (cp04B §8.1); null restores */
@@ -325,7 +364,7 @@ export async function startRegionGame(
       setStageEnabled(patch: Partial<typeof stageEnabled>) {
         Object.assign(stageEnabled, patch);
         regionRenderer.surface.setVisible(stageEnabled.surface);
-        regionRenderer.terrain.mesh.visible = stageEnabled.terrain;
+        regionRenderer.terrain.setVisible(stageEnabled.terrain);
       },
       setSurfaceVisible(v: boolean) {
         stageEnabled.surface = v;
@@ -349,6 +388,134 @@ export async function startRegionGame(
         });
       },
       containmentRun,
+      /**
+       * cp05 slide/contact scenario (deterministic, sim-only): a fresh sim
+       * launched at a chosen pose swims a fixed intent against the real
+       * baked terrain; per-step displacement is tracked for the jitter
+       * bound, samples every 0.05 s for the slide-retention analysis.
+       */
+      contactRun(opts: {
+        x: number;
+        z: number;
+        y: number;
+        yaw: number;
+        speed?: number;
+        seconds?: number;
+        intent?: Partial<SwimIntent>;
+        assist?: AssistMode;
+      }) {
+        const local = new SwimSim(sampler);
+        local.assist = opts.assist ?? 'expert';
+        local.state.x = opts.x;
+        local.state.z = opts.z;
+        local.state.y = opts.y;
+        local.state.yaw = opts.yaw;
+        local.state.speed = opts.speed ?? 5;
+        local.state.wvx = Math.sin(opts.yaw) * local.state.speed;
+        local.state.wvz = Math.cos(opts.yaw) * local.state.speed;
+        const intent: SwimIntent = { ...NEUTRAL_INTENT, ...(opts.intent ?? {}) };
+        const seconds = opts.seconds ?? 8;
+        const steps = Math.round(seconds / SIM.DT);
+        const every = Math.round(0.05 / SIM.DT);
+        let maxStepDispM = 0;
+        let firstContactT = -1;
+        const samples: {
+          t: number; x: number; y: number; z: number;
+          speed: number; dispSpeed: number; inContact: boolean; wedgeT: number;
+        }[] = [];
+        for (let k = 0; k <= steps; k++) {
+          if (k > 0) {
+            const bx = local.state.x;
+            const by = local.state.y;
+            const bz = local.state.z;
+            local.step(intent);
+            const d = Math.hypot(local.state.x - bx, local.state.y - by, local.state.z - bz);
+            if (d > maxStepDispM) maxStepDispM = d;
+          }
+          const cs = local.contactState();
+          if (cs.inContact && firstContactT < 0) firstContactT = k * SIM.DT;
+          if (k % every === 0) {
+            samples.push({
+              t: k * SIM.DT,
+              x: local.state.x,
+              y: local.state.y,
+              z: local.state.z,
+              speed: local.state.speed,
+              dispSpeed: cs.dispSpeed,
+              inContact: cs.inContact,
+              wedgeT: cs.wedgeT,
+            });
+          }
+        }
+        return { samples, maxStepDispM, firstContactT, dt: SIM.DT };
+      },
+      /**
+       * cp05 anti-wedge mechanism scenario: the baked region offers no
+       * guaranteed tight concave pocket at dolphin scale yet (caves are
+       * cp09), so the wedge detector/escape runs against a deterministic
+       * analytic V-pocket sampler (45° walls + closed end — two contact
+       * normals 90° apart). The SIM CODE under test is the real SwimSim;
+       * only the terrain is synthetic. Reported as such.
+       */
+      wedgeMechanismRun() {
+        const pocketHeight = (x: number, z: number) =>
+          -30 + Math.abs(x) + Math.max(0, z);
+        const pocket: WorldSampler = {
+          inWater: () => true,
+          shoreDistance: () => 1000,
+          depthAt: (x: number, z: number) => Math.max(0, -pocketHeight(x, z)),
+          terrainHeight: pocketHeight,
+        };
+        const local = new SwimSim(pocket);
+        local.assist = 'expert';
+        local.state.x = 0;
+        local.state.z = -8;
+        local.state.y = -28.5;
+        local.state.yaw = 0; // +z: into the pocket's closed end
+        local.state.speed = 1.5;
+        local.state.wvx = 0;
+        local.state.wvz = 1.5;
+        const steps = Math.round(12 / SIM.DT);
+        const every = Math.round(0.05 / SIM.DT);
+        let wedgeOnsetT = -1;
+        let escapeT = -1;
+        const samples: {
+          t: number; x: number; y: number; z: number;
+          dispSpeed: number; wedgeT: number; clearanceM: number;
+        }[] = [];
+        for (let k = 0; k <= steps; k++) {
+          if (k > 0) local.step(NEUTRAL_INTENT);
+          const cs = local.contactState();
+          const t = k * SIM.DT;
+          const h = pocketHeight(local.state.x, local.state.z);
+          const clearanceM = local.state.y - h;
+          if (cs.wedgeT > SIM.WEDGE_TIME_S && wedgeOnsetT < 0) wedgeOnsetT = t;
+          if (wedgeOnsetT >= 0 && escapeT < 0 && cs.wedgeT === 0 && clearanceM > SIM.CONTACT_PROBE) {
+            escapeT = t;
+          }
+          if (k % every === 0) {
+            samples.push({
+              t,
+              x: local.state.x,
+              y: local.state.y,
+              z: local.state.z,
+              dispSpeed: cs.dispSpeed,
+              wedgeT: cs.wedgeT,
+              clearanceM,
+            });
+          }
+        }
+        return { samples, wedgeOnsetT, escapeT };
+      },
+      /**
+       * cp05 crack-scan aid: paint the scene background a flat color so
+       * background pixels are exactly detectable in captures (test-only;
+       * null restores the vendored cubemap — approved visuals untouched
+       * outside the scan).
+       */
+      setFlatBackground(hex: number | null) {
+        scene.background = hex === null ? cubemap : new THREE.Color(hex);
+      },
       /** deterministic region replay — the cp04A region-preview contract
        *  verbatim (fresh sim at the approved spawn; digest format shared) */
       runScript(script: { steps: number; intent: Partial<SwimIntent> }[]): string {
@@ -504,7 +671,8 @@ export async function startRegionGame(
     stageAcc.caustics += performance.now() - causT0;
 
     const prepT0 = performance.now();
-    regionRenderer.renderTerrain(water);
+    bvh.prefetch(s.x, s.z); // amortized: at most one tile build per frame
+    regionRenderer.renderTerrain(water, cam.camera); // cp05: LOD + culling
     regionRenderer.renderWater(water, cam.camera);
     stageAcc.prepare += performance.now() - prepT0;
 
@@ -543,8 +711,20 @@ export async function startRegionGame(
       const sd = sim.shoreDistance(s.x, s.z);
       const t = Math.min(Math.max(1 - sd / SIM.SHORE_BAND, 0), 1);
       const gpu = gpuTimer?.averages();
+      const ts = regionRenderer.terrain.terrainStats();
+      const camEval = cam.evalState(s);
+      const contact = sim.contactState();
       overlay.textContent =
-        `REGION ?debug — cp04B instrumentation\n` +
+        `REGION ?debug — cp04B/cp05 instrumentation\n` +
+        `terrain tiles ${ts.drawnTiles}/${ts.totalTiles} ` +
+        `(lod ${ts.drawnPerLod.join('/')}) · ${(ts.drawnTriangles / 1000).toFixed(0)}k tris · ` +
+        `protected ${ts.protectedTiles}${ts.protectedAlwaysLod0 ? '' : ' ⚠lod>0'}\n` +
+        `bvh tiles ${bvh.stats.tilesLive} · builds ${bvh.stats.tilesBuilt} ` +
+        `(max ${bvh.stats.buildMsMax.toFixed(0)} ms) · ` +
+        `cam ${camEval.state} r ${camEval.compressionRatio.toFixed(2)} ` +
+        `clr ${Number.isFinite(camEval.bvhClearanceM) ? camEval.bvhClearanceM.toFixed(2) : '>10'} m\n` +
+        `contact ${contact.inContact ? 'YES' : 'no'} · wedgeT ${contact.wedgeT.toFixed(2)} · ` +
+        `disp ${contact.dispSpeed.toFixed(2)} m/s\n` +
         `speed ${s.speed.toFixed(2)} m/s · depth under ${sim.depthAt(s.x, s.z).toFixed(1)} m · y ${s.y.toFixed(1)}\n` +
         `shore dist ${sd.toFixed(1)} m · containment ${(SIM.SHORE_PUSH * t * t).toFixed(2)} m/s² ` +
         `(SHORE_BAND ${SIM.SHORE_BAND} / SHORE_PUSH ${SIM.SHORE_PUSH})\n` +

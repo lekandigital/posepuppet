@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "lil-gui": "^0.21.0",
-    "three": "^0.184.0"
+    "three": "^0.184.0",
+    "three-mesh-bvh": "^0.9.12"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",

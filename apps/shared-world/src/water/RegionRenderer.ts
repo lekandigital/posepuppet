@@ -39,16 +39,19 @@ export class RegionRenderer {
     );
   }
 
-  /** All scene meshes this renderer owns (terrain + surface sheets). */
+  /** All scene meshes this renderer owns (terrain tiles + surface sheets). */
   sceneMeshes(): THREE.Object3D[] {
-    return [this.terrain.mesh, ...this.surface.meshes()];
+    return [this.terrain.group, ...this.surface.meshes()];
   }
 
   updateCaustics(water: RegionWater) {
     this.caustics.update(water);
   }
 
-  renderTerrain(water: RegionWater) {
+  /** cp05: per-frame chunk LOD selection + frustum culling, then the sim
+   *  texture binding the graybox pass had. */
+  renderTerrain(water: RegionWater, camera: THREE.Camera) {
+    this.terrain.update(camera);
     this.terrain.prepare(water);
   }
 
