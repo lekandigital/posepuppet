@@ -116,3 +116,12 @@ FABLE_REMOTE_HANDOFF.local.md
 # world files include two PNG masks — override the global *.png ignore
 !apps/shared-world/public/world/
 !apps/shared-world/public/world/**
+
+# Stage-3 planning references (post-CP05 addendum): the pinned ZyFou
+# ProceduralTerrains snapshot and the 13 Ecco waterline frames are intentional
+# committed documentation inputs. Their existing binary files were force-added
+# and are now tracked. Global binary ignores remain active for unrelated files.
+# The imported snapshot remains read-only.
+!docs/bodyarcade-stage3/references/**/*.png
+!docs/bodyarcade-stage3/references/**/*.jpg
+!docs/bodyarcade-stage3/references/**/*.jpeg
