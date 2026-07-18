@@ -1,0 +1,311 @@
+{
+  "magic": "bodyarcade-region-placement/1",
+  "layout": "Sketch C — Twin Bay (APPROVED LAYOUT, 2026-07-18)",
+  "routeClosed": true,
+  "instances": [
+    {
+      "category": "spawn",
+      "type": "spawn-north-bay-lagoon",
+      "x": -180,
+      "z": -380,
+      "yaw": 0.896055,
+      "scale": 1
+    },
+    {
+      "category": "breach",
+      "type": "b1-crescent-summit-ne-island",
+      "x": -280,
+      "z": -300,
+      "yaw": -1.176005,
+      "scale": 1
+    },
+    {
+      "category": "breach",
+      "type": "b2-crescent-ridge-s-island",
+      "x": -100,
+      "z": 420,
+      "yaw": -1.965587,
+      "scale": 1
+    },
+    {
+      "category": "breach",
+      "type": "b3-both-e-islands-open-horizon",
+      "x": 430,
+      "z": -300,
+      "yaw": 2.951604,
+      "scale": 1
+    },
+    {
+      "category": "arch",
+      "type": "islet-gap-arch-5m",
+      "x": -40,
+      "z": -70,
+      "yaw": 1.951303,
+      "scale": 1
+    },
+    {
+      "category": "cave-mouth",
+      "type": "headland-cave-south-mouth",
+      "x": -420,
+      "z": 30,
+      "yaw": -3.086094,
+      "scale": 1
+    },
+    {
+      "category": "cave-mouth",
+      "type": "headland-cave-north-mouth",
+      "x": -430,
+      "z": -150,
+      "yaw": 0.055499,
+      "scale": 1
+    },
+    {
+      "category": "cave-mouth",
+      "type": "trench-wall-cave-optional",
+      "x": 450,
+      "z": -30,
+      "yaw": 1.642104,
+      "scale": 1
+    },
+    {
+      "category": "ruin",
+      "type": "shoreline-settlement",
+      "x": -470,
+      "z": -300,
+      "yaw": 0.6,
+      "scale": 1
+    },
+    {
+      "category": "ruin",
+      "type": "submerged-column-field",
+      "x": -120,
+      "z": 260,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "wreck",
+      "type": "trench-w-rim-wreck",
+      "x": 440,
+      "z": 160,
+      "yaw": 1.325818,
+      "scale": 1
+    },
+    {
+      "category": "corridor-mass",
+      "type": "islet-1",
+      "x": -80,
+      "z": -70,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "corridor-mass",
+      "type": "islet-2",
+      "x": 90,
+      "z": -80,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "corridor-mass",
+      "type": "islet-3",
+      "x": 230,
+      "z": -90,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "spire",
+      "type": "south-bay-spire-1",
+      "x": -300,
+      "z": 420,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "spire",
+      "type": "south-bay-spire-2",
+      "x": 100,
+      "z": 330,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "silhouette",
+      "type": "plain-silhouette",
+      "x": 250,
+      "z": 570,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "current",
+      "type": "corridor-trench-funnel",
+      "x": 260,
+      "z": -200,
+      "yaw": 2.156013,
+      "scale": 1
+    },
+    {
+      "category": "discovery",
+      "type": "monolith-1-of-7",
+      "x": 390,
+      "z": 302,
+      "yaw": 3.141593,
+      "scale": 1
+    },
+    {
+      "category": "discovery",
+      "type": "monolith-2-of-7",
+      "x": 399.381978,
+      "z": 297.481878,
+      "yaw": 4.039191,
+      "scale": 1
+    },
+    {
+      "category": "discovery",
+      "type": "monolith-3-of-7",
+      "x": 401.699135,
+      "z": 287.329749,
+      "yaw": 4.936788,
+      "scale": 1
+    },
+    {
+      "category": "discovery",
+      "type": "monolith-4-of-7",
+      "x": 395.206605,
+      "z": 279.188374,
+      "yaw": 5.834386,
+      "scale": 1
+    },
+    {
+      "category": "discovery",
+      "type": "monolith-5-of-7",
+      "x": 384.793395,
+      "z": 279.188374,
+      "yaw": 6.731984,
+      "scale": 1
+    },
+    {
+      "category": "discovery",
+      "type": "monolith-6-of-7",
+      "x": 378.300865,
+      "z": 287.329749,
+      "yaw": 7.629582,
+      "scale": 1
+    },
+    {
+      "category": "discovery",
+      "type": "monolith-7-of-7",
+      "x": 380.618022,
+      "z": 297.481878,
+      "yaw": 8.52718,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-00",
+      "x": -180,
+      "z": -380,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-01",
+      "x": -30,
+      "z": -260,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-02",
+      "x": 10,
+      "z": -90,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-03",
+      "x": 280,
+      "z": -210,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-04",
+      "x": 430,
+      "z": -300,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-05",
+      "x": 500,
+      "z": -120,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-06",
+      "x": 465,
+      "z": 90,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-07",
+      "x": 420,
+      "z": 200,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-08",
+      "x": 390,
+      "z": 290,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-09",
+      "x": 200,
+      "z": 470,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-10",
+      "x": -120,
+      "z": 260,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-11",
+      "x": -420,
+      "z": 30,
+      "yaw": 0,
+      "scale": 1
+    },
+    {
+      "category": "route",
+      "type": "loop-12",
+      "x": -430,
+      "z": -150,
+      "yaw": 0,
+      "scale": 1
+    }
+  ]
+}

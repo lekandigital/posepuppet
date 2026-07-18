@@ -10,6 +10,9 @@
  *    water-fidelity reference, byte-identical forever.
  *  - `credits`: the in-app CC-BY attribution panel (mandatory for the
  *    dolphin; mirrors repo-root CREDITS.md).
+ *  - `region-preview` (Checkpoint 04A): graybox terrain preview of the baked
+ *    authored region — an engineering view (no water, no pose runtime, no
+ *    camera access), explicitly not the game look.
  */
 
 const params = new URLSearchParams(location.search);
@@ -66,6 +69,13 @@ function mountPoolOverlay() {
   document.body.appendChild(el);
 }
 
+async function mountRegionPreviewView() {
+  document.getElementById('help')?.remove();
+  document.getElementById('help-toggle')?.remove();
+  const { mountRegionPreview } = await import('./world/regionPreview');
+  await mountRegionPreview(document.getElementById('app')!);
+}
+
 async function mountCreditsView() {
   const { mountCredits } = await import('./credits');
   document.getElementById('help')?.remove();
@@ -78,6 +88,8 @@ if (view === 'stock') {
   void mountStock();
 } else if (view === 'credits') {
   void mountCreditsView();
+} else if (view === 'region-preview') {
+  void mountRegionPreviewView();
 } else {
   if (view !== 'pool') {
     console.warn(`[shared-world] unknown view "${view}" — mounting pool`);

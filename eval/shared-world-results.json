@@ -1,5 +1,5 @@
 {
-  "checkpoint": "02-pool-camera",
+  "checkpoint": "04A-region-bake-loader",
   "timestamp": "2026-07-18T05:37:35.848Z",
   "url": "/shared-world/?view=stock",
   "viewport": {
@@ -33,32 +33,32 @@
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
   "paintedPixels": 508275,
-  "generatedAt": "2026-07-18T09:52:08.279Z",
+  "generatedAt": "2026-07-18T13:11:52.753Z",
   "pool": {
     "modelLengthM": 2.8968250546579615,
     "bootConsoleErrors": 0,
     "brake": {
-      "fromSpeed": 4.801977093672951,
-      "speedAfter1200ms": 0.001046898986860198
+      "fromSpeed": 4.809240411292962,
+      "speedAfter1200ms": 0.0010484824975142046
     },
     "cadenceCoupling": [
       {
         "rateHz": 0.4,
-        "speed": 2.4239462335584565
+        "speed": 2.423854769921252
       },
       {
         "rateHz": 0.9,
-        "speed": 4.909250851258097
+        "speed": 4.909513013082207
       }
     ],
-    "glideSpeedAfter3s": 2.888285652584222,
+    "glideSpeedAfter3s": 2.8604118341708578,
     "burst": {
       "peakSpeed": 9,
-      "msToExceed8": 1083
+      "msToExceed8": 1088
     },
     "sustainedMaxSpeed": 5,
     "dropout": {
-      "maxPitchStepRad": 0.07963411040347323,
+      "maxPitchStepRad": 0.08435649888072905,
       "trackingDuringLoss": "autopilot"
     },
     "replayDigest": "7.240747,-2.500000,0.714485,0.543055,5.000000,240,0|4.525521,-5.",
@@ -71,10 +71,10 @@
         "buckets": [
           120,
           120,
-          120,
-          120,
-          120,
           121,
+          120,
+          120,
+          120,
           120,
           120,
           120,
@@ -85,16 +85,16 @@
         "windowSeconds": 10
       },
       "simHzSamples": [
-        120.00396707329166,
-        120.00396707329166,
+        120.01586986708978,
+        119.98800119988007,
+        119.97600479904021,
+        119.23688394276634,
+        120.80670926517567,
+        120.00396707329155,
+        120.00396707329176,
         119.98800119987997,
-        120.02777502231918,
-        119.97600479904033,
-        119.98800119987997,
-        120.07541927160852,
-        119.95201919232312,
-        119.99206664022218,
-        120.00396707329176
+        119.21319292668385,
+        120.79464909653602
       ],
       "viewport": {
         "width": 1728,
@@ -106,18 +106,18 @@
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 18545401
+      "usedJSHeapBytes": 24451286
     },
     "turnShaping": {
-      "slowYawRateRadS": 2.439555799319956,
-      "slowSpeed": 0.000049211769383126674,
-      "fastYawRateRadS": 1.5634077531780477,
+      "slowYawRateRadS": 2.4481949588044367,
+      "slowSpeed": 0.00005210657934684004,
+      "fastYawRateRadS": 1.5771132688602596,
       "fastSpeed": 9
     }
   },
   "containmentBatteryNote": "NOT ported at pool scale (walls are the vendored demo pool); returns re-pointed at cp04B",
   "stock": {
-    "timestamp": "2026-07-18T09:52:21.932Z",
+    "timestamp": "2026-07-18T13:12:27.522Z",
     "url": "/shared-world/?view=stock",
     "viewport": {
       "width": 1728,
@@ -136,14 +136,14 @@
         120,
         120,
         120,
-        113,
+        120,
+        120,
+        120,
         121,
-        120,
-        120,
         120
       ],
       "median": 120,
-      "min": 113,
+      "min": 120,
       "windowSeconds": 10
     },
     "simHz": null,
@@ -153,46 +153,46 @@
   },
   "camera02": {
     "cruiseCoverage": {
-      "samples": 44,
+      "samples": 43,
       "widthFrac": {
-        "median": 0.10009363672993235,
-        "min": 0.09762043612019866,
-        "max": 0.10686308411854947
+        "median": 0.1000325770121592,
+        "min": 0.09760941910254703,
+        "max": 0.10703092503491146
       },
       "centerHeightFrac": {
-        "median": 0.436947320715199,
-        "min": 0.4234264664572378,
-        "max": 0.44415627421187215
+        "median": 0.436741944175959,
+        "min": 0.4242764030360794,
+        "max": 0.4439958801080731
       },
-      "followDistM": 6.7972266217552315
+      "followDistM": 6.7940315622702085
     },
     "burstCoverage": {
       "samples": 21,
       "state": "FastTravel (bands relaxed per cp02 §8.1)",
       "widthFrac": {
-        "median": 0.0765468117823229
+        "median": 0.07639122289366534
       },
-      "followDistM": 8.167170100465324
+      "followDistM": 8.18622345950132
     },
     "hoverCoverage": {
       "state": "SlowHover (bands relaxed per cp02 §8.1)",
-      "followDistM": 3.4785054263316635,
+      "followDistM": 3.478505426292743,
       "widthFrac": {
-        "median": 0.294083855534343
+        "median": 0.2941371588917181
       }
     },
     "bandStatesSeen": [
       "NormalFollow"
     ],
     "stepTurn": {
-      "peakAzimuthErrorRad": 1.279915982294135,
-      "t90S": 0.28
+      "peakAzimuthErrorRad": 1.287451743935208,
+      "t90S": 0.285
     },
     "stopTest": {
-      "dolphinStoppedAtMs": 319,
-      "finalFollowDistM": 3.478505574142614,
-      "minFollowDistAfterStopM": 3.478505574142614,
-      "distErrorAtStopPlus1200msM": 0.03142019369742943
+      "dolphinStoppedAtMs": 341,
+      "finalFollowDistM": 3.4785055740409923,
+      "minFollowDistAfterStopM": 3.4785055740409923,
+      "distErrorAtStopPlus1200msM": 0.02852649408227803
     },
     "wallTest": {
       "minWallClearanceM": 0.7500000000000018,
@@ -223,8 +223,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286119,
-          "poolBytes": 1076518
+          "stockBytes": 1286195,
+          "poolBytes": 1077023
         },
         "c-below-lip": {
           "eyeDemo": [
@@ -242,8 +242,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286110,
-          "poolBytes": 1378621
+          "stockBytes": 1286371,
+          "poolBytes": 1378384
         },
         "d-snell-window": {
           "eyeDemo": [
@@ -261,28 +261,28 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1346770,
-          "poolBytes": 1347142
+          "stockBytes": 1346816,
+          "poolBytes": 1347839
         }
       }
     },
     "replayDigestVsCp01": "identical (first 64 chars compared against committed artifact)",
     "recenter": {
-      "azimuthErrorBeforeRad": 0.11169503907548961,
-      "azimuthErrorAfterRad": 0.07141621102101148
+      "azimuthErrorBeforeRad": 0.1099964290619031,
+      "azimuthErrorAfterRad": 0.07370045319062424
     },
     "waterline": {
       "breachReEntries": 4,
       "cameraSurfaceCrossings": 8,
       "antiShimmerEngagements": 8,
-      "maxFrameStepM": 0.5585666758822982,
+      "maxFrameStepM": 0.5819598873494914,
       "statesSeen": {
         "NormalFollow": 534,
-        "Airborne": 410,
+        "Airborne": 411,
         "SurfaceTransition": 290,
-        "ReEntryRecovery": 187,
-        "Obstructed": 468,
-        "FastTravel": 50
+        "ReEntryRecovery": 190,
+        "Obstructed": 463,
+        "FastTravel": 47
       }
     },
     "perf": {
@@ -290,13 +290,13 @@
       "fps": {
         "buckets": [
           120,
-          120,
           121,
           121,
           120,
           121,
           120,
           121,
+          120,
           120,
           120
         ],
@@ -305,30 +305,356 @@
         "windowSeconds": 10
       },
       "simHzSamples": [
-        105.11701705672351,
-        120.0039670732917,
+        103.52379056432966,
+        120.39800995024878,
         120.08733624454145,
-        119.91605875886881,
+        119.98800119988007,
+        119.9400299850075,
+        119.99206664022206,
         120.00396707329166,
-        120.01586986708989,
+        120.12310136007156,
+        119.88011988011988,
         119.98800119987997,
-        120.09925558312655,
-        119.9040767386092,
-        119.49810794662409,
+        120.01586986708978,
         120.00396707329176,
-        120.00396707329155,
         120.00396707329176,
-        119.98800119987997,
-        120.00396707329176,
-        120.00396707329155
+        119.99206664022196,
+        120.01586986708999,
+        119.97600479904033
       ],
-      "cameraUpdateUsAvg": 31.40495902250621,
+      "cameraUpdateUsAvg": 28.333333258827526,
       "viewport": {
         "width": 1728,
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 23295560
+      "usedJSHeapBytes": 23194393
+    }
+  },
+  "region": {
+    "bakeDeterminism": "PASS (SHA-256 per artifact, in-memory ×2 + disk)",
+    "fidelity": [
+      {
+        "name": "height-resolution",
+        "pass": true,
+        "texels": 4198401,
+        "expected": 4198401
+      },
+      {
+        "name": "height-range",
+        "pass": true,
+        "min": -80,
+        "max": 199.893187
+      },
+      {
+        "name": "height-shore-sign-consistency",
+        "pass": true,
+        "agree": 10000,
+        "samples": 10000
+      },
+      {
+        "name": "coastline-iou-vs-sketch",
+        "pass": true,
+        "iou": 0.999995,
+        "bound": 0.92,
+        "coastlineDeviationMeters": 0
+      },
+      {
+        "name": "island-centroid-ne-island",
+        "pass": true,
+        "target": [
+          480,
+          -560
+        ],
+        "centroid": [
+          479.022086,
+          -557.223679
+        ],
+        "deviationM": 2.943513,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-s-island",
+        "pass": true,
+        "target": [
+          -380,
+          640
+        ],
+        "centroid": [
+          -375.63232,
+          652.49757
+        ],
+        "deviationM": 13.238803,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-islet-1",
+        "pass": true,
+        "target": [
+          -80,
+          -70
+        ],
+        "centroid": [
+          -79.526667,
+          -69.895962
+        ],
+        "deviationM": 0.484632,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-islet-2",
+        "pass": true,
+        "target": [
+          90,
+          -80
+        ],
+        "centroid": [
+          87.36639,
+          -78.166753
+        ],
+        "deviationM": 3.208847,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-islet-3",
+        "pass": true,
+        "target": [
+          230,
+          -90
+        ],
+        "centroid": [
+          230.199353,
+          -89.439655
+        ],
+        "deviationM": 0.59475,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-e-wall-rock-1",
+        "pass": true,
+        "target": [
+          900,
+          -480
+        ],
+        "centroid": [
+          901.242898,
+          -481.397964
+        ],
+        "deviationM": 1.870588,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-e-wall-rock-2",
+        "pass": true,
+        "target": [
+          905,
+          620
+        ],
+        "centroid": [
+          907.311481,
+          620.817765
+        ],
+        "deviationM": 2.451874,
+        "boundM": 50
+      },
+      {
+        "name": "summit-position-and-height",
+        "pass": true,
+        "peak": [
+          -759.765625,
+          -99.609375
+        ],
+        "target": [
+          -760,
+          -100
+        ],
+        "deviationM": 0.455543,
+        "heightM": 199.893187
+      },
+      {
+        "name": "trench-floor",
+        "pass": true,
+        "minAlongSpineM": -80,
+        "boundM": -70
+      },
+      {
+        "name": "lagoon-depth-band",
+        "pass": true,
+        "fracIn3to10": 1,
+        "waterTexels": 131769
+      },
+      {
+        "name": "sdf-sign-matches-inwater",
+        "pass": true,
+        "agree": 1000,
+        "samples": 1000
+      },
+      {
+        "name": "sdf-gradient-magnitude",
+        "pass": true,
+        "fracIn085to115": 0.998,
+        "min": 0.448633,
+        "max": 1.017576,
+        "samples": 1000
+      }
+    ],
+    "artifactBytes": {
+      "height.r16": 8396802,
+      "shore.png": 9196,
+      "shore_sdf.r16": 8396802,
+      "biome.png": 143521,
+      "placement.json": 5679,
+      "caves.json": 2207,
+      "world.json": 5683
+    },
+    "heightRange": {
+      "min": -80,
+      "max": 199.8931868467231
+    },
+    "heightShoreSignAgree": 10000,
+    "placementCensus": {
+      "spawn": 1,
+      "breach": 3,
+      "arch": 1,
+      "cave-mouth": 3,
+      "ruin": 2,
+      "wreck": 1,
+      "corridor-mass": 3,
+      "spire": 2,
+      "silhouette": 1,
+      "current": 1,
+      "discovery": 7,
+      "route": 13
+    },
+    "roundTripMaxDeltaM": 0.000005238281232777808,
+    "containmentBattery": [
+      {
+        "yaw": 0,
+        "minShore": 206.56830024021662,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 0.7853981633974483,
+        "minShore": 228.01397962793658,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 1.5707963267948966,
+        "minShore": 292.62020196409753,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 2.356194490192345,
+        "minShore": 295.9960083007812,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 3.141592653589793,
+        "minShore": 295.9960083007812,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 3.9269908169872414,
+        "minShore": 268.98245887135613,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 4.71238898038469,
+        "minShore": 251.8696958332755,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 5.497787143782138,
+        "minShore": 217.7429638570395,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      }
+    ],
+    "containmentEngagementCove": [
+      {
+        "yaw": 0,
+        "minShore": 21.709546541919824,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 0.7853981633974483,
+        "minShore": 23.992815701026906,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 1.5707963267948966,
+        "minShore": 27.756491088867172,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 2.356194490192345,
+        "minShore": 27.756491088867172,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 3.141592653589793,
+        "minShore": 27.756491088867172,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 3.9269908169872414,
+        "minShore": 27.756491088867172,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 4.71238898038469,
+        "minShore": 27.756491088867172,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      },
+      {
+        "yaw": 5.497787143782138,
+        "minShore": 27.541898532742643,
+        "minSpeed": 9,
+        "maxDecelPer200ms": 0
+      }
+    ],
+    "depthClampWorstBelowFloorM": 0.6972453370649907,
+    "regionReplayDigest": "-170.212920,-2.500000,-380.000000,1.570796,5.000000,240,0|-161.5",
+    "previewPerf": {
+      "fpsBuckets": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        121,
+        120,
+        120,
+        120,
+        120
+      ],
+      "median": 120,
+      "min": 120,
+      "viewport": {
+        "width": 1728,
+        "height": 1080
+      },
+      "usedJSHeapBytes": 60649785
+    },
+    "previewBoot": {
+      "decodeMs": 88.79999999701977,
+      "meshBuildMs": 33.29999999701977,
+      "decodedBytes": 37785609,
+      "consoleErrors": 0
     }
   }
 }

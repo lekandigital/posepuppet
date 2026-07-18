@@ -111,3 +111,8 @@ FABLE_REMOTE_HANDOFF.local.md
 !apps/shared-world/public/
 !apps/shared-world/public/models/
 !apps/shared-world/public/models/**
+
+# shared-world baked region artifacts (Checkpoint 04A): the seven committed
+# world files include two PNG masks — override the global *.png ignore
+!apps/shared-world/public/world/
+!apps/shared-world/public/world/**
