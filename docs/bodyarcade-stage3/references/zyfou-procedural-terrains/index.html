@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050505">
+<link rel="icon" type="image/png" href="/favicon.png">
+<title>Terrain Studio — Procedural Terrain Generator</title>
+<style>
+  /* Paint the app background immediately so there's no white flash before the
+     CSS bundle or JS loads. */
+  html, body { margin: 0; height: 100%; background: #050505; }
+  /* Instant first-paint splash. Pure inline CSS so it shows on the first byte,
+     before the module bundle downloads. main.jsx fades it out once React mounts;
+     the engine's boot overlay underneath then takes over. */
+  #boot-splash {
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; background: #050505;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    transition: opacity .35s ease;
+  }
+  #boot-splash.hide { opacity: 0; pointer-events: none; }
+  #boot-splash .bs-mark {
+    width: 46px; height: 46px;
+    animation: bs-spin 1s linear infinite;
+  }
+  #boot-splash .bs-mark circle { stroke: #1f1f1f; }
+  #boot-splash .bs-mark path { stroke: #2563eb; }
+  #boot-splash .bs-title {
+    font-size: 17px; font-weight: 600; letter-spacing: .02em; color: #f5f5f5;
+  }
+  #boot-splash .bs-sub { font-size: 13px; color: #737373; }
+  @keyframes bs-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    #boot-splash .bs-mark { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div id="boot-splash">
+  <svg class="bs-mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" stroke-width="2.5" />
+    <path d="M12 3a9 9 0 0 1 9 9" stroke-width="2.5" stroke-linecap="round" />
+  </svg>
+  <div class="bs-title">Terrain Studio</div>
+  <div class="bs-sub">Loading…</div>
+</div>
+<div id="root"></div>
+<script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

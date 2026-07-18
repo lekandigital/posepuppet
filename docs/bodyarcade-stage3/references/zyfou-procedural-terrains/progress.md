@@ -1,0 +1,31 @@
+Original prompt: In square mode the add-tile overlay must be square; circle mode must crop the terrain correctly without a circular add overlay; move tile information into the World tab.
+
+- Diagnosed the circular assembly regression from commit 960991f.
+- Planned fixes: restore square ghost geometry, disable tile-add hover interaction in circle mode, discard terrain fragments outside the circular mask, and merge Tiles controls into World.
+- Implemented the geometry/shader/UI fixes. Verification pending.
+- Fixed a live runtime error caused by the moved Tiles content missing its ControlSection import.
+- Live verification: World contains Tiles, circle mode crops the square mesh cleanly and has no add preview, square mode shows a square add-tile preview.
+- Removed an ANGLE shader warning by making assemblyFalloff assign both branches before mixing.
+- Final production build passes and a clean browser startup reports no console warnings or errors.
+- Follow-up requested: complete missing circle cells when switching from Square, support circular ring expansion, and make Mountains add edge noise instead of behaving like Island.
+- Circle radius is now explicit and persisted in saves/undo. Each radius includes every square backing chunk intersected by the rendered disk, eliminating diagonal wedge gaps.
+- Verified partial Square layout (2 tiles) becomes a complete radius-1 Circle (9 backing tiles), then expands through an all-around ring to radius 2 (25 backing tiles).
+- Mountains now preserves the base terrain and adds deterministic ridged noise toward the outer boundary; CPU sampling matches the shader.
+- Production build passes and the tested browser flow reports no console warnings or errors.
+- Follow-up: remove the circular plinth's black top cap beneath water and suppress circular-mode chunk skirts that appear as dark tile seams.
+- Implemented an open-top circular plinth (outer wall + bottom only), so lakes show the water material instead of a black cap.
+- Disabled square chunk skirts in Circle mode; the circular plinth owns the perimeter wall and internal tile boundaries remain continuous.
+- Verified top-down and close angled views after circle expansion: water renders normally, internal black seams are gone, and browser console is clean.
+- Follow-up: eliminate circle seams at every LOD, align the outer wall with the real terrain edge, and redefine falloff width so 0 disables edge modification.
+- Restored circle chunk skirts purely as LOD crack fillers (full depth, terrain-coloured, no darkening, no wall shading).
+- Replaced the fixed-height circular cylinder with a dedicated radial wall rendered by the shared terrain height shader (aWall attribute): its top ring follows the exact island/mountain silhouette, its base drops to the plinth base. The circular plinth is now just the bottom cap.
+- Separated circular clipping (hard diskMask) from island attenuation (inward diskIsland profile), removing the half-height boundary caused by centring the old smooth mask across the disk edge.
+- Redefined Edge Falloff Width: 0 = no island attenuation and no mountain edge noise (terrain reaches the boundary unchanged); island values fade entirely inside the boundary; mountain values scale both band width and noise amplitude (0.05 is a subtle rim). UI min lowered 0.05 -> 0 in both control tables. CPU sampler formulas mirror the shader.
+- Verified via the live engine: clean top-down disk with no chunk lines, radial wall tracking the mountain silhouette with no V-gaps, island fade into water with lakes (no black cap), correct falloff heights at 0/0.05/0.2/1 for island and mountains, square<->circle toggle and radius 0/1/2 expansion, no console warnings, production build passes.
+- Follow-up bugs reported on the expanded circle: dark tile-edge seams between cells, and the cloud slab only covering the centre cell.
+- Fixed the seams: circle disk chunks now suppress the skirt drop on interior cell boundaries (tileInteriorSeam), matching square mode, so the vertical crack-filler flap no longer reads as a dark line between tiles; intra-cell LOD skirts are kept.
+- Fixed the clouds: CloudSlabLayer.applyParams now takes a tile-assembly layout { extent, center } so the slab radius/box/occupancy/far-march and the in-range cull all cover the whole union (feature size still per-cell); Engine passes the union extent + centre. Verified clouds blanket the full radius-2 disk and the expanded terrain is seam-free at a low rim angle. Production build passes.
+- Third report: (a) dark tile edges still appear between tiles; (b) the circular wall outline follows the PREDICTED (analytic) terrain, not the VISIBLE mesh — thin dark whiskers poke above the silhouette, worst at the far rim.
+- Diagnosed (b): the radial wall samples full-detail heightAt radially and captures sub-mesh edge-noise spikes that the coarse far-LOD terrain mesh smooths away, so the wall pokes above the terrain. Confirmed visually (thin dark spikes above the silhouette at a grazing rim view).
+- Fixed (b): the wall TOP is now low-passed — averaged over 5 heightAt samples spanning ±2 coarsest-LOD quads (uChunkSize/8) of arc — so it tracks the visible terrain mesh instead of the analytic field. Build passes. NOT yet visually verified (test GPU context exhausted from automated render churn).
+- (a) seams: added interiorSeam skirt suppression matches square mode's proven approach; in multi-angle testing (top-down, low water skim, oblique) the water/terrain looked continuous with no dark lines. Could NOT reproduce the reported dark tile lines — they may be stale (pre-fix) screenshots or LOD-transition height-step lines (not cell boundaries). Needs a precise repro (preset/seed/camera) on a working GPU.

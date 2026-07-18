@@ -2,7 +2,19 @@
 
 **Stage 3 deliverable 1.** Consolidated, deterministic implementation specification synthesizing the five Stage-2 research reports (Tracks A–E), the governing decision record, and the verified repository state. Generated 2026-07-17 from the checksum-verified input package at `docs/bodyarcade-stage3/inputs/` (all 17 SHA-256 sums verified OK).
 
-This document governs the checkpoint prompt sequence `CHECKPOINT_00 … CHECKPOINT_14C` (see `CHECKPOINT_INDEX.md`). Every implementable value herein carries a source label. Nothing here authorizes skipping a user review gate.
+This document governs the checkpoint prompt sequence `CHECKPOINT_00 … CHECKPOINT_14C` (see `CHECKPOINT_INDEX.md` in this directory). Every implementable value herein carries a source label. Nothing here authorizes skipping a user review gate.
+
+> **Post-CP05 amendment (2026-07-18) — newer governing context.** After Checkpoint 05 was approved, the user recorded the decision document
+> `docs/bodyarcade-stage3/decisions/POST_CP05_TERRAIN_WATERLINE_CHECKPOINT_AMENDMENTS.md` (the "post-CP05 addendum"). Where that addendum conflicts with this master or an older checkpoint prompt, **the addendum wins**, and it is required reading before CP05A and every later checkpoint. Its effects, reflected in §9 and the individual prompt files:
+>
+> 1. **Checkpoint 05 stands approved as the technical terrain foundation** (loading, chunked LOD, skirts/crack control, culling, shoreline integration, shared height authority, camera collision, dolphin contact, water integration) — but **not** as the final terrain geology or final terrain material appearance (addendum §2.2). The approved region water system is **kept**, not replaced (addendum §2.1).
+> 2. Two checkpoints are inserted before breach work: **CP05A — Terrain Relief and Substrate Color Rework** and **CP05B — Ambient Ocean Surface Motion and Terrain-Boundary Interaction**. CP06 must not begin until 05A and 05B have each been implemented, reviewed, and explicitly approved.
+> 3. **CP06** is renamed **Breach, Re-entry, and Cross-Waterline Continuity** and now also owns continuous cross-waterline geometry and camera-side-dependent visibility. **CP08** becomes **Ecco Atmosphere and Final Water Optics**, a finishing pass over the CP05A substrate classes. CP07, CP09, and CP10+ are amended per addendum §§7, 9, 10.
+> 4. CP05A supersedes the R14/§5.4 two-tint provisional terrain treatment with a shared substrate classification and color system (substrate only — never a substitute for assets; the §8.3 rectangular-placeholder law is unchanged).
+> 5. **Pinned technique reference:** `docs/bodyarcade-stage3/references/zyfou-procedural-terrains/` — read-only snapshot of ZyFou/ProceduralTerrains at commit `8b396f9c784676d46f6a147d310d9f547bf41403` (MIT; see its `BODYARCADE_SOURCE_RECORD.md` and `LICENSE`). Techniques are adapted into app-owned code; the snapshot never becomes runtime architecture. Secondary conceptual reference: SimonStorlSchulke/threejs-examples (no code copy until licensing is resolved).
+> 6. **Visual behavior reference:** `docs/bodyarcade-stage3/references/ecco-waterline/` — 13 selected Ecco: Defender of the Future frames plus a README; the acceptance set for CP05B, CP06, and CP08 (behavior and composition, never pixel-identical reproduction).
+>
+> The one-checkpoint-per-session rule and every explicit user approval gate are unchanged. Neither this notice nor the addendum authorizes starting CP05A, CP06, or any other checkpoint.
 
 **Source-label key** (carried from the reports, never flattened):
 - **[MEASURED]** — measured directly (repository fact, local-file audit, or primary-source verification).
@@ -20,7 +32,7 @@ This document governs the checkpoint prompt sequence `CHECKPOINT_00 … CHECKPOI
 
 ### 1.1 Document stack (highest first)
 
-1. The user's newest explicit statements (including the Stage-3 session instructions that fixed the BL and speed policies, §7.1–§7.2).
+1. The user's newest explicit statements (including the Stage-3 session instructions that fixed the BL and speed policies, §7.1–§7.2, and the post-CP05 addendum `docs/bodyarcade-stage3/decisions/POST_CP05_TERRAIN_WATERLINE_CHECKPOINT_AMENDMENTS.md`, which governs every checkpoint after 05).
 2. `00_BODYARCADE_MASTER_CONTEXT_V3.md` including Addendum A (Addendum governs over the body where they conflict).
 3. `01_NEW_DECISIONS_TO_MERGE.md` (Ecco gameplay-fidelity priority; the GAMICO dolphin listing pin).
 4. The verified state of `github.com/lekandigital/posepuppet` at the pinned SHAs (re-verified 2026-07-17, zero drift — §1.4).
@@ -420,18 +432,22 @@ Base sequence = master context §13.2 (0–14). Adjustments, each with its resea
 | 03 | Region-layout gate (2–3 sketch maps; **no build**) | **Decision gate** |
 | 04A | Region bake and loader (approved sketch → §2.3 artifacts; WorldSampler re-point; terrain preview) | Demo review |
 | 04B | Pool → region water (container swap §4.2; windowed sim §4.3; four-shot §4.4) | Demo review |
-| 05 | Terrain across the waterline (chunked LOD; islands; masking above+below; BVH camera collision; slide/anti-wedge) | Demo review |
-| 06 | Breach over the region (Track E §15 chain; splash injection; mode-continuity money shot) | Demo review |
-| 07 | Placeholder world (every §8.3 category per approved layout + Track D densities) | Demo review |
-| 08 | Ecco atmosphere pass A (underwater only — §6 applied through jeantimex mechanisms; surface untouched; four-shot re-run) | Demo review |
-| 09 | Caves and overhangs (Kenney kit + Blender; Rapier heightfield+trimesh; BVH queries; dark-zone atmosphere; shafts) | Demo review |
-| 10 | Vegetation bakes (SeedThree → glTF; sway shader; replaces vegetation placeholders) | Demo review |
+| 05 | Terrain across the waterline (chunked LOD; islands; masking above+below; BVH camera collision; slide/anti-wedge) — **completed**; approved as the technical terrain foundation, explicitly **not** the final terrain geology or material appearance [addendum §2.2] | Demo review (approved) |
+| **05A** | Terrain relief and substrate color rework (deterministic ZyFou-adapted ridged/domain-warped rebake preserving the approved Twin Bay layout; one shared above/below-water substrate classification and color system expanding `RegionWallColor`) [addendum §4] | Demo review |
+| **05B** | Ambient ocean surface motion and terrain-boundary interaction (continuous restrained swell + animated underside refraction at idle; persistent low-level shoreline/terrain-contact ripples; jeantimex system and approved water character preserved) [addendum §5] | Demo review |
+| 06 | **Breach, re-entry, and cross-waterline continuity** (Track E §15 chain; splash injection; continuous geometry and camera-side-dependent visibility across the waterline; split-level rendering; the 13-frame Ecco acceptance set) [addendum §6] | Demo review |
+| 07 | Placeholder world (every §8.3 category per approved layout + Track D densities; X/Z preserved, Y/normals resampled from the 05A heightfield; terrain color never reduces the placeholder requirement) [addendum §7] | Demo review |
+| 08 | **Ecco atmosphere and final water optics** (§6 applied through jeantimex mechanisms over the 05A substrate classes; final reflection/transmission balance and split-level tuning against the Ecco set; four-shot re-run) [addendum §8] | Demo review |
+| 09 | Caves and overhangs (Kenney kit + Blender; Rapier heightfield+trimesh; BVH queries; dark-zone atmosphere; shafts; every seam revalidated against the 05A heightfield) [addendum §9] | Demo review |
+| 10 | Vegetation and later asset passes (user-supplied or explicitly approved assets/workflows only; SeedThree only for categories it actually produces; replaces placeholders category by category) [addendum §10] | Demo review |
 | 11 | Fish and ambient life motion (schooling/drift on placeholders or supplied models; Track D budgets) | Demo review |
 | 12 | Ruins and architecture (user-approved assets replace their placeholders; async license gate) | Demo review |
 | 13 | Minimal audio pass (§8.4) | Demo review |
 | 14A | Rowing view over the region | Demo review |
 | 14B | Walking view over the region | Demo review |
 | 14C | Flight view over the region | Demo review |
+
+Revised-order provenance: 05A/05B insertion, the 06 and 08 renames, and the 07/09/10 amendments come from the post-CP05 addendum (§3 there), the newest user decision. Rows 11–14C are unchanged in identity; the addendum §10.3 asset gate (no invented substitutes, no terrain-color substitution, placeholders until explicit approval, category-by-category replacement) binds every asset pass from 10 onward. Authoritative prompt files live in this directory (`CHECKPOINT_05A_TERRAIN_RELIEF_AND_SUBSTRATE_COLOR.md`, `CHECKPOINT_05B_AMBIENT_OCEAN_SURFACE_MOTION_AND_BOUNDARY_INTERACTION.md`, `CHECKPOINT_06_BREACH_REENTRY_AND_CROSS_WATERLINE_CONTINUITY.md`, and so on — see `CHECKPOINT_INDEX.md`). CP06 requires explicit prior approval of both 05A and 05B. Nothing in this table authorizes starting any checkpoint.
 
 Definition of done for the slice [GOVERNED §13.3]: full region loop in ~5–10 min; breach at ≥3 sightline spots seeing islands/terrain; ≥1 cave and ≥1 arch passed through; placeholders present for every category; four-shot fidelity passes; 60 fps sustained per §10.
 
