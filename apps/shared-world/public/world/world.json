@@ -1,0 +1,269 @@
+{
+  "magic": "bodyarcade-region-world/1",
+  "generator": "apps/shared-world/authoring/bake-region.mjs",
+  "seed": 60418003,
+  "layout": "REGION_SKETCHES.md § APPROVED LAYOUT — Sketch C (Twin Bay), approved 2026-07-18: no redlines; both caves (headland primary shortcut, trench-wall optional); no E2 shaft; monolith-ring discovery; spawn north-bay lagoon center",
+  "axis": "right-handed, y-up, meters; ground plane XZ; north = -Z",
+  "origin": [
+    0,
+    0
+  ],
+  "sizeMeters": [
+    2000,
+    2000
+  ],
+  "seaLevel": 0,
+  "heightRange": [
+    -80,
+    200
+  ],
+  "spawn": {
+    "x": -180,
+    "z": -380,
+    "yaw": 0.896055,
+    "note": "north-bay lagoon center (approved default)"
+  },
+  "artifacts": {
+    "height.r16": {
+      "resolution": 2049,
+      "encoding": "uint16-le",
+      "bytes": 8396802,
+      "valueToMeters": "y = -80 + v/65535*280",
+      "texelToWorld": "x = -1000 + i*(2000/2048); z = -1000 + j*(2000/2048)"
+    },
+    "shore.png": {
+      "resolution": 2049,
+      "encoding": "png-gray8",
+      "bytes": 9196,
+      "meaning": "255 = land (terrainHeight >= 0), 0 = water; derived from dequantized height.r16 (sign-exact)"
+    },
+    "shore_sdf.r16": {
+      "resolution": 2049,
+      "encoding": "uint16-le",
+      "bytes": 8396802,
+      "valueToMeters": "d = -500 + v/65535*1000; positive = water; clamped ±500 m; exact EDT, half-texel-centered (schema extension R13)"
+    },
+    "biome.png": {
+      "resolution": 1025,
+      "encoding": "png-rgba8",
+      "bytes": 143521,
+      "channels": {
+        "R": "bright shallow band — north-bay lagoon + beach fringe",
+        "G": "family C kelp reef — south bay shelf",
+        "B": "family E desaturated plain — SE pocket",
+        "A": "reserved (constant 255 so canvas decode is lossless)"
+      }
+    },
+    "placement.json": {
+      "bytes": 5679
+    },
+    "caves.json": {
+      "bytes": 2207
+    }
+  },
+  "zones": [
+    {
+      "family": "bright-shallow",
+      "area": "north-bay lagoon + beach fringe",
+      "raster": "biome.R",
+      "depthBand": "3-10 m"
+    },
+    {
+      "family": "C-kelp-reef",
+      "area": "south bay shelf",
+      "raster": "biome.G",
+      "depthBand": "10-36 m"
+    },
+    {
+      "family": "E-desaturated-plain",
+      "area": "SE pocket",
+      "raster": "biome.B",
+      "depthBand": "~44 m"
+    },
+    {
+      "family": "D-olive-cave",
+      "area": "headland cave + optional trench-wall cave (interior volumes — sites in caves.json, no top-down raster)",
+      "raster": null,
+      "depthBand": "enclosed"
+    },
+    {
+      "family": "depth-ramp-default",
+      "area": "everywhere else",
+      "raster": null,
+      "depthBand": "master depth ramp"
+    }
+  ],
+  "ridgeLines": [
+    {
+      "name": "crescent-spine",
+      "points": [
+        [
+          -650,
+          -520
+        ],
+        [
+          -780,
+          -80
+        ],
+        [
+          -620,
+          420
+        ]
+      ]
+    },
+    {
+      "name": "crescent-summit",
+      "points": [
+        [
+          -760,
+          -100
+        ]
+      ]
+    },
+    {
+      "name": "headland-spine",
+      "points": [
+        [
+          -600,
+          -40
+        ],
+        [
+          -280,
+          -60
+        ]
+      ]
+    },
+    {
+      "name": "ne-island",
+      "points": [
+        [
+          480,
+          -560
+        ]
+      ]
+    },
+    {
+      "name": "s-island",
+      "points": [
+        [
+          -380,
+          640
+        ]
+      ]
+    }
+  ],
+  "silhouetteProtection": {
+    "coastlineTiles": "derive from shore.png at cp05 (tiles containing a land/water transition keep max LOD)",
+    "ridgeLines": "tiles crossed by ridgeLines keep max LOD (Master §5.4)"
+  },
+  "attribution": [
+    "Region: original BodyArcade authored terrain, 2026",
+    "Layout: Sketch C (Twin Bay), Checkpoint 03 decision gate, approved 2026-07-18",
+    "Authoring algorithms: THREE.Terrain 2.0.0 (MIT, Isaac Sukin) noise passes over the approved analytic field"
+  ],
+  "verification": {
+    "note": "Loader round-trip targets (§8.6): terrainHeight bilinear over the dequantized uint16 grid at these points must match within 0.01 m.",
+    "probes": [
+      {
+        "x": -180,
+        "z": -380,
+        "h": -7.664772
+      },
+      {
+        "x": -100,
+        "z": -300,
+        "h": -8.096803
+      },
+      {
+        "x": -180,
+        "z": 300,
+        "h": -20.67389
+      },
+      {
+        "x": -120,
+        "z": 260,
+        "h": -22.983604
+      },
+      {
+        "x": 140,
+        "z": 660,
+        "h": -42.688029
+      },
+      {
+        "x": 560,
+        "z": -250,
+        "h": -80
+      },
+      {
+        "x": 520,
+        "z": 180,
+        "h": -80
+      },
+      {
+        "x": 540,
+        "z": -35,
+        "h": -80
+      },
+      {
+        "x": -760,
+        "z": -100,
+        "h": 199.852923
+      },
+      {
+        "x": -700,
+        "z": -300,
+        "h": 156.331536
+      },
+      {
+        "x": -420,
+        "z": 30,
+        "h": -33.895834
+      },
+      {
+        "x": -430,
+        "z": -150,
+        "h": -45.366356
+      },
+      {
+        "x": 450,
+        "z": -30,
+        "h": -78.401152
+      },
+      {
+        "x": -40,
+        "z": -70,
+        "h": -28.580832
+      },
+      {
+        "x": 390,
+        "z": 290,
+        "h": -46.990648
+      },
+      {
+        "x": 480,
+        "z": -560,
+        "h": 71.948413
+      },
+      {
+        "x": -380,
+        "z": 640,
+        "h": 43.8331
+      },
+      {
+        "x": 90,
+        "z": -80,
+        "h": 3.383987
+      },
+      {
+        "x": 900,
+        "z": -480,
+        "h": 4.217642
+      },
+      {
+        "x": 0,
+        "z": -900,
+        "h": -60.99324
+      }
+    ]
+  }
+}

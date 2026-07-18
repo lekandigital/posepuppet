@@ -24,21 +24,25 @@ const APP_DIST = fileURLToPath(new URL('./dist', import.meta.url));
 
 /**
  * App-owned static assets (the licensed dolphin GLB + LICENSE-dolphin.txt
- * at public/models/dolphin/). `publicDir` stays pointed at the pristine
- * vendored demo's public/ (stock fidelity assets), so app assets get their
- * own path: served under the base in dev, copied into dist/ at build.
+ * at public/models/dolphin/, and the Checkpoint-04A baked world artifacts
+ * at public/world/). `publicDir` stays pointed at the pristine vendored
+ * demo's public/ (stock fidelity assets), so app assets get their own path:
+ * served under the base in dev, copied into dist/ at build.
  */
 function appAssets(): Plugin {
   const MIME: Record<string, string> = {
     '.glb': 'model/gltf-binary',
     '.txt': 'text/plain; charset=utf-8',
+    '.r16': 'application/octet-stream',
+    '.png': 'image/png',
+    '.json': 'application/json; charset=utf-8',
   };
   return {
     name: 'bodyarcade-app-assets',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const url = (req.url ?? '').split('?')[0]!;
-        if (!url.startsWith('/shared-world/models/')) return next();
+        if (!url.startsWith('/shared-world/models/') && !url.startsWith('/shared-world/world/')) return next();
         const rel = url.slice('/shared-world/'.length);
         const file = normalize(join(APP_PUBLIC, decodeURIComponent(rel)));
         if (!file.startsWith(resolve(APP_PUBLIC)) || !existsSync(file) || !statSync(file).isFile()) {

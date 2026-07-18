@@ -1,0 +1,94 @@
+{
+  "magic": "bodyarcade-region-caves/1",
+  "note": "Sites + transforms fixed at cp04A; module IDs assigned at cp09 (Kenney kit + Blender). Seam rule per Master §5.2.",
+  "modules": [
+    {
+      "id": "cave-headland",
+      "family": "D",
+      "role": "primary bay-to-bay loop shortcut (approved: the main route)",
+      "moduleId": null,
+      "transform": {
+        "x": -425,
+        "z": -60,
+        "yaw": 0.055499,
+        "scale": 1
+      },
+      "mouths": [
+        {
+          "name": "south",
+          "x": -420,
+          "z": 30,
+          "yaw": -3.086094,
+          "lipY": -33.895834
+        },
+        {
+          "name": "north",
+          "x": -430,
+          "z": -150,
+          "yaw": 0.055499,
+          "lipY": -45.366356
+        }
+      ],
+      "passage": [
+        [
+          -430,
+          -150
+        ],
+        [
+          -420,
+          30
+        ]
+      ],
+      "seam": {
+        "policy": "heightmap locally lowered to meet each module lip at cp09; shared triplanar rock across the seam; trimesh authoritative where the module undercuts"
+      }
+    },
+    {
+      "id": "cave-trench-wall",
+      "family": "D",
+      "role": "smaller optional trench-wall discovery — NOT another major route (approved)",
+      "moduleId": null,
+      "transform": {
+        "x": 450,
+        "z": -30,
+        "yaw": 1.642104,
+        "scale": 0.6
+      },
+      "mouths": [
+        {
+          "name": "west",
+          "x": 450,
+          "z": -30,
+          "yaw": 1.642104,
+          "lipY": -78.401152
+        }
+      ],
+      "passage": [
+        [
+          450,
+          -30
+        ]
+      ],
+      "seam": {
+        "policy": "single-mouth pocket in the trench W wall; heightmap lip lowered at cp09; trimesh authoritative inside"
+      }
+    },
+    {
+      "id": "arch-islet-gap",
+      "family": "arch",
+      "role": "the approved arch in the islet gap (opening 5 m)",
+      "moduleId": null,
+      "openingMeters": 5,
+      "transform": {
+        "x": -40,
+        "z": -70,
+        "yaw": 1.951303,
+        "scale": 1
+      },
+      "mouths": [],
+      "seam": {
+        "policy": "free-standing arch; footings meet terrain; trimesh at cp09"
+      }
+    }
+  ]
+}
