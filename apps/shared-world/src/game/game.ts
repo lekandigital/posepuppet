@@ -21,7 +21,8 @@ import { loadSceneAssets } from '../../vendor/threejs-water/src/app/LoadSceneAss
 import { NO_WATER_OPTICS } from '../../vendor/threejs-water/src/water/WaterOptics';
 import { SwimSim, SIM, NEUTRAL_INTENT, type AssistMode, type SwimIntent } from './sim';
 import { PoolSampler } from './worldSampler';
-import { ChaseCamera } from './camera';
+import { CameraRig, RIG, type CameraEvalState } from './cameraRig';
+import { CameraCollision } from './cameraCollision';
 import { loadDolphin } from './dolphinActor';
 import { createSwimControls } from '../input/swimControls';
 import { CREDITS_ATTRIBUTION } from '../credits';
@@ -97,11 +98,14 @@ export async function startPoolGame(root: HTMLElement): Promise<void> {
     `${dolphin.measuredLengthM.toFixed(3)} m (expected 2.89 ± 2 %; BL policy: measure, never rescale)`,
   );
 
-  // --- sim + controls + camera ---
+  // --- sim + controls + camera (cp02: the Track E rig, Master §7.5) ---
   const sampler = new PoolSampler(K, K);
   const sim = new SwimSim(sampler);
   const controls = createSwimControls();
-  const cam = new ChaseCamera(innerWidth / innerHeight);
+  const cam = new CameraRig(
+    innerWidth / innerHeight,
+    new CameraCollision(K, K, RIG.COLLISION_RADIUS),
+  );
   // demo-space eye proxy for the vendored water shaders (they raytrace in
   // demo-local space; the proxy's world position is the real eye ÷ K)
   const eyeProxy = new THREE.PerspectiveCamera();
@@ -120,11 +124,13 @@ export async function startPoolGame(root: HTMLElement): Promise<void> {
     water.addDrop(Math.random() * 2 - 1, Math.random() * 2 - 1, 0.03, i % 2 === 0 ? -0.01 : 0.01);
   }
 
-  // assist keys (dolphin parity)
+  // assist keys (dolphin parity) + R recenter (cp02 §3.4, Track E Table C;
+  // binding R = derived integration parameter, flagged)
   addEventListener('keydown', (e) => {
     if (e.key === '1') sim.assist = 'full';
     if (e.key === '2') sim.assist = 'standard';
     if (e.key === '3') sim.assist = 'expert';
+    if (e.key === 'r' || e.key === 'R') cam.recenter();
   });
   const qs = new URLSearchParams(location.search);
   const qa = qs.get('assist');
@@ -136,6 +142,50 @@ export async function startPoolGame(root: HTMLElement): Promise<void> {
   let simHz = 0;
   let splashes = 0;
   let firstFrame: { actionRunning: boolean; base: string } | null = null;
+
+  // cp02 shot mode: fixed camera transform + canvas size for the fidelity
+  // shots (c)/(d) — sim frozen, water running, vendored passes untouched.
+  interface ShotMode {
+    pos: [number, number, number];
+    look: [number, number, number];
+    fov: number;
+    size: [number, number];
+  }
+  let shot: ShotMode | null = null;
+
+  // cp02 coverage probe: project the posed dolphin bounds through the rig
+  // camera → frame-width fraction + centre-height fraction (Track D §13
+  // bands; height fraction measured from the frame bottom).
+  const corner = new THREE.Vector3();
+  const coverage = () => {
+    const box = dolphin.worldBounds();
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    let behindCamera = false;
+    for (let i = 0; i < 8; i++) {
+      corner
+        .set(
+          i & 1 ? box.max.x : box.min.x,
+          i & 2 ? box.max.y : box.min.y,
+          i & 4 ? box.max.z : box.min.z,
+        )
+        .project(cam.camera);
+      if (corner.z > 1 || corner.z < -1) behindCamera = true;
+      minX = Math.min(minX, corner.x);
+      maxX = Math.max(maxX, corner.x);
+      minY = Math.min(minY, corner.y);
+      maxY = Math.max(maxY, corner.y);
+    }
+    return {
+      widthFrac: (maxX - minX) / 2,
+      heightFrac: (maxY - minY) / 2,
+      centerXFrac: ((minX + maxX) / 2 + 1) / 2,
+      centerHeightFrac: ((minY + maxY) / 2 + 1) / 2,
+      behindCamera,
+    };
+  };
   const handle = {
     state: (): EvalState => ({
       phase: sim.state.phase,
@@ -157,7 +207,21 @@ export async function startPoolGame(root: HTMLElement): Promise<void> {
     transport: () => controls.debug(),
     credits: CREDITS_ATTRIBUTION,
     firstFrame: () => firstFrame,
+    camera: (): CameraEvalState => cam.evalState(sim.state),
+    coverage,
+    RIG,
     test: {
+      /** fixed-camera fidelity-shot mode (cp02 shots c/d); null restores */
+      shotMode(opts: ShotMode | null) {
+        shot = opts;
+        if (opts) {
+          webglRenderer.setSize(opts.size[0], opts.size[1]);
+          renderer.setSize(opts.size[0], opts.size[1]);
+        } else {
+          cam.camera.fov = RIG.FOV;
+          resize();
+        }
+      },
       /** merge a partial intent over the live one (null clears) — test-only */
       setIntent(p: Partial<SwimIntent> | null) { testIntent = p; },
       setAssist(a: AssistMode) { sim.assist = a; },
@@ -201,6 +265,8 @@ export async function startPoolGame(root: HTMLElement): Promise<void> {
   let frames = 0;
   let steps = 0;
   let statAt = last;
+  let rigUs = 0;
+  let rigN = 0;
 
   function frame(now: number): void {
     requestAnimationFrame(frame);
@@ -211,6 +277,9 @@ export async function startPoolGame(root: HTMLElement): Promise<void> {
     const live = controls.intent(dtMs);
     const intent: SwimIntent = testIntent ? { ...live, ...testIntent } : live;
 
+    if (shot) {
+      acc = 0; // sim frozen during fidelity shots (water keeps running)
+    }
     let kicksLeft = intent.kicks;
     while (acc >= SIM.DT) {
       // kick deltas land on the first sub-step only (impulses, not rates)
@@ -246,8 +315,10 @@ export async function startPoolGame(root: HTMLElement): Promise<void> {
 
     // --- water interaction: the sanctioned displacement-input path ---
     // 3-sphere spine compound; world→demo by ÷K; amplitude ∝ |velocity|
+    // (suppressed in shot mode — the fidelity shots compare the water
+    // system itself, dolphin parked out of frame)
     const speedNorm = Math.min(1, s.speed / SIM.MAX_SPEED);
-    if (s.phase === 'swim') {
+    if (s.phase === 'swim' && !shot) {
       const dirX = Math.sin(s.yaw) * Math.cos(s.pitch);
       const dirY = -Math.sin(s.pitch);
       const dirZ = Math.cos(s.yaw) * Math.cos(s.pitch);
@@ -271,11 +342,13 @@ export async function startPoolGame(root: HTMLElement): Promise<void> {
       for (let i = 0; i < prevSpheres.length; i++) prevSpheres[i] = null;
     }
     // breach splash: addDrop bursts at both surface crossings (Master §4.3)
-    if (prevPhase === 'swim' && s.phase === 'air') {
-      water.addDrop(s.x / K, s.z / K, 0.08, 0.05);
-    }
-    if (s.splashed || (prevPhase === 'air' && s.phase === 'swim')) {
-      water.addDrop(s.x / K, s.z / K, 0.1, 0.06);
+    if (!shot) {
+      if (prevPhase === 'swim' && s.phase === 'air') {
+        water.addDrop(s.x / K, s.z / K, 0.08, 0.05);
+      }
+      if (s.splashed || (prevPhase === 'air' && s.phase === 'swim')) {
+        water.addDrop(s.x / K, s.z / K, 0.1, 0.06);
+      }
     }
     prevPhase = s.phase;
 
@@ -285,7 +358,19 @@ export async function startPoolGame(root: HTMLElement): Promise<void> {
     water.updateNormals();
 
     // --- camera + draw (the demo's pass order) ---
-    cam.update(s, frameDt);
+    if (shot) {
+      cam.camera.position.set(shot.pos[0], shot.pos[1], shot.pos[2]);
+      cam.camera.up.set(0, 1, 0);
+      cam.camera.fov = shot.fov;
+      cam.camera.aspect = shot.size[0] / shot.size[1];
+      cam.camera.updateProjectionMatrix();
+      cam.camera.lookAt(shot.look[0], shot.look[1], shot.look[2]);
+    } else {
+      const rigT0 = performance.now();
+      cam.update(s, frameDt);
+      rigUs += (performance.now() - rigT0) * 1000;
+      rigN++;
+    }
     cam.camera.updateMatrixWorld();
     eyeProxy.position.copy(cam.camera.position).divideScalar(K);
     eyeProxy.updateMatrixWorld();
@@ -299,8 +384,11 @@ export async function startPoolGame(root: HTMLElement): Promise<void> {
     if (now - statAt > 1000) {
       fps = (frames * 1000) / (now - statAt);
       simHz = (steps * 1000) / (now - statAt);
+      if (rigN > 0) cam.updateUsAvg = rigUs / rigN;
       frames = 0;
       steps = 0;
+      rigUs = 0;
+      rigN = 0;
       statAt = now;
     }
   }

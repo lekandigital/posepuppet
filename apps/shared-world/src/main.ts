@@ -60,7 +60,7 @@ function mountPoolOverlay() {
     'font:12px/1.7 ui-monospace,Menlo,monospace;text-shadow:0 1px 3px rgba(0,0,0,.6);' +
     'pointer-events:none;user-select:none;';
   el.innerHTML =
-    'SHIFT kick · W/S pitch · A/D bank · Q/E trim · SPACE burst · X brake<br>' +
+    'SHIFT kick · W/S pitch · A/D bank · Q/E trim · SPACE burst · X brake · R recenter<br>' +
     '<a href="?view=credits" style="color:#8fd4ff;pointer-events:auto">credits</a> — ' +
     'dolphin by GAMICO (CC-BY 4.0)';
   document.body.appendChild(el);
