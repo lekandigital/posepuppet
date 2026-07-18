@@ -17,7 +17,18 @@ export interface CollisionResult {
   obstructed: boolean;
 }
 
-export class CameraCollision {
+/**
+ * The structural seam the CameraRig consumes (cp04B, additive): the pool
+ * keeps this analytic box; the region supplies its heightfield stand-in
+ * (regionCameraCollision.ts) until the cp05 BVH replaces both.
+ */
+export interface CameraCollisionLike {
+  resolve(from: THREE.Vector3, to: THREE.Vector3): CollisionResult;
+  clampPoint(p: THREE.Vector3): THREE.Vector3;
+  losClear(a: THREE.Vector3, b: THREE.Vector3): boolean;
+}
+
+export class CameraCollision implements CameraCollisionLike {
   constructor(
     /** pool half-extent, metres */
     readonly half = 7.5,
