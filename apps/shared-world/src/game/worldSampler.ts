@@ -18,6 +18,14 @@ export interface WorldSampler {
    * pull. [DERIVED integration parameter — see the cp01 deviations list.]
    */
   containmentBand?: number;
+  /**
+   * cp05: analytic terrain height (metres, y-up; < 0 = seabed). When a
+   * sampler provides it, the sim's deterministic terrain-contact model
+   * (slide + anti-wedge, cp05 §6) activates. The pool sampler does NOT
+   * provide it — pool behavior and its committed replay digests are
+   * unchanged by construction.
+   */
+  terrainHeight?(x: number, z: number): number;
 }
 
 /**

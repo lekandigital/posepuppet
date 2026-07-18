@@ -1,34 +1,38 @@
 /**
- * REGION WALL/TERRAIN COLOR — Checkpoint 04B app-owned adaptation of the
- * vendored `getWallColor` (WaterAbove/WaterBelow/Cube .frag), shared by the
- * region water-above, water-below and terrain fragments so the terrain seen
- * directly and the terrain seen through refracted rays shade identically.
+ * REGION WALL/TERRAIN COLOR — the shared terrain-shading of the region
+ * (introduced at Checkpoint 04B as the app-owned adaptation of the vendored
+ * `getWallColor`; tint/lighting inputs updated at Checkpoint 05). Shared by
+ * the region water-above, water-below and terrain-chunk fragments so the
+ * terrain seen directly and the terrain seen through refracted/reflected
+ * rays shade identically.
  *
- * Include AFTER RegionContainer.glsl. The including shader must declare
- * uniforms `light` (vec3), `causticTex` (sampler2D), `water` (sampler2D)
- * and the IOR constants first.
+ * Include AFTER RegionContainer.glsl AND RegionTerrainTint.glsl. The
+ * including shader must declare uniforms `light` (vec3), `causticTex`
+ * (sampler2D), `water` (sampler2D) and the IOR constants first.
  *
- * Sanctioned swaps vs the vendored getWallColor (Master §4.2 items 1–3, 6):
- *  - triplanar pool-tile lookup → R14 provisional terrain tints
- *    (submerged #D2C7A9 sand / exposed #A98F6C rock, ±0.5 m shoreline
- *    blend — provisional-until-checkpoint-08), normal from the heightfield
- *    instead of the box faces;
- *  - `point.y < info.r` waterline test evaluated against the composited
- *    global surface (uSeaLevel + windowed displacement);
- *  - caustic lookup re-parameterized to the window-projected caustic RT and
- *    blended to the flat-water caustic value outside the sim window;
- *  - the above-waterline rim sigmoid evaluated in demo units against the
- *    sea surface [DERIVED — same constants, same band width as the pool
- *    rim: ~2/12 du ≈ 1.25 m];
- *  - the pool-box centre-distance vignette (`scale /= length(point)`) has
- *    no region analogue and is pinned to the pool's centre-floor value
- *    (documented deviation; revisit at the cp08 atmosphere pass).
- * The diffuse/caustic consumption math (`scale += diffuse·caustic.r·2.0·
- * caustic.g`) is byte-identical.
+ * Checkpoint 05 changes vs the 04B version (sanctioned terrain-material
+ * work, cp05 §3 item 2 — the water OPTICS above this function are
+ * untouched and re-proven by the four-shot re-run):
+ *  - the ±0.5 m submerged/exposed tint split → the cp05 §6 height/slope
+ *    band law (RegionTerrainTint.glsl), evaluated per raymarch hit;
+ *  - the exposed-terrain branch (above the waterline) → single
+ *    DirectionalLight (the vendored sun direction — one sun) + hemisphere
+ *    ambient [initial intensities from Track D §6.4's recommended bands,
+ *    provisional-until-cp08, flagged], replacing the 04B pool-rim sigmoid
+ *    stand-in (which had no region analogue — 04B deviations list).
+ *
+ * Byte-identical (protected, carried from 04B): surfaceHeightAt(), the
+ * caustic projection/sample law, and the submerged diffuse/caustic
+ * consumption math (`scale += diffuse·caustic.r·2.0·caustic.g`) with the
+ * 0.5 ambient floor.
  */
 
-const vec3 TINT_SUBMERGED = vec3(0.823529, 0.780392, 0.662745); // #D2C7A9 [R14]
-const vec3 TINT_EXPOSED = vec3(0.662745, 0.560784, 0.423529);   // #A98F6C [R14]
+/** cp05 exposed-terrain lighting [DERIVED initials, provisional-until-cp08] */
+const vec3 EXPOSED_SUN_COLOR = vec3(1.0, 0.956863, 0.878431); // #FFF4E0 [Track D 17.1 band]
+const float EXPOSED_SUN_INT = 0.55;                            // Track D 0.45–0.65 midpoint
+const vec3 EXPOSED_HEMI_SKY = vec3(0.749020, 0.909804, 1.0);   // #BFE8FF (scene hemi sky)
+const float EXPOSED_HEMI_INT = 0.50;
+const float EXPOSED_HEMI_GROUND_FRAC = 0.30;                   // ground = 30 % of sky
 
 /** Composited global-surface height at xz (calm plane + windowed sim). */
 float surfaceHeightAt(vec2 xz) {
@@ -52,22 +56,30 @@ vec4 sampleCaustic(vec3 point, vec3 refractedLight) {
   return mix(vec4(0.2, 1.0, 0.0, 0.0), c, windowFalloff(wuvProj));
 }
 
-vec3 getWallColor(vec3 point) {
-  float scale = 0.5;
-  float h = terrainHeight(point.xz);
-  vec3 wallColor = mix(TINT_SUBMERGED, TINT_EXPOSED, smoothstep(-0.5, 0.5, h));
+/**
+ * Shade a terrain point with a supplied albedo tint. The chunk fragment
+ * passes its interpolated per-vertex tint; the water raymarch path derives
+ * the tint analytically (getWallColor below) — same law, same result.
+ */
+vec3 getWallColorTinted(vec3 point, vec3 tint) {
   vec3 normal = seabedNormal(point.xz);
-
   vec3 refractedLight = -refract(-light, vec3(0.0, 1.0, 0.0), IOR_AIR / IOR_WATER);
-  float diffuse = max(0.0, dot(refractedLight, normal));
   if (point.y < surfaceHeightAt(point.xz)) {
+    // submerged: the vendored diffuse/caustic consumption — byte-identical
+    float scale = 0.5;
+    float diffuse = max(0.0, dot(refractedLight, normal));
     vec4 caustic = sampleCaustic(point, refractedLight);
     scale += diffuse * caustic.r * 2.0 * caustic.g;
-  } else {
-    float yDu = (point.y - uSeaLevel) / POOL_DU_M;
-    float travel = max(0.0, (2.0 / 12.0 - yDu) / max(refractedLight.y, 1.0e-3));
-    diffuse *= 1.0 / (1.0 + exp(-200.0 / (1.0 + 10.0 * travel) * (yDu - 2.0 / 12.0)));
-    scale += diffuse * 0.5;
+    return tint * scale;
   }
-  return wallColor * scale;
+  // exposed: single directional (the one vendored sun) + hemisphere (cp05)
+  float hemiMix = normal.y * 0.5 + 0.5;
+  vec3 hemi = EXPOSED_HEMI_SKY * (EXPOSED_HEMI_INT * mix(EXPOSED_HEMI_GROUND_FRAC, 1.0, hemiMix));
+  vec3 sun = EXPOSED_SUN_COLOR * (EXPOSED_SUN_INT * max(0.0, dot(normal, light)));
+  return tint * (hemi + sun);
+}
+
+vec3 getWallColor(vec3 point) {
+  float h = terrainHeight(point.xz);
+  return getWallColorTinted(point, terrainTint(h, seabedNormal(point.xz)));
 }

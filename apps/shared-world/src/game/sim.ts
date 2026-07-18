@@ -102,6 +102,21 @@ export const SIM = {
   BREACH_GRAVITY: 7.5,      // dreamy, slightly sub-earth
   BREACH_REENTRY_KEEP: 0.85,
   BREACH_COOLDOWN_S: 1.0,
+  // cp05 terrain contact (region only — activates when the sampler
+  // provides terrainHeight; the pool sampler does not, so pool behavior
+  // and its committed replay digests are byte-identical)
+  CONTACT_PROBE: 1.2,        // m probe along the surface normal [cp05 §6]
+  CONTACT_EXIT_FACTOR: 1.15, // probe hysteresis on exit [DERIVED anti-flutter, flagged]
+  CONTACT_KEEP: 0.85,        // tangential retention at contact entry [cp05 §6]
+  CONTACT_ENTRY_MIN: 0.2,    // m/s into-surface speed that counts as an impact [DERIVED, flagged]
+  CONTACT_PITCH_RATE: 0.5,   // rad/s pitch-away cap [cp05 §6]
+  CONTACT_NORMAL_EPS: 1.0,   // m central-difference offset for the analytic normal [DERIVED, flagged]
+  // cp05 anti-wedge (low-speed multi-contact escape)
+  WEDGE_SPEED: 0.75,         // m/s actual-displacement threshold [cp05 §6]
+  WEDGE_MIN_ANGLE_COS: 0.5,  // ≥ 2 contact normals > 60° apart [cp05 §6]
+  WEDGE_TIME_S: 1.0,         // sustained longer than 1 s [cp05 §6]
+  WEDGE_NUDGE: 0.5,          // m/s escape along the mean open direction [cp05 §6]
+  WEDGE_PROBE_OFFSET: 1.2,   // m fore/aft/lateral probe offsets [DERIVED ≈ body half-length, flagged]
 } as const;
 
 export interface SimState {
@@ -122,14 +137,35 @@ export interface SimState {
   time: number;
 }
 
+export interface ContactInfo {
+  nx: number;
+  ny: number;
+  nz: number;
+  /** clearance along the normal, m (can be negative when penetrated) */
+  d: number;
+}
+
 export class SwimSim {
   state: SimState;
   assist: AssistMode = 'full';
   private readonly band: number;
+  /** cp05: analytic terrain height — null in the pool (no contact model) */
+  private readonly th: ((x: number, z: number) => number) | null;
+
+  // cp05 contact/anti-wedge state (deterministic; reset with the sim)
+  private inContact = false;
+  private wedgeT = 0;
+  private lastDispSpeed = 0;
 
   constructor(readonly sampler: WorldSampler) {
     this.band = Math.min(SIM.SHORE_BAND, sampler.containmentBand ?? SIM.SHORE_BAND);
+    this.th = sampler.terrainHeight ? sampler.terrainHeight.bind(sampler) : null;
     this.state = this.spawnState();
+  }
+
+  /** cp05 instrumentation: contact/wedge internals (not part of digests). */
+  contactState(): { inContact: boolean; wedgeT: number; dispSpeed: number } {
+    return { inContact: this.inContact, wedgeT: this.wedgeT, dispSpeed: this.lastDispSpeed };
   }
 
   /** Spawn: pool/region-neutral — centre, cruising depth, heading +X
@@ -158,6 +194,30 @@ export class SwimSim {
 
   reset(): void {
     this.state = this.spawnState();
+    this.inContact = false;
+    this.wedgeT = 0;
+    this.lastDispSpeed = 0;
+  }
+
+  /**
+   * cp05 analytic contact probe: heightfield normal by central differences
+   * (fixed 1 m offset — deterministic) and the clearance along that normal
+   * (planar-slope approximation (y − h)·n_y). Contact within CONTACT_PROBE
+   * (× the exit hysteresis while already touching).
+   */
+  private contactAt(x: number, y: number, z: number, threshold: number): ContactInfo | null {
+    const th = this.th!;
+    const e = SIM.CONTACT_NORMAL_EPS;
+    const h = th(x, z);
+    let nx = th(x - e, z) - th(x + e, z);
+    let nz = th(x, z - e) - th(x, z + e);
+    let ny = 2 * e;
+    const len = Math.hypot(nx, ny, nz);
+    nx /= len;
+    ny /= len;
+    nz /= len;
+    const d = (y - h) * ny;
+    return d < threshold ? { nx, ny, nz, d } : null;
   }
 
   step(intent: SwimIntent, dt = SIM.DT): void {
@@ -170,6 +230,11 @@ export class SwimSim {
       this.stepAir(dt);
       return;
     }
+
+    // step-start position (cp05: actual-displacement speed for anti-wedge)
+    const px0 = s.x;
+    const py0 = s.y;
+    const pz0 = s.z;
 
     // --- attitude ---
     const levelK = intent.autopilot
@@ -246,11 +311,152 @@ export class SwimSim {
       s.wvx = mx * dmag; s.wvy = my * dmag; s.wvz = mz * dmag;
     }
 
+    // --- cp05 terrain contact (region only; analytic heightfield — the
+    // camera's BVH never enters the sim, §6 determinism law). Slide, not
+    // stop: the into-surface component of the chase velocity is removed
+    // every contact step (the chase re-aims at facing, so pressing into a
+    // wall becomes a glide along it); the one-time entry impact scrubs
+    // tangential speed to 85 %; a capped pitch nudge eases the nose away
+    // while yaw stays fully under player control (Track E §14).
+    let wedgeEscape: { x: number; y: number; z: number } | null = null;
+    if (this.th) {
+      const threshold = this.inContact
+        ? SIM.CONTACT_PROBE * SIM.CONTACT_EXIT_FACTOR
+        : SIM.CONTACT_PROBE;
+      const c = this.contactAt(s.x, s.y, s.z, threshold);
+      if (c) {
+        const vDotN = s.wvx * c.nx + s.wvy * c.ny + s.wvz * c.nz;
+        if (vDotN < 0) {
+          const preMag = Math.hypot(s.wvx, s.wvy, s.wvz);
+          s.wvx -= c.nx * vDotN;
+          s.wvy -= c.ny * vDotN;
+          s.wvz -= c.nz * vDotN;
+          if (!this.inContact && -vDotN > SIM.CONTACT_ENTRY_MIN) {
+            // entry impact: keep 85 % of the tangential component
+            s.wvx *= SIM.CONTACT_KEEP;
+            s.wvy *= SIM.CONTACT_KEEP;
+            s.wvz *= SIM.CONTACT_KEEP;
+            let mag = Math.hypot(s.wvx, s.wvy, s.wvz);
+            if (mag < 1e-6 && preMag > 1e-6) {
+              // near-perpendicular impact: deterministic tangential seed
+              // (up, then facing, projected onto the surface tangent) so a
+              // head-on hit deflects into a slide instead of a dead stop
+              const seeds: [number, number, number][] = [
+                [0, 1, 0],
+                [Math.sin(s.yaw), 0, Math.cos(s.yaw)],
+                [1, 0, 0],
+              ];
+              for (const [sx, sy, sz] of seeds) {
+                const dot = sx * c.nx + sy * c.ny + sz * c.nz;
+                const tx = sx - c.nx * dot;
+                const ty = sy - c.ny * dot;
+                const tz = sz - c.nz * dot;
+                const tl = Math.hypot(tx, ty, tz);
+                if (tl > 1e-6) {
+                  mag = preMag * SIM.CONTACT_KEEP;
+                  s.wvx = (tx / tl) * mag;
+                  s.wvy = (ty / tl) * mag;
+                  s.wvz = (tz / tl) * mag;
+                  break;
+                }
+              }
+            }
+            // the scalar speed model follows the impact (deceleration is
+            // real, and the chase never re-injects the lost energy)
+            s.speed = Math.min(s.speed, Math.max(mag, s.speed * SIM.CONTACT_KEEP));
+          }
+          // pitch-away nudge (≤ CONTACT_PITCH_RATE), only while the nose
+          // points into the surface; yaw untouched
+          const fCos = Math.cos(s.pitch);
+          const fDotN =
+            Math.sin(s.yaw) * fCos * c.nx - Math.sin(s.pitch) * c.ny + Math.cos(s.yaw) * fCos * c.nz;
+          if (fDotN < 0) {
+            const eps = 1e-3;
+            const at = (p: number) =>
+              Math.sin(s.yaw) * Math.cos(p) * c.nx - Math.sin(p) * c.ny + Math.cos(s.yaw) * Math.cos(p) * c.nz;
+            const grad = at(s.pitch + eps) - at(s.pitch - eps);
+            const dir = grad > 0 ? 1 : -1;
+            s.pitch = clamp(
+              s.pitch + dir * SIM.CONTACT_PITCH_RATE * dt,
+              -SIM.PITCH_MAX,
+              SIM.PITCH_MAX,
+            );
+          }
+        }
+        this.inContact = true;
+      } else {
+        this.inContact = false;
+      }
+
+      // --- anti-wedge (cp05 §6): probes fore/aft/lateral collect local
+      // contact normals; two normals > 60° apart at low actual speed for
+      // > 1 s → a 0.5 m/s escape nudge along the mean open direction,
+      // held until the multi-contact clears (never traps the player).
+      if (this.lastDispSpeed < SIM.WEDGE_SPEED || this.wedgeT > 0) {
+        const sy = Math.sin(s.yaw);
+        const cy = Math.cos(s.yaw);
+        const o = SIM.WEDGE_PROBE_OFFSET;
+        const probePts: [number, number][] = [
+          [s.x, s.z],
+          [s.x + sy * o, s.z + cy * o],
+          [s.x - sy * o, s.z - cy * o],
+          [s.x + cy * o, s.z - sy * o],
+          [s.x - cy * o, s.z + sy * o],
+        ];
+        const normals: ContactInfo[] = [];
+        for (const [px, pz] of probePts) {
+          const pc = this.contactAt(px, s.y, pz, SIM.CONTACT_PROBE);
+          if (pc) normals.push(pc);
+        }
+        let separated = false;
+        for (let a = 0; a < normals.length && !separated; a++) {
+          for (let b = a + 1; b < normals.length; b++) {
+            const na = normals[a]!;
+            const nb = normals[b]!;
+            if (na.nx * nb.nx + na.ny * nb.ny + na.nz * nb.nz < SIM.WEDGE_MIN_ANGLE_COS) {
+              separated = true;
+              break;
+            }
+          }
+        }
+        if (separated && this.lastDispSpeed < SIM.WEDGE_SPEED) {
+          this.wedgeT += dt;
+        } else if (!separated) {
+          this.wedgeT = 0;
+        }
+        if (this.wedgeT > SIM.WEDGE_TIME_S && normals.length > 0) {
+          let mx2 = 0;
+          let my2 = 0;
+          let mz2 = 0;
+          for (const nrm of normals) {
+            mx2 += nrm.nx;
+            my2 += nrm.ny;
+            mz2 += nrm.nz;
+          }
+          const ml = Math.hypot(mx2, my2, mz2);
+          if (ml > 1e-6) {
+            wedgeEscape = {
+              x: (mx2 / ml) * SIM.WEDGE_NUDGE,
+              y: (my2 / ml) * SIM.WEDGE_NUDGE,
+              z: (mz2 / ml) * SIM.WEDGE_NUDGE,
+            };
+          }
+        }
+      } else {
+        this.wedgeT = 0;
+      }
+    }
+
     // step velocity (containment modifies the step's copy, as the dolphin
     // original did with its per-step velocity)
     let vx = s.wvx;
     let vy = s.wvy;
     let vz = s.wvz;
+    if (wedgeEscape) {
+      vx += wedgeEscape.x;
+      vy += wedgeEscape.y;
+      vz += wedgeEscape.z;
+    }
 
     // --- containment current: the water pushes back near the shore ---
     const sd = this.shoreDistance(s.x, s.z);
@@ -328,6 +534,7 @@ export class SwimSim {
     s.x = nx2;
     s.y = ny2;
     s.z = nz2;
+    this.lastDispSpeed = Math.hypot(s.x - px0, s.y - py0, s.z - pz0) / dt;
   }
 
   private stepAir(dt: number): void {

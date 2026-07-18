@@ -35,4 +35,9 @@ export class RegionSampler implements WorldSampler {
   depthAt(x: number, z: number): number {
     return this.data.depthAt(x, z);
   }
+
+  /** cp05: activates the sim's deterministic terrain-contact model. */
+  terrainHeight(x: number, z: number): number {
+    return this.data.terrainHeight(x, z);
+  }
 }

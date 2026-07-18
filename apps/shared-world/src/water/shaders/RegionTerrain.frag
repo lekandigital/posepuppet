@@ -1,16 +1,21 @@
 precision highp float;
 
 /**
- * REGION TERRAIN FRAGMENT SHADER — Checkpoint 04B app-owned copy of the
- * vendored Cube.frag (pool walls/floor) with the sanctioned container swap
- * (Master §4.2 row 6): the tiled box walls become the coastline/seabed
- * terrain, shaded by the SAME getWallColor as the region water shaders so
- * terrain seen directly and terrain seen through refracted rays agree.
+ * REGION TERRAIN CHUNK FRAGMENT SHADER — Checkpoint 05 chunked-LOD terrain
+ * material (replaces the cp04B graybox fragment). Shading goes through the
+ * SAME getWallColorTinted as the region water shaders, so terrain seen
+ * directly and terrain seen through refracted rays agree; normals come
+ * per-fragment from uHeightTex (single source, Master §2.2).
  *
- * Byte-identical (protected): the caustic consumption math and the
- * underwater tint (`underwaterColor · 1.2`) applied to submerged fragments.
- * Object-optics proximity shadows removed (optics 'none' — see
- * RegionWaterAbove.frag header note).
+ * Byte-identical (protected): the submerged caustic-consumption math inside
+ * getWallColorTinted and the vendored underwater tint (`underwaterColor ·
+ * 1.2`) applied to submerged fragments, both carried from 04B.
+ *
+ * Triplanar-ready structure (cp05 §3 item 2): `terrainAlbedo` is the cp08
+ * texture seam — it receives the world point, the heightfield normal and
+ * the provisional per-vertex tint, and today returns the tint unchanged.
+ * cp08 replaces its body with height/slope-blended triplanar texture
+ * sampling without touching the lighting math around it.
  */
 
 const float IOR_AIR = 1.0;
@@ -23,15 +28,23 @@ uniform sampler2D causticTex;
 uniform sampler2D water;
 
 varying vec3 vPosition;
+varying vec3 vTint;
 
 #include ./RegionContainer.glsl;
+#include ./RegionTerrainTint.glsl;
 #include ./RegionWallColor.glsl;
 
+/** cp08 triplanar seam — flat provisional tint until textures arrive. */
+vec3 terrainAlbedo(vec3 point, vec3 normal, vec3 tint) {
+  return tint;
+}
+
 void main() {
-  gl_FragColor = vec4(getWallColor(vPosition), 1.0);
+  vec3 albedo = terrainAlbedo(vPosition, seabedNormal(vPosition.xz), vTint);
+  gl_FragColor = vec4(getWallColorTinted(vPosition, albedo), 1.0);
 
   // Blue tinting for underwater fragments — vendored law, waterline
-  // evaluated against the composited global surface
+  // evaluated against the composited global surface (carried from 04B)
   if (vPosition.y < surfaceHeightAt(vPosition.xz)) {
     gl_FragColor.rgb *= underwaterColor * 1.2;
   }
