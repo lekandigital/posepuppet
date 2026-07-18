@@ -1,6 +1,6 @@
 {
   "checkpoint": "00-scaffold-stock-demo",
-  "timestamp": "2026-07-18T04:54:35.403Z",
+  "timestamp": "2026-07-18T05:37:35.848Z",
   "url": "/shared-world/?view=stock",
   "viewport": {
     "width": 1728,
@@ -11,18 +11,18 @@
     "width": 1398,
     "height": 1080
   },
-  "chromeVersion": "149.0.7827.55",
+  "chromeVersion": "150.0.7871.125",
   "fps": {
     "buckets": [
       120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
       121,
-      120,
-      120,
-      120,
-      120,
-      120,
-      120,
-      120,
       120
     ],
     "median": 120,

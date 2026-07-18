@@ -20,6 +20,7 @@ export default defineConfig({
     baseURL: `http://localhost:${GAME_PORT}`,
     viewport: { width: 1728, height: 1080 },
     headless: false,
+    channel: 'chrome',
   },
   webServer: [
     {
