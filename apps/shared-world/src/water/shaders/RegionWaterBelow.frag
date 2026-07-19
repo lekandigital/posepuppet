@@ -37,13 +37,16 @@ varying vec3 vPosition;
 vec3 getSurfaceRayColor(vec3 origin, vec3 ray, vec3 waterColor) {
   vec3 color;
   float t = raymarchSeabed(origin, ray);
+  float underwaterPath = 0.0;
 
   if (ray.y < 0.0) {
     // Hits the seabed heightfield; grazing misses drop onto the seabed
     // under the march end (see the above-water copy's note)
-    vec3 hit = origin + ray * (t >= 0.0 ? t : RM_MAX);
+    float tHit = t >= 0.0 ? t : RM_MAX;
+    vec3 hit = origin + ray * tHit;
     if (t < 0.0) hit.y = terrainHeight(hit.xz);
     color = getWallColor(hit);
+    underwaterPath = tHit;
   } else {
     // Exits water into air: exposed coastline, else sky cubemap (vendored)
     if (t >= 0.0) {
@@ -55,8 +58,8 @@ vec3 getSurfaceRayColor(vec3 origin, vec3 ray, vec3 waterColor) {
     }
   }
 
-  // Modulate by water tinting if traveling inside water — vendored
-  if (ray.y < 0.0) color *= waterColor;
+  // Water tinting in path-length form (cp05A correction; see waterPathTint)
+  if (ray.y < 0.0) color *= waterPathTint(waterColor, underwaterPath);
   return color;
 }
 

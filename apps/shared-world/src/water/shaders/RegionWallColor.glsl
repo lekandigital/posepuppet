@@ -37,6 +37,26 @@ const vec3 EXPOSED_HEMI_SKY = vec3(0.749020, 0.909804, 1.0);   // #BFE8FF (scene
 const float EXPOSED_HEMI_INT = 0.50;
 const float EXPOSED_HEMI_GROUND_FRAC = 0.30;                   // ground = 30 % of sky
 
+/**
+ * Path-length water tint (CP05A correction). The vendored pool applied its
+ * water-color multiply at FULL strength to every submerged ray regardless
+ * of path length — correct in a 7.5 m pool, but at region scale it crushed
+ * the substrate's non-teal channels into one uniform cyan (the flagged
+ * visual defect). This generalizes the same vendored color to a
+ * Beer-Lambert path form: tint(d) = waterColor^(d / WT_REF), exactly the
+ * vendored tint at d = WT_REF (continuity with the approved four-shot
+ * look), milder for shorter underwater paths (shallow seabed stays sandy/
+ * rocky), stronger — clamped at WT_EMAX — for deep/distant terrain (the
+ * natural teal cast is kept and deepens with distance). [DERIVED, flagged.]
+ */
+const float WT_REF = 18.0;
+const float WT_EMIN = 0.35;
+const float WT_EMAX = 2.2;
+
+vec3 waterPathTint(vec3 waterColor, float pathLen) {
+  return pow(waterColor, vec3(clamp(pathLen / WT_REF, WT_EMIN, WT_EMAX)));
+}
+
 /** Composited global-surface height at xz (calm plane + windowed sim). */
 float surfaceHeightAt(vec2 xz) {
   vec2 wuv = windowUv(xz);

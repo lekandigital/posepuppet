@@ -1,92 +1,163 @@
 /**
- * REGION SUBSTRATE — Checkpoint 05A shared substrate classification and
- * color system (post-CP05 addendum §4.7–§4.10; supersedes the R14/cp05
- * two-tint law of RegionTerrainTint.glsl, which this file replaces).
+ * REGION SUBSTRATE — CP05A correction: faithful port of ZyFou
+ * ProceduralTerrains' BLANK terrain coloring (the Highlands/default
+ * configuration), per the user's CP05A review correction. Supersedes the
+ * first CP05A submission's Track-D-anchored 17-family palette.
  *
- * ONE classification/color function consumed identically by:
- *   - the directly rendered terrain (RegionTerrain.frag);
- *   - terrain hit by the above-water and underwater water raymarches
- *     (RegionWaterAbove/Below.frag via RegionWallColor.glsl getWallColor);
- *   - reflected/refracted terrain paths (the same raymarch tracer);
- *   - the debug/baked classification outputs (albedo-debug mode + the CPU
- *     twin `src/world/substrateCpu.ts`, which mirrors this math for the
- *     region preview and the probe tests).
+ * Source of truth (read-only pinned snapshot, commit 8b396f9c):
+ *   docs/bodyarcade-stage3/references/zyfou-procedural-terrains/
+ *     src/project/ProjectTemplates.js      blank → preset 'highlands'
+ *     src/engine/presets.js                highlands = DEFAULT_PARAMS
+ *     src/engine/style/ColorPalette.js     EARTH_PALETTE (verbatim below)
+ *     src/engine/style/PlanetStyleConfig.js DEFAULT_PLANET_STYLE
+ *     src/engine/shaders/terrainColor.glsl.js  applyPalettePost +
+ *                                          computeTerrainAlbedo (ported)
+ *     src/engine/biomeGLSL.js (terrain/)   climateAt / biomeWeightsAt /
+ *                                          vegetationDensity (ported)
+ *     src/engine/terrain/TerrainMaterial.js  jitter/detail/micro taps
+ *     src/engine/terrain/TerrainDetailMaterial.js  close-range detail
+ *                                          layer (ported at defaults)
+ *     src/engine/Engine.js                 uniform wiring: uFrequency =
+ *                                          (noiseScale·0.1)/boardSize;
+ *                                          uSeedOffset = mulberry32(seed)
+ *                                          ·2048−1024 (defaults below)
  *
- * Architecture adapted from ZyFou/ProceduralTerrains (MIT, pinned snapshot
- * docs/bodyarcade-stage3/references/zyfou-procedural-terrains/, commit
- * 8b396f9c): one shared color function across terrain/water/export paths
- * (terrainColor.glsl.js), slope/height/depth/noise-driven albedo with
- * smooth overlapping family weights (computeTerrainAlbedo), and the
- * close-range world-space/triplanar detail principle
- * (TerrainDetailMaterial.js) — combined with Simon-style restrained
- * blending (addendum §11.2) and the existing RegionWallColor shared-shader
- * discipline. App-owned code; the snapshot is never imported.
+ * ONE color function consumed identically by: directly rendered exposed
+ * terrain; terrain beneath the ocean; the above-water refraction/ray-hit
+ * path; and the underwater/water-below ray-hit path (all via
+ * RegionWallColor.glsl getWallColor → substrateColor). Underwater terrain
+ * carries the SAME ZyFou Blank substrate identity; the approved water
+ * attenuation/caustics/refraction alter only how it is viewed.
  *
- * SUBSTRATE ONLY (addendum §2.4): every family below is ordinary ground —
- * sand, sediment, soil, stone, cliff rock, reef limestone, silt, trench
- * rock, cave-mouth rock. No family imitates, substitutes for, or encodes
- * the presence of kelp, coral, grass, trees, rocks-as-assets, ruins,
- * wrecks, fish, wildlife, or structures.
+ * BodyArcade integration adaptations (each listed in the correction
+ * report; everything else is the ZyFou math verbatim):
+ *  A1 lattice hash: ZyFou's Dave-Hoskins hash12 is not fp32/f64
+ *     bit-reproducible across GPU and CPU; the fp32-exact mod-289
+ *     permutation hash below replaces it so the required GPU/CPU parity
+ *     holds. Lattice structure, quintic fade, ROT2 octave rotation,
+ *     frequencies, offsets and blend math are ZyFou's.
+ *  A2 height mapping: BodyArcade heights y ∈ [−80,+200] m map affinely
+ *     onto ZyFou's Blank range [0,560]: yZ = 2·y + 160; sea level y=0 →
+ *     yZ = ZSEA = 160 (ZyFou's default sea 100 is a fraction-of-range
+ *     difference; hRel/h01 keep ZyFou's internal relationship).
+ *  A3 coordinates: 1 BodyArcade meter = 1 ZyFou world unit (their Blank
+ *     board is 2048 units vs our 2000 m region — feature scale within
+ *     2.4 %); uFrequency/uSeedOffset are Blank's own values.
+ *  A4 display encode: ZyFou displays pow(litColor, 1/2.2); the vendored
+ *     jeantimex pipeline is display-raw, so the encode is folded into the
+ *     shared albedo (before BodyArcade's approved lighting laws) — the
+ *     palette reads at Blank's intended visible values.
+ *  A5 lighting/AO/fog stay BodyArcade's approved region laws (vendored
+ *     sun + hemisphere, protected submerged caustic math, jeantimex
+ *     optics); ZyFou terrainLighting/cavity-AO/exp2 fog are not ported.
+ *  A6 paint/spline/erosion/import/biome-paint editor inputs: absent —
+ *     biome weights are the pure climate-noise path.
+ *  A7 surface-texture system: no-op at Blank defaults (uSurfMode 0) —
+ *     matched by omission.
  *
- * Include AFTER RegionContainer.glsl (uses terrainHeight/heightUv/
- * seabedNormal/uSeaLevel/uRegionSize/uHeightN) and BEFORE
- * RegionWallColor.glsl.
- *
- * Determinism: the noise lattice hash is a permutation polynomial
- * (mod-289, Gustavson-style) whose intermediates stay < 2^23 — exact in
- * fp32 — so the fround-emulating CPU twin reproduces it bit-for-bit;
- * classification thresholds are smoothsteps of artifact-derived inputs.
- * Colors are pre-cp08 WORKING VALUES (Track D table 6.2 [BVM→REC] anchors
- * + [DERIVED] blends, flagged), not the final palette.
+ * SUBSTRATE ONLY: the ZyFou families are ground/climate colorations
+ * (sand, grass, forest-floor tones, rock, snow, underwater floor) — no
+ * kelp/coral/vegetation/ruins/wrecks/wildlife assets are painted into the
+ * terrain (vegetation-density affects soil COLOR only, as in ZyFou).
  */
 
-uniform sampler2D uShoreSdf; // baked shore_sdf.r16 → R-float meters (+ = water), 2049²
-uniform sampler2D uBiomeTex; // baked biome.png → RGBA8 (R bright, G kelp-shelf, B plain), 1025²
 uniform float uAlbedoDebug;  // 1 = classification-only output (test/debug mode)
 
 /* ------------------------------------------------------------------------
- * Substrate palette — pre-cp08 working values.
- * [T6.2] = Track D table 6.2 [BVM→REC] source hex; [DRV] = derived blend.
+ * ZyFou Blank constants (Engine.js wiring at DEFAULT_PARAMS, seed 1337)
  * ---------------------------------------------------------------------- */
 
-const vec3 SUB_DRY_SAND    = vec3(0.823529, 0.780392, 0.662745); // #D2C7A9 [T6.2 B sand / R14]
-const vec3 SUB_WET_SAND    = vec3(0.717647, 0.658824, 0.541176); // #B7A88A [DRV dry sand ×0.87]
-const vec3 SUB_LOW_SOIL    = vec3(0.639216, 0.564706, 0.419608); // #A3906B [DRV sand→rock]
-const vec3 SUB_DRY_EARTH   = vec3(0.690196, 0.541176, 0.360784); // #B08A5C [T6.2 F tan rock]
-const vec3 SUB_VEG_SOIL    = vec3(0.513725, 0.505882, 0.352941); // #83815A [DRV soil→#5E8F4E wash]
-const vec3 SUB_ROCK        = vec3(0.662745, 0.560784, 0.423529); // #A98F6C [T6.2 B reef rock / R14]
-const vec3 SUB_CLIFF_ROCK  = vec3(0.552941, 0.462745, 0.341176); // #8D7657 [DRV rock ×0.84]
-const vec3 SUB_HIGH_ROCK   = vec3(0.611765, 0.580392, 0.541176); // #9C948A [DRV toward A #7C8468]
-const vec3 SUB_SHAL_SAND   = vec3(0.847059, 0.823529, 0.635294); // #D8D2A2 [T6.2 bright-shallow sand]
-const vec3 SUB_SHORE_STONE = vec3(0.486275, 0.517647, 0.407843); // #7C8468 [T6.2 A grey-green rock]
-const vec3 SUB_REEF_LIME   = vec3(0.709804, 0.631373, 0.498039); // #B5A17F [DRV pale B rock]
-const vec3 SUB_KELP_STONE  = vec3(0.607843, 0.541176, 0.372549); // #9B8A5F [T6.2 C tan-olive rock]
-const vec3 SUB_MID_STONE   = vec3(0.560784, 0.494118, 0.388235); // #8F7E63 [DRV]
-const vec3 SUB_UW_CLIFF    = vec3(0.435294, 0.411765, 0.360784); // #6F695C [DRV cool, low sediment]
-const vec3 SUB_SILT        = vec3(0.662745, 0.698039, 0.713725); // #A9B2B6 [T6.2 E cool grey sand]
-const vec3 SUB_TRENCH_ROCK = vec3(0.243137, 0.290196, 0.337255); // #3E4A56 [T6.2 J spires]
-const vec3 SUB_TRENCH_SED  = vec3(0.556863, 0.576471, 0.498039); // #8E937F [T6.2 J dim pale sand]
-const vec3 SUB_CAVE_ROCK   = vec3(0.333333, 0.286275, 0.113725); // #55491D [DRV D walls #6E621C ×0.8]
+/** uSeedOffset = mulberry32(1337): (rng()·2048−1024, rng()·2048−1024) */
+const vec2 Z_SEED_OFFSET = vec2(-646.3245668411255, -634.9020133018494);
+/** uFrequency = (noiseScale 45 · 0.1) / boardSize 2048 */
+const float Z_FREQ = 0.002197265625;
+/** heightScale 560; BodyArcade [−80,+200] → [0,560]: yZ = 2·y + 160 */
+const float Z_HEIGHT_SCALE = 560.0;
+const float Z_SEA = 160.0;
+/** snowLine 0.7; slope gates rock 0.42/0.72, snow 0.30/0.62 */
+const float Z_SNOW_LINE = 0.7;
+const float Z_ROCK_SLOPE_LO = 0.42;
+const float Z_ROCK_SLOPE_HI = 0.72;
+const float Z_SNOW_SLOPE_MIN = 0.30;
+const float Z_SNOW_SLOPE_MAX = 0.62;
+/** climate defaults: biomeScale 1, tempBias 0, moistScale 1, moistBias 0 */
+const float Z_BIOME_SCALE = 1.0;
+const float Z_TEMP_BIAS = 0.0;
+const float Z_MOIST_SCALE = 1.0;
+const float Z_MOIST_BIAS = 0.0;
+/** DEFAULT_PLANET_STYLE: saturation 1, contrast 1, tint (1,1,1) */
+const float Z_PAL_SATURATION = 1.0;
+const float Z_PAL_CONTRAST = 1.0;
+const vec3 Z_PAL_TINT = vec3(1.0, 1.0, 1.0);
 
-/** approved cave-mouth sites (world XZ; placement.json — fixed transforms) */
-const vec2 SUB_CAVE_A = vec2(-420.0, 30.0);
-const vec2 SUB_CAVE_B = vec2(-430.0, -150.0);
-const vec2 SUB_CAVE_C = vec2(450.0, -30.0);
+/* EARTH_PALETTE — ColorPalette.js, verbatim linear RGB */
+const vec3 Z_COL_DEEP      = vec3(0.012, 0.075, 0.140);
+const vec3 Z_COL_SHALLOW   = vec3(0.060, 0.290, 0.330);
+const vec3 Z_COL_SAND      = vec3(0.560, 0.470, 0.300);
+const vec3 Z_COL_DUNE      = vec3(0.620, 0.490, 0.290);
+const vec3 Z_COL_DRYGRASS  = vec3(0.380, 0.330, 0.150);
+const vec3 Z_COL_GRASS     = vec3(0.130, 0.260, 0.085);
+const vec3 Z_COL_FOREST    = vec3(0.052, 0.140, 0.055);
+const vec3 Z_COL_JUNGLE    = vec3(0.035, 0.125, 0.045);
+const vec3 Z_COL_SWAMP     = vec3(0.090, 0.130, 0.070);
+const vec3 Z_COL_TUNDRA    = vec3(0.300, 0.290, 0.240);
+const vec3 Z_COL_REDROCK   = vec3(0.420, 0.235, 0.140);
+const vec3 Z_COL_REDROCK2  = vec3(0.560, 0.370, 0.210);
+const vec3 Z_COL_ROCK      = vec3(0.260, 0.235, 0.215);
+const vec3 Z_COL_ROCKHI    = vec3(0.380, 0.365, 0.355);
+const vec3 Z_COL_SNOW      = vec3(0.870, 0.890, 0.930);
+/* foam slot unused by terrain albedo */
+
+/* TerrainDetailMaterial defaults (Engine._applyTerrainDetailPerf +
+ * VISUAL_DEFAULT_PARAMS) */
+const float ZD_QUALITY = 3.0;
+const float ZD_SCALE = 0.16;
+const float ZD_STRENGTH = 0.72;
+const float ZD_NORMAL_STRENGTH = 0.42;
+const float ZD_NEAR = 80.0;
+const float ZD_FAR = 190.0;
+const float ZD_ROCK_SLOPE = 0.28;
+const float ZD_ROCK_SHARPNESS = 0.14;
+const float ZD_TRIPLANAR = 1.0;
+const float ZD_SHORE_RANGE = 18.0;
+const float ZD_SHORE_WETNESS = 0.35;
+const float ZD_OPACITY = 1.0;
+const float ZD_MICRO = 0.6;
+const float ZD_MACRO = 0.5;
+const float ZV_COLOR_VARIATION = 0.36;
+const float ZV_HEIGHT_DETAIL = 0.42;
+const float ZV_WET_SHORE = 0.55;
+const float ZV_ROCK_DETAIL = 0.45;
+const float ZV_SOIL_DETAIL = 0.35;
+const float ZV_SAND_DETAIL = 0.38;
+const float ZV_WET_SAND_RANGE = 18.0;
 
 /* ------------------------------------------------------------------------
- * Deterministic lattice noise (fp32-exact hash; CPU-twin reproducible)
+ * Noise primitives — ZyFou structure (quintic fade, ROT2 per-octave
+ * rotation, fbm3 weights .55/.30/.15 at lacunarity 2.13) over the
+ * fp32-exact mod-289 permutation lattice hash (adaptation A1)
  * ---------------------------------------------------------------------- */
 
+/** permutation polynomial (Gustavson): exact in fp32 for v ∈ [0, 289) */
+float zPerm(float v) {
+  return mod(v * (v * 34.0 + 1.0), 289.0);
+}
+
+/** 2-D lattice hash via NESTED permutation — perm(perm(x) + y) — so the
+ *  hash is not a function of any 1-D linear projection of the lattice
+ *  (the CP05A-correction fix for the large axis-aligned climate patches
+ *  the earlier x + 57·y form produced). All intermediates < 2^23: exact
+ *  in fp32, bit-reproducible by the CPU twin. */
 float subHash(vec2 ip, float seed) {
-  float n = mod(ip.x + ip.y * 57.0 + seed, 289.0);
-  n = mod(n * (n * 34.0 + 1.0), 289.0);
+  float n = zPerm(mod(zPerm(mod(ip.x + seed, 289.0)) + ip.y, 289.0));
   return fract(n * 0.024390243);
 }
 
-float subNoise(vec2 p, float seed) {
+/** quintic value noise (ZyFou vnoise fade: f³(f(6f−15)+10)) */
+float vnoiseQ(vec2 p, float seed) {
   vec2 ip = floor(p);
   vec2 f = p - ip;
-  vec2 u = f * f * (3.0 - 2.0 * f);
+  vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
   float a = subHash(ip, seed);
   float b = subHash(ip + vec2(1.0, 0.0), seed);
   float c = subHash(ip + vec2(0.0, 1.0), seed);
@@ -94,223 +165,408 @@ float subNoise(vec2 p, float seed) {
   return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
 
-/** two-band FBM (kept to 2 octaves — this runs per raymarch hit) */
-float subFbm(vec2 p, float seed) {
-  return subNoise(p, seed) * 0.65 + subNoise(p * 2.13 + 31.0, seed + 7.0) * 0.35;
+const mat2 Z_ROT2 = mat2(0.80, -0.60, 0.60, 0.80);
+
+/** ZyFou fbm3 (biomeGLSL.js): manually unrolled 3 octaves, gain/lacunarity
+ *  hardcoded so climate stays stable */
+float zFbm3(vec2 p, float seed) {
+  float v = vnoiseQ(p, seed) * 0.55;
+  p = Z_ROT2 * p * 2.13;
+  v += vnoiseQ(p, seed) * 0.30;
+  p = Z_ROT2 * p * 2.13;
+  v += vnoiseQ(p, seed) * 0.15;
+  return v;
 }
 
 /* ------------------------------------------------------------------------
- * Shared samplers
+ * Climate / biome weights / vegetation — biomeGLSL.js verbatim
  * ---------------------------------------------------------------------- */
 
-/** signed shore distance, meters, + = water (same half-texel law as height) */
-float shoreDistAt(vec2 xz) {
-  return texture2D(uShoreSdf, heightUv(xz)).r;
+struct ZClimate {
+  float temp;
+  float moist;
+  float cont;
+  float erosion;
+  float region;
+};
+
+ZClimate zClimateAt(vec2 p) {
+  ZClimate c;
+  vec2 b = p * Z_BIOME_SCALE;
+  c.cont    = zFbm3(b * 0.085 + vec2(211.3,  57.9), 0.0);
+  c.temp    = clamp(zFbm3(b * 0.150 + vec2( 71.7, 313.1), 0.0) * 1.5 - 0.25 + Z_TEMP_BIAS, 0.0, 1.0);
+  c.moist   = clamp(zFbm3(b * 0.130 * Z_MOIST_SCALE + vec2( 91.7,  53.9), 0.0) * 1.5 - 0.25 + Z_MOIST_BIAS, 0.0, 1.0);
+  c.erosion = zFbm3(b * 0.190 + vec2(157.1, 423.7), 0.0);
+  c.region  = zFbm3(p * 0.700 + vec2(631.4, 199.2), 0.0);
+  return c;
 }
 
-/** biome masks: R bright-shallow, G kelp-shelf region, B plain region */
-vec3 biomeAt(vec2 xz) {
-  float nb = 1025.0;
-  vec2 uv = ((xz + 0.5 * uRegionSize) * ((nb - 1.0) / uRegionSize) + 0.5) / nb;
-  return texture2D(uBiomeTex, uv).rgb;
+struct ZBiomeWeights {
+  float desert;
+  float canyon;
+  float wetland;
+  float mountains;
+};
+
+ZBiomeWeights zBiomeWeightsAt(ZClimate c) {
+  float j = (c.region - 0.5) * 0.16;
+  float hot    = smoothstep(0.52, 0.74, c.temp + j);
+  float dry    = smoothstep(0.55, 0.30, c.moist - j);
+  float wet    = smoothstep(0.55, 0.78, c.moist + j);
+  float lowC   = smoothstep(0.55, 0.32, c.cont);
+  float eroded = smoothstep(0.40, 0.70, c.erosion + j * 0.5);
+
+  ZBiomeWeights w;
+  w.desert    = hot * dry * (1.0 - eroded * 0.55);
+  w.canyon    = dry * eroded * smoothstep(0.30, 0.55, c.cont);
+  w.wetland   = wet * lowC * (1.0 - hot * 0.4);
+  w.mountains = smoothstep(0.38, 0.62, c.cont) * (1.0 - eroded * 0.7);
+  return w;
 }
 
-/** cheap deterministic concavity proxy: neighborhood mean minus height over
- *  a 4-texel ring, 1 ≈ hollow/low-energy accumulation basin */
-float concavityAt(vec2 xz, float h) {
-  float e = 4.0 * uRegionSize / (uHeightN - 1.0);
-  float hAvg = 0.25 * (
-    terrainHeight(xz + vec2(e, 0.0)) + terrainHeight(xz - vec2(e, 0.0)) +
-    terrainHeight(xz + vec2(0.0, e)) + terrainHeight(xz - vec2(0.0, e)));
-  return clamp((hAvg - h) / 3.0, 0.0, 1.0);
+float zVegetationDensity(ZClimate c, float h01, float slope) {
+  float tempEff = c.temp - h01 * 0.55;
+  float warmEnough = smoothstep(0.18, 0.34, tempEff) * smoothstep(0.92, 0.70, tempEff);
+  float wetEnough  = smoothstep(0.34, 0.62, c.moist);
+  float flatGround = smoothstep(0.55, 0.25, slope);
+  return warmEnough * wetEnough * flatGround;
 }
 
 /* ------------------------------------------------------------------------
- * The classification (addendum §4.8 above water, §4.9 underwater).
- * Blend order (authoritative → local): elevation/depth base → regional
- * variation → slope-driven rock → accumulation (silt) → shoreline bands →
- * cave-mouth transition → restrained mineral drift.
- * All thresholds [DERIVED, flagged for the §9 manual review].
+ * applyPalettePost + computeTerrainAlbedo — terrainColor.glsl.js verbatim
+ * (palette uniforms → the Blank constants above)
  * ---------------------------------------------------------------------- */
 
-vec3 substrateAlbedo(vec3 point, vec3 normal) {
-  vec2 xz = point.xz;
-  float h = terrainHeight(xz);
-  float slope = 1.0 - clamp(normal.y, 0.0, 1.0); // 0 flat … 1 vertical
-  float sd = shoreDistAt(xz);                    // + water, − land
-  vec3 biome = biomeAt(xz);
-  // concavity feeds only the underwater silt classifier — land fragments
-  // skip its four height fetches (terrain-stage budget; math unchanged)
-  float conc = h < 0.0 ? concavityAt(xz, h) : 0.0;
+vec3 zApplyPalettePost(vec3 col) {
+  float luma = dot(col, vec3(0.299, 0.587, 0.114));
+  col = mix(vec3(luma), col, Z_PAL_SATURATION);
+  col = (col - 0.5) * Z_PAL_CONTRAST + 0.5;
+  col *= Z_PAL_TINT;
+  return max(col, vec3(0.0));
+}
 
-  // deterministic variation fields (fixed seeds, committed)
-  float bBroad = subFbm(xz * 0.0058824, 11.0); // ~170 m regional mineral field
-  float bMoist = subFbm(xz * 0.0111111, 23.0); // ~90 m soil-condition field
-  float bMed   = subFbm(xz * 0.0454545, 37.0); // ~22 m material breakup
+struct ZTerrainColorResult {
+  vec3 albedo;
+  float snow;
+  float sandBand;
+  float flatness;
+  float rockBlend;
+};
 
-  vec3 ground;
+/** hRelFloor: the underwater floor ramp runs on REAL meters (adaptation
+ *  A2b — with the ×2 vertical band mapping the Blank sand→deep ramp would
+ *  saturate by 27.5 real meters and erase mid-depth substrate, the exact
+ *  uniform-teal collapse the CP05A visual review flagged; ZyFou's −hRel/55
+ *  law is kept, fed with unexaggerated depth). */
+ZTerrainColorResult zComputeTerrainAlbedo(
+  ZClimate cl, ZBiomeWeights bw,
+  float hC, float hRel, float hRelFloor, float h01, float slope, float detail, float jitter, float microN
+) {
+  ZTerrainColorResult res;
+  float tempEff = clamp(cl.temp - h01 * 0.55, 0.0, 1.0);
+  float veg = zVegetationDensity(cl, h01, slope);
+  float jt = jitter * 0.06;
 
-  if (h < 0.0) {
-    // ---------------- underwater substrate families (addendum §4.9) ----------------
-    float depth = -h;
+  vec3 hotBand = mix(Z_COL_DUNE,
+    mix(Z_COL_DRYGRASS, Z_COL_JUNGLE, smoothstep(0.45, 0.75, cl.moist)),
+    smoothstep(0.20, 0.50, cl.moist));
+  vec3 midBand = mix(Z_COL_DRYGRASS,
+    mix(Z_COL_GRASS, Z_COL_FOREST, veg * (0.5 + 0.5 * smoothstep(0.35, 0.65, detail))),
+    smoothstep(0.22, 0.52, cl.moist));
+  vec3 coldBand = mix(Z_COL_TUNDRA, mix(Z_COL_TUNDRA, Z_COL_FOREST * 0.85, veg),
+    smoothstep(0.30, 0.60, cl.moist));
 
-    // sediment ramp: pale shallow sand → mixed → silty grey with depth
-    vec3 sediment = mix(SUB_SHAL_SAND, SUB_SILT, smoothstep(10.0, 42.0, depth));
+  vec3 lowland = mix(coldBand, midBand, smoothstep(0.20, 0.38, tempEff + jt));
+  lowland = mix(lowland, hotBand, smoothstep(0.55, 0.72, tempEff + jt));
+  lowland = mix(lowland, Z_COL_SWAMP, bw.wetland * 0.8);
 
-    // stone ramp: reef limestone → medium-depth stone → deep trench rock;
-    // the kelp-shelf REGION reads as tan-olive mineral rock (regional stone
-    // identity — a material tint, never a kelp asset)
-    vec3 shallowStone = mix(SUB_REEF_LIME, SUB_KELP_STONE, biome.g * 0.75);
-    vec3 stone = mix(shallowStone, SUB_MID_STONE, smoothstep(8.0, 30.0, depth));
-    stone = mix(stone, SUB_TRENCH_ROCK, smoothstep(45.0, 65.0, depth));
+  float sandBand = (mix(3.0, 9.0, smoothstep(0.30, 0.70, tempEff)) + jitter * 4.0)
+                 * (1.0 - bw.wetland * 0.85);
+  vec3 albedo = mix(Z_COL_SAND, lowland, smoothstep(sandBand * 0.4, max(sandBand, 0.3), hRel));
 
-    // broken rocky seabed vs sediment: slope + medium breakup decide
-    float rockW = smoothstep(0.16, 0.42, slope + (bMed - 0.5) * 0.35);
-    ground = mix(sediment, stone, rockW);
+  float band = fract(h01 * 14.0 + detail * 0.15);
+  vec3 canyonCol = mix(Z_COL_REDROCK, Z_COL_REDROCK2, smoothstep(0.25, 0.75, band));
+  albedo = mix(albedo, canyonCol, bw.canyon * smoothstep(1.0, 6.0, hRel));
 
-    // silt/fine-sediment pockets: flat, concave, low-energy, deeper floors
-    float siltW = (1.0 - smoothstep(0.06, 0.16, slope)) *
-      smoothstep(0.15, 0.6, conc) * smoothstep(6.0, 16.0, depth);
-    ground = mix(ground, mix(SUB_SILT, SUB_TRENCH_SED, smoothstep(45.0, 65.0, depth)), siltW * 0.8);
+  float highBlend = smoothstep(0.30, 0.62, h01 + jitter * 0.08);
+  albedo = mix(albedo, Z_COL_ROCKHI, highBlend * 0.65 * (1.0 - bw.desert * 0.7));
 
-    // steep underwater cliff stone — reduced sediment accumulation
-    float cliffW = smoothstep(0.45, 0.72, slope);
-    ground = mix(ground, mix(SUB_UW_CLIFF, SUB_TRENCH_ROCK, smoothstep(40.0, 62.0, depth)), cliffW);
+  float rockBlend = smoothstep(Z_ROCK_SLOPE_LO, Z_ROCK_SLOPE_HI, slope + jitter * 0.06);
+  vec3 slopeRock = mix(mix(Z_COL_ROCK, Z_COL_ROCKHI, detail), Z_COL_REDROCK, bw.canyon * 0.8);
+  albedo = mix(albedo, slopeRock, rockBlend);
 
-    // wet/algae-stained shoreline stone (material tint on rocky shallows)
-    float shoreW = (1.0 - smoothstep(4.0, 14.0, sd)) *
-      smoothstep(0.12, 0.35, slope + (bMed - 0.5) * 0.2);
-    ground = mix(ground, SUB_SHORE_STONE, shoreW * 0.7);
+  float snowLine01 = Z_SNOW_LINE * (0.40 + 1.20 * cl.temp);
+  float flatness = smoothstep(Z_SNOW_SLOPE_MAX, Z_SNOW_SLOPE_MIN, slope);
+  float snow = smoothstep(snowLine01 - 0.03, snowLine01 + 0.05, h01 + jitter * 0.04) * flatness;
+  snow = max(snow, smoothstep(0.10, 0.02, tempEff) * smoothstep(0.50, 0.25, slope));
+  snow *= 1.0 - bw.desert;
+  albedo = mix(albedo, Z_COL_SNOW, snow);
 
-    // darker cave-mouth transition rock (approved sites; fixed transforms)
-    float dCave = min(distance(xz, SUB_CAVE_A), min(distance(xz, SUB_CAVE_B), distance(xz, SUB_CAVE_C)));
-    float caveW = 1.0 - smoothstep(8.0, 24.0, dCave);
-    ground = mix(ground, SUB_CAVE_ROCK, caveW * 0.75);
-
-    // restrained regional variation: plain region desaturates toward silt;
-    // bright-shallow region lifts value slightly
-    ground = mix(ground, mix(ground, SUB_SILT, 0.35), biome.b * 0.6);
-    ground = mix(ground, ground * 1.06, biome.r * 0.5);
-  } else {
-    // ---------------- exposed-land substrate families (addendum §4.8) ----------------
-    float inland = -sd; // meters from the waterline, on land
-
-    // lowland soil family: soil-condition field picks lowland / dry-earth /
-    // vegetation-compatible soil coloration (soil only — never vegetation)
-    vec3 soil = mix(SUB_LOW_SOIL, SUB_DRY_EARTH, smoothstep(0.35, 0.7, bMoist));
-    soil = mix(soil, SUB_VEG_SOIL, smoothstep(0.55, 0.8, 1.0 - bMoist) * 0.7);
-
-    // dry beach sand: low, flat, near the approved waterline
-    float beachW = (1.0 - smoothstep(3.5, 7.0, h)) *
-      (1.0 - smoothstep(0.14, 0.32, slope)) *
-      (1.0 - smoothstep(28.0, 60.0, inland));
-    ground = mix(soil, SUB_DRY_SAND, beachW);
-
-    // ordinary exposed rock → high-elevation rock; steep cliff rock band
-    float rockW = smoothstep(0.22, 0.45, slope + (bMed - 0.5) * 0.25);
-    vec3 rockCol = mix(SUB_ROCK, SUB_HIGH_ROCK, smoothstep(60.0, 130.0, h));
-    float cliffW = smoothstep(0.5, 0.72, slope);
-    rockCol = mix(rockCol, SUB_CLIFF_ROCK, cliffW);
-    // subtle strata variation on steep faces (elevation-banded, warbled)
-    float strata = sin(h * 0.55 + bMed * 6.0);
-    rockCol *= 1.0 + strata * 0.05 * cliffW;
-    ground = mix(ground, rockCol, rockW);
-
-    // wet shoreline sand/stone: the first meters above the waterline
-    float wetW = max(1.0 - smoothstep(0.3, 1.4, h), 1.0 - smoothstep(2.0, 6.0, inland));
-    ground = mix(ground, mix(SUB_WET_SAND, SUB_SHORE_STONE, smoothstep(0.25, 0.5, slope)), wetW * 0.65);
+  if (hRel < 0.0) {
+    float depth = clamp(-hRelFloor / 55.0, 0.0, 1.0);
+    vec3 floorCol = mix(mix(Z_COL_SAND, Z_COL_SWAMP, bw.wetland * 0.7) * 0.65, Z_COL_DEEP, depth);
+    albedo = mix(albedo, floorCol, 0.92);
   }
 
-  // restrained broad mineral drift (both sides of the waterline; matte,
-  // low-frequency, value-grouped — Track D §10 restraint)
-  ground *= vec3(1.0 + (bBroad - 0.5) * 0.06, 1.0, 1.0 - (bBroad - 0.5) * 0.05);
-  ground *= 1.0 + (bBroad - 0.5) * 0.08;
+  float micro = mix(0.20, 0.06, max(bw.desert * (1.0 - rockBlend), bw.wetland * 0.8));
+  micro = mix(micro, 0.30, max(rockBlend * 0.6, bw.canyon * 0.4));
+  albedo *= (1.0 - micro * 0.5) + micro * microN;
 
-  return ground;
+  res.albedo = zApplyPalettePost(albedo);
+  res.snow = snow;
+  res.sandBand = sandBand;
+  res.flatness = flatness;
+  res.rockBlend = rockBlend;
+  return res;
 }
 
 /* ------------------------------------------------------------------------
- * Close-range surface-detail layer (addendum §4.10; ZyFou
- * TerrainDetailMaterial principle — world-space bands, triplanar on steep
- * faces, strictly subordinate to the real geometry; fades out by ~55 m).
+ * Close-range detail layer — TerrainDetailMaterial.js, ported at Blank
+ * defaults (quality 3, triplanar on, fade 80→190 m). All ZyFou math; the
+ * only omissions are the desert wind-ripple / canyon-band terms' UNUSED
+ * inputs (they evaluate exactly as sourced).
  * ---------------------------------------------------------------------- */
 
-const float SUB_DETAIL_NEAR = 14.0;
-const float SUB_DETAIL_FAR = 55.0;
+float zDetailFadeAt(vec3 worldPos) {
+  float d = length(cameraPosition - worldPos);
+  float fade = 1.0 - smoothstep(ZD_NEAR, ZD_FAR, d);
+  return fade * clamp(ZD_OPACITY, 0.0, 1.0);
+}
 
-/** triplanar blend weights (ZyFou terrainTriBlend, pow-4 sharpening) */
-vec3 subTriBlend(vec3 n) {
+float zDetailQualityFactor() {
+  return clamp(ZD_QUALITY / 3.0, 0.0, 1.0);
+}
+
+vec3 zTriBlend(vec3 n) {
   vec3 b = pow(abs(n), vec3(4.0));
   return b / max(b.x + b.y + b.z, 1e-4);
 }
 
-/** world-space detail noise, triplanar-projected on steep faces so texture
- *  stretching is reduced (planar XZ elsewhere). The triplanar taps are
- *  branched out on flat ground — the majority of fragments — to hold the
- *  cp05 terrain-stage budget (≤ 3 ms); the branch is warp-coherent over
- *  flat regions. */
-float subDetailNoise(vec3 p, vec3 n, float freq, float seed) {
-  float planar = subNoise(p.xz * freq, seed);
-  float steep = smoothstep(0.35, 0.6, 1.0 - clamp(n.y, 0.0, 1.0));
-  if (steep <= 0.001) return planar;
-  vec3 b = subTriBlend(n);
-  float tri = subNoise(p.yz * freq, seed + 3.0) * b.x +
-    subNoise(p.zx * freq, seed + 5.0) * b.y +
-    subNoise(p.xy * freq, seed + 9.0) * b.z;
-  return mix(planar, tri, steep);
+float zTriNoise(vec3 p, vec3 blend) {
+  return vnoiseQ(p.yz, 0.0) * blend.x + vnoiseQ(p.zx, 0.0) * blend.y + vnoiseQ(p.xy, 0.0) * blend.z;
 }
 
-/** detail fade 0..1 by camera distance (cameraPosition is three-provided) */
-float subDetailFade(vec3 point) {
-  float d = distance(cameraPosition, point);
-  return 1.0 - smoothstep(SUB_DETAIL_NEAR, SUB_DETAIL_FAR, d);
+float zDetailNoise2D(vec2 xz, float scale) {
+  vec2 p = xz * max(scale, 0.0001) + Z_SEED_OFFSET * 0.37;
+  float a = vnoiseQ(p, 0.0);
+  float b = vnoiseQ(Z_ROT2 * p * 2.73 + vec2(19.7, 41.1), 0.0);
+  float c = vnoiseQ(Z_ROT2 * p * 6.10 + vec2(83.2, 11.4), 0.0);
+  return clamp(a * 0.50 + b * 0.32 + c * 0.18, 0.0, 1.0);
 }
 
-/**
- * Close-range albedo detail: rock grain, sediment breakup, shoreline
- * wetness variation, subtle strata — value modulation only (hue held), so
- * classification identity is never repainted. Returns the enriched albedo.
- */
-vec3 substrateDetail(vec3 albedo, vec3 point, vec3 normal) {
-  float fade = subDetailFade(point);
-  if (fade <= 0.001) return albedo;
+float zDetailNoiseTri(vec3 worldPos, vec3 n, float scale) {
+  vec3 p = worldPos * max(scale, 0.0001) + vec3(Z_SEED_OFFSET, Z_SEED_OFFSET.x - Z_SEED_OFFSET.y) * 0.37;
+  vec3 b = zTriBlend(n);
+  float a = zTriNoise(p, b);
+  float q = zTriNoise(vec3(Z_ROT2 * p.xy, p.z) * 2.73 + vec3(19.7, 41.1, 7.3), b);
+  float r = zTriNoise(vec3(Z_ROT2 * p.xz, p.y).xzy * 6.10 + vec3(83.2, 11.4, 31.9), b);
+  return clamp(a * 0.50 + q * 0.32 + r * 0.18, 0.0, 1.0);
+}
 
-  float h = terrainHeight(point.xz);
+float zDetailNoise(vec3 worldPos, vec3 n, float scale) {
+  float planar = zDetailNoise2D(worldPos.xz, scale);
+  vec3 pTri = worldPos;
+  float tri = zDetailNoiseTri(pTri, n, scale);
+  return mix(planar, tri, clamp(ZD_TRIPLANAR, 0.0, 1.0));
+}
+
+float zDetailRelief(vec3 worldPos, vec3 n, float scale) {
+  float fine = zDetailNoise(worldPos, n, scale);
+  float micro = clamp(ZD_MICRO, 0.0, 1.0);
+  float heightDetail = clamp(ZV_HEIGHT_DETAIL, 0.0, 1.0);
+  float coarse = zDetailNoise(worldPos + vec3(53.0, 17.0, 29.0), n, scale * 0.42);
+  float hi = zDetailNoise(worldPos + vec3(11.3, 5.7, 23.9), n, scale * 3.0);
+  return fine
+    + (hi - 0.5) * micro * 0.55
+    + (coarse - 0.5) * heightDetail * 0.42;
+}
+
+float zRockMask(float slope, float jitter) {
+  float width = max(0.04, ZD_ROCK_SHARPNESS);
+  return smoothstep(ZD_ROCK_SLOPE - width, ZD_ROCK_SLOPE + width, slope + jitter * 0.06);
+}
+
+float zShoreMask(float hRel) {
+  float shoreRange = max(ZD_SHORE_RANGE + ZV_WET_SAND_RANGE * 0.35, 0.01);
+  return 1.0 - smoothstep(0.0, shoreRange, abs(hRel));
+}
+
+struct ZDetailResult {
+  vec3 albedo;
+  float fade;
+  float rockMask;
+  float shoreMask;
+};
+
+ZDetailResult zApplyDetailLayer(
+  ZTerrainColorResult tc, ZClimate cl, ZBiomeWeights bw,
+  vec3 worldPos, vec3 normalGeo, float hRel, float h01, float slope, float jitter
+) {
+  ZDetailResult outD;
+  float fade = zDetailFadeAt(worldPos);
+  float quality = zDetailQualityFactor();
+  float scale = ZD_SCALE * mix(0.55, 1.25, quality);
+
+  float fine = zDetailNoise(worldPos, normalGeo, scale);
+  float coarse = zDetailNoise(worldPos + vec3(53.0, 17.0, 29.0), normalGeo, scale * 0.33);
+  float microB = zDetailNoise(worldPos + vec3(11.3, 5.7, 23.9), normalGeo, scale * 3.0);
+  float macroB = zDetailNoise(worldPos + vec3(127.0, 0.0, 211.0), normalGeo, scale * 0.085);
+  float micro = clamp(ZD_MICRO, 0.0, 1.0);
+  float macroAmt = clamp(ZD_MACRO + ZV_COLOR_VARIATION * 0.45, 0.0, 1.35);
+
+  float grain = clamp(fine * 0.60 + coarse * 0.26 + microB * (0.14 + 0.10 * micro), 0.0, 1.0);
+  float signedGrain = grain * 2.0 - 1.0;
+  float microSigned = microB * 2.0 - 1.0;
+  float macroSigned = macroB * 2.0 - 1.0;
+
+  float rockMask = max(tc.rockBlend, zRockMask(slope, jitter));
+  float shoreMask = zShoreMask(hRel);
+  float desertGround = clamp(max(bw.desert, tc.sandBand > 0.0 ? 1.0 - smoothstep(tc.sandBand * 0.4, tc.sandBand, hRel) : 0.0), 0.0, 1.0);
+  float wetGround = clamp(max(bw.wetland, shoreMask * 0.65), 0.0, 1.0);
+  float vegGround = clamp((1.0 - desertGround) * (1.0 - bw.canyon) * (1.0 - tc.snow) * tc.flatness * smoothstep(0.20, 0.72, cl.moist), 0.0, 1.0);
+
+  vec2 windDir = normalize(vec2(0.86, 0.51));
+  float ripplePhase = dot(worldPos.xz, windDir) * scale * 7.5 + coarse * 6.5 + macroB * 3.0;
+  float ripple = sin(ripplePhase) * 0.5 + 0.5;
+  ripple *= ripple;
+  float dunes = (ripple - 0.5) * desertGround * (1.0 - rockMask);
+
+  float strata = 0.5 + 0.5 * sin(h01 * 120.0 + coarse * 4.0 + macroSigned * 2.0);
+  float canyonBands = 0.5 + 0.5 * sin(h01 * 210.0 + coarse * 5.0);
+
+  float weather = macroSigned * macroAmt;
+
+  float sandDetail = 1.0 + clamp(ZV_SAND_DETAIL, 0.0, 1.0) * 0.45;
+  float soilDetail = 1.0 + clamp(ZV_SOIL_DETAIL, 0.0, 1.0) * 0.40;
+  float rockDetail = 1.0 + clamp(ZV_ROCK_DETAIL, 0.0, 1.0) * 0.55;
+
+  vec3 sandTint = mix(Z_COL_SAND * 0.78, Z_COL_DUNE * 1.12, clamp((grain - 0.5) * sandDetail + 0.5, 0.0, 1.0));
+  sandTint *= 1.0 + dunes * 0.22;
+  vec3 grassTint = mix(Z_COL_DRYGRASS * 0.82, Z_COL_FOREST * 0.92, clamp((grain - 0.5) * soilDetail + 0.5, 0.0, 1.0)) * mix(0.96, 1.08, coarse);
+  grassTint = mix(grassTint, mix(Z_COL_DRYGRASS, Z_COL_GRASS, grain),
+    smoothstep(0.40, 0.70, macroB) * 0.35);
+  vec3 mudTint = mix(Z_COL_SWAMP * 0.62, Z_COL_SAND * 0.55, clamp((grain - 0.5) * soilDetail + 0.5, 0.0, 1.0));
+  vec3 rockTint = mix(Z_COL_ROCK * 0.68, Z_COL_ROCKHI * 1.10, clamp((grain - 0.5) * rockDetail + 0.5, 0.0, 1.0));
+  rockTint = mix(rockTint, rockTint * mix(0.82, 1.12, strata), 0.55);
+  vec3 canyonTint = mix(Z_COL_REDROCK * 0.70, Z_COL_REDROCK2 * 1.12, canyonBands);
+  vec3 snowTint = mix(Z_COL_SNOW * 0.84, vec3(0.90, 0.97, 1.0), grain);
+
+  vec3 materialTint = mix(tc.albedo, grassTint, vegGround * 0.42);
+  materialTint = mix(materialTint, sandTint, desertGround * (1.0 - rockMask) * 0.52);
+  materialTint = mix(materialTint, mudTint, wetGround * (1.0 - rockMask) * 0.38);
+  materialTint = mix(materialTint, mix(rockTint, canyonTint, bw.canyon), rockMask * 0.66);
+  materialTint = mix(materialTint, snowTint, tc.snow * 0.42);
+
+  materialTint *= 1.0 + weather * (0.16 + 0.10 * rockMask);
+  materialTint *= vec3(1.0 + weather * 0.05, 1.0, 1.0 - weather * 0.04);
+
+  float crack = smoothstep(0.16, 0.0, abs(microSigned)) * rockMask;
+  float fleck = (vnoiseQ(worldPos.xz * scale * 3.8 + Z_SEED_OFFSET.yx, 0.0) - 0.5) * 2.0;
+  vec3 detailed = materialTint;
+  detailed *= 1.0 + signedGrain * (0.055 + 0.085 * rockMask + 0.030 * vegGround);
+  detailed *= 1.0 + microSigned * micro * (0.05 + 0.06 * rockMask);
+  detailed *= 1.0 - crack * 0.22;
+  detailed += fleck * 0.028 * (desertGround + vegGround * 0.5) * (1.0 - rockMask);
+  float wetShore = clamp(ZD_SHORE_WETNESS + ZV_WET_SHORE * 0.55, 0.0, 1.4);
+  detailed = mix(detailed, detailed * mix(0.68, 0.92, grain), shoreMask * wetShore);
+
+  float strength = clamp(ZD_STRENGTH, 0.0, 2.0) * fade;
+  outD.albedo = mix(tc.albedo, max(detailed, vec3(0.0)), strength);
+  outD.fade = fade;
+  outD.rockMask = rockMask;
+  outD.shoreMask = shoreMask;
+  return outD;
+}
+
+/* ------------------------------------------------------------------------
+ * Entry points (RegionWallColor / RegionTerrain contract preserved)
+ * ---------------------------------------------------------------------- */
+
+/** ZyFou display encode folded into the shared albedo (adaptation A4). */
+vec3 zDisplayEncode(vec3 col) {
+  return pow(max(col, vec3(0.0)), vec3(1.0 / 2.2));
+}
+
+/** the ZyFou fragment-main input taps (TerrainMaterial.js), on world xz */
+void zColorInputs(vec2 xz, out ZClimate cl, out ZBiomeWeights bw,
+                  out float jitter, out float detail, out float microN) {
+  cl = zClimateAt(xz * Z_FREQ + Z_SEED_OFFSET);
+  bw = zBiomeWeightsAt(cl);
+  jitter = (cl.region - 0.5) * 0.8 + (vnoiseQ(xz * 0.045 + Z_SEED_OFFSET, 0.0) - 0.5) * 0.6;
+  detail = vnoiseQ(xz * 0.35 + Z_SEED_OFFSET.yx, 0.0);
+  microN = vnoiseQ(xz * 0.9, 0.0);
+}
+
+/** Classification albedo (pre-detail) — the probe/debug surface and the
+ *  base every path shares. */
+vec3 substrateAlbedo(vec3 point, vec3 normal) {
+  vec2 xz = point.xz;
+  float h = terrainHeight(xz);
+  float hZ = h * 2.0 + Z_SEA;             // adaptation A2
+  float hRel = hZ - Z_SEA;                // = 2·h
+  float h01 = hZ / Z_HEIGHT_SCALE;
   float slope = 1.0 - clamp(normal.y, 0.0, 1.0);
-  float rockish = smoothstep(0.2, 0.5, slope);
 
-  float fine = subDetailNoise(point, normal, 0.9, 51.0) * 2.0 - 1.0;   // ~1.1 m grain
-  float micro = subDetailNoise(point, normal, 3.1, 63.0) * 2.0 - 1.0;  // ~0.3 m speckle
-  float coarse = subNoise(point.xz * 0.14, 77.0) * 2.0 - 1.0;          // ~7 m clumps
+  ZClimate cl;
+  ZBiomeWeights bw;
+  float jitter;
+  float detail;
+  float microN;
+  zColorInputs(xz, cl, bw, jitter, detail, microN);
 
-  float amp = 0.05 + 0.05 * rockish;         // rock grain stronger than sediment
-  vec3 detailed = albedo * (1.0 + fade * (fine * amp + micro * amp * 0.5 + coarse * 0.04));
+  ZTerrainColorResult tc = zComputeTerrainAlbedo(cl, bw, hZ, hRel, h, h01, slope, detail, jitter, microN);
+  return zDisplayEncode(tc.albedo);
+}
 
-  // shoreline wetness variation: darker, patchy band at the waterline
-  float sd = shoreDistAt(point.xz);
-  float wetBand = 1.0 - smoothstep(1.5, 5.0, abs(sd) + abs(h) * 2.0);
-  detailed = mix(detailed, detailed * (0.82 + 0.10 * (fine * 0.5 + 0.5)), wetBand * fade * 0.8);
+/** Full substrate color: classification + the ZyFou close-range detail
+ *  layer (fade 80→190 m), shared by every consuming path. */
+vec3 substrateColor(vec3 point, vec3 normal) {
+  vec2 xz = point.xz;
+  float h = terrainHeight(xz);
+  float hZ = h * 2.0 + Z_SEA;
+  float hRel = hZ - Z_SEA;
+  float h01 = hZ / Z_HEIGHT_SCALE;
+  float slope = 1.0 - clamp(normal.y, 0.0, 1.0);
 
-  return detailed;
+  ZClimate cl;
+  ZBiomeWeights bw;
+  float jitter;
+  float detail;
+  float microN;
+  zColorInputs(xz, cl, bw, jitter, detail, microN);
+
+  ZTerrainColorResult tc = zComputeTerrainAlbedo(cl, bw, hZ, hRel, h, h01, slope, detail, jitter, microN);
+  ZDetailResult td;
+  if (zDetailFadeAt(point) > 0.001) {
+    td = zApplyDetailLayer(tc, cl, bw, point, normal, hRel, h01, slope, jitter);
+  } else {
+    td.albedo = tc.albedo;
+    td.fade = 0.0;
+    td.rockMask = tc.rockBlend;
+    td.shoreMask = 0.0;
+  }
+  return zDisplayEncode(td.albedo);
 }
 
 /**
- * Low-intensity detail normal (ZyFou applyTerrainDetailNormal2D principle):
- * perturbs the lighting normal near the camera; never a substitute for the
- * baked relief (subordinate by amplitude and fade).
+ * Low-intensity detail normal (ZyFou applyTerrainDetailNormal2D at Blank
+ * defaults: strength 0.42, quality 3) — feeds BodyArcade's approved
+ * lighting law (adaptation A5); fades with the same 80→190 m law.
  */
 vec3 substrateDetailNormal(vec3 normal, vec3 point) {
-  float fade = subDetailFade(point);
-  if (fade <= 0.001) return normal;
-  float e = 0.55;
-  float c = subDetailNoise(point, normal, 0.9, 51.0);
-  float dx = subDetailNoise(point + vec3(e, 0.0, 0.0), normal, 0.9, 51.0) - c;
-  float dz = subDetailNoise(point + vec3(0.0, 0.0, e), normal, 0.9, 51.0) - c;
-  float strength = 0.55 * fade;
-  return normalize(normal + vec3(-dx * strength, 0.0, -dz * strength));
-}
-
-/** The one substrate color entry point (classification + detail). */
-vec3 substrateColor(vec3 point, vec3 normal) {
-  return substrateDetail(substrateAlbedo(point, normal), point, normal);
+  float fade = zDetailFadeAt(point);
+  float strength = ZD_NORMAL_STRENGTH * fade * (0.45 + 0.55 * zDetailQualityFactor());
+  if (strength <= 0.0001) return normal;
+  float scale = ZD_SCALE * mix(0.55, 1.25, zDetailQualityFactor());
+  float e = max(0.45, 0.55 / max(scale, 0.0001));
+  float c = zDetailRelief(point, normal, scale);
+  float dx = zDetailRelief(point + vec3(e, 0.0, 0.0), normal, scale) - c;
+  float dz = zDetailRelief(point + vec3(0.0, 0.0, e), normal, scale) - c;
+  // ZyFou material weighting: rock strengthens, shore adds a little
+  float slope = 1.0 - clamp(normal.y, 0.0, 1.0);
+  float rockMask = zRockMask(slope, 0.0);
+  float hRel = terrainHeight(point.xz) * 2.0;
+  float shoreMask = zShoreMask(hRel);
+  float matStrength = strength * (0.55 + rockMask * 1.05 + shoreMask * 0.25);
+  return normalize(normal + vec3(-dx * matStrength * 5.5, 0.0, -dz * matStrength * 5.5));
 }

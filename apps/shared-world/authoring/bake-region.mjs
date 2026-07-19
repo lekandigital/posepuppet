@@ -70,6 +70,7 @@ import {
   protectionFactor,
   ridgeZoneWeight,
   loopWaypoints,
+  isletSpecs,
 } from './region-relief.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -933,6 +934,52 @@ function runChecks({ h16, base, h05, mask, sdf16, reliefRange }) {
   push('cp05a-relief-protected-lagoon', lagoonRms <= 0.9, {
     rmsDeltaM: r6(lagoonRms), rmsCapM: 0.9, sampledTexels: lagoonRN,
   });
+
+  // --- CP05A correction: corridor-islet rockiness — the three approved
+  // masses read as rocky mini-islands (peaks raised above the smooth
+  // stamps, roughness materially increased) while their footprints stay
+  // byte-identical (covered by cp05a-shore-mask-preserved above) ---
+  for (const it of isletSpecs()) {
+    let maxNew = -Infinity;
+    let maxOld = -Infinity;
+    let gN = 0;
+    let gO = 0;
+    let gs = 0;
+    const i0 = Math.max(4, Math.floor((it.x - it.r + 1000) / TEXEL));
+    const i1 = Math.min(N - 5, Math.ceil((it.x + it.r + 1000) / TEXEL));
+    const j0 = Math.max(4, Math.floor((it.z - it.r + 1000) / TEXEL));
+    const j1 = Math.min(N - 5, Math.ceil((it.z + it.r + 1000) / TEXEL));
+    for (let j = j0; j <= j1; j++) {
+      for (let i = i0; i <= i1; i++) {
+        const x = texX(i);
+        const z = texZ(j);
+        if (hyp(x - it.x, z - it.z) > it.r) continue;
+        const k = j * N + i;
+        const hNew = qDecode(h16[k]);
+        if (hNew > maxNew) maxNew = hNew;
+        if (h05[k] > maxOld) maxOld = h05[k];
+        if (h05[k] > 0.5) {
+          const e = 2 * TEXEL;
+          gN += hyp(
+            (qDecode(h16[k + 2]) - qDecode(h16[k - 2])) / (2 * e),
+            (qDecode(h16[k + 2 * N]) - qDecode(h16[k - 2 * N])) / (2 * e),
+          );
+          gO += hyp(
+            (h05[k + 2] - h05[k - 2]) / (2 * e),
+            (h05[k + 2 * N] - h05[k - 2 * N]) / (2 * e),
+          );
+          gs++;
+        }
+      }
+    }
+    const gradRatio = gO > 0 ? gN / gO : Infinity;
+    push(`cp05a-islet-rocky-${it.x}-${it.z}`, maxNew >= maxOld + 2 && gradRatio >= 1.5, {
+      center: [it.x, it.z], stampPeakM: it.peak,
+      maxOldM: r6(maxOld), maxNewM: r6(maxNew), peakGainFloorM: 2,
+      gradientRatioNewOld: r6(gradRatio), gradientRatioFloor: 1.5,
+      landGradSamples: gs,
+    });
+  }
 
   // --- cp05A loop navigability: the approved swim route stays swimmable ---
   const loopPts = loopWaypoints();
