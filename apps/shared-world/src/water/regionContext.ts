@@ -11,15 +11,24 @@
 
 import * as THREE from 'three';
 import type { WorldData } from '../world/WorldData';
+import { bakeClimateLut } from '../world/substrateCpu';
 import { SIM_UNIT_M, WINDOW_SIZE_M } from './RegionWater';
+
+/** climate LUT side (7.8 m/texel — the finest climate octave is ~143 m) */
+const CLIMATE_LUT_N = 256;
 
 export interface RegionContext {
   heightTex: THREE.DataTexture;
   shoreTex: THREE.DataTexture;
-  /** cp05A: shore_sdf.r16 as a float texture for the substrate shoreline bands */
+  /** cp05A: shore_sdf.r16 as a float texture (retained infrastructure for cp08) */
   shoreSdfTex: THREE.DataTexture;
-  /** cp05A: biome.png regional masks for the substrate classification */
+  /** cp05A: biome.png regional masks (retained infrastructure for cp08) */
   biomeTex: THREE.DataTexture;
+  /** cp05A correction: ZyFou climate LUT planes (temp/moist/cont/erosion + region) */
+  climateATex: THREE.DataTexture;
+  climateBTex: THREE.DataTexture;
+  /** LUT bake wall-clock, ms (performance report) */
+  climateBakeMs: number;
   /** shared with RegionWater.windowOrigin (min corner, meters) */
   windowOrigin: THREE.Vector2;
   regionSize: number;
@@ -89,11 +98,35 @@ export function buildRegionContext(
   biomeTex.unpackAlignment = 1;
   biomeTex.needsUpdate = true;
 
+  // cp05A correction: ZyFou climate LUT — baked once at load by the CPU
+  // twin's fp32-exact math (adaptation A8), two RGBA32F planes
+  const t0 = performance.now();
+  const lut = bakeClimateLut(CLIMATE_LUT_N, data.header.sizeMeters[0]);
+  const climateBakeMs = performance.now() - t0;
+  const makeLut = (arr: Float32Array) => {
+    const t = new THREE.DataTexture(
+      arr, CLIMATE_LUT_N, CLIMATE_LUT_N, THREE.RGBAFormat, THREE.FloatType,
+    );
+    t.minFilter = floatLinear ? THREE.LinearFilter : THREE.NearestFilter;
+    t.magFilter = t.minFilter;
+    t.wrapS = THREE.ClampToEdgeWrapping;
+    t.wrapT = THREE.ClampToEdgeWrapping;
+    t.generateMipmaps = false;
+    t.unpackAlignment = 1;
+    t.needsUpdate = true;
+    return t;
+  };
+  const climateATex = makeLut(lut.a);
+  const climateBTex = makeLut(lut.b);
+
   return {
     heightTex,
     shoreTex,
     shoreSdfTex,
     biomeTex,
+    climateATex,
+    climateBTex,
+    climateBakeMs,
     windowOrigin,
     regionSize: data.header.sizeMeters[0],
     heightN: n,
@@ -116,6 +149,8 @@ export function regionUniforms(ctx: RegionContext): Record<string, THREE.IUnifor
     // cp05A substrate inputs (consumed by materials including RegionSubstrate.glsl)
     uShoreSdf: { value: ctx.shoreSdfTex },
     uBiomeTex: { value: ctx.biomeTex },
+    uClimateA: { value: ctx.climateATex },
+    uClimateB: { value: ctx.climateBTex },
     uAlbedoDebug: { value: 0.0 },
   };
 }

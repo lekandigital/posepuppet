@@ -163,6 +163,39 @@ function zApplyPalettePost(col: V3): V3 {
   return [Math.max(out[0], 0), Math.max(out[1], 0), Math.max(out[2], 0)];
 }
 
+/** analytic climate at world (x,z) — the CPU baker for the GPU climate LUT
+ *  (adaptation A8: the five ZyFou climate fields vary over 143 m – 10 km
+ *  wavelengths, so per-fragment evaluation of 15 noise octaves is pure
+ *  waste; the same math bakes to a 256² LUT at load, deterministic). */
+export function climateAtCpu(x: number, z: number): ZClimate {
+  const px = x * Z_FREQ + Z_SEED_OFFSET[0];
+  const py = z * Z_FREQ + Z_SEED_OFFSET[1];
+  return zClimateAt(px, py);
+}
+
+/** bake the climate LUT: n² texels over the region, 8 floats per texel in
+ *  two RGBA planes: A = (temp, moist, cont, erosion), B = (region,0,0,0) */
+export function bakeClimateLut(n: number, regionSize: number): { a: Float32Array; b: Float32Array } {
+  const a = new Float32Array(n * n * 4);
+  const b = new Float32Array(n * n * 4);
+  const step = regionSize / (n - 1);
+  const half = regionSize / 2;
+  for (let j = 0; j < n; j++) {
+    const z = -half + j * step;
+    for (let i = 0; i < n; i++) {
+      const c = climateAtCpu(-half + i * step, z);
+      const o = (j * n + i) * 4;
+      a[o] = c.temp;
+      a[o + 1] = c.moist;
+      a[o + 2] = c.cont;
+      a[o + 3] = c.erosion;
+      b[o] = c.region;
+      b[o + 3] = 1;
+    }
+  }
+  return { a, b };
+}
+
 export function seabedNormalCpu(data: WorldData, x: number, z: number): V3 {
   const n = data.header.artifacts['height.r16']!.resolution!;
   const e = data.header.sizeMeters[0] / (n - 1);

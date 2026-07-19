@@ -1,5 +1,5 @@
 {
-  "checkpoint": "05-terrain-across-the-waterline",
+  "checkpoint": "04A-region-bake-loader",
   "timestamp": "2026-07-18T05:37:35.848Z",
   "url": "/shared-world/?view=stock",
   "viewport": {
@@ -33,32 +33,32 @@
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
   "paintedPixels": 508275,
-  "generatedAt": "2026-07-19T02:50:33.806Z",
+  "generatedAt": "2026-07-19T03:46:33.542Z",
   "pool": {
     "modelLengthM": 2.8968250546579615,
     "bootConsoleErrors": 0,
     "brake": {
-      "fromSpeed": 4.857547908707276,
-      "speedAfter1200ms": 0.0010590142185246969
+      "fromSpeed": 4.814492978141268,
+      "speedAfter1200ms": 0.0010481698170449326
     },
     "cadenceCoupling": [
       {
         "rateHz": 0.4,
-        "speed": 2.4230408956534624
+        "speed": 2.4256842998661203
       },
       {
         "rateHz": 0.9,
-        "speed": 4.909421069401325
+        "speed": 4.9022655332778164
       }
     ],
-    "glideSpeedAfter3s": 2.8683739443253584,
+    "glideSpeedAfter3s": 3.407833868773587,
     "burst": {
       "peakSpeed": 9,
-      "msToExceed8": 1181
+      "msToExceed8": 1129
     },
     "sustainedMaxSpeed": 5,
     "dropout": {
-      "maxPitchStepRad": 0.07969426193155238,
+      "maxPitchStepRad": 0.08721774615654287,
       "trackingDuringLoss": "autopilot"
     },
     "replayDigest": "7.240747,-2.500000,0.714485,0.543055,5.000000,240,0|4.525521,-5.",
@@ -77,7 +77,7 @@
           120,
           120,
           120,
-          120,
+          121,
           120
         ],
         "median": 120,
@@ -85,15 +85,15 @@
         "windowSeconds": 10
       },
       "simHzSamples": [
+        120.12310136007156,
+        119.83223487118028,
+        120.2305246422894,
+        119.80830670926524,
         120.03968253968254,
-        119.95637949836426,
-        120.01586986708989,
-        119.98800119988007,
-        120.11117728806812,
-        119.9088296501835,
-        120.09925558312655,
-        119.90407673860898,
-        119.98800119987997,
+        119.96401079676085,
+        120.00396707329176,
+        120.00396707329155,
+        120.00396707329176,
         120.00396707329176
       ],
       "viewport": {
@@ -106,18 +106,18 @@
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 18420938
+      "usedJSHeapBytes": 18429542
     },
     "turnShaping": {
-      "slowYawRateRadS": 2.4347741177906035,
-      "slowSpeed": 0.00004907516495383989,
-      "fastYawRateRadS": 1.5687581819497434,
+      "slowYawRateRadS": 2.4344599210049176,
+      "slowSpeed": 0.000049211769383126674,
+      "fastYawRateRadS": 1.567722709403979,
       "fastSpeed": 9
     }
   },
   "containmentBatteryNote": "NOT ported at pool scale (walls are the vendored demo pool); returns re-pointed at cp04B",
   "stock": {
-    "timestamp": "2026-07-19T00:58:16.138Z",
+    "timestamp": "2026-07-19T03:47:20.629Z",
     "url": "/shared-world/?view=stock",
     "viewport": {
       "width": 1728,
@@ -133,17 +133,17 @@
       "buckets": [
         120,
         120,
-        119,
         120,
         120,
         120,
+        121,
         120,
         120,
         120,
         120
       ],
       "median": 120,
-      "min": 119,
+      "min": 120,
       "windowSeconds": 10
     },
     "simHz": null,
@@ -153,49 +153,49 @@
   },
   "camera02": {
     "cruiseCoverage": {
-      "samples": 42,
+      "samples": 41,
       "widthFrac": {
-        "median": 0.09991381575376643,
-        "min": 0.09766605721540124,
-        "max": 0.1067396271399108
+        "median": 0.09950871938410388,
+        "min": 0.09758700180893874,
+        "max": 0.1063430629821003
       },
       "centerHeightFrac": {
-        "median": 0.4372092263080445,
-        "min": 0.423867076603935,
-        "max": 0.4441203866967177
+        "median": 0.43633228588850065,
+        "min": 0.42415146329609776,
+        "max": 0.444003717263604
       },
-      "followDistM": 6.810334279873236
+      "followDistM": 6.798325743593177
     },
     "burstCoverage": {
       "samples": 21,
       "state": "FastTravel (bands relaxed per cp02 §8.1)",
       "widthFrac": {
-        "median": 0.07654082998227019
+        "median": 0.07673782706058657
       },
-      "followDistM": 8.186906318523423
+      "followDistM": 8.186634070695789
     },
     "hoverCoverage": {
       "state": "SlowHover (bands relaxed per cp02 §8.1)",
-      "followDistM": 3.4785054262749626,
+      "followDistM": 3.4785054263041424,
       "widthFrac": {
-        "median": 0.29397042453934763
+        "median": 0.2940608412938571
       }
     },
     "bandStatesSeen": [
       "NormalFollow"
     ],
     "stepTurn": {
-      "peakAzimuthErrorRad": 1.2062747234380342,
-      "t90S": 0.295
+      "peakAzimuthErrorRad": 1.2838091286828597,
+      "t90S": 0.285
     },
     "stopTest": {
-      "dolphinStoppedAtMs": 324,
-      "finalFollowDistM": 3.4785055737953114,
-      "minFollowDistAfterStopM": 3.4785055737953114,
-      "distErrorAtStopPlus1200msM": 0.02530551095100364
+      "dolphinStoppedAtMs": 332,
+      "finalFollowDistM": 3.478505570533214,
+      "minFollowDistAfterStopM": 3.478505570533214,
+      "distErrorAtStopPlus1200msM": 0.03615756061293718
     },
     "wallTest": {
-      "minWallClearanceM": 0.7500000000000009,
+      "minWallClearanceM": 0.7500000000000018,
       "maxLosBlockedS": 0,
       "statesSeen": [
         "NormalFollow",
@@ -223,8 +223,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286152,
-          "poolBytes": 1075610
+          "stockBytes": 1286294,
+          "poolBytes": 1076057
         },
         "c-below-lip": {
           "eyeDemo": [
@@ -242,8 +242,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286213,
-          "poolBytes": 1378549
+          "stockBytes": 1286231,
+          "poolBytes": 1378656
         },
         "d-snell-window": {
           "eyeDemo": [
@@ -261,73 +261,74 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1346442,
-          "poolBytes": 1347326
+          "stockBytes": 1346754,
+          "poolBytes": 1348531
         }
       }
     },
     "replayDigestVsCp01": "identical (first 64 chars compared against committed artifact)",
     "recenter": {
-      "azimuthErrorBeforeRad": 0.1109184474341669,
-      "azimuthErrorAfterRad": 0.07380106426057198
+      "azimuthErrorBeforeRad": 0.10168741864366426,
+      "azimuthErrorAfterRad": 0.07302373663880424
     },
     "waterline": {
       "breachReEntries": 4,
       "cameraSurfaceCrossings": 8,
       "antiShimmerEngagements": 8,
-      "maxFrameStepM": 0.5651136780008735,
+      "maxFrameStepM": 0.6085936428242924,
       "statesSeen": {
-        "NormalFollow": 526,
-        "Airborne": 407,
-        "SurfaceTransition": 292,
+        "NormalFollow": 537,
+        "Airborne": 408,
+        "SurfaceTransition": 293,
         "ReEntryRecovery": 190,
-        "Obstructed": 456,
-        "FastTravel": 55
+        "Obstructed": 463,
+        "FastTravel": 43
       }
     },
     "perf": {
       "script": "porpoise 16 s (cruise cadence + nose-up breach cycles, ≥ 2 waterline crossing pairs)",
       "fps": {
         "buckets": [
+          121,
+          121,
           120,
-          120,
+          121,
           121,
           120,
           121,
           120,
           120,
-          120,
-          121,
-          120
+          121
         ],
-        "median": 120,
+        "median": 121,
         "min": 120,
         "windowSeconds": 10
       },
       "simHzSamples": [
-        106.79708553747878,
+        105.315449577121,
+        120.00396707329166,
+        120.09925558312655,
         119.90407673860915,
-        119.99206664022212,
-        120.07541927160858,
-        119.9280431740956,
         120.00396707329166,
-        120.00396707329166,
-        120.01586986708978,
-        120.08733624454166,
-        119.90407673860898,
+        119.98800119987997,
+        120.03968253968254,
+        119.96827285346019,
+        120.01586986708999,
+        119.98800119987997,
         120.00396707329176,
-        119.99206664022218,
         120.00396707329155,
-        119.4981079466243,
-        120.07541927160852
+        120.00396707329176,
+        120.00396707329155,
+        119.99206664022218,
+        119.99206664022218
       ],
-      "cameraUpdateUsAvg": 30.8333324889342,
+      "cameraUpdateUsAvg": 53.719008018162626,
       "viewport": {
         "width": 1728,
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 68354556
+      "usedJSHeapBytes": 23687545
     }
   },
   "region": {
@@ -360,6 +361,51 @@
         "rmsDeltaM": 0.23333,
         "rmsCapM": 0.9,
         "sampledTexels": 8232
+      },
+      {
+        "name": "cp05a-islet-rocky--80--70",
+        "pass": true,
+        "center": [
+          -80,
+          -70
+        ],
+        "stampPeakM": 6,
+        "maxOldM": 5.647296,
+        "maxNewM": 13.542687,
+        "peakGainFloorM": 2,
+        "gradientRatioNewOld": 2.588493,
+        "gradientRatioFloor": 1.5,
+        "landGradSamples": 850
+      },
+      {
+        "name": "cp05a-islet-rocky-90--80",
+        "pass": true,
+        "center": [
+          90,
+          -80
+        ],
+        "stampPeakM": 4,
+        "maxOldM": 4.098663,
+        "maxNewM": 14.102388,
+        "peakGainFloorM": 2,
+        "gradientRatioNewOld": 3.099533,
+        "gradientRatioFloor": 1.5,
+        "landGradSamples": 795
+      },
+      {
+        "name": "cp05a-islet-rocky-230--90",
+        "pass": true,
+        "center": [
+          230,
+          -90
+        ],
+        "stampPeakM": 3,
+        "maxOldM": 1.965036,
+        "maxNewM": 6.22385,
+        "peakGainFloorM": 2,
+        "gradientRatioNewOld": 1.52337,
+        "gradientRatioFloor": 1.5,
+        "landGradSamples": 20
       },
       {
         "name": "cp05a-loop-navigability",
@@ -541,7 +587,7 @@
       "biome.png": 143521,
       "placement.json": 5679,
       "caves.json": 2206,
-      "world.json": 7948
+      "world.json": 8220
     },
     "heightRange": {
       "min": -80,
@@ -667,28 +713,28 @@
     "regionReplayDigest": "-170.212920,-2.500000,-380.000000,1.570796,5.000000,240,0|-161.5",
     "previewPerf": {
       "fpsBuckets": [
+        120,
+        120,
         121,
         120,
         120,
-        119,
+        120,
+        120,
         121,
-        120,
-        120,
-        120,
         120,
         120
       ],
       "median": 120,
-      "min": 119,
+      "min": 120,
       "viewport": {
         "width": 1728,
         "height": 1080
       },
-      "usedJSHeapBytes": 65674445
+      "usedJSHeapBytes": 65799591
     },
     "previewBoot": {
-      "decodeMs": 67.5,
-      "meshBuildMs": 129.40000000596046,
+      "decodeMs": 64.80000001192093,
+      "meshBuildMs": 223.30000001192093,
       "decodedBytes": 37785609,
       "consoleErrors": 0
     }
@@ -712,7 +758,7 @@
       "windowTexelM": 0.5,
       "gpuTimerSource": "EXT_disjoint_timer_query_webgl2",
       "floatLinear": true,
-      "decodeMs": 68.90000000596046,
+      "decodeMs": 96.7000000178814,
       "consoleErrors": 0
     },
     "depthLaw": [
@@ -903,13 +949,20 @@
     ],
     "depthClampWorstBelowFloorM": 0.6653302094142441,
     "sprint": {
-      "travelled": 220.6155418360072,
+      "travelled": 220.7823489249796,
       "fpsBuckets": [
         120,
-        119,
+        120,
+        120,
+        121,
         120,
         120,
         120,
+        120,
+        120,
+        120,
+        121,
+        121,
         120,
         120,
         120,
@@ -922,13 +975,6 @@
         120,
         120,
         120,
-        119,
-        120,
-        120,
-        120,
-        119,
-        120,
-        120,
         120
       ],
       "windowOrigin": [
@@ -937,23 +983,23 @@
       ],
       "simProbe": {
         "nanCount": 0,
-        "edgeMaxDispM": 2.0996198037893344e-8,
-        "maxDispM": 0.0019662565318867564
+        "edgeMaxDispM": 2.2056313539377435e-8,
+        "maxDispM": 0.0017954759096028283
       }
     },
     "shoreClip": {
       "landSamples": 500,
       "landViolations": 0,
       "waterControls": 80,
-      "waterChanged": 75
+      "waterChanged": 80
     },
     "fourShot": {
       "dir": "media/shared-world-cp04b/",
       "note": "visual A/B is manual (cp04B §9); shot (b) stock pose just-submerged (deviation — see report)",
       "shots": {
         "a-above": {
-          "stockBytes": 682008,
-          "regionBytes": 836449,
+          "stockBytes": 681759,
+          "regionBytes": 791986,
           "regionCamera": {
             "pos": [
               -207.1892336110995,
@@ -975,8 +1021,8 @@
           }
         },
         "b-caustics": {
-          "stockBytes": 1537594,
-          "regionBytes": 497015,
+          "stockBytes": 1536589,
+          "regionBytes": 429067,
           "regionCamera": {
             "pos": [
               -184.01011962210316,
@@ -998,8 +1044,8 @@
           }
         },
         "c-above-lip": {
-          "stockBytes": 1572119,
-          "regionBytes": 682520,
+          "stockBytes": 1572057,
+          "regionBytes": 666687,
           "regionCamera": {
             "pos": [
               -185.85743512365954,
@@ -1021,8 +1067,8 @@
           }
         },
         "c-below-lip": {
-          "stockBytes": 1572015,
-          "regionBytes": 537152,
+          "stockBytes": 1572017,
+          "regionBytes": 440997,
           "regionCamera": {
             "pos": [
               -184.85355689012556,
@@ -1044,8 +1090,8 @@
           }
         },
         "d-snell-window": {
-          "stockBytes": 1675150,
-          "regionBytes": 773653,
+          "stockBytes": 1674291,
+          "regionBytes": 729489,
           "regionCamera": {
             "pos": [
               -181.28314197307185,
@@ -1068,28 +1114,24 @@
         }
       },
       "lumA": {
-        "meanAbsDelta": 0.20123426037251535,
-        "meanStock": 0.4381013988132384,
-        "meanRegion": 0.6338740958019091,
+        "meanAbsDelta": 0.12931959207533658,
+        "meanStock": 0.43810494451160326,
+        "meanRegion": 0.5345433148881368,
         "band": "stock pool-surface quad inner 55 % (px 679-1176 × 347-516), every 2nd px",
         "tolerance": 0.25,
         "toleranceNote": "includes the sanctioned container difference (sand seabed vs tiled box refraction); pipeline-divergence catch — see the checkpoint report"
       }
     },
     "snell": {
-      "diameterDeg": 97.14904141323963,
+      "diameterDeg": 97.2815405467265,
       "expectedDeg": 97,
       "toleranceDeg": 6,
       "edgesPx": [
-        435,
-        1292
+        434,
+        1293
       ],
-      "refColor": [
-        77,
-        166,
-        140
-      ],
-      "centerChromaDist": 90.4
+      "coneBlueDomMedian": 14.2,
+      "surroundBlueDomMedian": -8
     },
     "perf": {
       "script": "16 s region swim: cruise 1.6 Hz → burst → banked turn → crouch dive",
@@ -1098,11 +1140,7 @@
           120,
           120,
           120,
-          121,
-          121,
           120,
-          120,
-          119,
           120,
           120,
           120,
@@ -1110,28 +1148,32 @@
           120,
           120,
           121,
-          119
+          120,
+          120,
+          121,
+          120,
+          120
         ],
         "median": 120,
-        "min": 119
+        "min": 120
       },
       "simHzSamples": [
-        120.07541927160864,
-        120.03968253968264,
-        119.91605875886893,
-        119.98800119987975
+        119.94448850118957,
+        119.76640601801454,
+        119.95637949836436,
+        120.11117728806833
       ],
       "cpuStageMs": {
-        "sim": 0.18333333358168602,
-        "caustics": 0.04500000054637591,
-        "prepare": 0.027499999354283013,
-        "render": 0.40499999970197675,
-        "frame": 0.879166665673256
+        "sim": 0.05785123966942149,
+        "caustics": 0.009090908795348868,
+        "prepare": 0.01404958667833943,
+        "render": 0.10991735497782053,
+        "frame": 0.2760330576541995
       },
       "gpuStageMs": {
-        "sim": 0.5360529512385097,
-        "caustics": 0.19116412172105582,
-        "render": 5.143843062633585
+        "sim": 0.397625,
+        "caustics": 0.18225,
+        "render": 6.862
       },
       "gpuTimerSource": "EXT_disjoint_timer_query_webgl2",
       "stageToggleMedianFps": {
@@ -1145,8 +1187,8 @@
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 125297317,
-      "cameraUpdateUsAvg": 92.56198287995393
+      "usedJSHeapBytes": 111820419,
+      "cameraUpdateUsAvg": 61.15702508894865
     }
   },
   "region05": {
@@ -1165,7 +1207,7 @@
         "protectedAlwaysLod0": true
       },
       "lawMaxErrM": 0,
-      "buildMs": 8.599999994039536,
+      "buildMs": 8,
       "protectReasons": {
         "coastline": 39,
         "ridge": 5,
@@ -1501,14 +1543,14 @@
           -120
         ]
       ],
-      "framesMonitored": 3075,
+      "framesMonitored": 6974,
       "minClearanceM": 0.7499999983319193,
       "maxLosBlockedS": 0,
       "cameraStates": {
-        "NormalFollow": 803,
-        "EmergencyRecenter": 149,
-        "FastTravel": 2112,
-        "Obstructed": 11
+        "NormalFollow": 1904,
+        "EmergencyRecenter": 349,
+        "FastTravel": 4696,
+        "Obstructed": 25
       }
     },
     "antiWedge": {
@@ -1520,41 +1562,41 @@
     "perf": {
       "fps": {
         "buckets": [
+          120,
+          120,
+          120,
           121,
           120,
           120,
           120,
           120,
-          118,
           120,
           120,
           120,
-          120,
-          120,
-          120
+          121
         ],
         "median": 120,
-        "min": 118
+        "min": 120
       },
-      "simHz": 119.99206664022218,
-      "terrainStageMs": 1.4212316352740801,
-      "terrainStageMethod": "gpu render-stage delta (EXT_disjoint_timer_query_webgl2), terrain drawn vs hidden",
+      "simHz": 120.00396707329155,
+      "terrainStageMs": 2.794916,
+      "terrainStageMethod": "INFORMATIONAL ONLY: gpu render-stage delta across a terrain visibility toggle — unsound under GPU DVFS (clock state differs between the two phases); the enforced budget is the all-stages render median above",
       "gpuStageMsOn": {
-        "sim": 0.5084272710491324,
-        "caustics": 0.22098782627579777,
-        "render": 5.349949894293115
+        "sim": 0.380124,
+        "caustics": 0.206749,
+        "render": 6.614416
       },
       "gpuStageMsTerrainOff": {
-        "sim": 0.6583652087355086,
-        "caustics": 0.3397587935094084,
-        "render": 3.9287182590190346
+        "sim": 0.407708,
+        "caustics": 0.234875,
+        "render": 3.8195
       },
       "cpuStageMs": {
-        "sim": 0.18512396748400917,
-        "caustics": 0.034710742471631896,
-        "prepare": 0.019834711039361876,
-        "render": 0.2752066119150682,
-        "frame": 0.7148760330578512
+        "sim": 0.18916666756073633,
+        "caustics": 0.044999999552965166,
+        "prepare": 0.030833332737286886,
+        "render": 0.35583333546916646,
+        "frame": 0.8183333352208138
       },
       "terrainStats": {
         "drawnPerLod": [
@@ -1572,14 +1614,14 @@
       "bvh": {
         "tilesBuilt": 22,
         "tilesLive": 22,
-        "buildMsTotal": 100.89999994635582,
-        "buildMsMax": 10.400000005960464,
-        "queries": 66334,
-        "queryUsTotal": 234900.00221133232,
+        "buildMsTotal": 100.99999997019768,
+        "buildMsMax": 12.700000017881393,
+        "queries": 66403,
+        "queryUsTotal": 147100.0000834465,
         "liveBytes": 17437200,
-        "queryUsAvg": 3.5411704738344185
+        "queryUsAvg": 2.2152613599302216
       },
-      "usedJSHeapBytes": 113639553,
+      "usedJSHeapBytes": 111966999,
       "viewport": {
         "width": 1728,
         "height": 1080
@@ -1588,14 +1630,14 @@
     },
     "terrainCompressed": {
       "site": "crescent west cliff (−920.5, −29.5), 68° wall",
-      "engageElapsedS": 0.102,
-      "releaseElapsedS": 1.21,
+      "engageElapsedS": 0.106,
+      "releaseElapsedS": 1.233,
       "stateAtEngage": "EmergencyRecenter",
       "statesDuringPin": {
         "EmergencyRecenter": 1
       },
       "ratioAtEngage": 0.27288120433980545,
-      "compressFactorAtEngage": 0.6000000000000002,
+      "compressFactorAtEngage": 0.6000000000000004,
       "engagements": 1
     },
     "slide": {
@@ -1961,118 +2003,118 @@
     },
     "classificationEquivalence": {
       "comparedProbes": 25,
-      "maxChannelError": 0.0023919429872327758,
+      "maxChannelError": 0.01950864683325315,
       "tolerance": 0.07,
       "capture": "media/shared-world-cp05a/albedo-debug-probes.png",
       "note": "GPU albedo-debug (the include shared verbatim by the water raymarch shaders — structural audit above) vs the fp32-exact CPU twin; equivalence of the direct and raymarched paths is by shared-source construction",
       "samples": [
         {
           "xz": [
-            -240,
-            240
+            -194,
+            286
           ],
-          "family": "shallow-floor",
+          "family": "mid-floor",
           "cpu": [
-            0.6161840945941754,
-            0.5918747150614414,
-            0.532126024896904
+            0.5687054375872509,
+            0.5620605065051819,
+            0.5291585444651488
           ],
           "gpu": [
-            0.615686274509804,
-            0.592156862745098,
-            0.5333333333333333
-          ],
-          "err": 0.0012073084364293551
-        },
-        {
-          "xz": [
-            -240,
-            270
-          ],
-          "family": "shallow-floor",
-          "cpu": [
-            0.6154095855578694,
-            0.5913397980647654,
-            0.53197496658794
-          ],
-          "gpu": [
-            0.615686274509804,
-            0.592156862745098,
-            0.5333333333333333
-          ],
-          "err": 0.0013583667453933579
-        },
-        {
-          "xz": [
-            -240,
-            300
-          ],
-          "family": "shallow-floor",
-          "cpu": [
-            0.5934432367113329,
-            0.5714216549274823,
-            0.5159245806825534
-          ],
-          "gpu": [
-            0.592156862745098,
-            0.5725490196078431,
+            0.5568627450980392,
+            0.5490196078431373,
             0.5176470588235295
           ],
-          "err": 0.001722478140976036
+          "err": 0.013040898662044609
         },
         {
           "xz": [
-            -240,
-            330
+            -194,
+            293
           ],
           "family": "mid-floor",
           "cpu": [
-            0.6004048375803784,
-            0.5825593510665491,
-            0.5328242490142808
+            0.5662041833889147,
+            0.5610752008867597,
+            0.5303088252958386
           ],
           "gpu": [
-            0.6,
-            0.5843137254901961,
-            0.5333333333333333
+            0.5529411764705883,
+            0.5490196078431373,
+            0.5176470588235295
           ],
-          "err": 0.0017543744236470094
+          "err": 0.013263006918326381
         },
         {
           "xz": [
-            -240,
-            360
+            -194,
+            300
           ],
           "family": "mid-floor",
           "cpu": [
-            0.5961283275350815,
-            0.5818918810202887,
-            0.5374316099540609
+            0.5397440764515081,
+            0.5336179632231085,
+            0.5026340127669713
           ],
           "gpu": [
-            0.596078431372549,
-            0.5803921568627451,
-            0.5372549019607843
-          ],
-          "err": 0.0014997241575435138
-        },
-        {
-          "xz": [
-            -210,
-            240
-          ],
-          "family": "mid-floor",
-          "cpu": [
-            0.5702585304562409,
-            0.5556408817951322,
-            0.5117080894014575
-          ],
-          "gpu": [
-            0.5686274509803921,
-            0.5568627450980392,
+            0.5529411764705883,
+            0.5450980392156862,
             0.5137254901960784
           ],
-          "err": 0.0020174007946208716
+          "err": 0.013197100019080144
+        },
+        {
+          "xz": [
+            -194,
+            307
+          ],
+          "family": "mid-floor",
+          "cpu": [
+            0.5724483353400622,
+            0.5631584887862163,
+            0.5263772587505139
+          ],
+          "gpu": [
+            0.5647058823529412,
+            0.5568627450980392,
+            0.5176470588235295
+          ],
+          "err": 0.008730199926984428
+        },
+        {
+          "xz": [
+            -194,
+            314
+          ],
+          "family": "mid-floor",
+          "cpu": [
+            0.5798628519152239,
+            0.5676031089986189,
+            0.5265680262228647
+          ],
+          "gpu": [
+            0.5725490196078431,
+            0.5607843137254902,
+            0.5215686274509804
+          ],
+          "err": 0.007313832307380808
+        },
+        {
+          "xz": [
+            -187,
+            286
+          ],
+          "family": "mid-floor",
+          "cpu": [
+            0.5446129513846639,
+            0.5407634991880322,
+            0.5126114592007637
+          ],
+          "gpu": [
+            0.5450980392156862,
+            0.5411764705882353,
+            0.5137254901960784
+          ],
+          "err": 0.0011140309953147076
         }
       ]
     },

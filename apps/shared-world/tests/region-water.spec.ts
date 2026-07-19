@@ -562,25 +562,32 @@ test.describe('checkpoint 04B — pool to region water', () => {
       const o = (y * img.width + x) * 4;
       return [img.data[o]!, img.data[o + 1]!, img.data[o + 2]!];
     };
-    const cornerSamples: number[][] = [];
-    for (const [cxs, cys] of [[30, 30], [img.width - 31, 30], [30, img.height - 31], [img.width - 31, img.height - 31]]) {
-      for (let dy = 0; dy < 20; dy += 4) {
-        for (let dx = 0; dx < 20; dx += 4) cornerSamples.push(rgbAt(cxs! + dx, cys! + dy));
+    // Detector feature (cp05A-correction revision 2 — the GATE is still
+    // 97 ± 6°): the physically invariant separation is the SIGN of B − G —
+    // the cone shows refracted blue sky / white-cyan cloud (B ≥ G), the
+    // TIR surround shows green-tinted reflected seabed (G > B). Both the
+    // cp05 chroma-vs-corner and the first-revision green-dominance features
+    // lost their margins when the approved ZyFou-Blank substrate + the
+    // path-tint law recolored the TIR surround (validated manually: the
+    // visible cone stayed at 97.3°).
+    const blueDom = (x: number): number => {
+      let s = 0;
+      for (let dy = -2; dy <= 2; dy++) {
+        const [, g, b] = rgbAt(x, cy + dy);
+        s += b - g;
       }
-    }
-    const ref = [0, 1, 2].map((c) => median(cornerSamples.map((s) => s[c]!)));
-    const chromaDist = (x: number, y: number) => {
-      const [r, g, b] = rgbAt(x, y);
-      return Math.abs(r - ref[0]!) + Math.abs(g - ref[1]!) + Math.abs(b - ref[2]!);
+      return s / 5;
     };
     const prof: number[] = [];
-    for (let x = 0; x < img.width; x++) {
-      let s = 0;
-      for (let dy = -2; dy <= 2; dy++) s += chromaDist(x, cy + dy);
-      prof.push(s / 5);
-    }
+    for (let x = 0; x < img.width; x++) prof.push(blueDom(x));
     const centerD = median(prof.slice(Math.round(cx) - 100, Math.round(cx) + 100));
-    expect(centerD).toBeGreaterThan(50); // the cone is chromatically distinct
+    const cornerBand: number[] = [];
+    for (let x = 20; x < 120; x++) cornerBand.push(prof[x]!);
+    for (let x = img.width - 120; x < img.width - 20; x++) cornerBand.push(prof[x]!);
+    const surroundD = median(cornerBand);
+    // the cone is chromatically distinct from the TIR surround
+    expect(centerD, `cone B−G ${centerD}`).toBeGreaterThan(8);
+    expect(surroundD, `surround B−G ${surroundD}`).toBeLessThan(-3);
     // Edge detector (cp05A instrument revision — the GATE below is
     // unchanged): the cp05 detector assumed a near-constant TIR surround;
     // the approved cp05A substrate variegation makes the reflected seabed
@@ -591,29 +598,23 @@ test.describe('checkpoint 04B — pool to region water', () => {
     // water-tinted seabed (G > B), the cone is blue sky / white-cyan cloud
     // (B ≥ G). Scan inward; the cone edge is where the sustained
     // green-dominance of the surround ends.
-    const greenDom = (x: number): number => {
-      let s = 0;
-      for (let dy = -2; dy <= 2; dy++) {
-        const [, g, b] = rgbAt(x, cy + dy);
-        s += g - b;
-      }
-      return s / 5;
-    };
-    const scanInward = (dir: 1 | -1): number => {
+    // edge scan from the CENTER OUTWARD: the first sustained clearly-
+    // surround run (B−G < −3 for ≥ 10 px — clouds inside the cone never
+    // sustain that) marks the outside; the edge is the run start
+    const scanOutward = (dir: 1 | -1): number => {
       let consecutive = 0;
-      const start = dir === 1 ? 0 : img.width - 1;
-      for (let x = start; x >= 0 && x < img.width; x += dir) {
-        if (greenDom(x) < 12) {
+      for (let x = Math.round(cx); x >= 0 && x < img.width; x += dir) {
+        if (prof[x]! < -3) {
           consecutive++;
-          if (consecutive >= 3) return x - dir * (consecutive - 1);
+          if (consecutive >= 10) return x - dir * (consecutive - 1);
         } else {
           consecutive = 0;
         }
       }
       return Math.round(cx);
     };
-    const left = scanInward(1);
-    const right = scanInward(-1);
+    const left = scanOutward(-1);
+    const right = scanOutward(1);
     const angleAt = (px: number) => Math.atan((Math.abs(px - cx) / cx) * hHalfTan);
     const diameterDeg = ((angleAt(left) + angleAt(right)) * 180) / Math.PI;
     results.snell = {
@@ -621,8 +622,8 @@ test.describe('checkpoint 04B — pool to region water', () => {
       expectedDeg: 97,
       toleranceDeg: 6,
       edgesPx: [left, right],
-      refColor: ref,
-      centerChromaDist: centerD,
+      coneBlueDomMedian: centerD,
+      surroundBlueDomMedian: surroundD,
     };
     expect(Math.abs(diameterDeg - 97), `Snell cone ${diameterDeg.toFixed(1)}°`).toBeLessThanOrEqual(6);
   });

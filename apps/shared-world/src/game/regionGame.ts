@@ -851,7 +851,13 @@ function makeGpuHeightProbe(renderer: THREE.WebGLRenderer, region: RegionRendere
 class GpuStageTimer {
   private readonly queries = new Map<string, WebGLQuery>();
   private readonly pending = new Set<string>();
-  private readonly sums = new Map<string, { ms: number; n: number }>();
+  /** cp05A correction: ring of the most recent samples per stage — the
+   *  reported figure is the ring MEDIAN, so occasional disjoint-timer
+   *  spikes and pre-state samples from before a stage toggle (both of
+   *  which poisoned the old decaying mean into physically impossible
+   *  stage times) cannot contaminate the measurement. */
+  private readonly rings = new Map<string, number[]>();
+  private static readonly RING_N = 90;
   private active: string | null = null;
 
   constructor(
@@ -884,23 +890,30 @@ class GpuStageTimer {
         const disjoint = this.gl.getParameter(this.ext.GPU_DISJOINT_EXT) as boolean;
         if (!disjoint) {
           const ns = this.gl.getQueryParameter(q, this.gl.QUERY_RESULT) as number;
-          const rec = this.sums.get(stage) ?? { ms: 0, n: 0 };
-          rec.ms += ns / 1e6;
-          rec.n++;
-          if (rec.n > 120) {
-            rec.ms /= 2;
-            rec.n = Math.floor(rec.n / 2);
+          let ring = this.rings.get(stage);
+          if (!ring) {
+            ring = [];
+            this.rings.set(stage, ring);
           }
-          this.sums.set(stage, rec);
+          ring.push(ns / 1e6);
+          if (ring.length > GpuStageTimer.RING_N) ring.shift();
         }
         this.pending.delete(stage);
       }
     }
   }
 
+  /** per-stage ring MEDIAN, ms (name kept for the eval-surface contract) */
   averages(): Record<string, number | undefined> {
     const out: Record<string, number | undefined> = {};
-    for (const [stage, rec] of this.sums) out[stage] = rec.n > 0 ? rec.ms / rec.n : undefined;
+    for (const [stage, ring] of this.rings) {
+      if (ring.length === 0) {
+        out[stage] = undefined;
+        continue;
+      }
+      const sorted = [...ring].sort((a, b) => a - b);
+      out[stage] = sorted[Math.floor(sorted.length / 2)];
+    }
     return out;
   }
 }

@@ -107,5 +107,12 @@ vec3 getWallColorTinted(vec3 point, vec3 tint) {
 
 vec3 getWallColor(vec3 point) {
   vec3 normal = seabedNormal(point.xz);
-  return getWallColorShaded(point, substrateColor(point, normal), normal);
+  // The water raymarch path shades with the CLASSIFICATION albedo (the
+  // shared ZyFou base). The close-range detail layer is a direct-terrain
+  // material feature in ZyFou too — its WaterMaterial never evaluates the
+  // terrain color function at all (it grades uColShallow→uColDeep), so
+  // classification-through-water already exceeds ZyFou fidelity, and
+  // running the 30+-tap detail layer per ray hit is what collapsed the
+  // water-stage frame rate (cp05A correction, measured).
+  return getWallColorShaded(point, substrateAlbedo(point, normal), normal);
 }
