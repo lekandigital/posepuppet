@@ -501,22 +501,28 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     };
   });
 
-  test('7. ZyFou Blank source fidelity: palette, style, frequency and seed offsets match the pinned snapshot exactly', () => {
+  test('7. ZyFou Fantasy source fidelity: Cartoon terrain palette, style, frequency and seed offsets match the pinned snapshot; water roles excluded', () => {
     const REF = resolve(REPO_ROOT, 'docs', 'bodyarcade-stage3', 'references', 'zyfou-procedural-terrains');
     // pinned commit guard
     const record = readFileSync(join(REF, 'BODYARCADE_SOURCE_RECORD.md'), 'utf8');
     expect(record).toContain('8b396f9c784676d46f6a147d310d9f547bf41403');
 
-    // EARTH_PALETTE from the snapshot (ColorPalette.js)
-    const palSrc = readFileSync(join(REF, 'src', 'engine', 'style', 'ColorPalette.js'), 'utf8');
-    const palBlock = palSrc.slice(palSrc.indexOf('EARTH_PALETTE'), palSrc.indexOf('};', palSrc.indexOf('EARTH_PALETTE')));
+    // the fantasy template selects the cartoon preset → 'Cartoon Terrain'
+    const templates = readFileSync(join(REF, 'src', 'project', 'ProjectTemplates.js'), 'utf8');
+    expect(templates).toMatch(/id:\s*'fantasy'[\s\S]*?preset:\s*'cartoon'/);
+    const presets = readFileSync(join(REF, 'src', 'engine', 'presets.js'), 'utf8');
+    expect(presets).toMatch(/cartoon:\s*{[\s\S]*?palettePreset:\s*'cartoon'/);
+
+    // 'Cartoon Terrain' palette from the snapshot (ColorPalettePresets.js)
+    const palSrc = readFileSync(join(REF, 'src', 'engine', 'style', 'ColorPalettePresets.js'), 'utf8');
+    const start = palSrc.indexOf("cartoon: {");
+    const palBlock = palSrc.slice(start, palSrc.indexOf('},\n  },', start));
     const pal: Record<string, [number, number, number]> = {};
     for (const m of palBlock.matchAll(/(\w+):\s*\[([\d.]+),\s*([\d.]+),\s*([\d.]+)\]/g)) {
       pal[m[1]!] = [Number(m[2]), Number(m[3]), Number(m[4])];
     }
-    expect(Object.keys(pal).length).toBe(16);
+    expect(Object.keys(pal).length).toBeGreaterThanOrEqual(16);
 
-    // the shader's Z_COL_* constants must equal the snapshot palette
     const glsl = readFileSync(
       join(APP_ROOT, 'src', 'water', 'shaders', 'RegionSubstrate.glsl'), 'utf8');
     const glslCol = (name: string): [number, number, number] => {
@@ -524,8 +530,9 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       expect(m, `Z_COL_${name} present`).toBeTruthy();
       return [Number(m![1]), Number(m![2]), Number(m![3])];
     };
+    // the 13 TERRAIN-albedo roles must equal the Cartoon Terrain palette
     const MAP: [string, string][] = [
-      ['DEEP', 'deep'], ['SHALLOW', 'shallow'], ['SAND', 'sand'], ['DUNE', 'dune'],
+      ['SAND', 'sand'], ['DUNE', 'dune'],
       ['DRYGRASS', 'dryGrass'], ['GRASS', 'grass'], ['FOREST', 'forest'],
       ['JUNGLE', 'jungle'], ['SWAMP', 'swamp'], ['TUNDRA', 'tundra'],
       ['REDROCK', 'redRock'], ['REDROCK2', 'redRock2'], ['ROCK', 'rock'],
@@ -535,9 +542,25 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       const a = glslCol(glslName);
       const b = pal[srcName]!;
       for (let c = 0; c < 3; c++) {
-        expect(Math.abs(a[c]! - b[c]!), `Z_COL_${glslName}[${c}] vs EARTH_PALETTE.${srcName}`).toBeLessThanOrEqual(1e-9);
+        expect(Math.abs(a[c]! - b[c]!), `Z_COL_${glslName}[${c}] vs CartoonTerrain.${srcName}`).toBeLessThanOrEqual(1e-9);
       }
     }
+    // WATER-role exclusion (user instruction): Cartoon deep/shallow/foam
+    // never enter BodyArcade — the shader's deep slot stays the approved
+    // Earth deep-floor substrate target, and the Cartoon water values
+    // appear nowhere in the region water shaders
+    expect(glslCol('DEEP')).toEqual([0.012, 0.075, 0.140]);
+    expect(glslCol('SHALLOW')).toEqual([0.060, 0.290, 0.330]);
+    for (const wf of ['RegionWaterAbove.frag', 'RegionWaterBelow.frag', 'RegionWallColor.glsl', 'RegionContainer.glsl']) {
+      const src = readFileSync(join(APP_ROOT, 'src', 'water', 'shaders', wf), 'utf8');
+      expect(src.includes('0.02, 0.18, 0.55'), `${wf} has no Cartoon deep`).toBe(false);
+      expect(src.includes('0.02, 0.55, 0.85'), `${wf} has no Cartoon shallow`).toBe(false);
+      expect(src.includes('1.00, 1.00, 0.92'), `${wf} has no Cartoon foam`).toBe(false);
+    }
+    // approved vendored water colors still verbatim in the water shaders
+    const above = readFileSync(join(APP_ROOT, 'src', 'water', 'shaders', 'RegionWaterAbove.frag'), 'utf8');
+    expect(above).toContain('abovewaterColor = vec3(0.25, 1.0, 1.25)');
+    expect(above).toContain('underwaterColor = vec3(0.4, 0.9, 1.0)');
 
     // Blank/Highlands parameter law (Engine.js): uFrequency = (45·0.1)/2048;
     // uSeedOffset = mulberry32(1337)·2048 − 1024 (two draws)
@@ -558,23 +581,31 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     expect(glsl).toContain('Z_PAL_SATURATION = 1.0');
     expect(glsl).toContain('Z_PAL_CONTRAST = 1.0');
 
-    // the CPU twin carries the same palette (parity contract)
+    // the CPU twin carries the same palette (parity contract): the 13
+    // Cartoon terrain roles + the retained Earth deep-floor target
     const cpu = readFileSync(join(APP_ROOT, 'src', 'world', 'substrateCpu.ts'), 'utf8');
-    for (const key of ['deep', 'sand', 'dune', 'dryGrass', 'grass', 'forest', 'jungle', 'swamp', 'tundra', 'redRock', 'redRock2', 'rock', 'rockHi', 'snow'] as const) {
-      const p = pal[key]!;
+    const cpuCol = (key: string): [number, number, number] => {
       const m = cpu.match(new RegExp(`${key}:\\s*\\[([\\d.]+),\\s*([\\d.]+),\\s*([\\d.]+)\\]`));
       expect(m, `substrateCpu COL.${key}`).toBeTruthy();
+      return [Number(m![1]), Number(m![2]), Number(m![3])];
+    };
+    for (const key of ['sand', 'dune', 'dryGrass', 'grass', 'forest', 'jungle', 'swamp', 'tundra', 'redRock', 'redRock2', 'rock', 'rockHi', 'snow'] as const) {
+      const p = pal[key]!;
+      const a = cpuCol(key);
       for (let c = 0; c < 3; c++) {
-        expect(Math.abs(Number(m![c + 1]) - p[c]!), `COL.${key}[${c}]`).toBeLessThanOrEqual(1e-9);
+        expect(Math.abs(a[c]! - p[c]!), `COL.${key}[${c}]`).toBeLessThanOrEqual(1e-9);
       }
     }
+    expect(cpuCol('deep')).toEqual([0.012, 0.075, 0.14]);
 
     results.zyfouSourceFidelity = {
       pinnedCommit: '8b396f9c784676d46f6a147d310d9f547bf41403',
-      paletteSlots: 15,
+      terrainPaletteRoles: 13,
+      waterRolesExcluded: ['deep', 'shallow', 'foam'],
       uFrequency: (45 * 0.1) / 2048,
       uSeedOffset: [offX, offZ],
-      note: 'Blank = blank template → highlands preset = DEFAULT_PARAMS + earth palette + DEFAULT_PLANET_STYLE',
+      note:
+        'Fantasy world = fantasy template → cartoon preset → Cartoon Terrain palette (terrain roles only) over the Blank/Highlands classification; applyPalettePreset copies palette colors only, so saturation/contrast/tint stay 1/1/(1,1,1)',
     };
   });
 });
