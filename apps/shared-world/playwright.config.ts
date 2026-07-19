@@ -2,14 +2,29 @@ import { defineConfig } from '@playwright/test';
 
 const PP_PORT = process.env.PP_PORT ?? '5173';
 const GAME_PORT = process.env.SHARED_WORLD_PORT ?? '5198';
+const ACCEPTANCE = process.env.SHARED_WORLD_ACCEPTANCE === '1';
+
+const display = ACCEPTANCE
+  ? {
+      viewport: { width: 1728, height: 1080 },
+      args: ['--window-position=0,0'],
+    }
+  : {
+      viewport: { width: 1365, height: 768 },
+      args: [
+        '--window-position=153,-2529',
+        '--window-size=1440,853',
+      ],
+    };
 
 // BodyArcade Shared World suite — separate from PosePuppet's root suite and
 // the Flight/Dolphin suites so all stay independently green. Port 5198
 // avoids PosePuppet's 5173, Dolphin's 5197 and Flight's 5199. Headed like
 // the other game suites (headless WebGL gets compositor-throttled — the
 // documented convention). Local macOS native GPU only: no DISPLAY, no
-// SwiftShader; the fps floor asserts unconditionally. Viewport pinned
-// 1728×1080 — the performance-report resolution every checkpoint uses.
+// SwiftShader; the fps floor asserts unconditionally. Default local
+// development runs use the rotated secondary display; set
+// SHARED_WORLD_ACCEPTANCE=1 for the final 1728×1080 built-in-display pass.
 export default defineConfig({
   testDir: './tests',
   timeout: 120_000,
@@ -18,7 +33,7 @@ export default defineConfig({
   reporter: [['list']],
   use: {
     baseURL: `http://localhost:${GAME_PORT}`,
-    viewport: { width: 1728, height: 1080 },
+    viewport: display.viewport,
     headless: false,
     channel: 'chrome',
     launchOptions: {
@@ -32,11 +47,7 @@ export default defineConfig({
         '--deny-permission-prompts',
 
         // --- Deterministic window placement ---
-        // The 1728×1080 acceptance viewport exceeds the secondary display's
-        // 1440 logical-pixel width (rotated DELL P2721Q). Place the window
-        // on the built-in MacBook display instead, whose default scaling
-        // (3456÷2 = 1728) matches the viewport exactly.
-        '--window-position=0,0',
+        ...display.args,
       ],
     },
   },

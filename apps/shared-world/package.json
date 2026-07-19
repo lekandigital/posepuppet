@@ -9,6 +9,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "playwright test",
+    "test:acceptance": "SHARED_WORLD_ACCEPTANCE=1 playwright test",
     "review": "node review.mjs"
   },
   "dependencies": {

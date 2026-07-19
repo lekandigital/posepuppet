@@ -14,10 +14,10 @@
 //   node apps/shared-world/review.mjs --url=/shared-world/?view=pool&debug=1
 
 import { chromium } from '@playwright/test';
-import { spawn, spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { mkdirSync, readFileSync, writeFileSync, rmSync, existsSync, readdirSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { createServer, request } from 'node:http';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -40,22 +40,15 @@ const DISPLAY_PRESETS = {
     label: 'built-in display',
     viewport: { width: 1728, height: 1080 },
     args: ['--window-position=0,0'],
-    windowPlacement: { left: 0, top: 0, right: 1728, bottom: 1080 },
-    chromeBounds: null,
   },
   secondary: {
     name: 'secondary',
     label: 'secondary display',
     viewport: { width: 1365, height: 768 },
     args: [
-      // Chrome/macOS lands this review window 31 px lower than the launch
-      // request on the rotated monitor, so the launch target is compensated
-      // to resolve to the measured outer bounds below.
-      '--window-position=153,-2591',
+      '--window-position=153,-2529',
       '--window-size=1440,853',
     ],
-    windowPlacement: { left: 153, top: -2560, right: 1593, bottom: -1707 },
-    chromeBounds: { left: 153, top: -2560, right: 1593, bottom: -1707 },
   },
 };
 
@@ -68,33 +61,6 @@ if (!DISPLAY_PRESETS[displayArg]) {
 const USER_DATA_DIR = resolve(ROOT, '.local', 'chrome-review-profile');
 mkdirSync(USER_DATA_DIR, { recursive: true });
 const ENDPOINT_FILE = resolve(USER_DATA_DIR, 'endpoint.json');
-
-function resetChromeProfileState() {
-  rmSync(USER_DATA_DIR, { recursive: true, force: true });
-  mkdirSync(USER_DATA_DIR, { recursive: true });
-}
-
-function seedChromeWindowPlacement() {
-  if (!display.windowPlacement) return;
-  const preferencesFile = resolve(USER_DATA_DIR, 'Default', 'Preferences');
-  try {
-    if (existsSync(preferencesFile)) {
-      const prefs = JSON.parse(readFileSync(preferencesFile, 'utf8'));
-      prefs.browser ??= {};
-      prefs.browser.window_placement = {
-        ...display.windowPlacement,
-        maximized: false,
-        work_area_left: display.windowPlacement.left,
-        work_area_top: display.windowPlacement.top,
-        work_area_right: display.windowPlacement.right,
-        work_area_bottom: display.windowPlacement.bottom,
-      };
-      writeFileSync(preferencesFile, `${JSON.stringify(prefs)}`);
-    }
-  } catch (err) {
-    console.warn(`[ReviewLauncher] Failed to seed Chrome window placement prefs: ${err?.message ?? err}`);
-  }
-}
 
 // Attempt cross-invocation reuse if an owner process is already running.
 if (existsSync(ENDPOINT_FILE)) {
@@ -122,9 +88,6 @@ if (existsSync(ENDPOINT_FILE)) {
     rmSync(ENDPOINT_FILE, { force: true });
   }
 }
-
-resetChromeProfileState();
-seedChromeWindowPlacement();
 
 // --- Dev server ---
 async function serverUp() {
@@ -187,60 +150,6 @@ for (const p of context.pages()) {
 
 console.log(`navigating to ${reviewUrl}`);
 await page.goto(reviewUrl);
-
-if (display.chromeBounds) {
-  await page.bringToFront().catch(() => {});
-  await new Promise((resolve) => setTimeout(resolve, 300));
-
-  const boundsScript = `tell application "Google Chrome"
-    if (count of windows) = 0 then
-      return "no-window"
-    end if
-    set bounds of front window to {${display.chromeBounds.left}, ${display.chromeBounds.top}, ${display.chromeBounds.right}, ${display.chromeBounds.bottom}}
-    return bounds of front window
-  end tell`;
-  const placement = spawnSync('osascript', ['-e', boundsScript], { encoding: 'utf8' });
-  const expectedBounds = `{${display.chromeBounds.left}, ${display.chromeBounds.top}, ${display.chromeBounds.right}, ${display.chromeBounds.bottom}}`;
-  let appleScriptMatched = false;
-  if (placement.status !== 0) {
-    console.warn(`[ReviewLauncher] AppleScript placement failed: ${placement.stderr.trim() || placement.stdout.trim() || `exit ${placement.status}`}`);
-  } else {
-    const actualBounds = placement.stdout.trim().replace(/\s+/g, ' ');
-    if (actualBounds === expectedBounds) {
-      appleScriptMatched = true;
-      console.log(`[ReviewLauncher] AppleScript confirmed Chrome bounds: ${actualBounds}`);
-    } else {
-      console.warn(`[ReviewLauncher] AppleScript returned unexpected bounds (${actualBounds || 'empty'}), expected ${expectedBounds}.`);
-    }
-  }
-
-  if (!appleScriptMatched) {
-    try {
-      const cdp = await context.newCDPSession(page);
-      const width = display.chromeBounds.right - display.chromeBounds.left;
-      const height = display.chromeBounds.bottom - display.chromeBounds.top;
-      const { windowId } = await cdp.send('Browser.getWindowForTarget');
-      await cdp.send('Browser.setWindowBounds', {
-        windowId,
-        bounds: {
-          left: display.chromeBounds.left,
-          top: display.chromeBounds.top,
-          width,
-          height,
-        },
-      });
-      const { bounds } = await cdp.send('Browser.getWindowBounds', { windowId });
-      const cdpActual = `{${bounds.left}, ${bounds.top}, ${bounds.left + bounds.width}, ${bounds.top + bounds.height}}`;
-      if (cdpActual === expectedBounds) {
-        console.log(`[ReviewLauncher] Chrome DevTools fallback confirmed Chrome bounds: ${cdpActual}`);
-      } else {
-        console.warn(`[ReviewLauncher] Chrome DevTools fallback bounds mismatch (${cdpActual || 'empty'}), expected ${expectedBounds}.`);
-      }
-    } catch (err) {
-      console.warn(`[ReviewLauncher] Chrome DevTools window placement fallback failed: ${err?.message ?? err}`);
-    }
-  }
-}
 
 // --- Singleton Control Server (Owner) ---
 const server = createServer(async (req, res) => {
