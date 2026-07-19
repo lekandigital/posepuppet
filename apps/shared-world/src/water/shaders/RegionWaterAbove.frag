@@ -40,6 +40,7 @@ uniform vec3 eye;
 varying vec3 vPosition;
 
 #include ./RegionContainer.glsl;
+#include ./RegionAmbient.glsl;
 #include ./RegionSubstrate.glsl;
 #include ./RegionWallColor.glsl;
 
@@ -102,9 +103,12 @@ void main() {
   }
 
   // STEP 3: NORMAL RECONSTRUCTION — vendored, with the slope composited
-  // into the global calm surface by the window falloff (Master §4.3)
+  // into the global calm surface by the window falloff (Master §4.3).
+  // CP05B: the ambient swell + boundary-response slope (RegionAmbient.glsl)
+  // is ADDED to the sim slope before the vendored reconstruction — the
+  // reconstruction, Fresnel and ray math consuming it are untouched.
   float wf = windowFalloff(windowUv(vPosition.xz));
-  vec2 slope = clamp(info.ba * wf, vec2(-0.999), vec2(0.999));
+  vec2 slope = clamp(info.ba * wf + ambientSurf(vPosition.xz).yz, vec2(-0.999), vec2(0.999));
   float slopeLengthSq = min(dot(slope, slope), 0.999);
   vec3 normal = normalize(vec3(slope.x, sqrt(max(0.001, 1.0 - slopeLengthSq)), slope.y));
 

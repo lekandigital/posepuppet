@@ -386,6 +386,15 @@ test.describe('checkpoint 04B — pool to region water', () => {
 
     // ---- region captures ----
     await bootRegion(page);
+    // cp05B instrument note (gates unchanged): the four-shot compares the
+    // region's jeantimex baseline against the stock demo, whose surface
+    // damps toward rest after seeding. The cp05B ambient swell never damps
+    // by design, so these captures run in the sanctioned zero-ambient
+    // diagnostic state (checkpoint prompt §9 "ambient motion disabled" /
+    // addendum §5.3 test-only comparison) — the exact pre-CP05B
+    // measurement conditions. Ambient-on optics are covered by
+    // region-ambient.spec.ts.
+    await testHook(page, 'setAmbient({ enabled: false, boundary: false })');
     // park the dolphin behind the camera line, window covering the shot bay
     await testHook(page, `teleport(${SPAWN.x - 45}, ${SPAWN.z}, -3)`);
     await testHook(page, 'setIntent({ brake: true })');
@@ -705,6 +714,11 @@ test.describe('checkpoint 04B — pool to region water', () => {
     // park the dolphin (and window) away from the beach → deterministic calm
     await testHook(page, `teleport(${SPAWN.x}, ${SPAWN.z}, -3)`);
     await page.addStyleTag({ content: '#region-overlay { display: none !important; }' });
+    // cp05B instrument condition (gate unchanged): the on/off pair needs
+    // identical water in both frames; the never-damping ambient clock is
+    // frozen so ambient geometry/normals stay present but static across
+    // the pair (see region-terrain.spec test 2 for the measured rationale)
+    await testHook(page, 'setAmbient({ frozen: true, timeS: 137.25 })');
     // camera over the bay east of the crescent inner shore (probed: the
     // shoreline runs x ≈ −550…−600 across z ∈ [−360, −240]), looking west
     // at the coast

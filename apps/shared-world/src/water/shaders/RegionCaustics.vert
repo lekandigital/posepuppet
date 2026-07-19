@@ -28,6 +28,7 @@ varying vec3 newPos;
 varying vec3 ray;
 
 #include ./RegionContainer.glsl;
+#include ./RegionAmbient.glsl;
 
 /**
  * The vendored project() with the pool box swapped for the seabed: raymarch
@@ -50,6 +51,16 @@ void main() {
   float wf = windowFalloff(uv);
   info.r *= wf;        // window composite: displacement fades to the calm plane
   info.ba *= 0.5 * wf; // vendored 0.5 caustic smoothing × window falloff
+
+  // CP05B: the ambient swell is part of the surface the light refracts
+  // through — its height joins the displacement (× the same window
+  // falloff the surface vertex uses) and its slope joins the smoothed
+  // slope (× the vendored 0.5 smoothing). The differential-area fragment
+  // math consuming oldPos/newPos is untouched.
+  vec2 xzAmb = uWindowOrigin + uv * uWindowSize;
+  vec3 amb = ambientSurf(xzAmb);
+  info.r += amb.x * wf / uDispScale;
+  info.ba += 0.5 * amb.yz;
 
   // Step 2: reconstruct the surface normal — vendored
   vec2 slope = clamp(info.ba, vec2(-0.999), vec2(0.999));

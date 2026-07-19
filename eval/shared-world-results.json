@@ -33,32 +33,32 @@
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
   "paintedPixels": 508275,
-  "generatedAt": "2026-07-19T10:44:43.083Z",
+  "generatedAt": "2026-07-19T20:28:11.157Z",
   "pool": {
     "modelLengthM": 2.8968250546579615,
     "bootConsoleErrors": 0,
     "brake": {
-      "fromSpeed": 4.800018292583048,
-      "speedAfter1200ms": 0.0010450185056517312
+      "fromSpeed": 4.809895969944449,
+      "speedAfter1200ms": 0.0009889929423565476
     },
     "cadenceCoupling": [
       {
         "rateHz": 0.4,
-        "speed": 2.4280942657745967
+        "speed": 2.425109636882699
       },
       {
         "rateHz": 0.9,
-        "speed": 4.9013564422020925
+        "speed": 3.150082675425015
       }
     ],
-    "glideSpeedAfter3s": 3.4029925032175234,
+    "glideSpeedAfter3s": 2.936458118355162,
     "burst": {
       "peakSpeed": 9,
-      "msToExceed8": 1122
+      "msToExceed8": 1112
     },
     "sustainedMaxSpeed": 5,
     "dropout": {
-      "maxPitchStepRad": 0.08485441591955034,
+      "maxPitchStepRad": 0.07889415691905155,
       "trackingDuringLoss": "autopilot"
     },
     "replayDigest": "7.240747,-2.500000,0.714485,0.543055,5.000000,240,0|4.525521,-5.",
@@ -73,28 +73,28 @@
           120,
           120,
           120,
-          119,
+          121,
           120,
-          119,
+          120,
           120,
           120,
           120
         ],
         "median": 120,
-        "min": 119,
+        "min": 120,
         "windowSeconds": 10
       },
       "simHzSamples": [
-        120.00396707329166,
+        120.12310136007156,
+        119.88011988011988,
+        119.99206664022206,
+        120.01586986708989,
         119.98800119987997,
-        120.02777502231928,
-        119.97600479904021,
-        120.48192771084324,
+        120.00396707329176,
+        120.00396707329155,
         120.01586986708999,
-        119.49810794662409,
-        120.55395038358088,
-        119.9520191923229,
-        120.07541927160874
+        119.99206664022218,
+        119.98800119987997
       ],
       "viewport": {
         "width": 1728,
@@ -106,18 +106,18 @@
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 18897794
+      "usedJSHeapBytes": 18491426
     },
     "turnShaping": {
-      "slowYawRateRadS": 2.4369559917624586,
-      "slowSpeed": 0.00004654242445135771,
-      "fastYawRateRadS": 1.5650062775585838,
+      "slowYawRateRadS": 2.451128521031474,
+      "slowSpeed": 0.00005210657934684004,
+      "fastYawRateRadS": 1.556497113583703,
       "fastSpeed": 9
     }
   },
   "containmentBatteryNote": "NOT ported at pool scale (walls are the vendored demo pool); returns re-pointed at cp04B",
   "stock": {
-    "timestamp": "2026-07-19T10:26:45.127Z",
+    "timestamp": "2026-07-19T20:28:58.782Z",
     "url": "/shared-world/?view=stock",
     "viewport": {
       "width": 1728,
@@ -131,19 +131,19 @@
     "chromeVersion": "150.0.7871.125",
     "fps": {
       "buckets": [
-        120,
-        120,
-        119,
-        120,
         121,
         120,
         120,
         120,
         120,
+        120,
+        120,
+        121,
+        120,
         120
       ],
       "median": 120,
-      "min": 119,
+      "min": 120,
       "windowSeconds": 10
     },
     "simHz": null,
@@ -153,46 +153,46 @@
   },
   "camera02": {
     "cruiseCoverage": {
-      "samples": 41,
+      "samples": 42,
       "widthFrac": {
-        "median": 0.09955358012502388,
-        "min": 0.0975552834940644,
-        "max": 0.10593750536873556
+        "median": 0.09972017594397706,
+        "min": 0.09758974096687603,
+        "max": 0.10714596229367718
       },
       "centerHeightFrac": {
-        "median": 0.43625767232661977,
-        "min": 0.4241701497096328,
-        "max": 0.44397765272799306
+        "median": 0.4363103966747841,
+        "min": 0.4241513970244848,
+        "max": 0.4441290746840799
       },
-      "followDistM": 6.793784980071107
+      "followDistM": 6.793825041089039
     },
     "burstCoverage": {
-      "samples": 20,
+      "samples": 21,
       "state": "FastTravel (bands relaxed per cp02 §8.1)",
       "widthFrac": {
-        "median": 0.07536240792606566
+        "median": 0.07640938045748566
       },
-      "followDistM": 8.331927286649876
+      "followDistM": 8.204657617513107
     },
     "hoverCoverage": {
       "state": "SlowHover (bands relaxed per cp02 §8.1)",
-      "followDistM": 3.478505426264004,
+      "followDistM": 3.478505426304183,
       "widthFrac": {
-        "median": 0.293981369737642
+        "median": 0.29398043267158314
       }
     },
     "bandStatesSeen": [
       "NormalFollow"
     ],
     "stepTurn": {
-      "peakAzimuthErrorRad": 1.014844687105939,
-      "t90S": 0.321
+      "peakAzimuthErrorRad": 1.2075534318786298,
+      "t90S": 0.296
     },
     "stopTest": {
-      "dolphinStoppedAtMs": 336,
-      "finalFollowDistM": 3.478505566321334,
-      "minFollowDistAfterStopM": 3.478505566321334,
-      "distErrorAtStopPlus1200msM": 0.02402967232040254
+      "dolphinStoppedAtMs": 329,
+      "finalFollowDistM": 3.478505547173385,
+      "minFollowDistAfterStopM": 3.478505547173385,
+      "distErrorAtStopPlus1200msM": 0.026091656130490914
     },
     "wallTest": {
       "minWallClearanceM": 0.7500000000000018,
@@ -223,8 +223,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286210,
-          "poolBytes": 1075560
+          "stockBytes": 1286258,
+          "poolBytes": 1076801
         },
         "c-below-lip": {
           "eyeDemo": [
@@ -242,8 +242,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286003,
-          "poolBytes": 1378685
+          "stockBytes": 1286137,
+          "poolBytes": 1378545
         },
         "d-snell-window": {
           "eyeDemo": [
@@ -261,74 +261,74 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1346518,
-          "poolBytes": 1346988
+          "stockBytes": 1347022,
+          "poolBytes": 1348296
         }
       }
     },
     "replayDigestVsCp01": "identical (first 64 chars compared against committed artifact)",
     "recenter": {
-      "azimuthErrorBeforeRad": 0.11075410952123921,
-      "azimuthErrorAfterRad": 0.07243496085078682
+      "azimuthErrorBeforeRad": 0.11137775112347192,
+      "azimuthErrorAfterRad": 0.07256594417366369
     },
     "waterline": {
       "breachReEntries": 4,
       "cameraSurfaceCrossings": 8,
       "antiShimmerEngagements": 8,
-      "maxFrameStepM": 0.6051677645267325,
+      "maxFrameStepM": 0.5654994227207966,
       "statesSeen": {
-        "NormalFollow": 540,
+        "NormalFollow": 535,
         "Airborne": 409,
         "SurfaceTransition": 292,
-        "ReEntryRecovery": 191,
-        "Obstructed": 458,
-        "FastTravel": 40
+        "ReEntryRecovery": 187,
+        "Obstructed": 467,
+        "FastTravel": 46
       }
     },
     "perf": {
       "script": "porpoise 16 s (cruise cadence + nose-up breach cycles, ≥ 2 waterline crossing pairs)",
       "fps": {
         "buckets": [
-          120,
-          121,
-          120,
           121,
           121,
           120,
-          121,
+          120,
+          120,
           121,
           120,
-          121
+          120,
+          121,
+          120
         ],
-        "median": 121,
+        "median": 120,
         "min": 120,
         "windowSeconds": 10
       },
       "simHzSamples": [
-        100.76823306335365,
-        119.95637949836426,
-        120.15888778550149,
-        119.88011988011982,
-        119.99206664022218,
-        120.18275725069525,
-        119.84420253670227,
-        119.95637949836436,
-        120.1946955398827,
-        119.83223487118039,
-        120.07541927160852,
-        119.90882965018329,
+        101.81672988741641,
+        119.96401079676095,
+        119.99206664022212,
+        120.00396707329166,
+        120.03968253968254,
+        120.07541927160864,
+        119.90407673860909,
+        119.98800119987997,
+        120.00396707329176,
+        120.00396707329176,
+        120.0635046636236,
+        119.9400299850075,
+        120.00396707329176,
+        120.00396707329155,
         120.01586986708999,
-        120.15888778550149,
-        119.85617259288844,
-        120.12310136007135
+        119.99999999999979
       ],
-      "cameraUpdateUsAvg": 31.40495902250621,
+      "cameraUpdateUsAvg": 30.83333397905032,
       "viewport": {
         "width": 1728,
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 23407189
+      "usedJSHeapBytes": 23754697
     }
   },
   "region": {
@@ -714,7 +714,7 @@
     "previewPerf": {
       "fpsBuckets": [
         120,
-        108,
+        121,
         120,
         120,
         120,
@@ -722,19 +722,19 @@
         120,
         120,
         120,
-        120
+        121
       ],
       "median": 120,
-      "min": 108,
+      "min": 120,
       "viewport": {
         "width": 1728,
         "height": 1080
       },
-      "usedJSHeapBytes": 66777779
+      "usedJSHeapBytes": 65172135
     },
     "previewBoot": {
-      "decodeMs": 91.39999997615814,
-      "meshBuildMs": 292.90000000596046,
+      "decodeMs": 92.09999999403954,
+      "meshBuildMs": 280.80000001192093,
       "decodedBytes": 37785609,
       "consoleErrors": 0
     }
@@ -758,7 +758,7 @@
       "windowTexelM": 0.5,
       "gpuTimerSource": "EXT_disjoint_timer_query_webgl2",
       "floatLinear": true,
-      "decodeMs": 97.2000000178814,
+      "decodeMs": 96.39999997615814,
       "consoleErrors": 0
     },
     "depthLaw": [
@@ -949,42 +949,42 @@
     ],
     "depthClampWorstBelowFloorM": 0.6653302094142441,
     "sprint": {
-      "travelled": 220.628971806223,
+      "travelled": 220.553971806223,
       "fpsBuckets": [
-        112,
-        113,
-        116,
-        116,
-        115,
-        114,
+        104,
+        105,
+        103,
         109,
-        115,
-        116,
+        104,
+        108,
+        104,
         110,
-        116,
-        117,
-        118,
-        119,
-        119,
-        119,
-        119,
-        120,
-        119,
-        121,
-        120,
-        120,
-        120,
-        114,
-        100
+        112,
+        110,
+        100,
+        99,
+        103,
+        105,
+        106,
+        104,
+        111,
+        109,
+        107,
+        103,
+        106,
+        113,
+        102,
+        109,
+        102
       ],
       "windowOrigin": [
-        -87,
+        -87.5,
         -508
       ],
       "simProbe": {
         "nanCount": 0,
-        "edgeMaxDispM": 1.3020100026325404e-8,
-        "maxDispM": 0.002263499118271284
+        "edgeMaxDispM": 1.7084551273184434e-8,
+        "maxDispM": 0.009088959486689419
       }
     },
     "shoreClip": {
@@ -998,8 +998,8 @@
       "note": "visual A/B is manual (cp04B §9); shot (b) stock pose just-submerged (deviation — see report)",
       "shots": {
         "a-above": {
-          "stockBytes": 681568,
-          "regionBytes": 792191,
+          "stockBytes": 681657,
+          "regionBytes": 792506,
           "regionCamera": {
             "pos": [
               -207.1892336110995,
@@ -1021,8 +1021,8 @@
           }
         },
         "b-caustics": {
-          "stockBytes": 1536724,
-          "regionBytes": 429715,
+          "stockBytes": 1536965,
+          "regionBytes": 429044,
           "regionCamera": {
             "pos": [
               -184.01011962210316,
@@ -1044,8 +1044,8 @@
           }
         },
         "c-above-lip": {
-          "stockBytes": 1571633,
-          "regionBytes": 665870,
+          "stockBytes": 1571989,
+          "regionBytes": 666330,
           "regionCamera": {
             "pos": [
               -185.85743512365954,
@@ -1067,7 +1067,7 @@
           }
         },
         "c-below-lip": {
-          "stockBytes": 1571806,
+          "stockBytes": 1571889,
           "regionBytes": 441010,
           "regionCamera": {
             "pos": [
@@ -1090,8 +1090,8 @@
           }
         },
         "d-snell-window": {
-          "stockBytes": 1675080,
-          "regionBytes": 729559,
+          "stockBytes": 1674876,
+          "regionBytes": 729310,
           "regionCamera": {
             "pos": [
               -181.28314197307185,
@@ -1114,9 +1114,9 @@
         }
       },
       "lumA": {
-        "meanAbsDelta": 0.12930351103143786,
-        "meanStock": 0.43810850273527174,
-        "meanRegion": 0.5345282816710705,
+        "meanAbsDelta": 0.12930871418314552,
+        "meanStock": 0.43809892454708566,
+        "meanRegion": 0.5345367435879411,
         "band": "stock pool-surface quad inner 55 % (px 679-1176 × 347-516), every 2nd px",
         "tolerance": 0.25,
         "toleranceNote": "includes the sanctioned container difference (sand seabed vs tiled box refraction); pipeline-divergence catch — see the checkpoint report"
@@ -1137,58 +1137,58 @@
       "script": "16 s region swim: cruise 1.6 Hz → burst → banked turn → crouch dive",
       "fps": {
         "buckets": [
-          119,
-          120,
-          120,
-          120,
-          119,
-          120,
-          120,
-          120,
-          119,
           111,
-          109,
-          112,
-          111,
+          114,
+          106,
+          110,
           107,
-          104,
-          106
+          112,
+          102,
+          108,
+          86,
+          89,
+          83,
+          91,
+          91,
+          96,
+          89,
+          97
         ],
-        "median": 119,
-        "min": 104
+        "median": 102,
+        "min": 83
       },
       "simHzSamples": [
-        120.12310136007146,
-        120.00396707329176,
-        120.01586986708978,
-        119.51000896325063
+        120.00396707329166,
+        120.07541927160864,
+        120.01586986708999,
+        119.98800119987997
       ],
       "cpuStageMs": {
-        "sim": 0.07264150847803871,
-        "caustics": 0.01415094311507243,
-        "prepare": 0.006603774034752036,
-        "render": 0.13679245367365064,
-        "frame": 0.3339622636448662
+        "sim": 0.052173913173053574,
+        "caustics": 0.01086956456951473,
+        "prepare": 0.008695653275303219,
+        "render": 0.10760869442120842,
+        "frame": 0.26847826203574304
       },
       "gpuStageMs": {
-        "sim": 10.0525,
-        "caustics": 0.185583,
-        "render": 15.715666
+        "sim": 10.523333,
+        "caustics": 0.247708,
+        "render": 19.766583
       },
       "gpuTimerSource": "EXT_disjoint_timer_query_webgl2",
       "stageToggleMedianFps": {
         "surface": 120,
         "terrain": 120,
-        "caustics": 109,
-        "sim": 106
+        "caustics": 106,
+        "sim": 86
       },
       "viewport": {
         "width": 1728,
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 109428614,
-      "cameraUpdateUsAvg": 50.00000033113692
+      "usedJSHeapBytes": 126083193,
+      "cameraUpdateUsAvg": 112.37113561826882
     }
   },
   "region05": {
@@ -1197,17 +1197,17 @@
         "drawnPerLod": [
           18,
           11,
-          41,
-          39
+          42,
+          38
         ],
         "drawnTiles": 109,
-        "drawnTriangles": 862976,
+        "drawnTriangles": 864768,
         "totalTiles": 256,
         "protectedTiles": 56,
         "protectedAlwaysLod0": true
       },
       "lawMaxErrM": 0,
-      "buildMs": 9,
+      "buildMs": 9.399999976158142,
       "protectReasons": {
         "coastline": 39,
         "ridge": 5,
@@ -1543,14 +1543,14 @@
           -120
         ]
       ],
-      "framesMonitored": 6969,
-      "minClearanceM": 0.7499999982266009,
-      "maxLosBlockedS": 0.08120000000000005,
+      "framesMonitored": 5395,
+      "minClearanceM": 0.7499999983529492,
+      "maxLosBlockedS": 0,
       "cameraStates": {
-        "NormalFollow": 1885,
-        "EmergencyRecenter": 349,
-        "FastTravel": 4714,
-        "Obstructed": 21
+        "NormalFollow": 1453,
+        "EmergencyRecenter": 246,
+        "FastTravel": 3679,
+        "Obstructed": 17
       }
     },
     "antiWedge": {
@@ -1562,41 +1562,41 @@
     "perf": {
       "fps": {
         "buckets": [
-          120,
-          120,
-          120,
-          120,
-          120,
-          121,
-          120,
-          119,
-          120,
-          120,
-          120,
-          120
+          96,
+          79,
+          93,
+          78,
+          96,
+          79,
+          98,
+          79,
+          97,
+          80,
+          98,
+          78
         ],
-        "median": 120,
-        "min": 119
+        "median": 93,
+        "min": 78
       },
-      "simHz": 120.01586986708999,
-      "terrainStageMs": 2.8149580000000007,
+      "simHz": 120.01586986708978,
+      "terrainStageMs": 12.663292000000002,
       "terrainStageMethod": "RECORDED ONLY (not gated): GPU timer spans are unsound on this stack — toggle deltas cross DVFS clock states and all-stage spans measure pipelined latency, not throughput; the enforced gates are the fps/simHz floors above (Master §10 Playwright semantics)",
       "gpuStageMsOn": {
-        "sim": 0.395083,
-        "caustics": 0.224583,
-        "render": 7.255499
+        "sim": 11.749083,
+        "caustics": 0.24825,
+        "render": 19.207
       },
       "gpuStageMsTerrainOff": {
-        "sim": 0.513624,
-        "caustics": 0.243416,
-        "render": 4.440541
+        "sim": 2.009999,
+        "caustics": 0.265541,
+        "render": 6.543708
       },
       "cpuStageMs": {
-        "sim": 0.14876033131741295,
-        "caustics": 0.035537188703363594,
-        "prepare": 0.019008264315029805,
-        "render": 0.24380165387776273,
-        "frame": 0.6628099172568518
+        "sim": 0.08760330696736486,
+        "caustics": 0.023140495719988483,
+        "prepare": 0.012396694461176219,
+        "render": 0.13305785217561011,
+        "frame": 0.36942148799738606
       },
       "terrainStats": {
         "drawnPerLod": [
@@ -1614,14 +1614,14 @@
       "bvh": {
         "tilesBuilt": 22,
         "tilesLive": 22,
-        "buildMsTotal": 98.30000001192093,
-        "buildMsMax": 9.899999976158142,
-        "queries": 66358,
-        "queryUsTotal": 153000.00023841858,
+        "buildMsTotal": 102.40000003576279,
+        "buildMsMax": 10.599999994039536,
+        "queries": 51761,
+        "queryUsTotal": 125700.00013709068,
         "liveBytes": 17437200,
-        "queryUsAvg": 2.3056752801232494
+        "queryUsAvg": 2.4284693135196513
       },
-      "usedJSHeapBytes": 112087951,
+      "usedJSHeapBytes": 112705069,
       "viewport": {
         "width": 1728,
         "height": 1080
@@ -1630,14 +1630,14 @@
     },
     "terrainCompressed": {
       "site": "crescent west cliff (−920.5, −29.5), 68° wall",
-      "engageElapsedS": 0.107,
-      "releaseElapsedS": 1.224,
+      "engageElapsedS": 0.109,
+      "releaseElapsedS": 1.019,
       "stateAtEngage": "EmergencyRecenter",
       "statesDuringPin": {
         "EmergencyRecenter": 1
       },
       "ratioAtEngage": 0.27288120433980545,
-      "compressFactorAtEngage": 0.6000000000000006,
+      "compressFactorAtEngage": 0.6000000000000003,
       "engagements": 1
     },
     "slide": {
@@ -2145,6 +2145,84 @@
         -634.9020133018494
       ],
       "note": "Fantasy world = fantasy template → cartoon preset → Cartoon Terrain palette (terrain roles only) over the Blank/Highlands classification; applyPalettePreset copies palette colors only, so saturation/contrast/tint stay 1/1/(1,1,1)"
+    }
+  },
+  "region05b": {
+    "evidence": {
+      "dir": "media/shared-world-cp05b/",
+      "breachReached": true
+    },
+    "field": {
+      "pts": 99,
+      "maxH": 0.06456519638597964,
+      "rmsH": 0.021131569514549132,
+      "fixedRange": 0.09099385061764673,
+      "maxBoundM": 0.07
+    },
+    "frozenSurfaceDetector": {
+      "undersideDeltas": [
+        0.005581824089041287,
+        0.00603792687160466,
+        0.0064339283305202034,
+        0.005889003703400383,
+        0.007295006996819181,
+        0.006238542378921011,
+        0.005640808520524671
+      ],
+      "ambientOffDelta": 0,
+      "aboveDeltas": [
+        0.00951772700372666,
+        0.011004914321172246
+      ],
+      "idleSpanS": 21
+    },
+    "determinism": {
+      "settleDelta": 0,
+      "reloadDelta": 0,
+      "frozenTimeS": 137.25
+    },
+    "hierarchy": {
+      "ambientMaxHeightM": 0.07,
+      "openSlopeRms": 0.004481135729661924,
+      "boundaryBandSlopeRms": 0.013608312030035685,
+      "nearSurfaceCruiseWakeM": 0.10026620468124747,
+      "simTexAfterClearM": 0.00015585007076879265,
+      "note": "wake is depth-dependent by the vendored sphere kernel: near-surface swimming dominates ambient; deep swimming leaves the ambient surface (physical, reported)"
+    },
+    "shorelineAttenuation": {
+      "sweep": "sdf −2…12 m @ 0.02 m, Δh < 2 mm",
+      "nearMag": 0.022146297758353774,
+      "farMag": 0.00011798688610904846
+    },
+    "stockBoot": {
+      "errors": 0
+    },
+    "fpsGuard": {
+      "buckets": [
+        119,
+        104,
+        120,
+        104,
+        120,
+        104,
+        119,
+        105,
+        120,
+        105
+      ],
+      "simHz": 120.05159241988297
+    },
+    "dryLandShore": {
+      "landSamples": 600,
+      "landViolations": 0,
+      "waterControls": 60,
+      "waterChanged": 60
+    },
+    "dryLandIslets": {
+      "landSamples": 310,
+      "landViolations": 0,
+      "waterControls": 60,
+      "waterChanged": 59
     }
   }
 }
