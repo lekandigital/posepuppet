@@ -21,6 +21,24 @@ export default defineConfig({
     viewport: { width: 1728, height: 1080 },
     headless: false,
     channel: 'chrome',
+    launchOptions: {
+      args: [
+        // --- Camera suppression (development-automation only) ---
+        // Block camera/microphone permission prompts so the physical webcam
+        // never activates during automated test runs. The app's keyboard
+        // fallback and postMessage body-input pump remain fully functional.
+        // To restore camera access for a live-camera checkpoint, comment
+        // out the next line.
+        '--deny-permission-prompts',
+
+        // --- Deterministic window placement ---
+        // The 1728×1080 acceptance viewport exceeds the secondary display's
+        // 1440 logical-pixel width (rotated DELL P2721Q). Place the window
+        // on the built-in MacBook display instead, whose default scaling
+        // (3456÷2 = 1728) matches the viewport exactly.
+        '--window-position=0,0',
+      ],
+    },
   },
   webServer: [
     {

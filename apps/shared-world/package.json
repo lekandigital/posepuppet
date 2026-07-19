@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "playwright test"
+    "test": "playwright test",
+    "review": "node review.mjs"
   },
   "dependencies": {
     "lil-gui": "^0.21.0",
