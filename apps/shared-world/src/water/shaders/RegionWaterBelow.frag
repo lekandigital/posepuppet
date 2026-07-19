@@ -27,6 +27,7 @@ uniform vec3 eye;
 varying vec3 vPosition;
 
 #include ./RegionContainer.glsl;
+#include ./RegionAmbient.glsl;
 #include ./RegionSubstrate.glsl;
 #include ./RegionWallColor.glsl;
 
@@ -78,9 +79,15 @@ void main() {
   }
 
   // 3. Reconstruct surface normal (inverted for the underside) — vendored,
-  // slope composited by the window falloff
+  // slope composited by the window falloff. CP05B: the ambient swell +
+  // boundary slope is ADDED, scaled by uAmbient.w — the sanctioned
+  // underwater visibility multiplier that keeps the calm ambient readable
+  // through the underside refraction path (checkpoint prompt §9); the
+  // vendored reconstruction/Fresnel/Snell math consuming it is untouched.
   float wf = windowFalloff(windowUv(vPosition.xz));
-  vec2 slope = clamp(info.ba * wf, vec2(-0.999), vec2(0.999));
+  vec2 slope = clamp(
+    info.ba * wf + ambientSurf(vPosition.xz).yz * uAmbient.w,
+    vec2(-0.999), vec2(0.999));
   float slopeLengthSq = min(dot(slope, slope), 0.999);
   vec3 normal = normalize(vec3(slope.x, sqrt(max(0.001, 1.0 - slopeLengthSq)), slope.y));
   normal = -normal;

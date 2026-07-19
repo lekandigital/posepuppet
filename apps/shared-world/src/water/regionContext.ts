@@ -12,6 +12,7 @@
 import * as THREE from 'three';
 import type { WorldData } from '../world/WorldData';
 import { bakeClimateLut } from '../world/substrateCpu';
+import { AMBIENT } from './ambientCpu';
 import { SIM_UNIT_M, WINDOW_SIZE_M } from './RegionWater';
 
 /** climate LUT side (7.8 m/texel — the finest climate octave is ~143 m) */
@@ -29,6 +30,11 @@ export interface RegionContext {
   climateBTex: THREE.DataTexture;
   /** LUT bake wall-clock, ms (performance report) */
   climateBakeMs: number;
+  /** CP05B ambient-motion uniform value, shared BY REFERENCE with every
+   *  region material: x = clock s (wrapped AMBIENT.WRAP_S), y = amplitude
+   *  scale (production 1; 0 = pre-CP05B), z = boundary scale, w =
+   *  underwater slope multiplier. regionGame owns the clock. */
+  ambient: THREE.Vector4;
   /** shared with RegionWater.windowOrigin (min corner, meters) */
   windowOrigin: THREE.Vector2;
   regionSize: number;
@@ -127,6 +133,9 @@ export function buildRegionContext(
     climateATex,
     climateBTex,
     climateBakeMs,
+    ambient: new THREE.Vector4(
+      0, AMBIENT.AMP_SCALE, AMBIENT.BOUNDARY_SCALE, AMBIENT.UNDER_MUL,
+    ),
     windowOrigin,
     regionSize: data.header.sizeMeters[0],
     heightN: n,
@@ -146,6 +155,8 @@ export function regionUniforms(ctx: RegionContext): Record<string, THREE.IUnifor
     uWindowOrigin: { value: ctx.windowOrigin },
     uWindowSize: { value: WINDOW_SIZE_M },
     uDispScale: { value: SIM_UNIT_M },
+    // cp05B ambient-motion input (consumed by RegionAmbient.glsl)
+    uAmbient: { value: ctx.ambient },
     // cp05A substrate inputs (consumed by materials including RegionSubstrate.glsl)
     uShoreSdf: { value: ctx.shoreSdfTex },
     uBiomeTex: { value: ctx.biomeTex },

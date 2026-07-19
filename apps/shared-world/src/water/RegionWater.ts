@@ -267,6 +267,16 @@ export class RegionWater {
     this.runPass(this.sphereMaterial);
   }
 
+  /**
+   * cp05B test/diagnostic hook: reset the interactive sim to flat calm
+   * (the same clear the constructor and teleports use). Lets deterministic
+   * captures isolate the analytic ambient field from decaying seeded/wake
+   * state. Never called by production gameplay.
+   */
+  clearSim() {
+    this.clearTextures();
+  }
+
   /** One wave-equation step — the vendored shader at the window domain. */
   stepSimulation() {
     this.updateMaterial.uniforms.tInput.value = this.textureA.texture;

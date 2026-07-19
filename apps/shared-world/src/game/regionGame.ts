@@ -33,6 +33,7 @@ import {
   SKIRT_DROP_M,
 } from '../water/RegionTerrainPass';
 import { loadDolphin } from './dolphinActor';
+import { AMBIENT, ambientSurfCpu } from '../water/ambientCpu';
 import { substrateSampleCpu } from '../world/substrateCpu';
 import { createSwimControls } from '../input/swimControls';
 import { CREDITS_ATTRIBUTION } from '../credits';
@@ -56,12 +57,21 @@ const SPHERE_RADIUS_M = 3.0;
 /**
  * Emitter gain [DERIVED, tuned against the measured window response and
  * reported]: at the resolved radius the vendored column-volume injection
- * over-drives the 0.5 m grid (3.7 m crest measured at r 1.8/gain 1);
- * the gain lands the burst wake in the pool's ripple family (≈ 0.1–0.15 m
- * crest at 9 m/s, centimeters at cruise) so the surface chop never breaches
- * the camera rig's anti-shimmer band.
+ * over-drives the 0.5 m grid (3.7 m crest measured at r 1.8/gain 1).
+ *
+ * cp05B retune 0.025 → 0.09 (sanctioned: checkpoint prompt §3.4 "stronger
+ * local dolphin wake … the existing compound-sphere injection retuned as
+ * needed"): with the always-present ambient swell (bound 0.07 m), ordinary
+ * near-surface swimming must stay CLEARLY the stronger local disturbance.
+ * Measured on the authoritative acceptance tier (built-in display,
+ * ~120 Hz — the tier every water approval was made on): cruise crest
+ * 0.028 m at the old gain (below the ambient bound) → ≈ 0.10 m at 0.09;
+ * burst ≈ 0.33 m. The vendored sim is frame-driven, so the 60 Hz
+ * secondary display runs fewer, larger injections and slower decay —
+ * wake amplitudes there read stronger (inherited stock-demo property,
+ * recorded in the cp05B report; final breach-family balance is cp06).
  */
-const EMITTER_GAIN = 0.025;
+const EMITTER_GAIN = 0.09;
 
 /** cp01 breach-splash drops (game.ts): radius/strength in pool demo units
  *  0.08/0.05 and 0.1/0.06 → physical meters ×K (the same splash). */
@@ -157,6 +167,15 @@ export async function startRegionGame(
 
   // ambient starting ripples: the demo's seedWater pattern in the window
   water.seedAmbient();
+
+  // --- cp05B ambient-motion clock (deterministic; test-controllable) ---
+  // The analytic ambient field (RegionAmbient.glsl / ambientCpu.ts) is a
+  // pure function of world position and THIS clock; regionGame advances it
+  // with the render frame delta and wraps it at AMBIENT.WRAP_S (every
+  // field frequency is an integer multiple of 2π/WRAP_S — seamless wrap).
+  const ambient = regionRenderer.ctx.ambient;
+  let ambientTimeS = 0;
+  let ambientFrozen = false;
 
   // assist keys (dolphin parity) + R recenter (cp02)
   addEventListener('keydown', (e) => {
@@ -311,6 +330,33 @@ export async function startRegionGame(
       },
       gpuHeightProbe: (pts: [number, number][]) => gpuHeightProbe(pts),
       simTexProbe: () => water.probeSimTexture(),
+      // --- cp05B ambient instrumentation ---
+      ambient: {
+        constants: AMBIENT,
+        state: () => ({
+          timeS: ambientTimeS,
+          ampScale: ambient.y,
+          boundaryScale: ambient.z,
+          underMul: ambient.w,
+          frozen: ambientFrozen,
+        }),
+        /** CPU-twin field probe at world points (optional time override);
+         *  sdf + central-difference gradient come from the same baked
+         *  shore_sdf.r16 the shader samples */
+        probe: (pts: [number, number][], tOverride?: number) =>
+          pts.map(([x, z]) => {
+            const e = AMBIENT.SDF_GRAD_EPS_M;
+            return ambientSurfCpu(
+              x, z,
+              tOverride ?? ambientTimeS,
+              data.shoreDistance(x, z),
+              data.shoreDistance(x + e, z) - data.shoreDistance(x - e, z),
+              data.shoreDistance(x, z + e) - data.shoreDistance(x, z - e),
+              ambient.y,
+              ambient.z,
+            );
+          }),
+      },
       // --- cp05 terrain instrumentation ---
       terrain: {
         constants: {
@@ -404,6 +450,32 @@ export async function startRegionGame(
       /** re-run the demo's ambient seeding in the current window (the
        *  four-shot procedure matches the stock demo's post-seed state) */
       seedAmbient() { water.seedAmbient(); },
+      /**
+       * cp05B ambient-motion control (checkpoint prompt §9): production
+       * values enabled/boundary = true, underMul = AMBIENT.UNDER_MUL;
+       * enabled/boundary = false zero the additive contribution — the
+       * documented pre-CP05B comparison state. timeS/frozen give the
+       * deterministic fixed-time capture mechanism.
+       */
+      setAmbient(patch: {
+        enabled?: boolean;
+        boundary?: boolean;
+        underMul?: number;
+        timeS?: number;
+        frozen?: boolean;
+      }) {
+        if (patch.enabled !== undefined) ambient.y = patch.enabled ? AMBIENT.AMP_SCALE : 0;
+        if (patch.boundary !== undefined) ambient.z = patch.boundary ? AMBIENT.BOUNDARY_SCALE : 0;
+        if (patch.underMul !== undefined) ambient.w = patch.underMul;
+        if (patch.timeS !== undefined) {
+          ambientTimeS = ((patch.timeS % AMBIENT.WRAP_S) + AMBIENT.WRAP_S) % AMBIENT.WRAP_S;
+          ambient.x = ambientTimeS;
+        }
+        if (patch.frozen !== undefined) ambientFrozen = patch.frozen;
+      },
+      /** cp05B: reset the interactive sim window to flat calm so captures
+       *  isolate the analytic ambient field (see RegionWater.clearSim) */
+      clearSim() { water.clearSim(); },
       /** project world points through the live camera → pixel coords */
       projectPoints(pts: [number, number, number][]) {
         const size = new THREE.Vector2();
@@ -613,6 +685,12 @@ export async function startRegionGame(
 
     const s = sim.state;
     const frameDt = dtMs / 1000;
+
+    // --- cp05B ambient clock (frozen only through the test surface) ---
+    if (!ambientFrozen) {
+      ambientTimeS = (ambientTimeS + frameDt) % AMBIENT.WRAP_S;
+      ambient.x = ambientTimeS;
+    }
 
     // --- dolphin transform + animation (presentation only) ---
     dolphin.group.position.set(s.x, s.y, s.z);

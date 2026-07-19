@@ -339,6 +339,18 @@ test.describe('checkpoint 05 — terrain across the waterline', () => {
     await testHook(page, 'setIntent({ brake: true })');
     await page.addStyleTag({ content: '#region-overlay { display: none !important; }' });
     await page.waitForTimeout(800);
+    // cp05B instrument condition (gates unchanged): the mask/gap deltas
+    // compare paired captures taken ~0.3 s apart, which requires the water
+    // to look identical in both frames. Pre-cp05B the damped surface was
+    // static at capture time; the cp05B ambient motion never damps, so the
+    // ambient CLOCK is frozen for the paired captures — ambient geometry
+    // and normals stay PRESENT (the shoreline masking under ambient
+    // displacement is exactly what the gate then verifies), they just stop
+    // advancing between the two frames. Measured pre-fix: 1756 legal
+    // crest-adjacency water pixels flagged purely by inter-capture ambient
+    // motion (forensic heights +46…+49 m — cliff crests, not shoreline
+    // flats; recorded in the cp05B report).
+    await testHook(page, 'setAmbient({ frozen: true, timeS: 137.25 })');
 
     const perBeach: Record<string, unknown> = {};
     let totalLandSamples = 0;
