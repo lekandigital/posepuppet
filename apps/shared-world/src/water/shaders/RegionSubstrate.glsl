@@ -62,6 +62,13 @@
  */
 
 uniform float uAlbedoDebug;  // 1 = classification-only output (test/debug mode)
+/** climate LUT (adaptation A8): the five ZyFou climate fields baked at load
+ *  by the CPU twin's identical math (substrateCpu.bakeClimateLut) — their
+ *  wavelengths (143 m – 10 km) are far above the 7.8 m LUT texel, so the
+ *  bilinear read reproduces the analytic fields to ~1e-4 while removing
+ *  ~1,500 ALU of per-fragment/per-ray noise (the measured 21 ms collapse). */
+uniform sampler2D uClimateA; // (temp, moist, cont, erosion), 256² RGBA32F
+uniform sampler2D uClimateB; // (region, -, -, 1), 256² RGBA32F
 
 /* ------------------------------------------------------------------------
  * ZyFou Blank constants (Engine.js wiring at DEFAULT_PARAMS, seed 1337)
@@ -114,8 +121,13 @@ const float ZD_QUALITY = 3.0;
 const float ZD_SCALE = 0.16;
 const float ZD_STRENGTH = 0.72;
 const float ZD_NORMAL_STRENGTH = 0.42;
-const float ZD_NEAR = 80.0;
-const float ZD_FAR = 190.0;
+/** near/far are ZyFou PERF settings (Engine `this.perf`, device-adaptive
+ *  by design; their defaults 80/190). Reduced here to hold BodyArcade's
+ *  ≥ 58 fps floor next to the water pipeline and 120 Hz sim — a listed
+ *  perf adaptation, not a palette change (underwater visibility is
+ *  fog-bounded well inside this range regardless). */
+const float ZD_NEAR = 30.0;
+const float ZD_FAR = 80.0;
 const float ZD_ROCK_SLOPE = 0.28;
 const float ZD_ROCK_SHARPNESS = 0.14;
 const float ZD_TRIPLANAR = 1.0;
@@ -167,19 +179,11 @@ float vnoiseQ(vec2 p, float seed) {
 
 const mat2 Z_ROT2 = mat2(0.80, -0.60, 0.60, 0.80);
 
-/** ZyFou fbm3 (biomeGLSL.js): manually unrolled 3 octaves, gain/lacunarity
- *  hardcoded so climate stays stable */
-float zFbm3(vec2 p, float seed) {
-  float v = vnoiseQ(p, seed) * 0.55;
-  p = Z_ROT2 * p * 2.13;
-  v += vnoiseQ(p, seed) * 0.30;
-  p = Z_ROT2 * p * 2.13;
-  v += vnoiseQ(p, seed) * 0.15;
-  return v;
-}
-
 /* ------------------------------------------------------------------------
- * Climate / biome weights / vegetation — biomeGLSL.js verbatim
+ * Climate / biome weights / vegetation — biomeGLSL.js law; the five
+ * climate FIELDS come from the load-time LUT (adaptation A8 — identical
+ * math, baked by substrateCpu.bakeClimateLut with the same fp32-exact
+ * hash); weights/vegetation stay verbatim per-fragment.
  * ---------------------------------------------------------------------- */
 
 struct ZClimate {
@@ -190,14 +194,19 @@ struct ZClimate {
   float region;
 };
 
-ZClimate zClimateAt(vec2 p) {
+/** climate at WORLD xz via the baked LUT (256² over the region, half-texel
+ *  centered like the other region rasters) */
+ZClimate zClimateAt(vec2 xz) {
+  float n = 256.0;
+  vec2 uv = ((xz + 0.5 * uRegionSize) * ((n - 1.0) / uRegionSize) + 0.5) / n;
+  vec4 a = texture2D(uClimateA, uv);
+  vec4 b = texture2D(uClimateB, uv);
   ZClimate c;
-  vec2 b = p * Z_BIOME_SCALE;
-  c.cont    = zFbm3(b * 0.085 + vec2(211.3,  57.9), 0.0);
-  c.temp    = clamp(zFbm3(b * 0.150 + vec2( 71.7, 313.1), 0.0) * 1.5 - 0.25 + Z_TEMP_BIAS, 0.0, 1.0);
-  c.moist   = clamp(zFbm3(b * 0.130 * Z_MOIST_SCALE + vec2( 91.7,  53.9), 0.0) * 1.5 - 0.25 + Z_MOIST_BIAS, 0.0, 1.0);
-  c.erosion = zFbm3(b * 0.190 + vec2(157.1, 423.7), 0.0);
-  c.region  = zFbm3(p * 0.700 + vec2(631.4, 199.2), 0.0);
+  c.temp = a.r;
+  c.moist = a.g;
+  c.cont = a.b;
+  c.erosion = a.a;
+  c.region = b.r;
   return c;
 }
 
@@ -343,6 +352,11 @@ vec3 zTriBlend(vec3 n) {
 }
 
 float zTriNoise(vec3 p, vec3 blend) {
+  // degenerate-weight fast path: ZyFou's pow-4 blend puts ≥ 97 % of the
+  // weight on the y-plane for slopes ≲ 4° — the full sum reduces to the
+  // single y-plane tap within ±0.03 (same formula, warp-coherent branch;
+  // the cp05A-correction fix for the 19 ms always-on triplanar cost)
+  if (blend.y > 0.97) return vnoiseQ(p.zx, 0.0);
   return vnoiseQ(p.yz, 0.0) * blend.x + vnoiseQ(p.zx, 0.0) * blend.y + vnoiseQ(p.xy, 0.0) * blend.z;
 }
 
@@ -364,10 +378,10 @@ float zDetailNoiseTri(vec3 worldPos, vec3 n, float scale) {
 }
 
 float zDetailNoise(vec3 worldPos, vec3 n, float scale) {
-  float planar = zDetailNoise2D(worldPos.xz, scale);
-  vec3 pTri = worldPos;
-  float tri = zDetailNoiseTri(pTri, n, scale);
-  return mix(planar, tri, clamp(ZD_TRIPLANAR, 0.0, 1.0));
+  // ZD_TRIPLANAR is Blank's constant 1.0 → mix(planar, tri, 1.0) ≡ tri;
+  // the planar arm is elided outright so no compiler is trusted to DCE it
+  // (perf adaptation, exact same value as the sourced expression)
+  return zDetailNoiseTri(worldPos, n, scale);
 }
 
 float zDetailRelief(vec3 worldPos, vec3 n, float scale) {
@@ -409,14 +423,20 @@ ZDetailResult zApplyDetailLayer(
 
   float fine = zDetailNoise(worldPos, normalGeo, scale);
   float coarse = zDetailNoise(worldPos + vec3(53.0, 17.0, 29.0), normalGeo, scale * 0.33);
-  float microB = zDetailNoise(worldPos + vec3(11.3, 5.7, 23.9), normalGeo, scale * 3.0);
+  // micro-band LOD (perf adaptation): the ~0.6 m micro speckle is sub-pixel
+  // beyond ~35 m at this resolution — beyond it the taps only alias, so the
+  // band fades out over 20→35 m (smooth; its uses scale by microFade)
+  float microFade = 1.0 - smoothstep(20.0, 35.0, length(cameraPosition - worldPos));
+  float microB = microFade > 0.001
+    ? zDetailNoise(worldPos + vec3(11.3, 5.7, 23.9), normalGeo, scale * 3.0)
+    : 0.5;
   float macroB = zDetailNoise(worldPos + vec3(127.0, 0.0, 211.0), normalGeo, scale * 0.085);
   float micro = clamp(ZD_MICRO, 0.0, 1.0);
   float macroAmt = clamp(ZD_MACRO + ZV_COLOR_VARIATION * 0.45, 0.0, 1.35);
 
   float grain = clamp(fine * 0.60 + coarse * 0.26 + microB * (0.14 + 0.10 * micro), 0.0, 1.0);
   float signedGrain = grain * 2.0 - 1.0;
-  float microSigned = microB * 2.0 - 1.0;
+  float microSigned = (microB * 2.0 - 1.0) * microFade;
   float macroSigned = macroB * 2.0 - 1.0;
 
   float rockMask = max(tc.rockBlend, zRockMask(slope, jitter));
@@ -488,13 +508,24 @@ vec3 zDisplayEncode(vec3 col) {
 }
 
 /** the ZyFou fragment-main input taps (TerrainMaterial.js), on world xz */
-void zColorInputs(vec2 xz, out ZClimate cl, out ZBiomeWeights bw,
+void zColorInputs(vec3 point, out ZClimate cl, out ZBiomeWeights bw,
                   out float jitter, out float detail, out float microN) {
-  cl = zClimateAt(xz * Z_FREQ + Z_SEED_OFFSET);
+  vec2 xz = point.xz;
+  cl = zClimateAt(xz); // LUT read (world coords; adaptation A8)
   bw = zBiomeWeightsAt(cl);
   jitter = (cl.region - 0.5) * 0.8 + (vnoiseQ(xz * 0.045 + Z_SEED_OFFSET, 0.0) - 0.5) * 0.6;
-  detail = vnoiseQ(xz * 0.35 + Z_SEED_OFFSET.yx, 0.0);
-  microN = vnoiseQ(xz * 0.9, 0.0);
+  // mip-style staging (perf adaptation): the 2.9 m detail and 1.1 m micro
+  // taps are sub-pixel at distance — they fade to their 0.5 mean exactly as
+  // texture mip filtering would (smooth, alias-reducing)
+  float d = length(cameraPosition - point);
+  float detailFade = 1.0 - smoothstep(100.0, 150.0, d);
+  float microFade = 1.0 - smoothstep(40.0, 65.0, d);
+  detail = detailFade > 0.001
+    ? mix(0.5, vnoiseQ(xz * 0.35 + Z_SEED_OFFSET.yx, 0.0), detailFade)
+    : 0.5;
+  microN = microFade > 0.001
+    ? mix(0.5, vnoiseQ(xz * 0.9, 0.0), microFade)
+    : 0.5;
 }
 
 /** Classification albedo (pre-detail) — the probe/debug surface and the
@@ -512,7 +543,7 @@ vec3 substrateAlbedo(vec3 point, vec3 normal) {
   float jitter;
   float detail;
   float microN;
-  zColorInputs(xz, cl, bw, jitter, detail, microN);
+  zColorInputs(point, cl, bw, jitter, detail, microN);
 
   ZTerrainColorResult tc = zComputeTerrainAlbedo(cl, bw, hZ, hRel, h, h01, slope, detail, jitter, microN);
   return zDisplayEncode(tc.albedo);
@@ -533,7 +564,7 @@ vec3 substrateColor(vec3 point, vec3 normal) {
   float jitter;
   float detail;
   float microN;
-  zColorInputs(xz, cl, bw, jitter, detail, microN);
+  zColorInputs(point, cl, bw, jitter, detail, microN);
 
   ZTerrainColorResult tc = zComputeTerrainAlbedo(cl, bw, hZ, hRel, h, h01, slope, detail, jitter, microN);
   ZDetailResult td;
@@ -554,14 +585,21 @@ vec3 substrateColor(vec3 point, vec3 normal) {
  * lighting law (adaptation A5); fades with the same 80→190 m law.
  */
 vec3 substrateDetailNormal(vec3 normal, vec3 point) {
-  float fade = zDetailFadeAt(point);
+  // normal-wobble LOD (perf adaptation): the low-intensity detail normal is
+  // invisible beyond a few tens of meters — its own fade closes by 40 m
+  float d = length(cameraPosition - point);
+  float fade = zDetailFadeAt(point) * (1.0 - smoothstep(25.0, 40.0, d));
   float strength = ZD_NORMAL_STRENGTH * fade * (0.45 + 0.55 * zDetailQualityFactor());
   if (strength <= 0.0001) return normal;
   float scale = ZD_SCALE * mix(0.55, 1.25, zDetailQualityFactor());
   float e = max(0.45, 0.55 / max(scale, 0.0001));
-  float c = zDetailRelief(point, normal, scale);
-  float dx = zDetailRelief(point + vec3(e, 0.0, 0.0), normal, scale) - c;
-  float dz = zDetailRelief(point + vec3(0.0, 0.0, e), normal, scale) - c;
+  // perf adaptation (listed): the relief for the NORMAL pass samples the
+  // primary fine band in planar XZ (3 taps/sample) instead of ZyFou's full
+  // triplanar 3-band relief (27 taps/sample) — the albedo detail keeps
+  // ZyFou's full math; only the low-intensity normal wobble is thinned.
+  float c = zDetailNoise2D(point.xz, scale);
+  float dx = zDetailNoise2D(point.xz + vec2(e, 0.0), scale) - c;
+  float dz = zDetailNoise2D(point.xz + vec2(0.0, e), scale) - c;
   // ZyFou material weighting: rock strengthens, shore adds a little
   float slope = 1.0 - clamp(normal.y, 0.0, 1.0);
   float rockMask = zRockMask(slope, 0.0);

@@ -317,9 +317,11 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     expect(audit.anyLegacyTintLaw).toBe(false);
     results.substrateShaderAudit = audit;
 
-    // camera 120 m above the south-bay shelf looking straight down;
+    // camera 34 m above the south-bay shelf looking straight down — inside
+    // the mip-staging full-detail radius (< 40 m) so the GPU's staged
+    // detail/micro taps equal the camera-independent CPU twin exactly;
     // surface hidden + albedo-debug → raw classification pixels
-    const CAM: [number, number, number] = [-180, 120, 300];
+    const CAM: [number, number, number] = [-180, 34, 300];
     await testHook(page, 'teleport(-500, -380, -3)'); // dolphin far away
     await testHook(page, 'setIntent({ brake: true })');
     await testHook(
@@ -333,10 +335,11 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     const shotPath = join(MEDIA_DIR, 'albedo-debug-probes.png');
     await page.locator('#app canvas').screenshot({ path: shotPath });
 
-    // probe grid on the shelf (≥ 60 m from the camera → detail fade = 0)
+    // probe grid on the shelf (all within ~37 m of the camera → the staged
+    // classification taps are at full strength, matching the CPU twin)
     const pts: [number, number][] = [];
-    for (let dx = -60; dx <= 60; dx += 30) {
-      for (let dz = -60; dz <= 60; dz += 30) {
+    for (let dx = -14; dx <= 14; dx += 7) {
+      for (let dz = -14; dz <= 14; dz += 7) {
         pts.push([CAM[0] + dx, CAM[2] + dz]);
       }
     }
