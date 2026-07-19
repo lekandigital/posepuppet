@@ -54,15 +54,18 @@ varying vec3 vPosition;
 vec3 getSurfaceRayColor(vec3 origin, vec3 ray, vec3 waterColor) {
   vec3 color;
   float t = raymarchSeabed(origin, ray);
+  float underwaterPath = 0.0;
 
   if (ray.y < 0.0) {
     // RAY POINTS DOWNWARD - hits the seabed heightfield. Grazing rays that
     // out-run the march (> 192 m) drop onto the seabed under the march end
     // so the far field shades continuously with the last real hits
     // [DERIVED miss-path completion — reported].
-    vec3 hit = origin + ray * (t >= 0.0 ? t : RM_MAX);
+    float tHit = t >= 0.0 ? t : RM_MAX;
+    vec3 hit = origin + ray * tHit;
     if (t < 0.0) hit.y = terrainHeight(hit.xz);
     color = getWallColor(hit);
+    underwaterPath = tHit;
   } else {
     // RAY POINTS UPWARD - exits water into air
     if (t >= 0.0) {
@@ -75,8 +78,9 @@ vec3 getSurfaceRayColor(vec3 origin, vec3 ray, vec3 waterColor) {
     }
   }
 
-  // WATER COLOR ABSORPTION (Beer-Lambert approximation) — vendored
-  if (ray.y < 0.0) color *= waterColor;
+  // WATER COLOR ABSORPTION — the vendored Beer-Lambert approximation in
+  // path-length form (cp05A correction; see waterPathTint)
+  if (ray.y < 0.0) color *= waterPathTint(waterColor, underwaterPath);
 
   return color;
 }

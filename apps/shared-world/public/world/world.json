@@ -231,7 +231,16 @@
       "ARCH_RESIDUAL": 0.2,
       "SITE_RESIDUAL": 0.2,
       "PLAIN_RESIDUAL": 0.5,
-      "LOOP_SHALLOW_FRAC": 0.4
+      "LOOP_SHALLOW_FRAC": 0.4,
+      "ISLET_RIDGE_AMP_M": 8,
+      "ISLET_CARVE_AMP_M": 4,
+      "ISLET_RIDGE_WAVELEN_M": 18,
+      "ISLET_CARVE_WAVELEN_M": 14,
+      "ISLET_V0": 0.5,
+      "ISLET_V1": 1.2,
+      "ISLET_COAST_NEAR_M": 2,
+      "ISLET_COAST_FULL_M": 6,
+      "ISLET_PROT_OVERRIDE": 0.9
     }
   },
   "verification": {
@@ -305,7 +314,7 @@
       {
         "x": -40,
         "z": -70,
-        "h": -28.551833
+        "h": -28.462937
       },
       {
         "x": 390,
@@ -325,7 +334,7 @@
       {
         "x": 90,
         "z": -80,
-        "h": 3.392874
+        "h": 5.257069
       },
       {
         "x": 900,

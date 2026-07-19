@@ -1,79 +1,91 @@
-// substrateCpu — Checkpoint 05A CPU twin of the shared substrate
-// classification (RegionSubstrate.glsl), per addendum §4.7: the same
-// classification consumed by "debug and baked color outputs used to
-// validate classification". Consumers: the region-preview vertex colors
-// (the engineering view renders the real classification) and the
-// region-substrate spec's probe comparisons against the GPU albedo-debug
-// render.
+// substrateCpu — CP05A-correction CPU twin of the shared ZyFou-Blank
+// substrate color (RegionSubstrate.glsl). Mirrors the CLASSIFICATION
+// (substrateAlbedo: climate → biome weights → computeTerrainAlbedo →
+// palette post → display encode); the close-range detail layer is excluded
+// by design (it fades with camera distance; the probe comparisons run
+// against the pre-detail albedo-debug render).
 //
-// Parity contract with RegionSubstrate.glsl:
-//  - the lattice hash is fp32-exact on both sides (permutation polynomial,
-//    intermediates < 2^23; Math.fround emulates the GPU's fp32 multiply);
-//  - heights/SDF/biome come from the same decoded artifacts (JS f64
-//    bilinear vs GPU fp32 texture filtering — small tolerance);
-//  - the close-range detail layer is EXCLUDED here by design: it fades to
-//    zero beyond 55 m and the probe comparisons run at classification
-//    level (uAlbedoDebug renders substrateAlbedo, not substrateColor).
-//
-// Every constant below mirrors RegionSubstrate.glsl; change them together.
+// Parity contract: the lattice hash is fp32-exact on both sides (mod-289
+// permutation polynomial; Math.fround emulates the GPU's single fp32
+// multiply). All constants mirror RegionSubstrate.glsl — change them
+// together. Sources: ZyFou/ProceduralTerrains pinned 8b396f9c —
+// ColorPalette.js EARTH_PALETTE, PlanetStyleConfig.js DEFAULT_PLANET_STYLE,
+// terrainColor.glsl.js computeTerrainAlbedo, biomeGLSL.js climate system,
+// Engine.js uniform wiring (seed 1337, noiseScale 45, board 2048).
 
 import type { WorldData } from './WorldData';
 
+type V3 = [number, number, number];
+
 const F = Math.fround;
 
-/* palette — must match RegionSubstrate.glsl (source labels there) */
-const SUB_DRY_SAND: V3 = [0.823529, 0.780392, 0.662745];
-const SUB_WET_SAND: V3 = [0.717647, 0.658824, 0.541176];
-const SUB_LOW_SOIL: V3 = [0.639216, 0.564706, 0.419608];
-const SUB_DRY_EARTH: V3 = [0.690196, 0.541176, 0.360784];
-const SUB_VEG_SOIL: V3 = [0.513725, 0.505882, 0.352941];
-const SUB_ROCK: V3 = [0.662745, 0.560784, 0.423529];
-const SUB_CLIFF_ROCK: V3 = [0.552941, 0.462745, 0.341176];
-const SUB_HIGH_ROCK: V3 = [0.611765, 0.580392, 0.541176];
-const SUB_SHAL_SAND: V3 = [0.847059, 0.823529, 0.635294];
-const SUB_SHORE_STONE: V3 = [0.486275, 0.517647, 0.407843];
-const SUB_REEF_LIME: V3 = [0.709804, 0.631373, 0.498039];
-const SUB_KELP_STONE: V3 = [0.607843, 0.541176, 0.372549];
-const SUB_MID_STONE: V3 = [0.560784, 0.494118, 0.388235];
-const SUB_UW_CLIFF: V3 = [0.435294, 0.411765, 0.360784];
-const SUB_SILT: V3 = [0.662745, 0.698039, 0.713725];
-const SUB_TRENCH_ROCK: V3 = [0.243137, 0.290196, 0.337255];
-const SUB_TRENCH_SED: V3 = [0.556863, 0.576471, 0.498039];
-const SUB_CAVE_ROCK: V3 = [0.333333, 0.286275, 0.113725];
+/* Blank constants (mirror RegionSubstrate.glsl) */
+const Z_SEED_OFFSET: [number, number] = [-646.3245668411255, -634.9020133018494];
+const Z_FREQ = 0.002197265625;
+const Z_HEIGHT_SCALE = 560;
+const Z_SEA = 160;
+const Z_SNOW_LINE = 0.7;
+const Z_ROCK_SLOPE_LO = 0.42;
+const Z_ROCK_SLOPE_HI = 0.72;
+const Z_SNOW_SLOPE_MIN = 0.30;
+const Z_SNOW_SLOPE_MAX = 0.62;
+const Z_BIOME_SCALE = 1.0;
+const Z_TEMP_BIAS = 0.0;
+const Z_MOIST_SCALE = 1.0;
+const Z_MOIST_BIAS = 0.0;
+const Z_PAL_SATURATION = 1.0;
+const Z_PAL_CONTRAST = 1.0;
+const Z_PAL_TINT: V3 = [1, 1, 1];
 
-const CAVES: [number, number][] = [[-420, 30], [-430, -150], [450, -30]];
-
-type V3 = [number, number, number];
+/* EARTH_PALETTE (ColorPalette.js, verbatim) */
+const COL = {
+  deep: [0.012, 0.075, 0.14] as V3,
+  sand: [0.56, 0.47, 0.3] as V3,
+  dune: [0.62, 0.49, 0.29] as V3,
+  dryGrass: [0.38, 0.33, 0.15] as V3,
+  grass: [0.13, 0.26, 0.085] as V3,
+  forest: [0.052, 0.14, 0.055] as V3,
+  jungle: [0.035, 0.125, 0.045] as V3,
+  swamp: [0.09, 0.13, 0.07] as V3,
+  tundra: [0.3, 0.29, 0.24] as V3,
+  redRock: [0.42, 0.235, 0.14] as V3,
+  redRock2: [0.56, 0.37, 0.21] as V3,
+  rock: [0.26, 0.235, 0.215] as V3,
+  rockHi: [0.38, 0.365, 0.355] as V3,
+  snow: [0.87, 0.89, 0.93] as V3,
+};
 
 const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
 const mixN = (a: number, b: number, t: number) => a + (b - a) * t;
 const mixV = (a: V3, b: V3, t: number): V3 => [
   mixN(a[0], b[0], t), mixN(a[1], b[1], t), mixN(a[2], b[2], t),
 ];
+const mulV = (a: V3, s: number): V3 => [a[0] * s, a[1] * s, a[2] * s];
 function sstep(e0: number, e1: number, x: number): number {
   const t = clamp((x - e0) / (e1 - e0), 0, 1);
   return t * t * (3 - 2 * t);
 }
+const fractN = (x: number) => x - Math.floor(x);
 
-/* fp32-exact lattice hash (mirrors subHash) */
+/* fp32-exact lattice hash (mirror subHash: nested permutation polynomial —
+ * perm(perm(x) + y) — no 1-D linear-projection degeneracy) */
 const HASH_C = F(0.024390243);
-function glslMod(x: number, m: number): number {
-  return x - m * Math.floor(x / m);
-}
+const glslMod = (x: number, m: number) => x - m * Math.floor(x / m);
+const zPerm = (v: number) => glslMod(v * (v * 34 + 1), 289);
 function subHash(ipx: number, ipy: number, seed: number): number {
-  let n = glslMod(ipx + ipy * 57 + seed, 289);
-  n = glslMod(n * (n * 34 + 1), 289);
+  const n = zPerm(glslMod(zPerm(glslMod(ipx + seed, 289)) + ipy, 289));
   const t = F(n * HASH_C);
   return t - Math.floor(t);
 }
 
-function subNoise(px: number, py: number, seed: number): number {
+/** quintic value noise (ZyFou fade) over the parity hash */
+function vnoiseQ(px: number, py: number, seed: number): number {
   const ix = Math.floor(px);
   const iy = Math.floor(py);
   const fx = px - ix;
   const fy = py - iy;
-  const ux = fx * fx * (3 - 2 * fx);
-  const uy = fy * fy * (3 - 2 * fy);
+  const ux = fx * fx * fx * (fx * (fx * 6 - 15) + 10);
+  const uy = fy * fy * fy * (fy * (fy * 6 - 15) + 10);
   const a = subHash(ix, iy, seed);
   const b = subHash(ix + 1, iy, seed);
   const c = subHash(ix, iy + 1, seed);
@@ -81,11 +93,76 @@ function subNoise(px: number, py: number, seed: number): number {
   return mixN(mixN(a, b, ux), mixN(c, d, ux), uy);
 }
 
-function subFbm(px: number, py: number, seed: number): number {
-  return subNoise(px, py, seed) * 0.65 + subNoise(px * 2.13 + 31, py * 2.13 + 31, seed + 7) * 0.35;
+/* ROT2 = [0.80 −0.60; 0.60 0.80] — column-major GLSL mat2 multiply */
+function rot2(px: number, py: number): [number, number] {
+  return [0.8 * px + 0.6 * py, -0.6 * px + 0.8 * py];
 }
 
-/** heightfield normal — the same central-difference law as seabedNormal() */
+function zFbm3(px: number, py: number): number {
+  let v = vnoiseQ(px, py, 0) * 0.55;
+  [px, py] = rot2(px, py);
+  px *= 2.13; py *= 2.13;
+  v += vnoiseQ(px, py, 0) * 0.30;
+  [px, py] = rot2(px, py);
+  px *= 2.13; py *= 2.13;
+  v += vnoiseQ(px, py, 0) * 0.15;
+  return v;
+}
+
+interface ZClimate { temp: number; moist: number; cont: number; erosion: number; region: number }
+interface ZBiome { desert: number; canyon: number; wetland: number; mountains: number }
+
+function zClimateAt(px: number, py: number): ZClimate {
+  const bx = px * Z_BIOME_SCALE;
+  const by = py * Z_BIOME_SCALE;
+  return {
+    cont: zFbm3(bx * 0.085 + 211.3, by * 0.085 + 57.9),
+    temp: clamp(zFbm3(bx * 0.15 + 71.7, by * 0.15 + 313.1) * 1.5 - 0.25 + Z_TEMP_BIAS, 0, 1),
+    moist: clamp(zFbm3(bx * 0.13 * Z_MOIST_SCALE + 91.7, by * 0.13 * Z_MOIST_SCALE + 53.9) * 1.5 - 0.25 + Z_MOIST_BIAS, 0, 1),
+    erosion: zFbm3(bx * 0.19 + 157.1, by * 0.19 + 423.7),
+    region: zFbm3(px * 0.7 + 631.4, py * 0.7 + 199.2),
+  };
+}
+
+function zBiomeWeightsAt(c: ZClimate): ZBiome {
+  const j = (c.region - 0.5) * 0.16;
+  const hot = sstep(0.52, 0.74, c.temp + j);
+  const dry = sstep(0.55, 0.30, c.moist - j);
+  const wet = sstep(0.55, 0.78, c.moist + j);
+  const lowC = sstep(0.55, 0.32, c.cont);
+  const eroded = sstep(0.40, 0.70, c.erosion + j * 0.5);
+  return {
+    desert: hot * dry * (1 - eroded * 0.55),
+    canyon: dry * eroded * sstep(0.30, 0.55, c.cont),
+    wetland: wet * lowC * (1 - hot * 0.4),
+    mountains: sstep(0.38, 0.62, c.cont) * (1 - eroded * 0.7),
+  };
+}
+
+function zVegetationDensity(c: ZClimate, h01: number, slope: number): number {
+  const tempEff = c.temp - h01 * 0.55;
+  const warmEnough = sstep(0.18, 0.34, tempEff) * sstep(0.92, 0.70, tempEff);
+  const wetEnough = sstep(0.34, 0.62, c.moist);
+  const flatGround = sstep(0.55, 0.25, slope);
+  return warmEnough * wetEnough * flatGround;
+}
+
+function zApplyPalettePost(col: V3): V3 {
+  const luma = col[0] * 0.299 + col[1] * 0.587 + col[2] * 0.114;
+  let out: V3 = [
+    mixN(luma, col[0], Z_PAL_SATURATION),
+    mixN(luma, col[1], Z_PAL_SATURATION),
+    mixN(luma, col[2], Z_PAL_SATURATION),
+  ];
+  out = [
+    (out[0] - 0.5) * Z_PAL_CONTRAST + 0.5,
+    (out[1] - 0.5) * Z_PAL_CONTRAST + 0.5,
+    (out[2] - 0.5) * Z_PAL_CONTRAST + 0.5,
+  ];
+  out = [out[0] * Z_PAL_TINT[0], out[1] * Z_PAL_TINT[1], out[2] * Z_PAL_TINT[2]];
+  return [Math.max(out[0], 0), Math.max(out[1], 0), Math.max(out[2], 0)];
+}
+
 export function seabedNormalCpu(data: WorldData, x: number, z: number): V3 {
   const n = data.header.artifacts['height.r16']!.resolution!;
   const e = data.header.sizeMeters[0] / (n - 1);
@@ -100,112 +177,131 @@ export function seabedNormalCpu(data: WorldData, x: number, z: number): V3 {
   return [vx / len, vy / len, vz / len];
 }
 
-function concavityCpu(data: WorldData, x: number, z: number, h: number): number {
-  const n = data.header.artifacts['height.r16']!.resolution!;
-  const e = 4 * (data.header.sizeMeters[0] / (n - 1));
-  const hAvg = 0.25 * (
-    data.terrainHeight(x + e, z) + data.terrainHeight(x - e, z) +
-    data.terrainHeight(x, z + e) + data.terrainHeight(x, z - e));
-  return clamp((hAvg - h) / 3, 0, 1);
-}
-
 export interface SubstrateSample {
+  /** display-encoded classification albedo (matches uAlbedoDebug render) */
   albedo: V3;
-  /** dominant substrate family label (diagnostic; from the branch weights) */
+  /** dominant coloration family (diagnostic; from the ZyFou blend weights) */
   family: string;
   h: number;
   slope: number;
   depth: number;
-  shoreDist: number;
+  /** ZyFou intermediate diagnostics */
+  snow: number;
+  rockBlend: number;
+  weights: ZBiome;
+  climate: ZClimate;
 }
 
-/** The classification twin of substrateAlbedo() — same blend order. */
+/** Twin of substrateAlbedo(): the ZyFou Blank classification. */
 export function substrateSampleCpu(data: WorldData, x: number, z: number): SubstrateSample {
   const h = data.terrainHeight(x, z);
   const normal = seabedNormalCpu(data, x, z);
   const slope = 1 - clamp(normal[1], 0, 1);
-  const sd = data.shoreDistance(x, z);
-  const [biomeR, biomeG, biomeB] = data.biomeAt(x, z);
-  const conc = concavityCpu(data, x, z, h);
+  const hZ = h * 2 + Z_SEA;
+  const hRel = hZ - Z_SEA;
+  const h01 = hZ / Z_HEIGHT_SCALE;
 
-  const bBroad = subFbm(x * 0.0058824, z * 0.0058824, 11);
-  const bMoist = subFbm(x * 0.0111111, z * 0.0111111, 23);
-  const bMed = subFbm(x * 0.0454545, z * 0.0454545, 37);
+  const px = x * Z_FREQ + Z_SEED_OFFSET[0];
+  const py = z * Z_FREQ + Z_SEED_OFFSET[1];
+  const cl = zClimateAt(px, py);
+  const bw = zBiomeWeightsAt(cl);
+  const jitter = (cl.region - 0.5) * 0.8 +
+    (vnoiseQ(x * 0.045 + Z_SEED_OFFSET[0], z * 0.045 + Z_SEED_OFFSET[1], 0) - 0.5) * 0.6;
+  const detail = vnoiseQ(x * 0.35 + Z_SEED_OFFSET[1], z * 0.35 + Z_SEED_OFFSET[0], 0);
+  const microN = vnoiseQ(x * 0.9, z * 0.9, 0);
 
-  let ground: V3;
-  let family = 'rock';
-  let best = 0;
-  const consider = (name: string, w: number) => {
-    if (w > best) {
-      best = w;
-      family = name;
-    }
-  };
+  // ---- computeTerrainAlbedo (terrainColor.glsl.js), verbatim structure ----
+  const tempEff = clamp(cl.temp - h01 * 0.55, 0, 1);
+  const veg = zVegetationDensity(cl, h01, slope);
+  const jt = jitter * 0.06;
 
-  if (h < 0) {
-    const depth = -h;
-    const sediment = mixV(SUB_SHAL_SAND, SUB_SILT, sstep(10, 42, depth));
-    const shallowStone = mixV(SUB_REEF_LIME, SUB_KELP_STONE, biomeG * 0.75);
-    let stone = mixV(shallowStone, SUB_MID_STONE, sstep(8, 30, depth));
-    stone = mixV(stone, SUB_TRENCH_ROCK, sstep(45, 65, depth));
+  const hotBand = mixV(COL.dune,
+    mixV(COL.dryGrass, COL.jungle, sstep(0.45, 0.75, cl.moist)),
+    sstep(0.20, 0.50, cl.moist));
+  const midBand = mixV(COL.dryGrass,
+    mixV(COL.grass, COL.forest, veg * (0.5 + 0.5 * sstep(0.35, 0.65, detail))),
+    sstep(0.22, 0.52, cl.moist));
+  const coldBand = mixV(COL.tundra, mixV(COL.tundra, mulV(COL.forest, 0.85), veg),
+    sstep(0.30, 0.60, cl.moist));
 
-    const rockW = sstep(0.16, 0.42, slope + (bMed - 0.5) * 0.35);
-    ground = mixV(sediment, stone, rockW);
-    consider(depth < 12 ? 'shallow-sand' : 'deep-sediment', (1 - rockW) * 0.9);
-    consider(depth > 50 ? 'trench-rock' : depth > 22 ? 'mid-stone' : 'reef-stone', rockW);
+  let lowland = mixV(coldBand, midBand, sstep(0.20, 0.38, tempEff + jt));
+  lowland = mixV(lowland, hotBand, sstep(0.55, 0.72, tempEff + jt));
+  lowland = mixV(lowland, COL.swamp, bw.wetland * 0.8);
 
-    const siltW = (1 - sstep(0.06, 0.16, slope)) * sstep(0.15, 0.6, conc) * sstep(6, 16, depth);
-    ground = mixV(ground, mixV(SUB_SILT, SUB_TRENCH_SED, sstep(45, 65, depth)), siltW * 0.8);
-    consider('silt-pocket', siltW * 0.8);
+  const sandBand = (mixN(3, 9, sstep(0.30, 0.70, tempEff)) + jitter * 4) * (1 - bw.wetland * 0.85);
+  let albedo = mixV(COL.sand, lowland, sstep(sandBand * 0.4, Math.max(sandBand, 0.3), hRel));
 
-    const cliffW = sstep(0.45, 0.72, slope);
-    ground = mixV(ground, mixV(SUB_UW_CLIFF, SUB_TRENCH_ROCK, sstep(40, 62, depth)), cliffW);
-    consider('uw-cliff-stone', cliffW);
+  const band = fractN(h01 * 14 + detail * 0.15);
+  const canyonCol = mixV(COL.redRock, COL.redRock2, sstep(0.25, 0.75, band));
+  albedo = mixV(albedo, canyonCol, bw.canyon * sstep(1, 6, hRel));
 
-    const shoreW = (1 - sstep(4, 14, sd)) * sstep(0.12, 0.35, slope + (bMed - 0.5) * 0.2);
-    ground = mixV(ground, SUB_SHORE_STONE, shoreW * 0.7);
-    consider('shore-stone', shoreW * 0.7);
+  const highBlend = sstep(0.30, 0.62, h01 + jitter * 0.08);
+  albedo = mixV(albedo, COL.rockHi, highBlend * 0.65 * (1 - bw.desert * 0.7));
 
-    let dCave = Infinity;
-    for (const [cx, cz] of CAVES) dCave = Math.min(dCave, Math.hypot(x - cx, z - cz));
-    const caveW = 1 - sstep(8, 24, dCave);
-    ground = mixV(ground, SUB_CAVE_ROCK, caveW * 0.75);
-    consider('cave-mouth-rock', caveW * 0.75);
+  const rockBlend = sstep(Z_ROCK_SLOPE_LO, Z_ROCK_SLOPE_HI, slope + jitter * 0.06);
+  const slopeRock = mixV(mixV(COL.rock, COL.rockHi, detail), COL.redRock, bw.canyon * 0.8);
+  albedo = mixV(albedo, slopeRock, rockBlend);
 
-    ground = mixV(ground, mixV(ground, SUB_SILT, 0.35), biomeB * 0.6);
-    ground = mixV(ground, [ground[0] * 1.06, ground[1] * 1.06, ground[2] * 1.06], biomeR * 0.5);
-  } else {
-    const inland = -sd;
-    let soil = mixV(SUB_LOW_SOIL, SUB_DRY_EARTH, sstep(0.35, 0.7, bMoist));
-    soil = mixV(soil, SUB_VEG_SOIL, sstep(0.55, 0.8, 1 - bMoist) * 0.7);
+  const snowLine01 = Z_SNOW_LINE * (0.40 + 1.20 * cl.temp);
+  const flatness = sstep(Z_SNOW_SLOPE_MAX, Z_SNOW_SLOPE_MIN, slope);
+  let snow = sstep(snowLine01 - 0.03, snowLine01 + 0.05, h01 + jitter * 0.04) * flatness;
+  snow = Math.max(snow, sstep(0.10, 0.02, tempEff) * sstep(0.50, 0.25, slope));
+  snow *= 1 - bw.desert;
+  albedo = mixV(albedo, COL.snow, snow);
 
-    const beachW = (1 - sstep(3.5, 7, h)) * (1 - sstep(0.14, 0.32, slope)) * (1 - sstep(28, 60, inland));
-    ground = mixV(soil, SUB_DRY_SAND, beachW);
-    consider('beach-sand', beachW);
-    consider('soil', (1 - beachW) * 0.5);
-
-    const rockW = sstep(0.22, 0.45, slope + (bMed - 0.5) * 0.25);
-    let rockCol = mixV(SUB_ROCK, SUB_HIGH_ROCK, sstep(60, 130, h));
-    const cliffW = sstep(0.5, 0.72, slope);
-    rockCol = mixV(rockCol, SUB_CLIFF_ROCK, cliffW);
-    const strata = Math.sin(h * 0.55 + bMed * 6);
-    const sMul = 1 + strata * 0.05 * cliffW;
-    rockCol = [rockCol[0] * sMul, rockCol[1] * sMul, rockCol[2] * sMul];
-    ground = mixV(ground, rockCol, rockW);
-    consider(h > 90 ? 'high-rock' : cliffW > 0.5 ? 'cliff-rock' : 'exposed-rock', rockW);
-
-    const wetW = Math.max(1 - sstep(0.3, 1.4, h), 1 - sstep(2, 6, inland));
-    ground = mixV(ground, mixV(SUB_WET_SAND, SUB_SHORE_STONE, sstep(0.25, 0.5, slope)), wetW * 0.65);
-    consider('wet-shoreline', wetW * 0.65);
+  let floorW = 0;
+  if (hRel < 0) {
+    // floor ramp on REAL meters (adaptation A2b — mirrors the GLSL
+    // hRelFloor parameter; keeps mid-depth substrate readable)
+    const depth01 = clamp(-h / 55, 0, 1);
+    const floorCol = mixV(mulV(mixV(COL.sand, COL.swamp, bw.wetland * 0.7), 0.65), COL.deep, depth01);
+    albedo = mixV(albedo, floorCol, 0.92);
+    floorW = 0.92;
   }
 
-  ground = [
-    ground[0] * (1 + (bBroad - 0.5) * 0.06),
-    ground[1],
-    ground[2] * (1 - (bBroad - 0.5) * 0.05),
-  ];
-  const drift = 1 + (bBroad - 0.5) * 0.08;
-  ground = [ground[0] * drift, ground[1] * drift, ground[2] * drift];
+  let micro = mixN(0.20, 0.06, Math.max(bw.desert * (1 - rockBlend), bw.wetland * 0.8));
+  micro = mixN(micro, 0.30, Math.max(rockBlend * 0.6, bw.canyon * 0.4));
+  const microMul = (1 - micro * 0.5) + micro * microN;
+  albedo = mulV(albedo, microMul);
 
-  return { albedo: ground, family, h, slope, depth: Math.max(0, -h), shoreDist: sd };
+  const post = zApplyPalettePost(albedo);
+  const encoded: V3 = [
+    Math.pow(Math.max(post[0], 0), 1 / 2.2),
+    Math.pow(Math.max(post[1], 0), 1 / 2.2),
+    Math.pow(Math.max(post[2], 0), 1 / 2.2),
+  ];
+
+  // dominant-family diagnostic (from the same blend weights; substrate/
+  // ground-coloration labels only)
+  let family: string;
+  if (hRel < 0) {
+    const depth01 = clamp(-h / 55, 0, 1);
+    family = depth01 > 0.6 ? 'deep-floor' : depth01 > 0.25 ? 'mid-floor' : 'shallow-floor';
+    if (rockBlend > 0.5 && floorW < 1) family = depth01 > 0.6 ? 'deep-floor' : 'rocky-floor';
+  } else if (snow > 0.5) {
+    family = 'snow';
+  } else if (rockBlend > 0.5) {
+    family = bw.canyon > 0.5 ? 'canyon-rock' : 'slope-rock';
+  } else if (hRel < Math.max(sandBand, 0.3) * 0.7) {
+    family = 'shore-sand';
+  } else if (highBlend * 0.65 > 0.35) {
+    family = 'high-rock';
+  } else if (bw.wetland > 0.5) {
+    family = 'swamp-soil';
+  } else {
+    const tE = tempEff + jt;
+    family = tE > 0.6 ? 'dry-lowland' : tE > 0.25 ? 'grassland' : 'tundra';
+  }
+
+  return {
+    albedo: encoded,
+    family,
+    h,
+    slope,
+    depth: Math.max(0, -h),
+    snow,
+    rockBlend,
+    weights: bw,
+    climate: cl,
+  };
 }

@@ -49,6 +49,8 @@ const S_EMPH = RELIEF_SEED_BASE + 51040;
 const S_MED = RELIEF_SEED_BASE + 51050;
 const S_FINE = RELIEF_SEED_BASE + 51060;
 const S_WALL = RELIEF_SEED_BASE + 51070;
+const S_ISLET_RIDGE = RELIEF_SEED_BASE + 51080;
+const S_ISLET_CARVE = RELIEF_SEED_BASE + 51081;
 
 // ---------------------------------------------------------------------------
 // Relief parameters — every value [DERIVED, flagged for the §9 manual review]
@@ -136,6 +138,24 @@ export const RELIEF = {
   /** corridor swim-depth guard: in water on the approved loop, shallowing
    *  is capped so new depth ≥ (1 − LOOP_SHALLOW_FRAC)·depth − nothing */
   LOOP_SHALLOW_FRAC: 0.4,
+
+  /** CP05A-correction corridor-islet rework (user-authorized): the three
+   *  approved corridor masses keep position/footprint/count but get
+   *  natural rocky mini-island profiles — irregular silhouettes (in
+   *  profile), steeper broken sides, restrained ridges, uneven peaks.
+   *  All [DERIVED], flagged. */
+  ISLET_RIDGE_AMP_M: 8.0,   // upward craggy ridging on the islet bodies
+  ISLET_CARVE_AMP_M: 4.0,   // broken-side carving
+  ISLET_RIDGE_WAVELEN_M: 18,
+  ISLET_CARVE_WAVELEN_M: 14,
+  /** the islet term's own vertical ramp: the sign-preservation clamp (and
+   *  the exact-zero band at |h05| < SHORE_V0) guarantee the footprint, so
+   *  the low islet bodies ramp in tightly instead of over SHORE_V1 */
+  ISLET_V0: 0.5,
+  ISLET_V1: 1.2,
+  ISLET_COAST_NEAR_M: 2.0,  // islet relief lives to within ~2 m of the waterline
+  ISLET_COAST_FULL_M: 6.0,
+  ISLET_PROT_OVERRIDE: 0.9, // islet bodies are exempt from corridor flattening
 };
 
 // ---------------------------------------------------------------------------
@@ -181,6 +201,16 @@ const CAVE_PASSAGE = [-430, -150, -420, 30];
 
 /** arch seam zone */
 const ARCH = [-40, -70];
+
+/** the three approved corridor masses (fieldC islandDisc stamps: center,
+ *  stamp radius, authored peak) — positions/footprints immovable */
+const ISLETS = [
+  // back = authored backbone amplitude (m); lobes/phase shape each islet's
+  // uneven crest ring so no two read alike [DERIVED, flagged]
+  { x: -80, z: -70, r: 55, peak: 6, back: 6, lobes: 3, phase: 0.7 },
+  { x: 90, z: -80, r: 46, peak: 4, back: 6, lobes: 2, phase: 2.1 },
+  { x: 230, z: -90, r: 42, peak: 3, back: 5, lobes: 3, phase: 4.4 },
+];
 
 /** future ruin/structure/discovery footprints (placement.json sites) */
 const SITES = [
@@ -308,6 +338,17 @@ function shelfWeight(x, z) {
   return 1 - sstep(SHELF.r0, SHELF.r1, hyp(x - SHELF.x, z - SHELF.z));
 }
 
+/** corridor-islet body weight (CP05A correction): 1 on an islet body,
+ *  fading past its stamp radius */
+function isletWeight(x, z) {
+  let w = 0;
+  for (const it of ISLETS) {
+    const d = hyp(x - it.x, z - it.z);
+    w = Math.max(w, 1 - sstep(it.r * 0.7, it.r * 1.2, d));
+  }
+  return w;
+}
+
 function plainWeight(x, z) {
   return 1 - sstep(PLAIN.r0, PLAIN.r1, hyp(x - PLAIN.x, z - PLAIN.z));
 }
@@ -399,7 +440,12 @@ export function reliefAt(x, z, h05, shoreDistM) {
   const beachTaper = sstep(R.COAST_NEAR_M, R.COAST_FAR_M, asd);
   const cliffCoastW = ridgeW * (1 - sstep(R.CLIFF_COAST_M, R.CLIFF_COAST_FAR_M, asd));
   const cliffTaper = sstep(R.CLIFF_COAST_NEAR_M, R.CLIFF_COAST_FULL_M, asd) * cliffCoastW;
-  const coast = Math.max(beachTaper, cliffTaper);
+  // CP05A correction: the three corridor islets are authored rocky
+  // mini-islands — their bodies keep relief to within ~2 m of the
+  // waterline (the sv taper still guards the footprint mask exactly)
+  const isletW = isletWeight(x, z);
+  const isletCoastTaper = sstep(R.ISLET_COAST_NEAR_M, R.ISLET_COAST_FULL_M, asd);
+  const coast = Math.max(beachTaper, cliffTaper, isletCoastTaper * isletW);
   if (coast <= 0) return 0;
 
   // domain warp [ZyFou legacyShape2D layer 1]
@@ -444,7 +490,7 @@ export function reliefAt(x, z, h05, shoreDistM) {
     R.ZONE_SHELF_AMP_M * shelfW +
     R.ZONE_CLIFF_AMP_M * cliffCoastW;
 
-  let delta =
+  const core =
     broad * R.BROAD_AMP_M +
     ridgeSigned * zoneAmp +
     emph * R.EMPH_AMP_M * Math.max(ridgeW, wallW) +
@@ -452,7 +498,39 @@ export function reliefAt(x, z, h05, shoreDistM) {
     med * R.MED_AMP_M * (0.5 + 0.5 * ridge) +
     fine * R.FINE_AMP_M;
 
-  delta *= protectionFactor(x, z) * sv * coast;
+  // CP05A correction: authored rocky-islet formation on the corridor
+  // masses — short-wavelength craggy ridging with broken-side carving;
+  // exempt from the corridor-flattening residual (the corridor WATER stays
+  // guarded by the loop shallow-cap below)
+  let isletTerm = 0;
+  if (isletW > 0) {
+    const irf = 1 / R.ISLET_RIDGE_WAVELEN_M;
+    const iRidge = Math.pow(ridgedR(qx * irf, qz * irf, S_ISLET_RIDGE, 5), 1.25);
+    const icf = 1 / R.ISLET_CARVE_WAVELEN_M;
+    const iCarve = ridgedR(qx * icf + 13.1, qz * icf - 7.7, S_ISLET_CARVE, 4);
+    // the islet bodies are small (land within meters of their waterline), so
+    // the horizontal coast taper does not apply here — footprint safety is
+    // the |h05| < SHORE_V0 zero band + the sign-preservation clamp below
+    const svIslet = sstep(R.ISLET_V0, R.ISLET_V1, ah);
+    // authored backbone: a lobed crest per islet guarantees an uneven rocky
+    // profile even where the fixed-seed ridge field runs low (the noise
+    // remains the breakup on top)
+    let backbone = 0;
+    for (const it of ISLETS) {
+      const d = hyp(x - it.x, z - it.z);
+      const t = d / (it.r * 0.55);
+      if (t >= 1) continue;
+      const theta = Math.atan2(z - it.z, x - it.x);
+      const lobe = 0.55 + 0.45 * Math.cos(it.lobes * theta + it.phase);
+      backbone = Math.max(backbone, it.back * (1 - t * t) * lobe);
+    }
+    isletTerm = (backbone +
+      iRidge * R.ISLET_RIDGE_AMP_M - iCarve * R.ISLET_CARVE_AMP_M * 0.5) *
+      isletW * svIslet;
+  }
+
+  const pfEff = Math.max(protectionFactor(x, z), R.ISLET_PROT_OVERRIDE * isletW);
+  let delta = core * pfEff * sv * coast + isletTerm;
   delta *= delta > 0 ? topPos * botPos : topNeg;
 
   // sign-preservation clamp: never remove more than SIGN_KEEP·|h05|
@@ -488,6 +566,12 @@ export function loopDistanceM(x, z) {
 /** the approved loop waypoints (closed) — exported for checks */
 export function loopWaypoints() {
   return LOOP.map((p) => [...p]);
+}
+
+/** the corridor-islet specs (center/stamp radius/authored peak) — exported
+ *  for the bake's islet-rockiness check */
+export function isletSpecs() {
+  return ISLETS.map((i) => ({ ...i }));
 }
 
 /** metadata block recorded into world.json (self-documenting artifact) */

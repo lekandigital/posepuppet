@@ -2,13 +2,13 @@ precision highp float;
 
 /**
  * REGION TERRAIN CHUNK FRAGMENT SHADER — Checkpoint 05A substrate-color
- * terrain material (supersedes the cp05 per-vertex R14 two-tint law).
- * Shading goes through the SAME substrateColor + getWallColorShaded as the
- * region water shaders' raymarch path, so terrain seen directly and
- * terrain seen through refracted/reflected rays agree by construction
- * (addendum §4.7); normals come per-fragment from uHeightTex (single
- * source, Master §2.2), with the cp05A close-range detail normal
- * (addendum §4.10) feeding the same lighting law.
+ * terrain material (CP05A correction: the shared include now carries the
+ * ZyFou-Blank color port — see RegionSubstrate.glsl). Shading goes through
+ * the SAME substrateColor + getWallColorShaded as the region water
+ * shaders' raymarch path, so terrain seen directly and terrain seen
+ * through refracted/reflected rays agree by construction; normals come
+ * per-fragment from uHeightTex (single source, Master §2.2), with the
+ * ZyFou detail normal feeding the same lighting law.
  *
  * Byte-identical (protected): the submerged caustic-consumption math
  * inside getWallColorShaded and the vendored underwater tint
@@ -48,9 +48,13 @@ void main() {
   vec3 nLit = substrateDetailNormal(nGeo, vPosition);
   gl_FragColor = vec4(getWallColorShaded(vPosition, albedo, nLit), 1.0);
 
-  // Blue tinting for underwater fragments — vendored law, waterline
-  // evaluated against the composited global surface (carried from 04B)
+  // Blue tinting for underwater fragments — the vendored law in
+  // path-length form (cp05A correction): the constant full-strength
+  // multiply crushed the substrate into uniform teal at region scale;
+  // waterPathTint keeps the natural cast, mild up close, deepening with
+  // the camera→fragment underwater path. The vendored ×1.2 gain stays.
   if (vPosition.y < surfaceHeightAt(vPosition.xz)) {
-    gl_FragColor.rgb *= underwaterColor * 1.2;
+    float pathLen = distance(cameraPosition, vPosition);
+    gl_FragColor.rgb *= waterPathTint(underwaterColor, pathLen) * 1.2;
   }
 }

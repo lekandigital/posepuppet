@@ -33,32 +33,32 @@
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
   "paintedPixels": 508275,
-  "generatedAt": "2026-07-19T00:59:31.088Z",
+  "generatedAt": "2026-07-19T02:50:33.806Z",
   "pool": {
     "modelLengthM": 2.8968250546579615,
     "bootConsoleErrors": 0,
     "brake": {
-      "fromSpeed": 4.8150852871934955,
-      "speedAfter1200ms": 0.000990059952520266
+      "fromSpeed": 4.857547908707276,
+      "speedAfter1200ms": 0.0010590142185246969
     },
     "cadenceCoupling": [
       {
         "rateHz": 0.4,
-        "speed": 2.139359024967425
+        "speed": 2.4230408956534624
       },
       {
         "rateHz": 0.9,
-        "speed": 4.9048606107144765
+        "speed": 4.909421069401325
       }
     ],
-    "glideSpeedAfter3s": 3.4219594446862134,
+    "glideSpeedAfter3s": 2.8683739443253584,
     "burst": {
       "peakSpeed": 9,
-      "msToExceed8": 1102
+      "msToExceed8": 1181
     },
     "sustainedMaxSpeed": 5,
     "dropout": {
-      "maxPitchStepRad": 0.07850767297720784,
+      "maxPitchStepRad": 0.07969426193155238,
       "trackingDuringLoss": "autopilot"
     },
     "replayDigest": "7.240747,-2.500000,0.714485,0.543055,5.000000,240,0|4.525521,-5.",
@@ -71,9 +71,9 @@
         "buckets": [
           120,
           120,
-          120,
-          119,
           121,
+          120,
+          120,
           120,
           120,
           120,
@@ -81,20 +81,20 @@
           120
         ],
         "median": 120,
-        "min": 119,
+        "min": 120,
         "windowSeconds": 10
       },
       "simHzSamples": [
-        120.00396707329166,
-        119.98016856717898,
-        120.52993326028493,
+        120.03968253968254,
+        119.95637949836426,
+        120.01586986708989,
+        119.98800119988007,
+        120.11117728806812,
+        119.9088296501835,
+        120.09925558312655,
+        119.90407673860898,
         119.98800119987997,
-        119.4981079466243,
-        120.01586986708978,
-        120.00396707329176,
-        119.99206664022196,
-        120.00396707329176,
-        120.09925558312655
+        120.00396707329176
       ],
       "viewport": {
         "width": 1728,
@@ -106,12 +106,12 @@
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 18493286
+      "usedJSHeapBytes": 18420938
     },
     "turnShaping": {
-      "slowYawRateRadS": 2.439555799319956,
-      "slowSpeed": 0.000046413229719904114,
-      "fastYawRateRadS": 1.563948849727756,
+      "slowYawRateRadS": 2.4347741177906035,
+      "slowSpeed": 0.00004907516495383989,
+      "fastYawRateRadS": 1.5687581819497434,
       "fastSpeed": 9
     }
   },
@@ -153,49 +153,49 @@
   },
   "camera02": {
     "cruiseCoverage": {
-      "samples": 43,
+      "samples": 42,
       "widthFrac": {
-        "median": 0.09989795221671596,
-        "min": 0.09749749670081642,
-        "max": 0.10705065636365382
+        "median": 0.09991381575376643,
+        "min": 0.09766605721540124,
+        "max": 0.1067396271399108
       },
       "centerHeightFrac": {
-        "median": 0.4365852439947586,
-        "min": 0.4243047394903926,
-        "max": 0.4442250745436468
+        "median": 0.4372092263080445,
+        "min": 0.423867076603935,
+        "max": 0.4441203866967177
       },
-      "followDistM": 6.793658921997447
+      "followDistM": 6.810334279873236
     },
     "burstCoverage": {
       "samples": 21,
       "state": "FastTravel (bands relaxed per cp02 §8.1)",
       "widthFrac": {
-        "median": 0.07647642033604227
+        "median": 0.07654082998227019
       },
-      "followDistM": 8.205796416827376
+      "followDistM": 8.186906318523423
     },
     "hoverCoverage": {
       "state": "SlowHover (bands relaxed per cp02 §8.1)",
-      "followDistM": 3.478505426332004,
+      "followDistM": 3.4785054262749626,
       "widthFrac": {
-        "median": 0.2941086804287648
+        "median": 0.29397042453934763
       }
     },
     "bandStatesSeen": [
       "NormalFollow"
     ],
     "stepTurn": {
-      "peakAzimuthErrorRad": 1.2809026356772841,
-      "t90S": 0.303
+      "peakAzimuthErrorRad": 1.2062747234380342,
+      "t90S": 0.295
     },
     "stopTest": {
-      "dolphinStoppedAtMs": 316,
-      "finalFollowDistM": 3.478505607129223,
-      "minFollowDistAfterStopM": 3.478505607129223,
-      "distErrorAtStopPlus1200msM": 0.03363317444284952
+      "dolphinStoppedAtMs": 324,
+      "finalFollowDistM": 3.4785055737953114,
+      "minFollowDistAfterStopM": 3.4785055737953114,
+      "distErrorAtStopPlus1200msM": 0.02530551095100364
     },
     "wallTest": {
-      "minWallClearanceM": 0.7500000000000018,
+      "minWallClearanceM": 0.7500000000000009,
       "maxLosBlockedS": 0,
       "statesSeen": [
         "NormalFollow",
@@ -223,8 +223,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286058,
-          "poolBytes": 1075952
+          "stockBytes": 1286152,
+          "poolBytes": 1075610
         },
         "c-below-lip": {
           "eyeDemo": [
@@ -242,8 +242,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286050,
-          "poolBytes": 1378445
+          "stockBytes": 1286213,
+          "poolBytes": 1378549
         },
         "d-snell-window": {
           "eyeDemo": [
@@ -261,28 +261,28 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1346516,
-          "poolBytes": 1348143
+          "stockBytes": 1346442,
+          "poolBytes": 1347326
         }
       }
     },
     "replayDigestVsCp01": "identical (first 64 chars compared against committed artifact)",
     "recenter": {
-      "azimuthErrorBeforeRad": 0.11015474891743926,
-      "azimuthErrorAfterRad": 0.07377447944156978
+      "azimuthErrorBeforeRad": 0.1109184474341669,
+      "azimuthErrorAfterRad": 0.07380106426057198
     },
     "waterline": {
       "breachReEntries": 4,
       "cameraSurfaceCrossings": 8,
       "antiShimmerEngagements": 8,
-      "maxFrameStepM": 0.5749726537161288,
+      "maxFrameStepM": 0.5651136780008735,
       "statesSeen": {
-        "NormalFollow": 522,
+        "NormalFollow": 526,
         "Airborne": 407,
-        "SurfaceTransition": 293,
-        "ReEntryRecovery": 189,
-        "Obstructed": 457,
-        "FastTravel": 57
+        "SurfaceTransition": 292,
+        "ReEntryRecovery": 190,
+        "Obstructed": 456,
+        "FastTravel": 55
       }
     },
     "perf": {
@@ -290,44 +290,44 @@
       "fps": {
         "buckets": [
           120,
-          121,
-          121,
-          121,
-          121,
-          121,
+          120,
           121,
           120,
           121,
-          119
+          120,
+          120,
+          120,
+          121,
+          120
         ],
-        "median": 121,
-        "min": 119,
+        "median": 120,
+        "min": 120,
         "windowSeconds": 10
       },
       "simHzSamples": [
-        102.32465726328213,
-        120.01586986708989,
+        106.79708553747878,
+        119.90407673860915,
+        119.99206664022212,
+        120.07541927160858,
+        119.9280431740956,
         120.00396707329166,
-        120.0039670732917,
         120.00396707329166,
-        120.00396707329166,
-        120.00396707329166,
+        120.01586986708978,
+        120.08733624454166,
+        119.90407673860898,
+        120.00396707329176,
         119.99206664022218,
-        119.98800119987997,
-        120.09925558312655,
-        119.9400299850075,
-        120.03968253968254,
-        120.43396038618506,
         120.00396707329155,
-        119.99206664022218
+        119.4981079466243,
+        120.07541927160852
       ],
-      "cameraUpdateUsAvg": 33.333334575096764,
+      "cameraUpdateUsAvg": 30.8333324889342,
       "viewport": {
         "width": 1728,
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 23625705
+      "usedJSHeapBytes": 68354556
     }
   },
   "region": {
@@ -1165,7 +1165,7 @@
         "protectedAlwaysLod0": true
       },
       "lawMaxErrM": 0,
-      "buildMs": 9.699999988079071,
+      "buildMs": 8.599999994039536,
       "protectReasons": {
         "coastline": 39,
         "ridge": 5,
@@ -1501,14 +1501,14 @@
           -120
         ]
       ],
-      "framesMonitored": 6967,
-      "minClearanceM": 0.7499999983111414,
+      "framesMonitored": 3075,
+      "minClearanceM": 0.7499999983319193,
       "maxLosBlockedS": 0,
       "cameraStates": {
-        "NormalFollow": 1896,
-        "EmergencyRecenter": 350,
-        "FastTravel": 4698,
-        "Obstructed": 23
+        "NormalFollow": 803,
+        "EmergencyRecenter": 149,
+        "FastTravel": 2112,
+        "Obstructed": 11
       }
     },
     "antiWedge": {
@@ -1588,14 +1588,14 @@
     },
     "terrainCompressed": {
       "site": "crescent west cliff (−920.5, −29.5), 68° wall",
-      "engageElapsedS": 0.109,
-      "releaseElapsedS": 1.022,
+      "engageElapsedS": 0.102,
+      "releaseElapsedS": 1.21,
       "stateAtEngage": "EmergencyRecenter",
       "statesDuringPin": {
         "EmergencyRecenter": 1
       },
-      "ratioAtEngage": 0.28972572312622574,
-      "compressFactorAtEngage": 0.6000000000000005,
+      "ratioAtEngage": 0.27288120433980545,
+      "compressFactorAtEngage": 0.6000000000000002,
       "engagements": 1
     },
     "slide": {
@@ -1625,7 +1625,7 @@
           "landSamples": 1758,
           "landViolations": 0,
           "waterControls": 300,
-          "waterChanged": 250,
+          "waterChanged": 300,
           "gapSamples": 60,
           "gapHoles": 0,
           "belowBeachSamples": 80,
@@ -1655,7 +1655,7 @@
           "landSamples": 1264,
           "landViolations": 0,
           "waterControls": 258,
-          "waterChanged": 254,
+          "waterChanged": 258,
           "gapSamples": 69,
           "gapHoles": 0,
           "belowBeachSamples": 67,
@@ -1673,7 +1673,7 @@
     "artifactHashTable": {
       "height.r16": {
         "cp05": "3cadb13ee9a6e421d211a827213951b4e25a6ed1f8d2252670067605118adead",
-        "cp05a": "fe00bb89b101f815800ce0053e46cec4d9a853126254e2c39b792cf4dc5265c5",
+        "cp05a": "f8c7cd9e945d330529f4647829c49cc5ae2d0405a16f33c59e5e94c60fc63d35",
         "changed": true
       },
       "shore.png": {
@@ -1703,7 +1703,7 @@
       },
       "world.json": {
         "cp05": "0ce1d50e6ed2dad0d7e35bbeef40fb94a3f22295f67b60b406b5d87bc7f8adab",
-        "cp05a": "d593fcba42a6d26815e36aa13ef79ca64fc308d597847ca51fc728be740feb77",
+        "cp05a": "37f356ab553613d5b1d1e3b6410de2aa7f86dd8a2c4e1843b24e07170baa9b52",
         "changed": true
       }
     },
@@ -1735,6 +1735,51 @@
         "rmsDeltaM": 0.23333,
         "rmsCapM": 0.9,
         "sampledTexels": 8232
+      },
+      {
+        "name": "cp05a-islet-rocky--80--70",
+        "pass": true,
+        "center": [
+          -80,
+          -70
+        ],
+        "stampPeakM": 6,
+        "maxOldM": 5.647296,
+        "maxNewM": 13.542687,
+        "peakGainFloorM": 2,
+        "gradientRatioNewOld": 2.588493,
+        "gradientRatioFloor": 1.5,
+        "landGradSamples": 850
+      },
+      {
+        "name": "cp05a-islet-rocky-90--80",
+        "pass": true,
+        "center": [
+          90,
+          -80
+        ],
+        "stampPeakM": 4,
+        "maxOldM": 4.098663,
+        "maxNewM": 14.102388,
+        "peakGainFloorM": 2,
+        "gradientRatioNewOld": 3.099533,
+        "gradientRatioFloor": 1.5,
+        "landGradSamples": 795
+      },
+      {
+        "name": "cp05a-islet-rocky-230--90",
+        "pass": true,
+        "center": [
+          230,
+          -90
+        ],
+        "stampPeakM": 3,
+        "maxOldM": 1.965036,
+        "maxNewM": 6.22385,
+        "peakGainFloorM": 2,
+        "gradientRatioNewOld": 1.52337,
+        "gradientRatioFloor": 1.5,
+        "landGradSamples": 20
       },
       {
         "name": "cp05a-loop-navigability",
@@ -1888,25 +1933,23 @@
       "note": "placement.json carries no baked Y — runtime Y comes from terrainHeight (Master §2.2); caves.json lipY re-baked from the revised field"
     },
     "underwaterFamilies": [
-      "deep-sediment",
-      "mid-stone",
-      "reef-stone",
-      "shallow-sand",
-      "trench-rock"
+      "deep-floor",
+      "mid-floor",
+      "rocky-floor",
+      "shallow-floor"
     ],
     "substrateVocabulary": {
       "seen": [
-        "cliff-rock",
-        "deep-sediment",
-        "exposed-rock",
+        "deep-floor",
+        "grassland",
         "high-rock",
-        "mid-stone",
-        "reef-stone",
-        "shallow-sand",
-        "shore-stone",
-        "soil",
-        "trench-rock",
-        "wet-shoreline"
+        "mid-floor",
+        "rocky-floor",
+        "shallow-floor",
+        "shore-sand",
+        "slope-rock",
+        "snow",
+        "tundra"
       ],
       "note": "automated proxy for addendum §4.12 item 20; the visual \"no asset-like silhouettes or patterns\" ruling belongs to the §9 manual review"
     },
@@ -1918,7 +1961,7 @@
     },
     "classificationEquivalence": {
       "comparedProbes": 25,
-      "maxChannelError": 0.0030078347425777086,
+      "maxChannelError": 0.0023919429872327758,
       "tolerance": 0.07,
       "capture": "media/shared-world-cp05a/albedo-debug-probes.png",
       "note": "GPU albedo-debug (the include shared verbatim by the water raymarch shaders — structural audit above) vs the fp32-exact CPU twin; equivalence of the direct and raymarched paths is by shared-source construction",
@@ -1928,122 +1971,133 @@
             -240,
             240
           ],
-          "family": "shallow-sand",
+          "family": "shallow-floor",
           "cpu": [
-            0.8582166589361878,
-            0.829516933146595,
-            0.637940326718965
+            0.6161840945941754,
+            0.5918747150614414,
+            0.532126024896904
           ],
           "gpu": [
-            0.8588235294117647,
-            0.8313725490196079,
-            0.6392156862745098
+            0.615686274509804,
+            0.592156862745098,
+            0.5333333333333333
           ],
-          "err": 0.0018556158730128613
+          "err": 0.0012073084364293551
         },
         {
           "xz": [
             -240,
             270
           ],
-          "family": "shallow-sand",
+          "family": "shallow-floor",
           "cpu": [
-            0.8485013724404427,
-            0.8241055563947088,
-            0.6365742714031987
+            0.6154095855578694,
+            0.5913397980647654,
+            0.53197496658794
           ],
           "gpu": [
-            0.8470588235294118,
-            0.8235294117647058,
-            0.6352941176470588
+            0.615686274509804,
+            0.592156862745098,
+            0.5333333333333333
           ],
-          "err": 0.0014425489110309053
+          "err": 0.0013583667453933579
         },
         {
           "xz": [
             -240,
             300
           ],
-          "family": "deep-sediment",
+          "family": "shallow-floor",
           "cpu": [
-            0.834143085538938,
-            0.8158482459296755,
-            0.6354583868105831
+            0.5934432367113329,
+            0.5714216549274823,
+            0.5159245806825534
           ],
           "gpu": [
-            0.8352941176470589,
-            0.8156862745098039,
-            0.6352941176470588
+            0.592156862745098,
+            0.5725490196078431,
+            0.5176470588235295
           ],
-          "err": 0.0011510321081208419
+          "err": 0.001722478140976036
         },
         {
           "xz": [
             -240,
             330
           ],
-          "family": "deep-sediment",
+          "family": "mid-floor",
           "cpu": [
-            0.8173750074657903,
-            0.8049222718483543,
-            0.639969263551082
+            0.6004048375803784,
+            0.5825593510665491,
+            0.5328242490142808
           ],
           "gpu": [
-            0.8156862745098039,
-            0.803921568627451,
-            0.6392156862745098
+            0.6,
+            0.5843137254901961,
+            0.5333333333333333
           ],
-          "err": 0.0016887329559863717
+          "err": 0.0017543744236470094
         },
         {
           "xz": [
             -240,
             360
           ],
-          "family": "deep-sediment",
+          "family": "mid-floor",
           "cpu": [
-            0.8020974466925579,
-            0.7947238366784765,
-            0.6451458474684707
+            0.5961283275350815,
+            0.5818918810202887,
+            0.5374316099540609
           ],
           "gpu": [
-            0.803921568627451,
-            0.796078431372549,
-            0.6470588235294118
+            0.596078431372549,
+            0.5803921568627451,
+            0.5372549019607843
           ],
-          "err": 0.0019129760609410962
+          "err": 0.0014997241575435138
         },
         {
           "xz": [
             -210,
             240
           ],
-          "family": "deep-sediment",
+          "family": "mid-floor",
           "cpu": [
-            0.8269433879286442,
-            0.8092032753396999,
-            0.6469392782457306
+            0.5702585304562409,
+            0.5556408817951322,
+            0.5117080894014575
           ],
           "gpu": [
-            0.8274509803921568,
-            0.807843137254902,
-            0.6470588235294118
+            0.5686274509803921,
+            0.5568627450980392,
+            0.5137254901960784
           ],
-          "err": 0.0013601380847979572
+          "err": 0.0020174007946208716
         }
       ]
     },
     "underwaterVariation": {
       "probes": 856,
       "families": [
-        "deep-sediment",
-        "mid-stone",
-        "reef-stone",
-        "shallow-sand",
-        "trench-rock"
+        "deep-floor",
+        "mid-floor",
+        "rocky-floor",
+        "shallow-floor"
       ],
-      "slopeDelta": 0.33745149328954654,
-      "depthDelta": 0.2627509702585766
+      "slopeDelta": 0.09287836733504118,
+      "depthDelta": 0.37054807853387633,
+      "midMeanAbsDev": 0.07088154374516145,
+      "note": "ZyFou Blank floor is depth-dominant by user-directed design (CP05A correction)"
+    },
+    "zyfouSourceFidelity": {
+      "pinnedCommit": "8b396f9c784676d46f6a147d310d9f547bf41403",
+      "paletteSlots": 15,
+      "uFrequency": 0.002197265625,
+      "uSeedOffset": [
+        -646.3245668411255,
+        -634.9020133018494
+      ],
+      "note": "Blank = blank template → highlands preset = DEFAULT_PARAMS + earth palette + DEFAULT_PLANET_STYLE"
     }
   }
 }

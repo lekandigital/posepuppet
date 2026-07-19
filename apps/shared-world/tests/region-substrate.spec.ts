@@ -91,6 +91,18 @@ test.afterAll(async () => {
 
 const sha256 = (buf: Buffer) => createHash('sha256').update(buf).digest('hex');
 
+/** ZyFou Engine.js mulberry32 (same algorithm; seed-offset law check) */
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 const qDecode = (v: number) => -80 + (v / 65535) * 280;
 
 function readU16(name: string): Uint16Array {
@@ -233,6 +245,14 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     expect((byName['cp05a-relief-strong-zone']!.rmsDeltaM as number)).toBeGreaterThanOrEqual(4);
     expect(byName['cp05a-relief-protected-lagoon']!.pass).toBe(true);
     expect(byName['cp05a-loop-navigability']!.pass).toBe(true);
+    // CP05A correction: the three approved corridor masses read as rocky
+    // mini-islands (peaks raised, roughness ×1.5+, footprints byte-identical)
+    for (const c of report.checks) {
+      if (c.name.startsWith('cp05a-islet-rocky-')) {
+        expect(c.pass, c.name).toBe(true);
+      }
+    }
+    expect(report.checks.filter((c) => c.name.startsWith('cp05a-islet-rocky-')).length).toBe(3);
     // approved-layout fidelity re-asserted on the revised field (items 3–5)
     for (const c of report.checks) {
       if (c.name.startsWith('island-centroid-')) {
@@ -389,29 +409,26 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     const underwater = samples.filter((s) => s.h < 0);
     expect(underwater.length).toBeGreaterThan(300);
 
+    // CP05A-correction spec: ZyFou Blank's underwater floor is
+    // DEPTH-DOMINANT by design (albedo → floorCol mix 0.92, sand→deep over
+    // −hRel/55) — the user's correction makes Blank's behavior
+    // authoritative, superseding the first submission's stronger
+    // slope-separation expectation. Asserted here: the depth ramp is
+    // strong, floor bands are present, and the floor is still not one
+    // uniform tint (slope/micro/climate leave measurable variation).
     const families = new Set(underwater.map((s) => s.family));
     results.underwaterFamilies = [...families].sort();
-    expect(families.size, `families seen: ${[...families].join(', ')}`).toBeGreaterThanOrEqual(5);
+    expect(families.size, `families seen: ${[...families].join(', ')}`).toBeGreaterThanOrEqual(3);
 
-    // slope-dependence: at comparable mid depths, steep vs flat differ
-    const mid = underwater.filter((s) => s.depth > 15 && s.depth < 45);
-    const flat = mid.filter((s) => s.slope < 0.1);
-    const steep = mid.filter((s) => s.slope > 0.35);
-    expect(flat.length).toBeGreaterThan(5);
-    expect(steep.length).toBeGreaterThan(5);
-    const mean = (arr: typeof mid) => {
+    const mean = (arr: typeof underwater) => {
       const m: [number, number, number] = [0, 0, 0];
       for (const s of arr) {
         m[0] += s.albedo[0]; m[1] += s.albedo[1]; m[2] += s.albedo[2];
       }
       return m.map((v) => v / arr.length) as [number, number, number];
     };
-    const mf = mean(flat);
-    const ms = mean(steep);
-    const slopeDelta = Math.hypot(mf[0] - ms[0], mf[1] - ms[1], mf[2] - ms[2]);
-    expect(slopeDelta, 'flat vs steep mean albedo at matched depth').toBeGreaterThan(0.05);
 
-    // depth-dependence: shallow flats vs deep flats differ
+    // depth-dependence (the Blank floor ramp): shallow vs deep flats
     const shallowFlat = underwater.filter((s) => s.depth < 10 && s.slope < 0.1);
     const deepFlat = underwater.filter((s) => s.depth > 55 && s.slope < 0.1);
     expect(shallowFlat.length).toBeGreaterThan(5);
@@ -419,13 +436,35 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     const m1 = mean(shallowFlat);
     const m2 = mean(deepFlat);
     const depthDelta = Math.hypot(m1[0] - m2[0], m1[1] - m2[1], m1[2] - m2[2]);
-    expect(depthDelta, 'shallow vs deep mean albedo at matched slope').toBeGreaterThan(0.1);
+    expect(depthDelta, 'shallow vs deep mean albedo at matched slope').toBeGreaterThan(0.15);
+
+    // residual non-depth variation: at comparable mid depths the floor is
+    // not one constant color (slope rock bleed-through + micro noise +
+    // climate wetland tint survive the 0.92 floor mix)
+    const mid = underwater.filter((s) => s.depth > 15 && s.depth < 45);
+    const flat = mid.filter((s) => s.slope < 0.1);
+    const steep = mid.filter((s) => s.slope > 0.35);
+    expect(flat.length).toBeGreaterThan(5);
+    expect(steep.length).toBeGreaterThan(5);
+    const mf = mean(flat);
+    const ms = mean(steep);
+    const slopeDelta = Math.hypot(mf[0] - ms[0], mf[1] - ms[1], mf[2] - ms[2]);
+    expect(slopeDelta, 'flat vs steep mean albedo at matched depth').toBeGreaterThan(0.005);
+    let varSum = 0;
+    const mm = mean(mid);
+    for (const s of mid) {
+      varSum += Math.hypot(s.albedo[0] - mm[0], s.albedo[1] - mm[1], s.albedo[2] - mm[2]);
+    }
+    const midMeanAbsDev = varSum / mid.length;
+    expect(midMeanAbsDev, 'mid-depth floor not a uniform tint').toBeGreaterThan(0.01);
 
     results.underwaterVariation = {
       probes: underwater.length,
       families: [...families].sort(),
       slopeDelta,
       depthDelta,
+      midMeanAbsDev,
+      note: 'ZyFou Blank floor is depth-dominant by user-directed design (CP05A correction)',
     };
   });
 
@@ -442,12 +481,11 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       pts,
     )) as { family: string }[];
     const allowed = new Set([
-      // underwater substrate families (addendum §4.9)
-      'shallow-sand', 'deep-sediment', 'reef-stone', 'mid-stone', 'trench-rock',
-      'silt-pocket', 'uw-cliff-stone', 'shore-stone', 'cave-mouth-rock',
-      // exposed-land substrate families (addendum §4.8)
-      'beach-sand', 'soil', 'exposed-rock', 'cliff-rock', 'high-rock',
-      'wet-shoreline', 'rock',
+      // ZyFou Blank coloration families (CP05A correction) — every label is
+      // ordinary ground / climate coloration, never an asset
+      'shallow-floor', 'mid-floor', 'deep-floor', 'rocky-floor',
+      'shore-sand', 'dry-lowland', 'grassland', 'tundra', 'swamp-soil',
+      'slope-rock', 'canyon-rock', 'high-rock', 'snow',
     ]);
     const seen = new Set(samples.map((s) => s.family));
     for (const f of seen) {
@@ -457,6 +495,83 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       seen: [...seen].sort(),
       note:
         'automated proxy for addendum §4.12 item 20; the visual "no asset-like silhouettes or patterns" ruling belongs to the §9 manual review',
+    };
+  });
+
+  test('7. ZyFou Blank source fidelity: palette, style, frequency and seed offsets match the pinned snapshot exactly', () => {
+    const REF = resolve(REPO_ROOT, 'docs', 'bodyarcade-stage3', 'references', 'zyfou-procedural-terrains');
+    // pinned commit guard
+    const record = readFileSync(join(REF, 'BODYARCADE_SOURCE_RECORD.md'), 'utf8');
+    expect(record).toContain('8b396f9c784676d46f6a147d310d9f547bf41403');
+
+    // EARTH_PALETTE from the snapshot (ColorPalette.js)
+    const palSrc = readFileSync(join(REF, 'src', 'engine', 'style', 'ColorPalette.js'), 'utf8');
+    const palBlock = palSrc.slice(palSrc.indexOf('EARTH_PALETTE'), palSrc.indexOf('};', palSrc.indexOf('EARTH_PALETTE')));
+    const pal: Record<string, [number, number, number]> = {};
+    for (const m of palBlock.matchAll(/(\w+):\s*\[([\d.]+),\s*([\d.]+),\s*([\d.]+)\]/g)) {
+      pal[m[1]!] = [Number(m[2]), Number(m[3]), Number(m[4])];
+    }
+    expect(Object.keys(pal).length).toBe(16);
+
+    // the shader's Z_COL_* constants must equal the snapshot palette
+    const glsl = readFileSync(
+      join(APP_ROOT, 'src', 'water', 'shaders', 'RegionSubstrate.glsl'), 'utf8');
+    const glslCol = (name: string): [number, number, number] => {
+      const m = glsl.match(new RegExp(`Z_COL_${name}\\s*=\\s*vec3\\(([\\d.]+),\\s*([\\d.]+),\\s*([\\d.]+)\\)`));
+      expect(m, `Z_COL_${name} present`).toBeTruthy();
+      return [Number(m![1]), Number(m![2]), Number(m![3])];
+    };
+    const MAP: [string, string][] = [
+      ['DEEP', 'deep'], ['SHALLOW', 'shallow'], ['SAND', 'sand'], ['DUNE', 'dune'],
+      ['DRYGRASS', 'dryGrass'], ['GRASS', 'grass'], ['FOREST', 'forest'],
+      ['JUNGLE', 'jungle'], ['SWAMP', 'swamp'], ['TUNDRA', 'tundra'],
+      ['REDROCK', 'redRock'], ['REDROCK2', 'redRock2'], ['ROCK', 'rock'],
+      ['ROCKHI', 'rockHi'], ['SNOW', 'snow'],
+    ];
+    for (const [glslName, srcName] of MAP) {
+      const a = glslCol(glslName);
+      const b = pal[srcName]!;
+      for (let c = 0; c < 3; c++) {
+        expect(Math.abs(a[c]! - b[c]!), `Z_COL_${glslName}[${c}] vs EARTH_PALETTE.${srcName}`).toBeLessThanOrEqual(1e-9);
+      }
+    }
+
+    // Blank/Highlands parameter law (Engine.js): uFrequency = (45·0.1)/2048;
+    // uSeedOffset = mulberry32(1337)·2048 − 1024 (two draws)
+    const rng = mulberry32(1337);
+    const offX = rng() * 2048 - 1024;
+    const offZ = rng() * 2048 - 1024;
+    const freqM = glsl.match(/Z_FREQ\s*=\s*([\d.]+)/)!;
+    expect(Number(freqM[1])).toBe((45 * 0.1) / 2048);
+    const seedM = glsl.match(/Z_SEED_OFFSET\s*=\s*vec2\((-?[\d.]+),\s*(-?[\d.]+)\)/)!;
+    expect(Math.abs(Number(seedM[1]) - offX)).toBeLessThanOrEqual(1e-9);
+    expect(Math.abs(Number(seedM[2]) - offZ)).toBeLessThanOrEqual(1e-9);
+
+    // DEFAULT_PLANET_STYLE post defaults (PlanetStyleConfig.js)
+    const styleSrc = readFileSync(join(REF, 'src', 'engine', 'style', 'PlanetStyleConfig.js'), 'utf8');
+    expect(styleSrc).toContain('paletteSaturation: 1.0');
+    expect(styleSrc).toContain('paletteContrast: 1.0');
+    expect(styleSrc).toContain('paletteTint: [1.0, 1.0, 1.0]');
+    expect(glsl).toContain('Z_PAL_SATURATION = 1.0');
+    expect(glsl).toContain('Z_PAL_CONTRAST = 1.0');
+
+    // the CPU twin carries the same palette (parity contract)
+    const cpu = readFileSync(join(APP_ROOT, 'src', 'world', 'substrateCpu.ts'), 'utf8');
+    for (const key of ['deep', 'sand', 'dune', 'dryGrass', 'grass', 'forest', 'jungle', 'swamp', 'tundra', 'redRock', 'redRock2', 'rock', 'rockHi', 'snow'] as const) {
+      const p = pal[key]!;
+      const m = cpu.match(new RegExp(`${key}:\\s*\\[([\\d.]+),\\s*([\\d.]+),\\s*([\\d.]+)\\]`));
+      expect(m, `substrateCpu COL.${key}`).toBeTruthy();
+      for (let c = 0; c < 3; c++) {
+        expect(Math.abs(Number(m![c + 1]) - p[c]!), `COL.${key}[${c}]`).toBeLessThanOrEqual(1e-9);
+      }
+    }
+
+    results.zyfouSourceFidelity = {
+      pinnedCommit: '8b396f9c784676d46f6a147d310d9f547bf41403',
+      paletteSlots: 15,
+      uFrequency: (45 * 0.1) / 2048,
+      uSeedOffset: [offX, offZ],
+      note: 'Blank = blank template → highlands preset = DEFAULT_PARAMS + earth palette + DEFAULT_PLANET_STYLE',
     };
   });
 });
