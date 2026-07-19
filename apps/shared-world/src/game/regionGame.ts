@@ -33,6 +33,7 @@ import {
   SKIRT_DROP_M,
 } from '../water/RegionTerrainPass';
 import { loadDolphin } from './dolphinActor';
+import { substrateSampleCpu } from '../world/substrateCpu';
 import { createSwimControls } from '../input/swimControls';
 import { CREDITS_ATTRIBUTION } from '../credits';
 import { K, type EvalState } from './game';
@@ -369,6 +370,36 @@ export async function startRegionGame(
       setSurfaceVisible(v: boolean) {
         stageEnabled.surface = v;
         regionRenderer.surface.setVisible(v);
+      },
+      /** cp05A: render raw classification albedo on the terrain (no
+       *  lighting) — the probe surface the CPU twin compares against */
+      setAlbedoDebug(v: boolean) {
+        regionRenderer.terrain.setAlbedoDebug(v);
+      },
+      /** cp05A: the classification CPU twin at world points (albedo,
+       *  dominant family, classifier inputs) */
+      substrateProbe(pts: [number, number][]) {
+        return pts.map(([x, z]) => substrateSampleCpu(data, x, z));
+      },
+      /** cp05A structural audit: every terrain-consuming fragment shader
+       *  must carry the ONE substrate include (addendum §4.7 equivalence
+       *  by construction — direct, refracted and reflected paths) */
+      substrateShaderAudit() {
+        // code-level markers (comments may be stripped by the glsl plugin):
+        // the classification entry point and the deleted cp05 tint law
+        const marker = 'substrateAlbedo(';
+        const legacyTint = 'terrainTint(';
+        const water = regionRenderer.surface.fragmentSources();
+        const terrain = regionRenderer.terrain.fragmentSource();
+        return {
+          terrainHasSubstrate: terrain.includes(marker),
+          waterAboveHasSubstrate: water.above.includes(marker),
+          waterBelowHasSubstrate: water.below.includes(marker),
+          anyLegacyTintLaw:
+            terrain.includes(legacyTint) ||
+            water.above.includes(legacyTint) ||
+            water.below.includes(legacyTint),
+        };
       },
       /** re-run the demo's ambient seeding in the current window (the
        *  four-shot procedure matches the stock demo's post-seed state) */

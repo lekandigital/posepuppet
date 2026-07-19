@@ -6,20 +6,23 @@
  * terrain seen directly and the terrain seen through refracted/reflected
  * rays shade identically.
  *
- * Include AFTER RegionContainer.glsl AND RegionTerrainTint.glsl. The
+ * Include AFTER RegionContainer.glsl AND RegionSubstrate.glsl. The
  * including shader must declare uniforms `light` (vec3), `causticTex`
  * (sampler2D), `water` (sampler2D) and the IOR constants first.
  *
- * Checkpoint 05 changes vs the 04B version (sanctioned terrain-material
- * work, cp05 §3 item 2 — the water OPTICS above this function are
+ * Checkpoint 05A changes vs the cp05 version (sanctioned substrate-color
+ * work, cp05A §3 item 2 — the water OPTICS above this function are
  * untouched and re-proven by the four-shot re-run):
- *  - the ±0.5 m submerged/exposed tint split → the cp05 §6 height/slope
- *    band law (RegionTerrainTint.glsl), evaluated per raymarch hit;
- *  - the exposed-terrain branch (above the waterline) → single
- *    DirectionalLight (the vendored sun direction — one sun) + hemisphere
- *    ambient [initial intensities from Track D §6.4's recommended bands,
- *    provisional-until-cp08, flagged], replacing the 04B pool-rim sigmoid
- *    stand-in (which had no region analogue — 04B deviations list).
+ *  - the cp05 R14 two-tint law (RegionTerrainTint.glsl, deleted) → the
+ *    shared substrate classification of RegionSubstrate.glsl, evaluated
+ *    per raymarch hit and per terrain fragment identically (addendum §4.7);
+ *  - getWallColorShaded exposes the lighting normal as a parameter so the
+ *    close-range detail normal (addendum §4.10) can feed the SAME lighting
+ *    law; getWallColorTinted keeps its cp05 signature and behavior.
+ *
+ * Checkpoint 05 lineage (kept): the exposed-terrain branch is the single
+ * vendored sun direction + hemisphere ambient [Track D §6.4 initial
+ * intensities, provisional-until-cp08, flagged].
  *
  * Byte-identical (protected, carried from 04B): surfaceHeightAt(), the
  * caustic projection/sample law, and the submerged diffuse/caustic
@@ -57,12 +60,10 @@ vec4 sampleCaustic(vec3 point, vec3 refractedLight) {
 }
 
 /**
- * Shade a terrain point with a supplied albedo tint. The chunk fragment
- * passes its interpolated per-vertex tint; the water raymarch path derives
- * the tint analytically (getWallColor below) — same law, same result.
+ * Shade a terrain point with a supplied albedo and lighting normal — the
+ * ONE lighting law for terrain seen directly and through the water.
  */
-vec3 getWallColorTinted(vec3 point, vec3 tint) {
-  vec3 normal = seabedNormal(point.xz);
+vec3 getWallColorShaded(vec3 point, vec3 tint, vec3 normal) {
   vec3 refractedLight = -refract(-light, vec3(0.0, 1.0, 0.0), IOR_AIR / IOR_WATER);
   if (point.y < surfaceHeightAt(point.xz)) {
     // submerged: the vendored diffuse/caustic consumption — byte-identical
@@ -79,7 +80,12 @@ vec3 getWallColorTinted(vec3 point, vec3 tint) {
   return tint * (hemi + sun);
 }
 
+/** cp05-signature wrapper: heightfield normal (the water raymarch path). */
+vec3 getWallColorTinted(vec3 point, vec3 tint) {
+  return getWallColorShaded(point, tint, seabedNormal(point.xz));
+}
+
 vec3 getWallColor(vec3 point) {
-  float h = terrainHeight(point.xz);
-  return getWallColorTinted(point, terrainTint(h, seabedNormal(point.xz)));
+  vec3 normal = seabedNormal(point.xz);
+  return getWallColorShaded(point, substrateColor(point, normal), normal);
 }

@@ -1,21 +1,23 @@
 precision highp float;
 
 /**
- * REGION TERRAIN CHUNK FRAGMENT SHADER — Checkpoint 05 chunked-LOD terrain
- * material (replaces the cp04B graybox fragment). Shading goes through the
- * SAME getWallColorTinted as the region water shaders, so terrain seen
- * directly and terrain seen through refracted rays agree; normals come
- * per-fragment from uHeightTex (single source, Master §2.2).
+ * REGION TERRAIN CHUNK FRAGMENT SHADER — Checkpoint 05A substrate-color
+ * terrain material (supersedes the cp05 per-vertex R14 two-tint law).
+ * Shading goes through the SAME substrateColor + getWallColorShaded as the
+ * region water shaders' raymarch path, so terrain seen directly and
+ * terrain seen through refracted/reflected rays agree by construction
+ * (addendum §4.7); normals come per-fragment from uHeightTex (single
+ * source, Master §2.2), with the cp05A close-range detail normal
+ * (addendum §4.10) feeding the same lighting law.
  *
- * Byte-identical (protected): the submerged caustic-consumption math inside
- * getWallColorTinted and the vendored underwater tint (`underwaterColor ·
- * 1.2`) applied to submerged fragments, both carried from 04B.
+ * Byte-identical (protected): the submerged caustic-consumption math
+ * inside getWallColorShaded and the vendored underwater tint
+ * (`underwaterColor · 1.2`) applied to submerged fragments, both carried
+ * from 04B/05.
  *
- * Triplanar-ready structure (cp05 §3 item 2): `terrainAlbedo` is the cp08
- * texture seam — it receives the world point, the heightfield normal and
- * the provisional per-vertex tint, and today returns the tint unchanged.
- * cp08 replaces its body with height/slope-blended triplanar texture
- * sampling without touching the lighting math around it.
+ * `uAlbedoDebug` (test/debug only, default 0): outputs the raw
+ * classification albedo with no lighting — the probe surface the CPU twin
+ * (substrateCpu.ts) and the region-substrate spec compare against.
  */
 
 const float IOR_AIR = 1.0;
@@ -28,20 +30,23 @@ uniform sampler2D causticTex;
 uniform sampler2D water;
 
 varying vec3 vPosition;
-varying vec3 vTint;
 
 #include ./RegionContainer.glsl;
-#include ./RegionTerrainTint.glsl;
+#include ./RegionSubstrate.glsl;
 #include ./RegionWallColor.glsl;
 
-/** cp08 triplanar seam — flat provisional tint until textures arrive. */
-vec3 terrainAlbedo(vec3 point, vec3 normal, vec3 tint) {
-  return tint;
-}
-
 void main() {
-  vec3 albedo = terrainAlbedo(vPosition, seabedNormal(vPosition.xz), vTint);
-  gl_FragColor = vec4(getWallColorTinted(vPosition, albedo), 1.0);
+  vec3 nGeo = seabedNormal(vPosition.xz);
+  vec3 albedo = substrateColor(vPosition, nGeo);
+
+  if (uAlbedoDebug > 0.5) {
+    gl_FragColor = vec4(substrateAlbedo(vPosition, nGeo), 1.0);
+    return;
+  }
+
+  // low-intensity close-range detail normal feeds the SAME lighting law
+  vec3 nLit = substrateDetailNormal(nGeo, vPosition);
+  gl_FragColor = vec4(getWallColorShaded(vPosition, albedo, nLit), 1.0);
 
   // Blue tinting for underwater fragments — vendored law, waterline
   // evaluated against the composited global surface (carried from 04B)

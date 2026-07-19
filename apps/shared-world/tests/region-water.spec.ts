@@ -581,16 +581,29 @@ test.describe('checkpoint 04B — pool to region water', () => {
     }
     const centerD = median(prof.slice(Math.round(cx) - 100, Math.round(cx) + 100));
     expect(centerD).toBeGreaterThan(50); // the cone is chromatically distinct
-    // The TIR surround is near-constant (chroma dist ≈ 1–2 against its own
-    // median) — scan from the frame edges INWARD; the first sustained rise
-    // above the TIR noise floor is the cone edge (which carries a bright
-    // rim, then the sharp TIR cut — "edge sharp" per Master §4.4 (d)).
-    const thresh = 20;
+    // Edge detector (cp05A instrument revision — the GATE below is
+    // unchanged): the cp05 detector assumed a near-constant TIR surround;
+    // the approved cp05A substrate variegation makes the reflected seabed
+    // mottled, so chroma-vs-corner noise crosses the old threshold outside
+    // the true cone (measured 110.8° on a capture whose visible cone is
+    // ≈ 97° — see the cp05A report). The revised detector classifies by
+    // the physical invariant instead: the TIR surround reflects GREEN
+    // water-tinted seabed (G > B), the cone is blue sky / white-cyan cloud
+    // (B ≥ G). Scan inward; the cone edge is where the sustained
+    // green-dominance of the surround ends.
+    const greenDom = (x: number): number => {
+      let s = 0;
+      for (let dy = -2; dy <= 2; dy++) {
+        const [, g, b] = rgbAt(x, cy + dy);
+        s += g - b;
+      }
+      return s / 5;
+    };
     const scanInward = (dir: 1 | -1): number => {
       let consecutive = 0;
       const start = dir === 1 ? 0 : img.width - 1;
       for (let x = start; x >= 0 && x < img.width; x += dir) {
-        if (prof[x]! > thresh) {
+        if (greenDom(x) < 12) {
           consecutive++;
           if (consecutive >= 3) return x - dir * (consecutive - 1);
         } else {

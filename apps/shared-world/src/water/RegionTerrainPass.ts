@@ -208,6 +208,18 @@ export class RegionTerrainPass {
     this.group.visible = v;
   }
 
+  /** cp05A test/debug: render raw classification albedo (no lighting). */
+  setAlbedoDebug(v: boolean) {
+    this.material.uniforms.uAlbedoDebug!.value = v ? 1.0 : 0.0;
+    this.material.uniformsNeedUpdate = true;
+  }
+
+  /** cp05A structural audit: the compiled fragment source (include-marker
+   *  checks — the substrate include must be shared with the water path). */
+  fragmentSource(): string {
+    return this.material.fragmentShader;
+  }
+
   get visible(): boolean {
     return this.group.visible;
   }
