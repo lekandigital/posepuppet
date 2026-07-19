@@ -91,22 +91,6 @@ const float Z_FREQ = 0.002197265625;
 /** heightScale 560; BodyArcade [−80,+200] → [0,560]: yZ = 2·y + 160 */
 const float Z_HEIGHT_SCALE = 560.0;
 const float Z_SEA = 160.0;
-/** snowLine: the Fantasy/Cartoon preset value (presets.js cartoon params);
- *  slope gates rock 0.42/0.72, snow 0.30/0.62 (defaults — the cartoon
- *  preset does not override the slope gates) */
-const float Z_SNOW_LINE = 0.82;
-/** Frost restriction (final art-direction correction): frost is a slight
- *  accent confined to the very highest peaks — the snow line never drops
- *  below this h01 floor (≈ y 161 m real; summit 200 m), the sea-level
- *  cold-climate frost term is removed, and the blend is restrained.
- *  [User-directed adaptation of the snow threshold/height normalization.] */
-const float Z_FROST_MIN_H01 = 0.86;
-const float Z_FROST_STRENGTH = 0.85;
-/** Tundra confinement (same correction: "tundra does not cover large
- *  regions") — the pale tundra coloration only participates at altitude;
- *  cold LOWLAND climate cells keep the green mid-band. */
-const float Z_TUNDRA_H01_LO = 0.55;
-const float Z_TUNDRA_H01_HI = 0.75;
 const float Z_ROCK_SLOPE_LO = 0.42;
 const float Z_ROCK_SLOPE_HI = 0.72;
 const float Z_SNOW_SLOPE_MIN = 0.30;
@@ -121,31 +105,80 @@ const float Z_PAL_SATURATION = 1.0;
 const float Z_PAL_CONTRAST = 1.0;
 const vec3 Z_PAL_TINT = vec3(1.0, 1.0, 1.0);
 
-/* FANTASY-WORLD PALETTE (final user art-direction correction): the 13
- * terrain-albedo roles of ZyFou's "Cartoon Terrain" palette
- * (ColorPalettePresets.js `cartoon`, selected by the `fantasy` project
- * template → `cartoon` preset), verbatim linear RGB. The Cartoon
- * `deep`/`shallow`/`foam` slots are WATER roles and are excluded by
- * explicit instruction — BodyArcade's approved water colors are untouched;
- * Z_COL_DEEP below keeps its Earth value because in this shader it serves
- * ONLY as the approved deep-SEAFLOOR substrate ramp target (the reviewed
- * and approved seafloor presentation), never a water color. */
+/* ------------------------------------------------------------------------
+ * WATERLINE-SPLIT SUBSTRATE PALETTE (underwater-restoration correction).
+ *
+ * The user reviewed the Fantasy recolor and confirmed the UNDERWATER
+ * appearance regressed: the Fantasy substrate under the waterline fed the
+ * approved optics a much brighter/greener seafloor, changing the whole
+ * underwater atmosphere. The optics never changed — so the fix is at the
+ * substrate input:
+ *
+ *   SUBMERGED terrain (h ≤ 0): the approved pre-recolor palette + laws,
+ *     bit-exactly the 6274982 result (Earth palette; the law knobs below
+ *     algebraically degenerate to the original code: max(x, 0) = x,
+ *     ×1.0, smoothstep(−1,−0.5,h01≥0) = 1, seaFrost term ×1 restored);
+ *   EXPOSED terrain (h ≥ 0.4 m): the approved Fantasy direction — the 13
+ *     'Cartoon Terrain' roles + frost/tundra confinement;
+ *   0 < h < 0.4 m: a narrow wet-band parameter blend at the waterline.
+ *
+ * Cartoon deep/shallow/foam WATER roles remain excluded; Z_COL_DEEP is
+ * const Earth (the approved deep-seafloor ramp target, never water).
+ * The globals are set by zSelectSubstratePalette(landness) before any
+ * albedo evaluation (all entry points call it).
+ * ---------------------------------------------------------------------- */
 const vec3 Z_COL_DEEP      = vec3(0.012, 0.075, 0.140); // Earth deep — approved deep-floor substrate target (NOT the Cartoon water deep)
 const vec3 Z_COL_SHALLOW   = vec3(0.060, 0.290, 0.330); // Earth shallow — unused by terrain albedo (water role; retained inert)
-const vec3 Z_COL_SAND      = vec3(1.00, 0.86, 0.32);
-const vec3 Z_COL_DUNE      = vec3(1.00, 0.68, 0.24);
-const vec3 Z_COL_DRYGRASS  = vec3(0.78, 0.86, 0.20);
-const vec3 Z_COL_GRASS     = vec3(0.18, 0.78, 0.18);
-const vec3 Z_COL_FOREST    = vec3(0.02, 0.50, 0.16);
-const vec3 Z_COL_JUNGLE    = vec3(0.00, 0.40, 0.18);
-const vec3 Z_COL_SWAMP     = vec3(0.10, 0.44, 0.26);
-const vec3 Z_COL_TUNDRA    = vec3(0.62, 0.86, 0.82);
-const vec3 Z_COL_REDROCK   = vec3(0.90, 0.30, 0.18);
-const vec3 Z_COL_REDROCK2  = vec3(1.00, 0.48, 0.22);
-const vec3 Z_COL_ROCK      = vec3(0.44, 0.42, 0.48);
-const vec3 Z_COL_ROCKHI    = vec3(0.64, 0.62, 0.70);
-const vec3 Z_COL_SNOW      = vec3(0.98, 0.98, 0.92);
-/* foam slot unused by terrain albedo (water role; not adopted) */
+
+vec3 Z_COL_SAND;
+vec3 Z_COL_DUNE;
+vec3 Z_COL_DRYGRASS;
+vec3 Z_COL_GRASS;
+vec3 Z_COL_FOREST;
+vec3 Z_COL_JUNGLE;
+vec3 Z_COL_SWAMP;
+vec3 Z_COL_TUNDRA;
+vec3 Z_COL_REDROCK;
+vec3 Z_COL_REDROCK2;
+vec3 Z_COL_ROCK;
+vec3 Z_COL_ROCKHI;
+vec3 Z_COL_SNOW;
+float Z_SNOW_LINE;
+float Z_FROST_MIN_H01;
+float Z_FROST_STRENGTH;
+float Z_SEA_FROST;
+float Z_TUNDRA_H01_LO;
+float Z_TUNDRA_H01_HI;
+
+/** the wet-band width above the waterline over which the palettes blend */
+const float Z_LAND_BLEND_M = 0.4;
+
+void zSelectSubstratePalette(float landness) {
+  float t = landness;
+  // SUBMERGED (approved pre-recolor 6274982): EARTH_PALETTE terrain roles
+  Z_COL_SAND     = mix(vec3(0.560, 0.470, 0.300), vec3(1.00, 0.86, 0.32), t);
+  Z_COL_DUNE     = mix(vec3(0.620, 0.490, 0.290), vec3(1.00, 0.68, 0.24), t);
+  Z_COL_DRYGRASS = mix(vec3(0.380, 0.330, 0.150), vec3(0.78, 0.86, 0.20), t);
+  Z_COL_GRASS    = mix(vec3(0.130, 0.260, 0.085), vec3(0.18, 0.78, 0.18), t);
+  Z_COL_FOREST   = mix(vec3(0.052, 0.140, 0.055), vec3(0.02, 0.50, 0.16), t);
+  Z_COL_JUNGLE   = mix(vec3(0.035, 0.125, 0.045), vec3(0.00, 0.40, 0.18), t);
+  Z_COL_SWAMP    = mix(vec3(0.090, 0.130, 0.070), vec3(0.10, 0.44, 0.26), t);
+  Z_COL_TUNDRA   = mix(vec3(0.300, 0.290, 0.240), vec3(0.62, 0.86, 0.82), t);
+  Z_COL_REDROCK  = mix(vec3(0.420, 0.235, 0.140), vec3(0.90, 0.30, 0.18), t);
+  Z_COL_REDROCK2 = mix(vec3(0.560, 0.370, 0.210), vec3(1.00, 0.48, 0.22), t);
+  Z_COL_ROCK     = mix(vec3(0.260, 0.235, 0.215), vec3(0.44, 0.42, 0.48), t);
+  Z_COL_ROCKHI   = mix(vec3(0.380, 0.365, 0.355), vec3(0.64, 0.62, 0.70), t);
+  Z_COL_SNOW     = mix(vec3(0.870, 0.890, 0.930), vec3(0.98, 0.98, 0.92), t);
+  // laws: submerged = the original 6274982 values (snowLine 0.7, no frost
+  // floor, full strength, sea-level frost term ON, tundra gate ≡ 1);
+  // exposed = the approved Fantasy frost/tundra confinement
+  Z_SNOW_LINE      = mix(0.7, 0.82, t);
+  Z_FROST_MIN_H01  = mix(0.0, 0.86, t);
+  Z_FROST_STRENGTH = mix(1.0, 0.85, t);
+  Z_SEA_FROST      = 1.0 - t;
+  Z_TUNDRA_H01_LO  = mix(-1.0, 0.55, t);
+  Z_TUNDRA_H01_HI  = mix(-0.5, 0.75, t);
+}
 
 /* TerrainDetailMaterial defaults (Engine._applyTerrainDetailPerf +
  * VISUAL_DEFAULT_PARAMS) */
@@ -339,13 +372,15 @@ ZTerrainColorResult zComputeTerrainAlbedo(
   vec3 slopeRock = mix(mix(Z_COL_ROCK, Z_COL_ROCKHI, detail), Z_COL_REDROCK, bw.canyon * 0.8);
   albedo = mix(albedo, slopeRock, rockBlend);
 
-  // frost restriction (art-direction correction): the ZyFou snow law with
-  // (a) a snow-line FLOOR so frost never leaves the highest-peak band,
-  // (b) the sea-level cold-climate frost term REMOVED (it painted winter
-  // lowlands), (c) restrained blend strength — a high-peak accent only
+  // snow law, waterline-split (see zSelectSubstratePalette): the submerged
+  // parameterization reproduces the approved 6274982 code EXACTLY
+  // (floor 0 → max is identity; seaFrost 1 restores the original term;
+  // strength 1); the exposed parameterization is the approved Fantasy
+  // frost confinement (floor 0.86, term off, strength 0.85)
   float snowLine01 = max(Z_SNOW_LINE * (0.40 + 1.20 * cl.temp), Z_FROST_MIN_H01);
   float flatness = smoothstep(Z_SNOW_SLOPE_MAX, Z_SNOW_SLOPE_MIN, slope);
   float snow = smoothstep(snowLine01 - 0.03, snowLine01 + 0.05, h01 + jitter * 0.04) * flatness;
+  snow = max(snow, smoothstep(0.10, 0.02, tempEff) * smoothstep(0.50, 0.25, slope) * Z_SEA_FROST);
   snow *= 1.0 - bw.desert;
   snow *= Z_FROST_STRENGTH;
   albedo = mix(albedo, Z_COL_SNOW, snow);
@@ -577,6 +612,10 @@ vec3 substrateAlbedo(vec3 point, vec3 normal) {
   float h01 = hZ / Z_HEIGHT_SCALE;
   float slope = 1.0 - clamp(normal.y, 0.0, 1.0);
 
+  // waterline split: submerged (h ≤ 0) = the approved pre-recolor
+  // substrate exactly; exposed = Fantasy; 0..0.4 m wet-band blend
+  zSelectSubstratePalette(smoothstep(0.0, Z_LAND_BLEND_M, h));
+
   ZClimate cl;
   ZBiomeWeights bw;
   float jitter;
@@ -597,6 +636,9 @@ vec3 substrateColor(vec3 point, vec3 normal) {
   float hRel = hZ - Z_SEA;
   float h01 = hZ / Z_HEIGHT_SCALE;
   float slope = 1.0 - clamp(normal.y, 0.0, 1.0);
+
+  // waterline split (see substrateAlbedo)
+  zSelectSubstratePalette(smoothstep(0.0, Z_LAND_BLEND_M, h));
 
   ZClimate cl;
   ZBiomeWeights bw;
