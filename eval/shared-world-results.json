@@ -1,5 +1,5 @@
 {
-  "checkpoint": "02-pool-camera",
+  "checkpoint": "04A-region-bake-loader",
   "timestamp": "2026-07-18T05:37:35.848Z",
   "url": "/shared-world/?view=stock",
   "viewport": {
@@ -33,32 +33,32 @@
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
   "paintedPixels": 508275,
-  "generatedAt": "2026-07-19T04:46:17.612Z",
+  "generatedAt": "2026-07-19T10:44:43.083Z",
   "pool": {
     "modelLengthM": 2.8968250546579615,
     "bootConsoleErrors": 0,
     "brake": {
-      "fromSpeed": 4.827128315126323,
-      "speedAfter1200ms": 0.0009925361770874732
+      "fromSpeed": 4.800018292583048,
+      "speedAfter1200ms": 0.0010450185056517312
     },
     "cadenceCoupling": [
       {
         "rateHz": 0.4,
-        "speed": 2.424997754529942
+        "speed": 2.4280942657745967
       },
       {
         "rateHz": 0.9,
-        "speed": 4.910714065981998
+        "speed": 4.9013564422020925
       }
     ],
-    "glideSpeedAfter3s": 2.868283922415862,
+    "glideSpeedAfter3s": 3.4029925032175234,
     "burst": {
       "peakSpeed": 9,
-      "msToExceed8": 1104
+      "msToExceed8": 1122
     },
     "sustainedMaxSpeed": 5,
     "dropout": {
-      "maxPitchStepRad": 0.07969366325848304,
+      "maxPitchStepRad": 0.08485441591955034,
       "trackingDuringLoss": "autopilot"
     },
     "replayDigest": "7.240747,-2.500000,0.714485,0.543055,5.000000,240,0|4.525521,-5.",
@@ -73,28 +73,28 @@
           120,
           120,
           120,
-          121,
+          119,
+          120,
+          119,
           120,
           120,
-          120,
-          121,
-          118
+          120
         ],
         "median": 120,
-        "min": 118,
+        "min": 119,
         "windowSeconds": 10
       },
       "simHzSamples": [
-        120.05159241988297,
-        119.98016856717898,
-        120.01586986708989,
-        119.99999999999989,
-        119.98016856717898,
-        120.02777502231939,
-        119.99206664022196,
-        119.51000896325084,
-        119.96827285346019,
-        120.52993326028493
+        120.00396707329166,
+        119.98800119987997,
+        120.02777502231928,
+        119.97600479904021,
+        120.48192771084324,
+        120.01586986708999,
+        119.49810794662409,
+        120.55395038358088,
+        119.9520191923229,
+        120.07541927160874
       ],
       "viewport": {
         "width": 1728,
@@ -106,18 +106,18 @@
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 18428770
+      "usedJSHeapBytes": 18897794
     },
     "turnShaping": {
-      "slowYawRateRadS": 2.4367798585995435,
-      "slowSpeed": 0.00005210657934684004,
-      "fastYawRateRadS": 1.5689884779544254,
+      "slowYawRateRadS": 2.4369559917624586,
+      "slowSpeed": 0.00004654242445135771,
+      "fastYawRateRadS": 1.5650062775585838,
       "fastSpeed": 9
     }
   },
   "containmentBatteryNote": "NOT ported at pool scale (walls are the vendored demo pool); returns re-pointed at cp04B",
   "stock": {
-    "timestamp": "2026-07-19T04:41:38.225Z",
+    "timestamp": "2026-07-19T10:26:45.127Z",
     "url": "/shared-world/?view=stock",
     "viewport": {
       "width": 1728,
@@ -133,17 +133,17 @@
       "buckets": [
         120,
         120,
+        119,
         120,
         121,
         120,
         120,
         120,
         120,
-        120,
-        121
+        120
       ],
       "median": 120,
-      "min": 120,
+      "min": 119,
       "windowSeconds": 10
     },
     "simHz": null,
@@ -153,49 +153,49 @@
   },
   "camera02": {
     "cruiseCoverage": {
-      "samples": 44,
+      "samples": 41,
       "widthFrac": {
-        "median": 0.09995431803645505,
-        "min": 0.09757781997200649,
-        "max": 0.10697528721458403
+        "median": 0.09955358012502388,
+        "min": 0.0975552834940644,
+        "max": 0.10593750536873556
       },
       "centerHeightFrac": {
-        "median": 0.4368196381520451,
-        "min": 0.42473004532296055,
-        "max": 0.44427195852442797
+        "median": 0.43625767232661977,
+        "min": 0.4241701497096328,
+        "max": 0.44397765272799306
       },
-      "followDistM": 6.804821652735697
+      "followDistM": 6.793784980071107
     },
     "burstCoverage": {
-      "samples": 21,
+      "samples": 20,
       "state": "FastTravel (bands relaxed per cp02 §8.1)",
       "widthFrac": {
-        "median": 0.0757092016730744
+        "median": 0.07536240792606566
       },
-      "followDistM": 8.220569510460665
+      "followDistM": 8.331927286649876
     },
     "hoverCoverage": {
       "state": "SlowHover (bands relaxed per cp02 §8.1)",
-      "followDistM": 3.478505426321682,
+      "followDistM": 3.478505426264004,
       "widthFrac": {
-        "median": 0.29411292128748173
+        "median": 0.293981369737642
       }
     },
     "bandStatesSeen": [
       "NormalFollow"
     ],
     "stepTurn": {
-      "peakAzimuthErrorRad": 1.351543405032695,
-      "t90S": 0.28
+      "peakAzimuthErrorRad": 1.014844687105939,
+      "t90S": 0.321
     },
     "stopTest": {
-      "dolphinStoppedAtMs": 322,
-      "finalFollowDistM": 3.4785055906243865,
-      "minFollowDistAfterStopM": 3.4785055906243865,
-      "distErrorAtStopPlus1200msM": 0.027641007129945105
+      "dolphinStoppedAtMs": 336,
+      "finalFollowDistM": 3.478505566321334,
+      "minFollowDistAfterStopM": 3.478505566321334,
+      "distErrorAtStopPlus1200msM": 0.02402967232040254
     },
     "wallTest": {
-      "minWallClearanceM": 0.7500000000000009,
+      "minWallClearanceM": 0.7500000000000018,
       "maxLosBlockedS": 0,
       "statesSeen": [
         "NormalFollow",
@@ -223,8 +223,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286189,
-          "poolBytes": 1075751
+          "stockBytes": 1286210,
+          "poolBytes": 1075560
         },
         "c-below-lip": {
           "eyeDemo": [
@@ -242,8 +242,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286168,
-          "poolBytes": 1378467
+          "stockBytes": 1286003,
+          "poolBytes": 1378685
         },
         "d-snell-window": {
           "eyeDemo": [
@@ -261,28 +261,28 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1346643,
-          "poolBytes": 1347886
+          "stockBytes": 1346518,
+          "poolBytes": 1346988
         }
       }
     },
     "replayDigestVsCp01": "identical (first 64 chars compared against committed artifact)",
     "recenter": {
-      "azimuthErrorBeforeRad": 0.11097636877079076,
-      "azimuthErrorAfterRad": 0.0723735652661901
+      "azimuthErrorBeforeRad": 0.11075410952123921,
+      "azimuthErrorAfterRad": 0.07243496085078682
     },
     "waterline": {
       "breachReEntries": 4,
       "cameraSurfaceCrossings": 8,
       "antiShimmerEngagements": 8,
-      "maxFrameStepM": 0.6054914928317762,
+      "maxFrameStepM": 0.6051677645267325,
       "statesSeen": {
-        "NormalFollow": 524,
-        "Airborne": 408,
-        "SurfaceTransition": 293,
-        "ReEntryRecovery": 188,
-        "Obstructed": 469,
-        "FastTravel": 54
+        "NormalFollow": 540,
+        "Airborne": 409,
+        "SurfaceTransition": 292,
+        "ReEntryRecovery": 191,
+        "Obstructed": 458,
+        "FastTravel": 40
       }
     },
     "perf": {
@@ -292,43 +292,43 @@
           120,
           121,
           120,
-          120,
           121,
           121,
           120,
           121,
           121,
-          120
+          120,
+          121
         ],
         "median": 121,
         "min": 120,
         "windowSeconds": 10
       },
       "simHzSamples": [
-        102.83546325756201,
-        119.99999999999997,
-        120.0039670732917,
-        119.48620930000999,
-        120.11117728806823,
-        119.95201919232312,
-        119.96401079676095,
+        100.76823306335365,
+        119.95637949836426,
+        120.15888778550149,
+        119.88011988011982,
         119.99206664022218,
-        120.00396707329155,
-        119.98800119988019,
-        120.18275725069515,
+        120.18275725069525,
+        119.84420253670227,
+        119.95637949836436,
+        120.1946955398827,
         119.83223487118039,
-        120.00396707329176,
-        120.00396707329155,
-        119.96401079676106,
-        120.03968253968254
+        120.07541927160852,
+        119.90882965018329,
+        120.01586986708999,
+        120.15888778550149,
+        119.85617259288844,
+        120.12310136007135
       ],
-      "cameraUpdateUsAvg": 16.52892561983471,
+      "cameraUpdateUsAvg": 31.40495902250621,
       "viewport": {
         "width": 1728,
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 23574945
+      "usedJSHeapBytes": 23407189
     }
   },
   "region": {
@@ -714,10 +714,10 @@
     "previewPerf": {
       "fpsBuckets": [
         120,
+        108,
         120,
         120,
         120,
-        121,
         120,
         120,
         120,
@@ -725,16 +725,16 @@
         120
       ],
       "median": 120,
-      "min": 120,
+      "min": 108,
       "viewport": {
         "width": 1728,
         "height": 1080
       },
-      "usedJSHeapBytes": 65214400
+      "usedJSHeapBytes": 66777779
     },
     "previewBoot": {
-      "decodeMs": 105.2000000178814,
-      "meshBuildMs": 226.39999997615814,
+      "decodeMs": 91.39999997615814,
+      "meshBuildMs": 292.90000000596046,
       "decodedBytes": 37785609,
       "consoleErrors": 0
     }
@@ -758,7 +758,7 @@
       "windowTexelM": 0.5,
       "gpuTimerSource": "EXT_disjoint_timer_query_webgl2",
       "floatLinear": true,
-      "decodeMs": 80.59999999403954,
+      "decodeMs": 97.2000000178814,
       "consoleErrors": 0
     },
     "depthLaw": [
@@ -949,33 +949,33 @@
     ],
     "depthClampWorstBelowFloorM": 0.6653302094142441,
     "sprint": {
-      "travelled": 220.77563291422567,
+      "travelled": 220.628971806223,
       "fpsBuckets": [
+        112,
+        113,
+        116,
+        116,
+        115,
+        114,
+        109,
+        115,
+        116,
+        110,
+        116,
+        117,
         118,
-        120,
-        120,
-        121,
-        120,
+        119,
+        119,
+        119,
+        119,
         120,
         119,
         121,
         120,
         120,
         120,
-        120,
-        121,
-        120,
-        120,
-        120,
-        120,
-        120,
-        120,
-        120,
-        121,
-        120,
-        120,
-        120,
-        120
+        114,
+        100
       ],
       "windowOrigin": [
         -87,
@@ -983,8 +983,8 @@
       ],
       "simProbe": {
         "nanCount": 0,
-        "edgeMaxDispM": 2.3308949886119177e-8,
-        "maxDispM": 0.001959241271833889
+        "edgeMaxDispM": 1.3020100026325404e-8,
+        "maxDispM": 0.002263499118271284
       }
     },
     "shoreClip": {
@@ -998,8 +998,8 @@
       "note": "visual A/B is manual (cp04B §9); shot (b) stock pose just-submerged (deviation — see report)",
       "shots": {
         "a-above": {
-          "stockBytes": 681877,
-          "regionBytes": 798474,
+          "stockBytes": 681568,
+          "regionBytes": 792191,
           "regionCamera": {
             "pos": [
               -207.1892336110995,
@@ -1021,8 +1021,8 @@
           }
         },
         "b-caustics": {
-          "stockBytes": 1537324,
-          "regionBytes": 462494,
+          "stockBytes": 1536724,
+          "regionBytes": 429715,
           "regionCamera": {
             "pos": [
               -184.01011962210316,
@@ -1044,8 +1044,8 @@
           }
         },
         "c-above-lip": {
-          "stockBytes": 1571918,
-          "regionBytes": 668416,
+          "stockBytes": 1571633,
+          "regionBytes": 665870,
           "regionCamera": {
             "pos": [
               -185.85743512365954,
@@ -1067,8 +1067,8 @@
           }
         },
         "c-below-lip": {
-          "stockBytes": 1571996,
-          "regionBytes": 481216,
+          "stockBytes": 1571806,
+          "regionBytes": 441010,
           "regionCamera": {
             "pos": [
               -184.85355689012556,
@@ -1090,8 +1090,8 @@
           }
         },
         "d-snell-window": {
-          "stockBytes": 1674812,
-          "regionBytes": 735255,
+          "stockBytes": 1675080,
+          "regionBytes": 729559,
           "regionCamera": {
             "pos": [
               -181.28314197307185,
@@ -1114,9 +1114,9 @@
         }
       },
       "lumA": {
-        "meanAbsDelta": 0.17140864853647542,
-        "meanStock": 0.43808847006942947,
-        "meanRegion": 0.5984736865432071,
+        "meanAbsDelta": 0.12930351103143786,
+        "meanStock": 0.43810850273527174,
+        "meanRegion": 0.5345282816710705,
         "band": "stock pool-surface quad inner 55 % (px 679-1176 × 347-516), every 2nd px",
         "tolerance": 0.25,
         "toleranceNote": "includes the sanctioned container difference (sand seabed vs tiled box refraction); pipeline-divergence catch — see the checkpoint report"
@@ -1130,65 +1130,65 @@
         434,
         1293
       ],
-      "coneBlueDomMedian": -1.6,
-      "surroundBlueDomMedian": -38
+      "coneBlueDomMedian": 14.2,
+      "surroundBlueDomMedian": -8
     },
     "perf": {
       "script": "16 s region swim: cruise 1.6 Hz → burst → banked turn → crouch dive",
       "fps": {
         "buckets": [
-          121,
+          119,
           120,
           120,
           120,
+          119,
           120,
           120,
           120,
-          121,
-          120,
-          120,
-          121,
-          120,
-          120,
-          120,
-          121,
-          119
+          119,
+          111,
+          109,
+          112,
+          111,
+          107,
+          104,
+          106
         ],
-        "median": 120,
-        "min": 119
+        "median": 119,
+        "min": 104
       },
       "simHzSamples": [
-        120.0039670732917,
-        119.9207135777998,
-        120.01586986708999,
-        120.74643249176725
+        120.12310136007146,
+        120.00396707329176,
+        120.01586986708978,
+        119.51000896325063
       ],
       "cpuStageMs": {
-        "sim": 0.030833333730697632,
-        "caustics": 0.00833333283662796,
-        "prepare": 0.009166666865348816,
-        "render": 0.07250000014901162,
-        "frame": 0.1658333346247673
+        "sim": 0.07264150847803871,
+        "caustics": 0.01415094311507243,
+        "prepare": 0.006603774034752036,
+        "render": 0.13679245367365064,
+        "frame": 0.3339622636448662
       },
       "gpuStageMs": {
-        "sim": 0.411999,
-        "caustics": 0.182499,
-        "render": 6.898083
+        "sim": 10.0525,
+        "caustics": 0.185583,
+        "render": 15.715666
       },
       "gpuTimerSource": "EXT_disjoint_timer_query_webgl2",
       "stageToggleMedianFps": {
         "surface": 120,
         "terrain": 120,
-        "caustics": 121,
-        "sim": 120
+        "caustics": 109,
+        "sim": 106
       },
       "viewport": {
         "width": 1728,
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 115983862,
-      "cameraUpdateUsAvg": 29.166666915019352
+      "usedJSHeapBytes": 109428614,
+      "cameraUpdateUsAvg": 50.00000033113692
     }
   },
   "region05": {
@@ -1207,7 +1207,7 @@
         "protectedAlwaysLod0": true
       },
       "lawMaxErrM": 0,
-      "buildMs": 8,
+      "buildMs": 9,
       "protectReasons": {
         "coastline": 39,
         "ridge": 5,
@@ -1543,14 +1543,14 @@
           -120
         ]
       ],
-      "framesMonitored": 6966,
-      "minClearanceM": 0.7499999983319193,
-      "maxLosBlockedS": 0,
+      "framesMonitored": 6969,
+      "minClearanceM": 0.7499999982266009,
+      "maxLosBlockedS": 0.08120000000000005,
       "cameraStates": {
-        "NormalFollow": 1894,
+        "NormalFollow": 1885,
         "EmergencyRecenter": 349,
-        "FastTravel": 4703,
-        "Obstructed": 20
+        "FastTravel": 4714,
+        "Obstructed": 21
       }
     },
     "antiWedge": {
@@ -1565,38 +1565,38 @@
           120,
           120,
           120,
-          121,
-          120,
-          120,
-          120,
           120,
           120,
           121,
+          120,
+          119,
+          120,
+          120,
           120,
           120
         ],
         "median": 120,
-        "min": 120
+        "min": 119
       },
-      "simHz": 119.1421763304211,
-      "terrainStageMs": 3.1171659999999997,
-      "terrainStageMethod": "INFORMATIONAL ONLY: gpu render-stage delta across a terrain visibility toggle — unsound under GPU DVFS (clock state differs between the two phases); the enforced budget is the all-stages render median above",
+      "simHz": 120.01586986708999,
+      "terrainStageMs": 2.8149580000000007,
+      "terrainStageMethod": "RECORDED ONLY (not gated): GPU timer spans are unsound on this stack — toggle deltas cross DVFS clock states and all-stage spans measure pipelined latency, not throughput; the enforced gates are the fps/simHz floors above (Master §10 Playwright semantics)",
       "gpuStageMsOn": {
-        "sim": 0.382124,
-        "caustics": 0.211291,
-        "render": 6.920374
+        "sim": 0.395083,
+        "caustics": 0.224583,
+        "render": 7.255499
       },
       "gpuStageMsTerrainOff": {
-        "sim": 0.401875,
-        "caustics": 0.230791,
-        "render": 3.803208
+        "sim": 0.513624,
+        "caustics": 0.243416,
+        "render": 4.440541
       },
       "cpuStageMs": {
-        "sim": 0.18016528689171657,
-        "caustics": 0.02892561958841056,
-        "prepare": 0.023140495719988483,
-        "render": 0.26859504304641535,
-        "frame": 0.6768595039351912
+        "sim": 0.14876033131741295,
+        "caustics": 0.035537188703363594,
+        "prepare": 0.019008264315029805,
+        "render": 0.24380165387776273,
+        "frame": 0.6628099172568518
       },
       "terrainStats": {
         "drawnPerLod": [
@@ -1614,14 +1614,14 @@
       "bvh": {
         "tilesBuilt": 22,
         "tilesLive": 22,
-        "buildMsTotal": 106.19999995827675,
-        "buildMsMax": 13.799999982118607,
-        "queries": 66404,
-        "queryUsTotal": 144899.99988675117,
+        "buildMsTotal": 98.30000001192093,
+        "buildMsMax": 9.899999976158142,
+        "queries": 66358,
+        "queryUsTotal": 153000.00023841858,
         "liveBytes": 17437200,
-        "queryUsAvg": 2.1820974623027403
+        "queryUsAvg": 2.3056752801232494
       },
-      "usedJSHeapBytes": 111769318,
+      "usedJSHeapBytes": 112087951,
       "viewport": {
         "width": 1728,
         "height": 1080
@@ -1630,14 +1630,14 @@
     },
     "terrainCompressed": {
       "site": "crescent west cliff (−920.5, −29.5), 68° wall",
-      "engageElapsedS": 0.108,
-      "releaseElapsedS": 1.036,
+      "engageElapsedS": 0.107,
+      "releaseElapsedS": 1.224,
       "stateAtEngage": "EmergencyRecenter",
       "statesDuringPin": {
         "EmergencyRecenter": 1
       },
       "ratioAtEngage": 0.27288120433980545,
-      "compressFactorAtEngage": 0.6000000000000004,
+      "compressFactorAtEngage": 0.6000000000000006,
       "engagements": 1
     },
     "slide": {
@@ -2003,7 +2003,7 @@
     },
     "classificationEquivalence": {
       "comparedProbes": 25,
-      "maxChannelError": 0.023267610589165377,
+      "maxChannelError": 0.01950864683325315,
       "tolerance": 0.07,
       "capture": "media/shared-world-cp05a/albedo-debug-probes.png",
       "note": "GPU albedo-debug (the include shared verbatim by the water raymarch shaders — structural audit above) vs the fp32-exact CPU twin; equivalence of the direct and raymarched paths is by shared-source construction",
@@ -2015,16 +2015,16 @@
           ],
           "family": "mid-floor",
           "cpu": [
-            0.7063327299961702,
-            0.6782733887375227,
-            0.4838794593207114
+            0.5687054375872509,
+            0.5620605065051819,
+            0.5291585444651488
           ],
           "gpu": [
-            0.6901960784313725,
-            0.6627450980392157,
-            0.4745098039215686
+            0.5568627450980392,
+            0.5490196078431373,
+            0.5176470588235295
           ],
-          "err": 0.01613665156479771
+          "err": 0.013040898662044609
         },
         {
           "xz": [
@@ -2033,16 +2033,16 @@
           ],
           "family": "mid-floor",
           "cpu": [
-            0.7025117719172795,
-            0.6756561909241758,
-            0.48457243542970313
+            0.5662041833889147,
+            0.5610752008867597,
+            0.5303088252958386
           ],
           "gpu": [
-            0.6862745098039216,
-            0.6588235294117647,
-            0.4745098039215686
+            0.5529411764705883,
+            0.5490196078431373,
+            0.5176470588235295
           ],
-          "err": 0.01683266151241114
+          "err": 0.013263006918326381
         },
         {
           "xz": [
@@ -2051,16 +2051,16 @@
           ],
           "family": "mid-floor",
           "cpu": [
-            0.6702761594132944,
-            0.6437766344892698,
-            0.45958080577113986
+            0.5397440764515081,
+            0.5336179632231085,
+            0.5026340127669713
           ],
           "gpu": [
-            0.6862745098039216,
-            0.6588235294117647,
-            0.47058823529411764
+            0.5529411764705883,
+            0.5450980392156862,
+            0.5137254901960784
           ],
-          "err": 0.015998350390627136
+          "err": 0.013197100019080144
         },
         {
           "xz": [
@@ -2069,16 +2069,16 @@
           ],
           "family": "mid-floor",
           "cpu": [
-            0.7126051497880377,
-            0.6825652463592867,
-            0.4826815829407148
+            0.5724483353400622,
+            0.5631584887862163,
+            0.5263772587505139
           ],
           "gpu": [
-            0.7019607843137254,
-            0.6745098039215687,
-            0.4745098039215686
+            0.5647058823529412,
+            0.5568627450980392,
+            0.5176470588235295
           ],
-          "err": 0.010644365474312245
+          "err": 0.008730199926984428
         },
         {
           "xz": [
@@ -2087,16 +2087,16 @@
           ],
           "family": "mid-floor",
           "cpu": [
-            0.7227990670914666,
-            0.6902383160572012,
-            0.4828715516277485
+            0.5798628519152239,
+            0.5676031089986189,
+            0.5265680262228647
           ],
           "gpu": [
-            0.7176470588235294,
-            0.6823529411764706,
-            0.47843137254901963
+            0.5725490196078431,
+            0.5607843137254902,
+            0.5215686274509804
           ],
-          "err": 0.0078853748807306
+          "err": 0.007313832307380808
         },
         {
           "xz": [
@@ -2105,16 +2105,16 @@
           ],
           "family": "mid-floor",
           "cpu": [
-            0.6751998070768287,
-            0.650158597362528,
-            0.46814409088570486
+            0.5446129513846639,
+            0.5407634991880322,
+            0.5126114592007637
           ],
           "gpu": [
-            0.6784313725490196,
-            0.6509803921568628,
-            0.47058823529411764
+            0.5450980392156862,
+            0.5411764705882353,
+            0.5137254901960784
           ],
-          "err": 0.003231565472190945
+          "err": 0.0011140309953147076
         }
       ]
     },
@@ -2126,9 +2126,9 @@
         "rocky-floor",
         "shallow-floor"
       ],
-      "slopeDelta": 0.15804679879800668,
-      "depthDelta": 0.5766742760055794,
-      "midMeanAbsDev": 0.08418317731966934,
+      "slopeDelta": 0.09287836733504118,
+      "depthDelta": 0.37054807853387633,
+      "midMeanAbsDev": 0.07088154374516145,
       "note": "ZyFou Blank floor is depth-dominant by user-directed design (CP05A correction)"
     },
     "zyfouSourceFidelity": {

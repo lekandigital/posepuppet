@@ -523,6 +523,14 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     }
     expect(Object.keys(pal).length).toBeGreaterThanOrEqual(16);
 
+    // the approved pre-recolor SUBMERGED palette source: EARTH_PALETTE
+    const earthSrc = readFileSync(join(REF, 'src', 'engine', 'style', 'ColorPalette.js'), 'utf8');
+    const earthBlock = earthSrc.slice(earthSrc.indexOf('EARTH_PALETTE'), earthSrc.indexOf('};', earthSrc.indexOf('EARTH_PALETTE')));
+    const earthPal: Record<string, [number, number, number]> = {};
+    for (const m of earthBlock.matchAll(/(\w+):\s*\[([\d.]+),\s*([\d.]+),\s*([\d.]+)\]/g)) {
+      earthPal[m[1]!] = [Number(m[2]), Number(m[3]), Number(m[4])];
+    }
+
     const glsl = readFileSync(
       join(APP_ROOT, 'src', 'water', 'shaders', 'RegionSubstrate.glsl'), 'utf8');
     const glslCol = (name: string): [number, number, number] => {
@@ -530,7 +538,20 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       expect(m, `Z_COL_${name} present`).toBeTruthy();
       return [Number(m![1]), Number(m![2]), Number(m![3])];
     };
-    // the 13 TERRAIN-albedo roles must equal the Cartoon Terrain palette
+    /** waterline-split selector: Z_COL_X = mix(vec3(earth), vec3(fantasy), t) */
+    const glslSplit = (name: string): { e: [number, number, number]; f: [number, number, number] } => {
+      const m = glsl.match(new RegExp(
+        `Z_COL_${name}\\s*=\\s*mix\\(vec3\\(([\\d.]+),\\s*([\\d.]+),\\s*([\\d.]+)\\),\\s*vec3\\(([\\d.]+),\\s*([\\d.]+),\\s*([\\d.]+)\\)`,
+      ));
+      expect(m, `Z_COL_${name} waterline-split present`).toBeTruthy();
+      return {
+        e: [Number(m![1]), Number(m![2]), Number(m![3])],
+        f: [Number(m![4]), Number(m![5]), Number(m![6])],
+      };
+    };
+    // the 13 terrain-albedo roles: EXPOSED side = Cartoon Terrain palette
+    // (Fantasy art direction), SUBMERGED side = the approved pre-recolor
+    // EARTH_PALETTE (underwater-restoration correction)
     const MAP: [string, string][] = [
       ['SAND', 'sand'], ['DUNE', 'dune'],
       ['DRYGRASS', 'dryGrass'], ['GRASS', 'grass'], ['FOREST', 'forest'],
@@ -539,10 +560,10 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       ['ROCKHI', 'rockHi'], ['SNOW', 'snow'],
     ];
     for (const [glslName, srcName] of MAP) {
-      const a = glslCol(glslName);
-      const b = pal[srcName]!;
+      const { e, f } = glslSplit(glslName);
       for (let c = 0; c < 3; c++) {
-        expect(Math.abs(a[c]! - b[c]!), `Z_COL_${glslName}[${c}] vs CartoonTerrain.${srcName}`).toBeLessThanOrEqual(1e-9);
+        expect(Math.abs(f[c]! - pal[srcName]![c]!), `Z_COL_${glslName}.land[${c}] vs CartoonTerrain.${srcName}`).toBeLessThanOrEqual(1e-9);
+        expect(Math.abs(e[c]! - earthPal[srcName]![c]!), `Z_COL_${glslName}.submerged[${c}] vs EARTH_PALETTE.${srcName}`).toBeLessThanOrEqual(1e-9);
       }
     }
     // WATER-role exclusion (user instruction): Cartoon deep/shallow/foam
@@ -581,22 +602,33 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     expect(glsl).toContain('Z_PAL_SATURATION = 1.0');
     expect(glsl).toContain('Z_PAL_CONTRAST = 1.0');
 
-    // the CPU twin carries the same palette (parity contract): the 13
-    // Cartoon terrain roles + the retained Earth deep-floor target
+    // the CPU twin carries the same split palettes (parity contract):
+    // COL_F = Cartoon terrain roles, COL_E = Earth submerged roles, plus
+    // the retained Earth deep-floor target
     const cpu = readFileSync(join(APP_ROOT, 'src', 'world', 'substrateCpu.ts'), 'utf8');
-    const cpuCol = (key: string): [number, number, number] => {
-      const m = cpu.match(new RegExp(`${key}:\\s*\\[([\\d.]+),\\s*([\\d.]+),\\s*([\\d.]+)\\]`));
-      expect(m, `substrateCpu COL.${key}`).toBeTruthy();
-      return [Number(m![1]), Number(m![2]), Number(m![3])];
+    const cpuBlock = (marker: string): string => {
+      const at = cpu.indexOf(marker);
+      expect(at, `${marker} present`).toBeGreaterThanOrEqual(0);
+      return cpu.slice(at, cpu.indexOf('};', at));
     };
+    const parseRoles = (block: string): Record<string, [number, number, number]> => {
+      const out: Record<string, [number, number, number]> = {};
+      for (const m of block.matchAll(/(\w+):\s*\[([\d.]+),\s*([\d.]+),\s*([\d.]+)\]/g)) {
+        out[m[1]!] = [Number(m[2]), Number(m[3]), Number(m[4])];
+      }
+      return out;
+    };
+    const cpuE = parseRoles(cpuBlock('const COL_E'));
+    const cpuF = parseRoles(cpuBlock('const COL_F'));
     for (const key of ['sand', 'dune', 'dryGrass', 'grass', 'forest', 'jungle', 'swamp', 'tundra', 'redRock', 'redRock2', 'rock', 'rockHi', 'snow'] as const) {
-      const p = pal[key]!;
-      const a = cpuCol(key);
       for (let c = 0; c < 3; c++) {
-        expect(Math.abs(a[c]! - p[c]!), `COL.${key}[${c}]`).toBeLessThanOrEqual(1e-9);
+        expect(Math.abs(cpuF[key]![c]! - pal[key]![c]!), `COL_F.${key}[${c}]`).toBeLessThanOrEqual(1e-9);
+        expect(Math.abs(cpuE[key]![c]! - earthPal[key]![c]!), `COL_E.${key}[${c}]`).toBeLessThanOrEqual(1e-9);
       }
     }
-    expect(cpuCol('deep')).toEqual([0.012, 0.075, 0.14]);
+    const deepM = cpu.match(/COL_DEEP:\s*V3\s*=\s*\[([\d.]+),\s*([\d.]+),\s*([\d.]+)\]/);
+    expect(deepM, 'COL_DEEP present').toBeTruthy();
+    expect([Number(deepM![1]), Number(deepM![2]), Number(deepM![3])]).toEqual([0.012, 0.075, 0.14]);
 
     results.zyfouSourceFidelity = {
       pinnedCommit: '8b396f9c784676d46f6a147d310d9f547bf41403',
