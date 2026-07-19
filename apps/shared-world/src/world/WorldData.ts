@@ -85,6 +85,10 @@ export class WorldData {
     readonly sdf: Float32Array,
     /** shore mask: 1 = land */
     readonly mask: Uint8Array,
+    /** cp05A: biome.png RGBA bytes (R bright, G kelp-shelf, B plain, A 255) */
+    readonly biome: Uint8Array,
+    /** cp05A: biome raster side length (1025) */
+    readonly biomeN: number,
     decodeMs: number,
   ) {
     this.n = header.artifacts['height.r16']!.resolution!;
@@ -113,10 +117,11 @@ export class WorldData {
       throw new Error(`artifact resolutions inconsistent: height ${n}, sdf ${nSdf}, shore ${nShore}`);
     }
 
-    const [heightBytes, sdfBytes, shorePixels] = await Promise.all([
+    const [heightBytes, sdfBytes, shorePixels, biomePixels] = await Promise.all([
       fetchBytes(baseUrl + 'height.r16'),
       fetchBytes(baseUrl + 'shore_sdf.r16'),
       fetchPngPixels(baseUrl + 'shore.png'),
+      fetchPngPixels(baseUrl + 'biome.png'),
     ]);
 
     const expectBytes = n * n * 2;
@@ -151,8 +156,16 @@ export class WorldData {
       }
     }
 
+    // cp05A: biome regional masks for the substrate classification (RGBA;
+    // alpha is constant 255 by bake law so canvas decode stays lossless)
+    const nb = header.artifacts['biome.png']?.resolution;
+    if (!nb || biomePixels.width !== nb || biomePixels.height !== nb) {
+      throw new Error(`biome.png decoded ${biomePixels.width}×${biomePixels.height} ≠ ${nb}²`);
+    }
+    const biome = new Uint8Array(biomePixels.data.buffer.slice(0), 0, nb * nb * 4);
+
     const decodeMs = performance.now() - t0;
-    return new WorldData(header, placement, caves, heights, sdf, mask, decodeMs);
+    return new WorldData(header, placement, caves, heights, sdf, mask, biome, nb, decodeMs);
   }
 
   /** Is (x, z) inside the data domain? */
@@ -206,6 +219,29 @@ export class WorldData {
   /** Water depth, meters, positive down (Track A §4.3 sign note). */
   depthAt(x: number, z: number): number {
     return Math.max(0, -this.terrainHeight(x, z));
+  }
+
+  /** cp05A: bilinear biome-mask sample → [bright, kelpShelf, plain] ∈ 0..1
+   *  (matches the GPU's linear-filtered uBiomeTex read). */
+  biomeAt(x: number, z: number): [number, number, number] {
+    const nb = this.biomeN;
+    const step = this.header.sizeMeters[0] / (nb - 1);
+    const u = clamp((x + this.half) / step, 0, nb - 1);
+    const v = clamp((z + this.half) / step, 0, nb - 1);
+    const i0 = Math.min(Math.floor(u), nb - 2);
+    const j0 = Math.min(Math.floor(v), nb - 2);
+    const fu = u - i0;
+    const fv = v - j0;
+    const g = this.biome;
+    const out: [number, number, number] = [0, 0, 0];
+    for (let c = 0; c < 3; c++) {
+      const a = g[(j0 * nb + i0) * 4 + c]!;
+      const b = g[(j0 * nb + i0 + 1) * 4 + c]!;
+      const d = g[((j0 + 1) * nb + i0) * 4 + c]!;
+      const e = g[((j0 + 1) * nb + i0 + 1) * 4 + c]!;
+      out[c] = ((a + (b - a) * fu) * (1 - fv) + (d + (e - d) * fu) * fv) / 255;
+    }
+    return out;
   }
 
   /** Decoded-field memory for the performance report, bytes. */

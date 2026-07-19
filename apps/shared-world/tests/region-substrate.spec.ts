@@ -1,0 +1,462 @@
+import { test, expect, type Page } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { inflateSync } from 'node:zlib';
+
+/**
+ * Checkpoint 05A — terrain relief and substrate color rework (addendum
+ * §4.12 verification items not already carried by the existing suites):
+ *
+ *  1. artifact identity vs CP05: shore.png / shore_sdf.r16 / biome.png /
+ *     placement.json BYTE-IDENTICAL (recorded CP05 SHA-256); height.r16 /
+ *     caves.json / world.json changed — the full old→new hash table goes
+ *     to the eval artifact (items 2–5).
+ *  2. relief bake checks: the cp05a --check entries (shore-mask-preserved,
+ *     strong-zone roughness, protected-lagoon restraint, loop
+ *     navigability) all pass, plus the cp04A layout-fidelity set
+ *     (mini-islands, summit, trench, lagoon band) re-asserted (items 3–5).
+ *  3. placement Y resample: caves.json mouth lipY equals the revised
+ *     terrainHeight at each mouth's approved X/Z (independent decode);
+ *     cave/arch transforms keep their approved X/Z exactly (item 6).
+ *  4. classification equivalence: the GPU albedo-debug render vs the CPU
+ *     twin at projected probes within tolerance; the structural audit
+ *     proves the terrain fragment AND both water fragments carry the ONE
+ *     substrate include and no legacy tint law (items 7, 18).
+ *  5. underwater classification variation: dominant families across an
+ *     underwater probe grid ≥ 5 distinct; slope- and depth-dependence
+ *     demonstrated numerically (item 19).
+ *  6. substrate-only vocabulary: every family label is ordinary ground —
+ *     the automated proxy for item 20 (the visual "no asset-like
+ *     silhouettes" ruling stays with the §9 manual review).
+ *
+ * Items 8–17 (LOD-0 law, shoreline masking, four-shot, LOD protection,
+ * seams, camera, contact, containment, replay, views, performance) are the
+ * existing suites — region-terrain / region-water / region / camera / pool
+ * / scaffold — re-run against the revised bake in the same invocation.
+ */
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const APP_ROOT = resolve(HERE, '..');
+const REPO_ROOT = resolve(APP_ROOT, '..', '..');
+const WORLD_DIR = join(APP_ROOT, 'public', 'world');
+const BAKE = join(APP_ROOT, 'authoring', 'bake-region.mjs');
+const RESULTS_PATH = join(REPO_ROOT, 'eval', 'shared-world-results.json');
+const MEDIA_DIR = join(REPO_ROOT, 'media', 'shared-world-cp05a');
+
+const N = 2049;
+const TEXEL = 2000 / 2048;
+
+/** CP05-approved artifact hashes (commit 8ca67cc / 54ab302 tree). */
+const CP05_SHA256: Record<string, string> = {
+  'height.r16': '3cadb13ee9a6e421d211a827213951b4e25a6ed1f8d2252670067605118adead',
+  'shore.png': 'c640fbb71987dd763b18708ffc9070d9b5d7f0c970d097ba00eb4a43081c5d49',
+  'shore_sdf.r16': '1d5384f5b1a9c9551a06ebee442fbedc9bd6511c8cca4a1a8f6076b50673bd93',
+  'biome.png': '32d8de82fb9452c0b6862fe5ae2438ff540ab04516f1958aa0d720d0c022956e',
+  'placement.json': 'ac812947e3e606d4b890f25e4a77536fc3ecacc2baede3681dc05b6d164cf334',
+  'caves.json': '92bf01c35f376ea43bf8de09928b566cf1ffa33c488bba373f0e9ed0f0a7c23a',
+  'world.json': '0ce1d50e6ed2dad0d7e35bbeef40fb94a3f22295f67b60b406b5d87bc7f8adab',
+};
+
+/** artifacts the relief rebake must NOT change (coastline/footprint law) */
+const MUST_PRESERVE = ['shore.png', 'shore_sdf.r16', 'biome.png', 'placement.json'];
+/** artifacts the relief rebake legitimately changes */
+const MUST_CHANGE = ['height.r16', 'caves.json', 'world.json'];
+
+const results: Record<string, unknown> = {};
+
+test.afterAll(async () => {
+  mkdirSync(dirname(RESULTS_PATH), { recursive: true });
+  const existing = existsSync(RESULTS_PATH)
+    ? (JSON.parse(readFileSync(RESULTS_PATH, 'utf8')) as Record<string, unknown>)
+    : {};
+  writeFileSync(
+    RESULTS_PATH,
+    JSON.stringify(
+      {
+        ...existing,
+        checkpoint: '05A-terrain-relief-and-substrate-color',
+        generatedAt: new Date().toISOString(),
+        region05a: { ...(existing.region05a as object | undefined), ...results },
+      },
+      null,
+      2,
+    ) + '\n',
+  );
+});
+
+// ---------------------------------------------------------------- helpers
+
+const sha256 = (buf: Buffer) => createHash('sha256').update(buf).digest('hex');
+
+const qDecode = (v: number) => -80 + (v / 65535) * 280;
+
+function readU16(name: string): Uint16Array {
+  const buf = readFileSync(join(WORLD_DIR, name));
+  return new Uint16Array(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
+}
+
+function bilinearH(h16: Uint16Array, x: number, z: number): number {
+  const u = Math.min(Math.max((x + 1000) / TEXEL, 0), N - 1);
+  const v = Math.min(Math.max((z + 1000) / TEXEL, 0), N - 1);
+  const i0 = Math.min(Math.floor(u), N - 2);
+  const j0 = Math.min(Math.floor(v), N - 2);
+  const fu = u - i0;
+  const fv = v - j0;
+  const a = qDecode(h16[j0 * N + i0]!);
+  const b = qDecode(h16[j0 * N + i0 + 1]!);
+  const c = qDecode(h16[(j0 + 1) * N + i0]!);
+  const d = qDecode(h16[(j0 + 1) * N + i0 + 1]!);
+  return (a + (b - a) * fu) * (1 - fv) + (c + (d - c) * fu) * fv;
+}
+
+/** minimal PNG decode (the suite's shared 8-bit filter-0 helper) */
+function decodePng(path: string): { width: number; height: number; data: Buffer; bpp: number } {
+  const png = readFileSync(path);
+  const width = png.readUInt32BE(16);
+  const height = png.readUInt32BE(20);
+  const colorType = png[25]!;
+  const bpp = colorType === 6 ? 4 : colorType === 2 ? 3 : 1;
+  const idat: Buffer[] = [];
+  let off = 8;
+  while (off < png.length) {
+    const len = png.readUInt32BE(off);
+    const type = png.toString('ascii', off + 4, off + 8);
+    if (type === 'IDAT') idat.push(png.subarray(off + 8, off + 8 + len));
+    off += 12 + len;
+  }
+  const raw = inflateSync(Buffer.concat(idat));
+  const stride = 1 + width * bpp;
+  const data = Buffer.alloc(width * height * bpp);
+  for (let y = 0; y < height; y++) {
+    const ft = raw[y * stride]!;
+    if (ft === 0) {
+      raw.copy(data, y * width * bpp, y * stride + 1, (y + 1) * stride);
+    } else if (ft === 2) {
+      // up filter (Playwright screenshots use varied filters)
+      for (let i = 0; i < width * bpp; i++) {
+        const up = y > 0 ? data[(y - 1) * width * bpp + i]! : 0;
+        data[y * width * bpp + i] = (raw[y * stride + 1 + i]! + up) & 0xff;
+      }
+    } else if (ft === 1) {
+      for (let i = 0; i < width * bpp; i++) {
+        const left = i >= bpp ? data[y * width * bpp + i - bpp]! : 0;
+        data[y * width * bpp + i] = (raw[y * stride + 1 + i]! + left) & 0xff;
+      }
+    } else if (ft === 3) {
+      for (let i = 0; i < width * bpp; i++) {
+        const left = i >= bpp ? data[y * width * bpp + i - bpp]! : 0;
+        const up = y > 0 ? data[(y - 1) * width * bpp + i]! : 0;
+        data[y * width * bpp + i] = (raw[y * stride + 1 + i]! + ((left + up) >> 1)) & 0xff;
+      }
+    } else {
+      // paeth
+      for (let i = 0; i < width * bpp; i++) {
+        const left = i >= bpp ? data[y * width * bpp + i - bpp]! : 0;
+        const up = y > 0 ? data[(y - 1) * width * bpp + i]! : 0;
+        const ul = y > 0 && i >= bpp ? data[(y - 1) * width * bpp + i - bpp]! : 0;
+        const p = left + up - ul;
+        const pa = Math.abs(p - left);
+        const pb = Math.abs(p - up);
+        const pc = Math.abs(p - ul);
+        const pred = pa <= pb && pa <= pc ? left : pb <= pc ? up : ul;
+        data[y * width * bpp + i] = (raw[y * stride + 1 + i]! + pred) & 0xff;
+      }
+    }
+  }
+  return { width, height, data, bpp };
+}
+
+async function bootRegion(page: Page): Promise<string[]> {
+  const consoleErrors: string[] = [];
+  const isFavicon = (s: string) => s.includes('favicon');
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') {
+      const loc = msg.location();
+      const text = `${msg.text()}${loc.url ? ` [${loc.url}]` : ''}`;
+      if (!isFavicon(text)) consoleErrors.push(text);
+    }
+  });
+  page.on('pageerror', (err) => consoleErrors.push(String(err)));
+  await page.goto('/shared-world/?view=region&hud=0');
+  await page.waitForFunction(
+    () => {
+      const h = (window as any).__SHARED_WORLD;
+      return !!h && !!h.region && !!h.region.terrain && h.state().inWater === true;
+    },
+    undefined,
+    { timeout: 40_000 },
+  );
+  return consoleErrors;
+}
+
+const testHook = (page: Page, expr: string) =>
+  page.evaluate(`(window).__SHARED_WORLD.test.${expr}`);
+
+// ------------------------------------------------------------------ tests
+
+test.describe('checkpoint 05A — terrain relief and substrate color', () => {
+  test('1. artifact identity vs CP05: coastline/footprint artifacts byte-identical; relief artifacts changed; hash table recorded', () => {
+    const table: Record<string, { cp05: string; cp05a: string; changed: boolean }> = {};
+    for (const name of Object.keys(CP05_SHA256)) {
+      const now = sha256(readFileSync(join(WORLD_DIR, name)));
+      table[name] = {
+        cp05: CP05_SHA256[name]!,
+        cp05a: now,
+        changed: now !== CP05_SHA256[name],
+      };
+    }
+    for (const name of MUST_PRESERVE) {
+      expect(table[name]!.changed, `${name} must stay byte-identical to CP05`).toBe(false);
+    }
+    for (const name of MUST_CHANGE) {
+      expect(table[name]!.changed, `${name} must carry the CP05A revision`).toBe(true);
+    }
+    results.artifactHashTable = table;
+  });
+
+  test('2. relief bake checks green: coastline preserved, strong-zone roughness, protections, loop navigability, layout fidelity', () => {
+    const out = execFileSync('node', [BAKE, '--check'], { encoding: 'utf8', timeout: 240_000 });
+    const line = out.split('\n').find((l) => l.startsWith('CHECK-REPORT '));
+    expect(line).toBeTruthy();
+    const report = JSON.parse(line!.slice('CHECK-REPORT '.length)) as {
+      pass: boolean;
+      checks: { name: string; pass: boolean; [k: string]: unknown }[];
+    };
+    expect(report.pass).toBe(true);
+    const byName = Object.fromEntries(report.checks.map((c) => [c.name, c]));
+    // cp05A items
+    expect(byName['cp05a-shore-mask-preserved']!.pass).toBe(true);
+    expect(byName['cp05a-relief-strong-zone']!.pass).toBe(true);
+    expect((byName['cp05a-relief-strong-zone']!.rmsDeltaM as number)).toBeGreaterThanOrEqual(4);
+    expect(byName['cp05a-relief-protected-lagoon']!.pass).toBe(true);
+    expect(byName['cp05a-loop-navigability']!.pass).toBe(true);
+    // approved-layout fidelity re-asserted on the revised field (items 3–5)
+    for (const c of report.checks) {
+      if (c.name.startsWith('island-centroid-')) {
+        expect(c.pass, c.name).toBe(true);
+      }
+    }
+    expect(byName['summit-position-and-height']!.pass).toBe(true);
+    expect(byName['trench-floor']!.pass).toBe(true);
+    expect(byName['lagoon-depth-band']!.pass).toBe(true);
+    results.reliefChecks = report.checks.filter(
+      (c) => c.name.startsWith('cp05a') || c.name.startsWith('island-') ||
+        ['summit-position-and-height', 'trench-floor', 'lagoon-depth-band'].includes(c.name),
+    );
+  });
+
+  test('3. placement Y resample: caves.json lipY matches the revised terrainHeight; approved X/Z transforms unchanged', () => {
+    const h16 = readU16('height.r16');
+    const caves = JSON.parse(readFileSync(join(WORLD_DIR, 'caves.json'), 'utf8')) as {
+      modules: {
+        id: string;
+        transform: { x: number; z: number };
+        mouths: { name: string; x: number; z: number; lipY: number }[];
+      }[];
+    };
+    // approved transforms (REGION_SKETCHES § APPROVED LAYOUT — immovable)
+    const approved: Record<string, [number, number]> = {
+      'cave-headland': [-425, -60],
+      'cave-trench-wall': [450, -30],
+      'arch-islet-gap': [-40, -70],
+    };
+    const lipChecks: Record<string, { lipY: number; resampled: number }> = {};
+    for (const m of caves.modules) {
+      expect([m.transform.x, m.transform.z], `${m.id} X/Z`).toEqual(approved[m.id]);
+      for (const mouth of m.mouths) {
+        const resampled = bilinearH(h16, mouth.x, mouth.z);
+        expect(Math.abs(mouth.lipY - resampled), `${m.id}/${mouth.name} lipY`).toBeLessThanOrEqual(0.01);
+        lipChecks[`${m.id}/${mouth.name}`] = { lipY: mouth.lipY, resampled };
+      }
+    }
+    // placement.json is byte-identical (test 1) ⇒ every approved site keeps
+    // X/Z and category identity; Y is runtime-sampled from terrainHeight
+    // (single-source law), so it is resampled by construction.
+    results.placementYResample = {
+      caveLipY: lipChecks,
+      note: 'placement.json carries no baked Y — runtime Y comes from terrainHeight (Master §2.2); caves.json lipY re-baked from the revised field',
+    };
+  });
+
+  test('4. classification equivalence: GPU albedo-debug vs the CPU twin at projected probes; one substrate include everywhere', async ({ page }) => {
+    test.setTimeout(300_000);
+    mkdirSync(MEDIA_DIR, { recursive: true });
+    await page.setViewportSize({ width: 1748, height: 1080 });
+    const errors = await bootRegion(page);
+
+    // structural audit: the ONE include, no legacy tint law
+    const audit = (await page.evaluate(
+      () => (window as any).__SHARED_WORLD.test.substrateShaderAudit(),
+    )) as Record<string, boolean>;
+    expect(audit.terrainHasSubstrate).toBe(true);
+    expect(audit.waterAboveHasSubstrate).toBe(true);
+    expect(audit.waterBelowHasSubstrate).toBe(true);
+    expect(audit.anyLegacyTintLaw).toBe(false);
+    results.substrateShaderAudit = audit;
+
+    // camera 120 m above the south-bay shelf looking straight down;
+    // surface hidden + albedo-debug → raw classification pixels
+    const CAM: [number, number, number] = [-180, 120, 300];
+    await testHook(page, 'teleport(-500, -380, -3)'); // dolphin far away
+    await testHook(page, 'setIntent({ brake: true })');
+    await testHook(
+      page,
+      `shotMode({ pos: [${CAM.join(',')}], look: [${CAM[0] + 0.001}, 0, ${CAM[2]}], fov: 60, size: [1728, 1080] })`,
+    );
+    await testHook(page, 'setSurfaceVisible(false)');
+    await testHook(page, 'setAlbedoDebug(true)');
+    await page.waitForTimeout(800);
+    await page.addStyleTag({ content: '#region-overlay { display: none !important; }' });
+    const shotPath = join(MEDIA_DIR, 'albedo-debug-probes.png');
+    await page.locator('#app canvas').screenshot({ path: shotPath });
+
+    // probe grid on the shelf (≥ 60 m from the camera → detail fade = 0)
+    const pts: [number, number][] = [];
+    for (let dx = -60; dx <= 60; dx += 30) {
+      for (let dz = -60; dz <= 60; dz += 30) {
+        pts.push([CAM[0] + dx, CAM[2] + dz]);
+      }
+    }
+    const cpu = (await page.evaluate(
+      (p) => (window as any).__SHARED_WORLD.test.substrateProbe(p),
+      pts,
+    )) as { albedo: [number, number, number]; family: string; h: number }[];
+    const pts3 = pts.map(([x, z], i) => [x, cpu[i]!.h, z] as [number, number, number]);
+    const px = (await page.evaluate(
+      (p) => (window as any).__SHARED_WORLD.test.projectPoints(p),
+      pts3,
+    )) as { px: number; py: number; inFront: boolean }[];
+
+    await testHook(page, 'setAlbedoDebug(false)');
+    await testHook(page, 'setSurfaceVisible(true)');
+    await testHook(page, 'shotMode(null)');
+    await testHook(page, 'setIntent(null)');
+
+    const img = decodePng(shotPath);
+    expect(img.width).toBe(1728);
+    let compared = 0;
+    let maxErr = 0;
+    const TOL = 0.07; // fp32 texture filtering + varying interpolation headroom
+    const comparisons: unknown[] = [];
+    for (let i = 0; i < pts.length; i++) {
+      const p = px[i]!;
+      if (!p.inFront) continue;
+      const xI = Math.round(p.px);
+      const yI = Math.round(p.py);
+      if (xI < 2 || yI < 2 || xI >= img.width - 2 || yI >= img.height - 2) continue;
+      const o = (yI * img.width + xI) * img.bpp;
+      const gpu = [img.data[o]! / 255, img.data[o + 1]! / 255, img.data[o + 2]! / 255];
+      const want = cpu[i]!.albedo;
+      const err = Math.max(
+        Math.abs(gpu[0]! - want[0]),
+        Math.abs(gpu[1]! - want[1]),
+        Math.abs(gpu[2]! - want[2]),
+      );
+      comparisons.push({ xz: pts[i], family: cpu[i]!.family, cpu: want, gpu, err });
+      if (err > maxErr) maxErr = err;
+      compared++;
+      expect(err, `probe (${pts[i]![0]}, ${pts[i]![1]}) family ${cpu[i]!.family}`).toBeLessThanOrEqual(TOL);
+    }
+    expect(compared).toBeGreaterThanOrEqual(15);
+    results.classificationEquivalence = {
+      comparedProbes: compared,
+      maxChannelError: maxErr,
+      tolerance: TOL,
+      capture: 'media/shared-world-cp05a/albedo-debug-probes.png',
+      note:
+        'GPU albedo-debug (the include shared verbatim by the water raymarch shaders — structural audit above) vs the fp32-exact CPU twin; equivalence of the direct and raymarched paths is by shared-source construction',
+      samples: comparisons.slice(0, 6),
+    };
+    expect(errors, errors.join(' | ')).toEqual([]);
+  });
+
+  test('5. underwater classification varies by substrate, slope and depth — never one uniform deep tint', async ({ page }) => {
+    await bootRegion(page);
+    // probe grid across the region's underwater areas (approved features)
+    const pts: [number, number][] = [];
+    for (let x = -900; x <= 900; x += 60) {
+      for (let z = -900; z <= 900; z += 60) {
+        pts.push([x, z]);
+      }
+    }
+    const samples = (await page.evaluate(
+      (p) => (window as any).__SHARED_WORLD.test.substrateProbe(p),
+      pts,
+    )) as { albedo: [number, number, number]; family: string; h: number; slope: number; depth: number }[];
+    const underwater = samples.filter((s) => s.h < 0);
+    expect(underwater.length).toBeGreaterThan(300);
+
+    const families = new Set(underwater.map((s) => s.family));
+    results.underwaterFamilies = [...families].sort();
+    expect(families.size, `families seen: ${[...families].join(', ')}`).toBeGreaterThanOrEqual(5);
+
+    // slope-dependence: at comparable mid depths, steep vs flat differ
+    const mid = underwater.filter((s) => s.depth > 15 && s.depth < 45);
+    const flat = mid.filter((s) => s.slope < 0.1);
+    const steep = mid.filter((s) => s.slope > 0.35);
+    expect(flat.length).toBeGreaterThan(5);
+    expect(steep.length).toBeGreaterThan(5);
+    const mean = (arr: typeof mid) => {
+      const m: [number, number, number] = [0, 0, 0];
+      for (const s of arr) {
+        m[0] += s.albedo[0]; m[1] += s.albedo[1]; m[2] += s.albedo[2];
+      }
+      return m.map((v) => v / arr.length) as [number, number, number];
+    };
+    const mf = mean(flat);
+    const ms = mean(steep);
+    const slopeDelta = Math.hypot(mf[0] - ms[0], mf[1] - ms[1], mf[2] - ms[2]);
+    expect(slopeDelta, 'flat vs steep mean albedo at matched depth').toBeGreaterThan(0.05);
+
+    // depth-dependence: shallow flats vs deep flats differ
+    const shallowFlat = underwater.filter((s) => s.depth < 10 && s.slope < 0.1);
+    const deepFlat = underwater.filter((s) => s.depth > 55 && s.slope < 0.1);
+    expect(shallowFlat.length).toBeGreaterThan(5);
+    expect(deepFlat.length).toBeGreaterThan(5);
+    const m1 = mean(shallowFlat);
+    const m2 = mean(deepFlat);
+    const depthDelta = Math.hypot(m1[0] - m2[0], m1[1] - m2[1], m1[2] - m2[2]);
+    expect(depthDelta, 'shallow vs deep mean albedo at matched slope').toBeGreaterThan(0.1);
+
+    results.underwaterVariation = {
+      probes: underwater.length,
+      families: [...families].sort(),
+      slopeDelta,
+      depthDelta,
+    };
+  });
+
+  test('6. substrate-only vocabulary: every family label is ordinary ground (asset presence never encoded)', async ({ page }) => {
+    await bootRegion(page);
+    const pts: [number, number][] = [];
+    for (let x = -950; x <= 950; x += 45) {
+      for (let z = -950; z <= 950; z += 45) {
+        pts.push([x, z]);
+      }
+    }
+    const samples = (await page.evaluate(
+      (p) => (window as any).__SHARED_WORLD.test.substrateProbe(p),
+      pts,
+    )) as { family: string }[];
+    const allowed = new Set([
+      // underwater substrate families (addendum §4.9)
+      'shallow-sand', 'deep-sediment', 'reef-stone', 'mid-stone', 'trench-rock',
+      'silt-pocket', 'uw-cliff-stone', 'shore-stone', 'cave-mouth-rock',
+      // exposed-land substrate families (addendum §4.8)
+      'beach-sand', 'soil', 'exposed-rock', 'cliff-rock', 'high-rock',
+      'wet-shoreline', 'rock',
+    ]);
+    const seen = new Set(samples.map((s) => s.family));
+    for (const f of seen) {
+      expect(allowed.has(f), `family "${f}" must be an ordinary-ground label`).toBe(true);
+    }
+    results.substrateVocabulary = {
+      seen: [...seen].sort(),
+      note:
+        'automated proxy for addendum §4.12 item 20; the visual "no asset-like silhouettes or patterns" ruling belongs to the §9 manual review',
+    };
+  });
+});

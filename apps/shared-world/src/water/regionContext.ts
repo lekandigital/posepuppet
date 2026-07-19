@@ -16,6 +16,10 @@ import { SIM_UNIT_M, WINDOW_SIZE_M } from './RegionWater';
 export interface RegionContext {
   heightTex: THREE.DataTexture;
   shoreTex: THREE.DataTexture;
+  /** cp05A: shore_sdf.r16 as a float texture for the substrate shoreline bands */
+  shoreSdfTex: THREE.DataTexture;
+  /** cp05A: biome.png regional masks for the substrate classification */
+  biomeTex: THREE.DataTexture;
   /** shared with RegionWater.windowOrigin (min corner, meters) */
   windowOrigin: THREE.Vector2;
   regionSize: number;
@@ -59,9 +63,37 @@ export function buildRegionContext(
   shoreTex.unpackAlignment = 1;
   shoreTex.needsUpdate = true;
 
+  // cp05A: shore_sdf.r16 → float texture (meters, + = water) — the substrate
+  // classification's shoreline-band input (same half-texel law as height)
+  const shoreSdfTex = new THREE.DataTexture(
+    data.sdf, n, n, THREE.RedFormat, THREE.FloatType,
+  );
+  shoreSdfTex.minFilter = floatLinear ? THREE.LinearFilter : THREE.NearestFilter;
+  shoreSdfTex.magFilter = shoreSdfTex.minFilter;
+  shoreSdfTex.wrapS = THREE.ClampToEdgeWrapping;
+  shoreSdfTex.wrapT = THREE.ClampToEdgeWrapping;
+  shoreSdfTex.generateMipmaps = false;
+  shoreSdfTex.unpackAlignment = 1;
+  shoreSdfTex.needsUpdate = true;
+
+  // cp05A: biome.png regional masks (R bright, G kelp-shelf, B plain)
+  const nb = data.biomeN;
+  const biomeTex = new THREE.DataTexture(
+    data.biome, nb, nb, THREE.RGBAFormat, THREE.UnsignedByteType,
+  );
+  biomeTex.minFilter = THREE.LinearFilter;
+  biomeTex.magFilter = THREE.LinearFilter;
+  biomeTex.wrapS = THREE.ClampToEdgeWrapping;
+  biomeTex.wrapT = THREE.ClampToEdgeWrapping;
+  biomeTex.generateMipmaps = false;
+  biomeTex.unpackAlignment = 1;
+  biomeTex.needsUpdate = true;
+
   return {
     heightTex,
     shoreTex,
+    shoreSdfTex,
+    biomeTex,
     windowOrigin,
     regionSize: data.header.sizeMeters[0],
     heightN: n,
@@ -81,5 +113,9 @@ export function regionUniforms(ctx: RegionContext): Record<string, THREE.IUnifor
     uWindowOrigin: { value: ctx.windowOrigin },
     uWindowSize: { value: WINDOW_SIZE_M },
     uDispScale: { value: SIM_UNIT_M },
+    // cp05A substrate inputs (consumed by materials including RegionSubstrate.glsl)
+    uShoreSdf: { value: ctx.shoreSdfTex },
+    uBiomeTex: { value: ctx.biomeTex },
+    uAlbedoDebug: { value: 0.0 },
   };
 }

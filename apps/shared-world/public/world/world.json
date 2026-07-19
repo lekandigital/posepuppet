@@ -58,7 +58,7 @@
       "bytes": 5679
     },
     "caves.json": {
-      "bytes": 2207
+      "bytes": 2206
     }
   },
   "zones": [
@@ -159,35 +159,108 @@
   "attribution": [
     "Region: original BodyArcade authored terrain, 2026",
     "Layout: Sketch C (Twin Bay), Checkpoint 03 decision gate, approved 2026-07-18",
-    "Authoring algorithms: THREE.Terrain 2.0.0 (MIT, Isaac Sukin) noise passes over the approved analytic field"
+    "Authoring algorithms: THREE.Terrain 2.0.0 (MIT, Isaac Sukin) noise passes over the approved analytic field",
+    "Relief techniques (CP05A) adapted from ZyFou/ProceduralTerrains (MIT, github.com/ZyFou/ProceduralTerrains, pinned 8b396f9c) into app-owned authoring code"
   ],
+  "relief": {
+    "checkpoint": "05A",
+    "technique": "ZyFou/ProceduralTerrains-adapted (MIT, pinned 8b396f9c) domain-warp + ridged-multifractal (spectral weighting) + authored emphasis + restrained breakup over the approved Twin Bay macro field; protected-flatness and protected-coast masks; coastline-preserving vertical shore taper",
+    "seeds": {
+      "base": 60418003,
+      "warpX": 60469004,
+      "warpZ": 60469005,
+      "broad": 60469013,
+      "ridge": 60469023,
+      "chain": 60469024,
+      "carve": 60469033,
+      "carveChain": 60469034,
+      "emphasis": 60469043,
+      "medium": 60469053,
+      "fine": 60469063,
+      "wall": 60469073
+    },
+    "params": {
+      "SHORE_V0": 0.5,
+      "SHORE_V1": 6,
+      "SIGN_KEEP": 0.85,
+      "TOP_T0": 150,
+      "TOP_T1": 195,
+      "TOP_NEG_T0": 185,
+      "TOP_NEG_T1": 196,
+      "BOT_T0": 60,
+      "BOT_T1": 75,
+      "WARP_AMP_M": 40,
+      "WARP_WAVELEN_M": 350,
+      "BROAD_AMP_M": 7,
+      "BROAD_WAVELEN_M": 240,
+      "RIDGE_AMP_M": 14,
+      "RIDGE_WAVELEN_M": 95,
+      "RIDGE_NEEDLE": 1.35,
+      "CHAIN_WAVELEN_M": 380,
+      "CHAIN_LO": 0.35,
+      "CHAIN_HI": 0.62,
+      "CARVE_FRAC": 0.7,
+      "CARVE_WAVELEN_M": 130,
+      "ZONE_RIDGE_AMP_M": 22,
+      "ZONE_WALL_AMP_M": 16,
+      "ZONE_SHELF_AMP_M": 7,
+      "ZONE_CLIFF_AMP_M": 14,
+      "EMPH_AMP_M": 12,
+      "EMPH_WAVELEN_M": 60,
+      "WALL_WAVELEN_M": 55,
+      "RIDGE_NEAR_M": 60,
+      "RIDGE_FAR_M": 200,
+      "TRENCH_WALL_IN_M": 40,
+      "TRENCH_WALL_IN2_M": 80,
+      "TRENCH_WALL_OUT_M": 160,
+      "TRENCH_WALL_OUT2_M": 230,
+      "CLIFF_COAST_M": 15,
+      "CLIFF_COAST_FAR_M": 80,
+      "MED_AMP_M": 3.2,
+      "MED_WAVELEN_M": 28,
+      "FINE_AMP_M": 0.8,
+      "FINE_WAVELEN_M": 9,
+      "COAST_NEAR_M": 8,
+      "COAST_FAR_M": 45,
+      "CLIFF_COAST_NEAR_M": 4,
+      "CLIFF_COAST_FULL_M": 12,
+      "LAGOON_RESIDUAL": 0.12,
+      "LOOP_RESIDUAL": 0.3,
+      "BREACH_RESIDUAL": 0.25,
+      "CAVE_RESIDUAL": 0.15,
+      "ARCH_RESIDUAL": 0.2,
+      "SITE_RESIDUAL": 0.2,
+      "PLAIN_RESIDUAL": 0.5,
+      "LOOP_SHALLOW_FRAC": 0.4
+    }
+  },
   "verification": {
     "note": "Loader round-trip targets (§8.6): terrainHeight bilinear over the dequantized uint16 grid at these points must match within 0.01 m.",
     "probes": [
       {
         "x": -180,
         "z": -380,
-        "h": -7.664772
+        "h": -7.580689
       },
       {
         "x": -100,
         "z": -300,
-        "h": -8.096803
+        "h": -8.120217
       },
       {
         "x": -180,
         "z": 300,
-        "h": -20.67389
+        "h": -24.031993
       },
       {
         "x": -120,
         "z": 260,
-        "h": -22.983604
+        "h": -23.078112
       },
       {
         "x": 140,
         "z": 660,
-        "h": -42.688029
+        "h": -42.635426
       },
       {
         "x": 560,
@@ -212,17 +285,17 @@
       {
         "x": -700,
         "z": -300,
-        "h": 156.331536
+        "h": 158.612723
       },
       {
         "x": -420,
         "z": 30,
-        "h": -33.895834
+        "h": -32.63591
       },
       {
         "x": -430,
         "z": -150,
-        "h": -45.366356
+        "h": -45.126001
       },
       {
         "x": 450,
@@ -232,27 +305,27 @@
       {
         "x": -40,
         "z": -70,
-        "h": -28.580832
+        "h": -28.551833
       },
       {
         "x": 390,
         "z": 290,
-        "h": -46.990648
+        "h": -46.558357
       },
       {
         "x": 480,
         "z": -560,
-        "h": 71.948413
+        "h": 91.608897
       },
       {
         "x": -380,
         "z": 640,
-        "h": 43.8331
+        "h": 50.391195
       },
       {
         "x": 90,
         "z": -80,
-        "h": 3.383987
+        "h": 3.392874
       },
       {
         "x": 900,
@@ -262,7 +335,7 @@
       {
         "x": 0,
         "z": -900,
-        "h": -60.99324
+        "h": -55.454337
       }
     ]
   }

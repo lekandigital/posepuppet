@@ -146,4 +146,13 @@ export class RegionWaterSurfacePass {
   setVisible(v: boolean) {
     for (const m of this.meshes()) m.visible = v;
   }
+
+  /** cp05A structural audit: compiled fragment sources (include-marker
+   *  checks — the substrate include must be shared with the terrain path). */
+  fragmentSources(): { above: string; below: string } {
+    return {
+      above: this.aboveMaterial.fragmentShader,
+      below: this.belowMaterial.fragmentShader,
+    };
+  }
 }

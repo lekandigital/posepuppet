@@ -1,9 +1,10 @@
-// ?view=region-preview — the Checkpoint 04A graybox terrain preview.
+// ?view=region-preview — the Checkpoint 04A graybox terrain preview,
+// cp05A revision: vertex colors now come from the substrate-classification
+// CPU twin (substrateCpu.ts — addendum §4.7 "debug and baked color outputs
+// used to validate classification"), superseding the R14 two-tint law.
 //
 // AN ENGINEERING VIEW, explicitly not the game look (cp04A §3.4): single
-// 512²-quad Lambert mesh over the region, provisional hypsometric tints per
-// resolution R14 (submerged #D2C7A9, exposed #A98F6C, shoreline blend
-// ±0.5 m — provisional-until-checkpoint-08), free-orbit dev camera,
+// 512²-quad Lambert mesh over the region, free-orbit dev camera,
 // sea-level reference grid at y 0, fog off, mono stats overlay, spawn +
 // approved-loop + site markers from placement.json (dev-view markers, not
 // cp07 placeholders).
@@ -16,12 +17,11 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { WorldData } from './WorldData';
 import { RegionSampler } from './RegionSampler';
+import { substrateSampleCpu } from './substrateCpu';
 import { SwimSim, NEUTRAL_INTENT, SIM, type SwimIntent } from '../game/sim';
 
-/** R14 provisional tints (Track D table 6.2 family-B; until cp08). */
-const TINT_SUBMERGED = new THREE.Color('#D2C7A9');
-const TINT_EXPOSED = new THREE.Color('#A98F6C');
-const SHORE_BLEND_M = 0.5;
+// (cp05A: the R14 two-tint law is superseded by substrateSampleCpu — the
+// preview now renders the real classification, pre-cp08 working values.)
 
 const GRID_SEGMENTS = 512; // 512² quads (≈ 3.9 m step — preview-grade)
 
@@ -78,14 +78,14 @@ export async function mountRegionPreview(root: HTMLElement): Promise<void> {
   const hemi = new THREE.HemisphereLight(0xbfd8e8, 0x3a3428, 0.8);
   scene.add(sun, hemi);
 
-  // --- terrain mesh: vertex y from terrainHeight, R14 vertex tints ---
+  // --- terrain mesh: vertex y from terrainHeight, cp05A substrate colors
+  // from the classification CPU twin (the validating debug output) ---
   const t0 = performance.now();
   const verts = GRID_SEGMENTS + 1;
   const positions = new Float32Array(verts * verts * 3);
   const colors = new Float32Array(verts * verts * 3);
   const size = data.header.sizeMeters[0];
   const step = size / GRID_SEGMENTS;
-  const tint = new THREE.Color();
   for (let j = 0; j < verts; j++) {
     const z = -size / 2 + j * step;
     for (let i = 0; i < verts; i++) {
@@ -95,11 +95,10 @@ export async function mountRegionPreview(root: HTMLElement): Promise<void> {
       positions[o] = x;
       positions[o + 1] = h;
       positions[o + 2] = z;
-      const t = smoothstep(-SHORE_BLEND_M, SHORE_BLEND_M, h);
-      tint.copy(TINT_SUBMERGED).lerp(TINT_EXPOSED, t);
-      colors[o] = tint.r;
-      colors[o + 1] = tint.g;
-      colors[o + 2] = tint.b;
+      const s = substrateSampleCpu(data, x, z);
+      colors[o] = s.albedo[0];
+      colors[o + 1] = s.albedo[1];
+      colors[o + 2] = s.albedo[2];
     }
   }
   const indices = new Uint32Array(GRID_SEGMENTS * GRID_SEGMENTS * 6);
@@ -382,9 +381,4 @@ export async function mountRegionPreview(root: HTMLElement): Promise<void> {
         : '');
   }
   requestAnimationFrame(frame);
-}
-
-function smoothstep(e0: number, e1: number, x: number): number {
-  const t = Math.min(Math.max((x - e0) / (e1 - e0), 0), 1);
-  return t * t * (3 - 2 * t);
 }

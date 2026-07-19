@@ -1,5 +1,5 @@
 {
-  "checkpoint": "04A-region-bake-loader",
+  "checkpoint": "05-terrain-across-the-waterline",
   "timestamp": "2026-07-18T05:37:35.848Z",
   "url": "/shared-world/?view=stock",
   "viewport": {
@@ -33,32 +33,32 @@
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
   "paintedPixels": 508275,
-  "generatedAt": "2026-07-18T19:02:20.624Z",
+  "generatedAt": "2026-07-19T00:59:31.088Z",
   "pool": {
     "modelLengthM": 2.8968250546579615,
     "bootConsoleErrors": 0,
     "brake": {
-      "fromSpeed": 4.811864869643348,
-      "speedAfter1200ms": 0.0009893977803730463
+      "fromSpeed": 4.8150852871934955,
+      "speedAfter1200ms": 0.000990059952520266
     },
     "cadenceCoupling": [
       {
         "rateHz": 0.4,
-        "speed": 2.423515511664822
+        "speed": 2.139359024967425
       },
       {
         "rateHz": 0.9,
-        "speed": 4.907660719095309
+        "speed": 4.9048606107144765
       }
     ],
-    "glideSpeedAfter3s": 2.8722731582930177,
+    "glideSpeedAfter3s": 3.4219594446862134,
     "burst": {
       "peakSpeed": 9,
-      "msToExceed8": 1082
+      "msToExceed8": 1102
     },
     "sustainedMaxSpeed": 5,
     "dropout": {
-      "maxPitchStepRad": 0.0796763778537879,
+      "maxPitchStepRad": 0.07850767297720784,
       "trackingDuringLoss": "autopilot"
     },
     "replayDigest": "7.240747,-2.500000,0.714485,0.543055,5.000000,240,0|4.525521,-5.",
@@ -70,10 +70,10 @@
       "fps": {
         "buckets": [
           120,
+          120,
+          120,
+          119,
           121,
-          120,
-          120,
-          120,
           120,
           120,
           120,
@@ -81,20 +81,20 @@
           120
         ],
         "median": 120,
-        "min": 120,
+        "min": 119,
         "windowSeconds": 10
       },
       "simHzSamples": [
-        119.99206664022218,
-        120.11117728806823,
-        119.9040767386092,
+        120.00396707329166,
+        119.98016856717898,
+        120.52993326028493,
         119.98800119987997,
-        120.00396707329176,
+        119.4981079466243,
         120.01586986708978,
-        119.99206664022218,
-        120.00396707329155,
-        120.03968253968254,
-        119.95201919232312
+        120.00396707329176,
+        119.99206664022196,
+        120.00396707329176,
+        120.09925558312655
       ],
       "viewport": {
         "width": 1728,
@@ -106,18 +106,18 @@
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 18744746
+      "usedJSHeapBytes": 18493286
     },
     "turnShaping": {
-      "slowYawRateRadS": 2.437281368283726,
-      "slowSpeed": 0.00005210657934684004,
-      "fastYawRateRadS": 1.566979287591222,
+      "slowYawRateRadS": 2.439555799319956,
+      "slowSpeed": 0.000046413229719904114,
+      "fastYawRateRadS": 1.563948849727756,
       "fastSpeed": 9
     }
   },
   "containmentBatteryNote": "NOT ported at pool scale (walls are the vendored demo pool); returns re-pointed at cp04B",
   "stock": {
-    "timestamp": "2026-07-18T19:02:55.058Z",
+    "timestamp": "2026-07-19T00:58:16.138Z",
     "url": "/shared-world/?view=stock",
     "viewport": {
       "width": 1728,
@@ -131,19 +131,19 @@
     "chromeVersion": "150.0.7871.125",
     "fps": {
       "buckets": [
-        121,
+        120,
+        120,
+        119,
         120,
         120,
         120,
-        120,
-        121,
         120,
         120,
         120,
         120
       ],
       "median": 120,
-      "min": 120,
+      "min": 119,
       "windowSeconds": 10
     },
     "simHz": null,
@@ -155,44 +155,44 @@
     "cruiseCoverage": {
       "samples": 43,
       "widthFrac": {
-        "median": 0.10003618320066593,
-        "min": 0.09763615785787703,
-        "max": 0.10706374816640582
+        "median": 0.09989795221671596,
+        "min": 0.09749749670081642,
+        "max": 0.10705065636365382
       },
       "centerHeightFrac": {
-        "median": 0.43656890370971363,
-        "min": 0.4242712340072913,
-        "max": 0.4442427421252161
+        "median": 0.4365852439947586,
+        "min": 0.4243047394903926,
+        "max": 0.4442250745436468
       },
-      "followDistM": 6.794346089807747
+      "followDistM": 6.793658921997447
     },
     "burstCoverage": {
       "samples": 21,
       "state": "FastTravel (bands relaxed per cp02 §8.1)",
       "widthFrac": {
-        "median": 0.07593250538277033
+        "median": 0.07647642033604227
       },
-      "followDistM": 8.199280277126368
+      "followDistM": 8.205796416827376
     },
     "hoverCoverage": {
       "state": "SlowHover (bands relaxed per cp02 §8.1)",
-      "followDistM": 3.478505426332791,
+      "followDistM": 3.478505426332004,
       "widthFrac": {
-        "median": 0.2941389066171354
+        "median": 0.2941086804287648
       }
     },
     "bandStatesSeen": [
       "NormalFollow"
     ],
     "stepTurn": {
-      "peakAzimuthErrorRad": 1.287845939792132,
-      "t90S": 0.29
+      "peakAzimuthErrorRad": 1.2809026356772841,
+      "t90S": 0.303
     },
     "stopTest": {
-      "dolphinStoppedAtMs": 313,
-      "finalFollowDistM": 3.4785056069964395,
-      "minFollowDistAfterStopM": 3.4785056069964395,
-      "distErrorAtStopPlus1200msM": 0.032465718383809516
+      "dolphinStoppedAtMs": 316,
+      "finalFollowDistM": 3.478505607129223,
+      "minFollowDistAfterStopM": 3.478505607129223,
+      "distErrorAtStopPlus1200msM": 0.03363317444284952
     },
     "wallTest": {
       "minWallClearanceM": 0.7500000000000018,
@@ -223,8 +223,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286200,
-          "poolBytes": 1076679
+          "stockBytes": 1286058,
+          "poolBytes": 1075952
         },
         "c-below-lip": {
           "eyeDemo": [
@@ -242,8 +242,8 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1286349,
-          "poolBytes": 1378552
+          "stockBytes": 1286050,
+          "poolBytes": 1378445
         },
         "d-snell-window": {
           "eyeDemo": [
@@ -261,79 +261,115 @@
             "w": 1398,
             "h": 1080
           },
-          "stockBytes": 1346968,
-          "poolBytes": 1348018
+          "stockBytes": 1346516,
+          "poolBytes": 1348143
         }
       }
     },
     "replayDigestVsCp01": "identical (first 64 chars compared against committed artifact)",
     "recenter": {
-      "azimuthErrorBeforeRad": 0.11003665247591199,
-      "azimuthErrorAfterRad": 0.07482107822859119
+      "azimuthErrorBeforeRad": 0.11015474891743926,
+      "azimuthErrorAfterRad": 0.07377447944156978
     },
     "waterline": {
       "breachReEntries": 4,
       "cameraSurfaceCrossings": 8,
       "antiShimmerEngagements": 8,
-      "maxFrameStepM": 0.5593774124416346,
+      "maxFrameStepM": 0.5749726537161288,
       "statesSeen": {
-        "NormalFollow": 535,
-        "Airborne": 410,
-        "SurfaceTransition": 292,
-        "ReEntryRecovery": 188,
-        "Obstructed": 462,
-        "FastTravel": 43
+        "NormalFollow": 522,
+        "Airborne": 407,
+        "SurfaceTransition": 293,
+        "ReEntryRecovery": 189,
+        "Obstructed": 457,
+        "FastTravel": 57
       }
     },
     "perf": {
       "script": "porpoise 16 s (cruise cadence + nose-up breach cycles, ≥ 2 waterline crossing pairs)",
       "fps": {
         "buckets": [
+          120,
+          121,
+          121,
+          121,
+          121,
           121,
           121,
           120,
           121,
-          121,
-          120,
-          120,
-          121,
-          120,
-          120
+          119
         ],
         "median": 121,
-        "min": 120,
+        "min": 119,
         "windowSeconds": 10
       },
       "simHzSamples": [
-        109.61634280150147,
-        120.01586986708986,
-        119.98800119988002,
+        102.32465726328213,
+        120.01586986708989,
+        120.00396707329166,
         120.0039670732917,
-        120.02777502231918,
-        119.97600479904021,
+        120.00396707329166,
+        120.00396707329166,
         120.00396707329166,
         119.99206664022218,
-        120.07541927160852,
-        119.92804317409549,
-        120.01586986708999,
         119.98800119987997,
-        120.00396707329176,
-        120.02777502231918,
-        120.01586986708978,
-        119.96401079676106
+        120.09925558312655,
+        119.9400299850075,
+        120.03968253968254,
+        120.43396038618506,
+        120.00396707329155,
+        119.99206664022218
       ],
-      "cameraUpdateUsAvg": 25.83333229025205,
+      "cameraUpdateUsAvg": 33.333334575096764,
       "viewport": {
         "width": 1728,
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 23739761
+      "usedJSHeapBytes": 23625705
     }
   },
   "region": {
     "bakeDeterminism": "PASS (SHA-256 per artifact, in-memory ×2 + disk)",
     "fidelity": [
+      {
+        "name": "cp05a-shore-mask-preserved",
+        "pass": true,
+        "agree": 4198401,
+        "texels": 4198401,
+        "note": "artifact land/water bit identical to the pre-relief CP05 field ⇒ shore.png byte-identical"
+      },
+      {
+        "name": "cp05a-relief-strong-zone",
+        "pass": true,
+        "rmsDeltaM": 8.459648,
+        "rmsFloorM": 4,
+        "gradientRatioNewOldOnSmoothBase": 2.032677,
+        "gradientRatioFloor": 1.6,
+        "sampledTexels": 28285,
+        "gradSamples": 3370,
+        "deltaRange": {
+          "min": -24.895074,
+          "max": 38.042609
+        }
+      },
+      {
+        "name": "cp05a-relief-protected-lagoon",
+        "pass": true,
+        "rmsDeltaM": 0.23333,
+        "rmsCapM": 0.9,
+        "sampledTexels": 8232
+      },
+      {
+        "name": "cp05a-loop-navigability",
+        "pass": true,
+        "minDepthNewM": 4.254542,
+        "minDepthFloorM": 2.5,
+        "worstDepthRatio": 0.90376,
+        "ratioFloor": 0.55,
+        "waterSamples": 303
+      },
       {
         "name": "height-resolution",
         "pass": true,
@@ -504,8 +540,8 @@
       "shore_sdf.r16": 8396802,
       "biome.png": 143521,
       "placement.json": 5679,
-      "caves.json": 2207,
-      "world.json": 5683
+      "caves.json": 2206,
+      "world.json": 7948
     },
     "heightRange": {
       "min": -80,
@@ -526,7 +562,7 @@
       "discovery": 7,
       "route": 13
     },
-    "roundTripMaxDeltaM": 0.000005238281232777808,
+    "roundTripMaxDeltaM": 0.0000028300781593770807,
     "containmentBattery": [
       {
         "yaw": 0,
@@ -586,9 +622,9 @@
       },
       {
         "yaw": 0.7853981633974483,
-        "minShore": 23.992815701026906,
+        "minShore": 24.17203192429731,
         "minSpeed": 9,
-        "maxDecelPer200ms": 0
+        "maxDecelPer200ms": 0.3521446223476472
       },
       {
         "yaw": 1.5707963267948966,
@@ -627,14 +663,14 @@
         "maxDecelPer200ms": 0
       }
     ],
-    "depthClampWorstBelowFloorM": 0.6972453370649907,
+    "depthClampWorstBelowFloorM": 0.6653302094142441,
     "regionReplayDigest": "-170.212920,-2.500000,-380.000000,1.570796,5.000000,240,0|-161.5",
     "previewPerf": {
       "fpsBuckets": [
+        121,
         120,
         120,
-        120,
-        120,
+        119,
         121,
         120,
         120,
@@ -643,16 +679,16 @@
         120
       ],
       "median": 120,
-      "min": 120,
+      "min": 119,
       "viewport": {
         "width": 1728,
         "height": 1080
       },
-      "usedJSHeapBytes": 60887379
+      "usedJSHeapBytes": 65674445
     },
     "previewBoot": {
-      "decodeMs": 50.19999998807907,
-      "meshBuildMs": 32.20000001788139,
+      "decodeMs": 67.5,
+      "meshBuildMs": 129.40000000596046,
       "decodedBytes": 37785609,
       "consoleErrors": 0
     }
@@ -676,49 +712,49 @@
       "windowTexelM": 0.5,
       "gpuTimerSource": "EXT_disjoint_timer_query_webgl2",
       "floatLinear": true,
-      "decodeMs": 62.20000001788139,
+      "decodeMs": 68.90000000596046,
       "consoleErrors": 0
     },
     "depthLaw": [
       {
         "x": -180,
         "z": -380,
-        "committed": -7.664772,
-        "cpu": -7.6647722328186045,
-        "depthAt": 7.6647722328186045,
-        "gpu": -7.664765357971191
+        "committed": -7.580689,
+        "cpu": -7.580688789367676,
+        "depthAt": 7.580688789367676,
+        "gpu": -7.58068323135376
       },
       {
         "x": -100,
         "z": -300,
-        "committed": -8.096803,
-        "cpu": -8.096803359985353,
-        "depthAt": 8.096803359985353,
-        "gpu": -8.096823692321777
+        "committed": -8.120217,
+        "cpu": -8.120216751098633,
+        "depthAt": 8.120216751098633,
+        "gpu": -8.120244026184082
       },
       {
         "x": -180,
         "z": 300,
-        "committed": -20.67389,
-        "cpu": -20.673889846801746,
-        "depthAt": 20.673889846801746,
-        "gpu": -20.67391014099121
+        "committed": -24.031993,
+        "cpu": -24.031993209838856,
+        "depthAt": 24.031993209838856,
+        "gpu": -24.032182693481445
       },
       {
         "x": -120,
         "z": 260,
-        "committed": -22.983604,
-        "cpu": -22.98360370788574,
-        "depthAt": 22.98360370788574,
-        "gpu": -22.98381233215332
+        "committed": -23.078112,
+        "cpu": -23.078112222290038,
+        "depthAt": 23.078112222290038,
+        "gpu": -23.078292846679688
       },
       {
         "x": 140,
         "z": 660,
-        "committed": -42.688029,
-        "cpu": -42.68803024291992,
-        "depthAt": 42.68803024291992,
-        "gpu": -42.68803024291992
+        "committed": -42.635426,
+        "cpu": -42.63542655029298,
+        "depthAt": 42.63542655029298,
+        "gpu": -42.635467529296875
       },
       {
         "x": 560,
@@ -755,10 +791,10 @@
       {
         "x": -700,
         "z": -300,
-        "committed": 156.331536,
-        "cpu": 156.33153076171877,
+        "committed": 158.612723,
+        "cpu": 158.61272583007815,
         "depthAt": 0,
-        "gpu": 156.33209228515625
+        "gpu": 158.61300659179688
       }
     ],
     "replay": {
@@ -824,9 +860,9 @@
       },
       {
         "yaw": 0.7853981633974483,
-        "minShore": 23.992815701026906,
+        "minShore": 24.17203192429731,
         "minSpeed": 9,
-        "maxDecelPer200ms": 0
+        "maxDecelPer200ms": 0.3521446223476472
       },
       {
         "yaw": 1.5707963267948966,
@@ -865,20 +901,15 @@
         "maxDecelPer200ms": 0
       }
     ],
-    "depthClampWorstBelowFloorM": 0.6972453370649907,
+    "depthClampWorstBelowFloorM": 0.6653302094142441,
     "sprint": {
-      "travelled": 220.70397180622302,
+      "travelled": 220.6155418360072,
       "fpsBuckets": [
         120,
-        120,
-        120,
-        121,
-        120,
+        119,
         120,
         120,
         120,
-        120,
-        121,
         120,
         120,
         120,
@@ -890,7 +921,12 @@
         120,
         120,
         120,
-        121,
+        120,
+        119,
+        120,
+        120,
+        120,
+        119,
         120,
         120,
         120
@@ -901,23 +937,23 @@
       ],
       "simProbe": {
         "nanCount": 0,
-        "edgeMaxDispM": 4.998166849251108e-9,
-        "maxDispM": 0.002000843669520691
+        "edgeMaxDispM": 2.0996198037893344e-8,
+        "maxDispM": 0.0019662565318867564
       }
     },
     "shoreClip": {
       "landSamples": 500,
       "landViolations": 0,
       "waterControls": 80,
-      "waterChanged": 12
+      "waterChanged": 75
     },
     "fourShot": {
       "dir": "media/shared-world-cp04b/",
       "note": "visual A/B is manual (cp04B §9); shot (b) stock pose just-submerged (deviation — see report)",
       "shots": {
         "a-above": {
-          "stockBytes": 681676,
-          "regionBytes": 759205,
+          "stockBytes": 682008,
+          "regionBytes": 836449,
           "regionCamera": {
             "pos": [
               -207.1892336110995,
@@ -939,8 +975,8 @@
           }
         },
         "b-caustics": {
-          "stockBytes": 1536669,
-          "regionBytes": 43712,
+          "stockBytes": 1537594,
+          "regionBytes": 497015,
           "regionCamera": {
             "pos": [
               -184.01011962210316,
@@ -962,8 +998,8 @@
           }
         },
         "c-above-lip": {
-          "stockBytes": 1572017,
-          "regionBytes": 651241,
+          "stockBytes": 1572119,
+          "regionBytes": 682520,
           "regionCamera": {
             "pos": [
               -185.85743512365954,
@@ -985,8 +1021,8 @@
           }
         },
         "c-below-lip": {
-          "stockBytes": 1572002,
-          "regionBytes": 19863,
+          "stockBytes": 1572015,
+          "regionBytes": 537152,
           "regionCamera": {
             "pos": [
               -184.85355689012556,
@@ -1008,8 +1044,8 @@
           }
         },
         "d-snell-window": {
-          "stockBytes": 1675148,
-          "regionBytes": 701931,
+          "stockBytes": 1675150,
+          "regionBytes": 773653,
           "regionCamera": {
             "pos": [
               -181.28314197307185,
@@ -1032,9 +1068,9 @@
         }
       },
       "lumA": {
-        "meanAbsDelta": 0.1760747505269067,
-        "meanStock": 0.438091148297913,
-        "meanRegion": 0.6041992230236273,
+        "meanAbsDelta": 0.20123426037251535,
+        "meanStock": 0.4381013988132384,
+        "meanRegion": 0.6338740958019091,
         "band": "stock pool-surface quad inner 55 % (px 679-1176 × 347-516), every 2nd px",
         "tolerance": 0.25,
         "toleranceNote": "includes the sanctioned container difference (sand seabed vs tiled box refraction); pipeline-divergence catch — see the checkpoint report"
@@ -1049,11 +1085,11 @@
         1292
       ],
       "refColor": [
-        70,
-        149,
-        141
+        77,
+        166,
+        140
       ],
-      "centerChromaDist": 81
+      "centerChromaDist": 90.4
     },
     "perf": {
       "script": "16 s region swim: cruise 1.6 Hz → burst → banked turn → crouch dive",
@@ -1063,39 +1099,39 @@
           120,
           120,
           121,
-          120,
           121,
           120,
           120,
+          119,
+          120,
           120,
           120,
           120,
           120,
           120,
           121,
-          120,
-          120
+          119
         ],
         "median": 120,
-        "min": 120
+        "min": 119
       },
       "simHzSamples": [
-        119.98016856717892,
-        119.99206664022206,
-        119.78438810141753,
-        120.12310136007156
+        120.07541927160864,
+        120.03968253968264,
+        119.91605875886893,
+        119.98800119987975
       ],
       "cpuStageMs": {
-        "sim": 0.21735537224564672,
-        "caustics": 0.028925620327311115,
-        "prepare": 0.028925619834710745,
-        "render": 0.3933884292102057,
-        "frame": 0.9057851244102825
+        "sim": 0.18333333358168602,
+        "caustics": 0.04500000054637591,
+        "prepare": 0.027499999354283013,
+        "render": 0.40499999970197675,
+        "frame": 0.879166665673256
       },
       "gpuStageMs": {
-        "sim": 0.5952493169522066,
-        "caustics": 0.1901149836184999,
-        "render": 4.189806274403794
+        "sim": 0.5360529512385097,
+        "caustics": 0.19116412172105582,
+        "render": 5.143843062633585
       },
       "gpuTimerSource": "EXT_disjoint_timer_query_webgl2",
       "stageToggleMedianFps": {
@@ -1109,8 +1145,8 @@
         "height": 1080
       },
       "chromeVersion": "150.0.7871.125",
-      "usedJSHeapBytes": 106028420,
-      "cameraUpdateUsAvg": 105.78512578956352
+      "usedJSHeapBytes": 125297317,
+      "cameraUpdateUsAvg": 92.56198287995393
     }
   },
   "region05": {
@@ -1119,17 +1155,17 @@
         "drawnPerLod": [
           18,
           11,
-          41,
-          39
+          42,
+          38
         ],
         "drawnTiles": 109,
-        "drawnTriangles": 862976,
+        "drawnTriangles": 864768,
         "totalTiles": 256,
         "protectedTiles": 56,
         "protectedAlwaysLod0": true
       },
       "lawMaxErrM": 0,
-      "buildMs": 8.900000005960464,
+      "buildMs": 9.699999988079071,
       "protectReasons": {
         "coastline": 39,
         "ridge": 5,
@@ -1145,7 +1181,7 @@
         {
           "z": -850,
           "drawnPerLod": [
-            36,
+            37,
             9,
             13,
             10
@@ -1406,7 +1442,7 @@
         {
           "z": 650,
           "drawnPerLod": [
-            45,
+            46,
             6,
             15,
             13
@@ -1416,7 +1452,7 @@
       "seamScan": [
         {
           "z": -850,
-          "edgePoints": 238,
+          "edgePoints": 239,
           "holes": 0
         },
         {
@@ -1431,7 +1467,7 @@
         },
         {
           "z": 288,
-          "edgePoints": 179,
+          "edgePoints": 180,
           "holes": 0
         },
         {
@@ -1465,13 +1501,14 @@
           -120
         ]
       ],
-      "framesMonitored": 6953,
-      "minClearanceM": 0.7499999999717245,
+      "framesMonitored": 6967,
+      "minClearanceM": 0.7499999983111414,
       "maxLosBlockedS": 0,
       "cameraStates": {
-        "NormalFollow": 1898,
+        "NormalFollow": 1896,
         "EmergencyRecenter": 350,
-        "FastTravel": 4705
+        "FastTravel": 4698,
+        "Obstructed": 23
       }
     },
     "antiWedge": {
@@ -1483,12 +1520,12 @@
     "perf": {
       "fps": {
         "buckets": [
-          120,
-          120,
-          120,
-          120,
-          120,
           121,
+          120,
+          120,
+          120,
+          120,
+          118,
           120,
           120,
           120,
@@ -1497,27 +1534,27 @@
           120
         ],
         "median": 120,
-        "min": 120
+        "min": 118
       },
-      "simHz": 120.03968253968254,
-      "terrainStageMs": 0.480261496136257,
+      "simHz": 119.99206664022218,
+      "terrainStageMs": 1.4212316352740801,
       "terrainStageMethod": "gpu render-stage delta (EXT_disjoint_timer_query_webgl2), terrain drawn vs hidden",
       "gpuStageMsOn": {
-        "sim": 0.6971971278077622,
-        "caustics": 0.246568143219648,
-        "render": 4.567894082125314
+        "sim": 0.5084272710491324,
+        "caustics": 0.22098782627579777,
+        "render": 5.349949894293115
       },
       "gpuStageMsTerrainOff": {
-        "sim": 0.6511161347530962,
-        "caustics": 0.2953897065684474,
-        "render": 4.0876325859890565
+        "sim": 0.6583652087355086,
+        "caustics": 0.3397587935094084,
+        "render": 3.9287182590190346
       },
       "cpuStageMs": {
-        "sim": 0.20330578655250803,
-        "caustics": 0.05123967006186808,
-        "prepare": 0.02479338769085151,
-        "render": 0.3438016533359023,
-        "frame": 0.8330578528159907
+        "sim": 0.18512396748400917,
+        "caustics": 0.034710742471631896,
+        "prepare": 0.019834711039361876,
+        "render": 0.2752066119150682,
+        "frame": 0.7148760330578512
       },
       "terrainStats": {
         "drawnPerLod": [
@@ -1535,14 +1572,14 @@
       "bvh": {
         "tilesBuilt": 22,
         "tilesLive": 22,
-        "buildMsTotal": 90.59999999403954,
-        "buildMsMax": 10.5,
-        "queries": 66408,
-        "queryUsTotal": 243500.00098347664,
+        "buildMsTotal": 100.89999994635582,
+        "buildMsMax": 10.400000005960464,
+        "queries": 66334,
+        "queryUsTotal": 234900.00221133232,
         "liveBytes": 17437200,
-        "queryUsAvg": 3.6667269151830597
+        "queryUsAvg": 3.5411704738344185
       },
-      "usedJSHeapBytes": 104351632,
+      "usedJSHeapBytes": 113639553,
       "viewport": {
         "width": 1728,
         "height": 1080
@@ -1551,29 +1588,29 @@
     },
     "terrainCompressed": {
       "site": "crescent west cliff (−920.5, −29.5), 68° wall",
-      "engageElapsedS": 0.106,
-      "releaseElapsedS": 1.031,
+      "engageElapsedS": 0.109,
+      "releaseElapsedS": 1.022,
       "stateAtEngage": "EmergencyRecenter",
       "statesDuringPin": {
         "EmergencyRecenter": 1
       },
-      "ratioAtEngage": 0.27288120433980545,
-      "compressFactorAtEngage": 0.6000000000000006,
+      "ratioAtEngage": 0.28972572312622574,
+      "compressFactorAtEngage": 0.6000000000000005,
       "engagements": 1
     },
     "slide": {
       "cliff": {
-        "entrySpeed": 3.7343303489507536,
-        "retained": 2.642053398852475,
+        "entrySpeed": 3.493330243942493,
+        "retained": 2.4715696404699674,
         "frameJitter": 0.08321759259257594,
-        "firstContactT": 1.8,
+        "firstContactT": 2.2,
         "maxStepDispM": 0.04160879629628797
       },
       "seabed": {
-        "entrySpeed": 2.565896303605728,
-        "retained": 1.8298377248565292,
+        "entrySpeed": 2.883646427546505,
+        "retained": 2.0393490349687955,
         "frameJitter": 0.08321759259264687,
-        "firstContactT": 4.025,
+        "firstContactT": 3.35,
         "maxStepDispM": 0.041608796296323435
       }
     },
@@ -1585,10 +1622,10 @@
             -570,
             -294
           ],
-          "landSamples": 1803,
+          "landSamples": 1758,
           "landViolations": 0,
           "waterControls": 300,
-          "waterChanged": 47,
+          "waterChanged": 250,
           "gapSamples": 60,
           "gapHoles": 0,
           "belowBeachSamples": 80,
@@ -1600,13 +1637,13 @@
             528,
             -626
           ],
-          "landSamples": 1795,
+          "landSamples": 1486,
           "landViolations": 0,
           "waterControls": 290,
           "waterChanged": 134,
           "gapSamples": 75,
           "gapHoles": 0,
-          "belowBeachSamples": 72,
+          "belowBeachSamples": 71,
           "beachHoles": 0,
           "gapHolesBelow": 0
         },
@@ -1615,10 +1652,10 @@
             -392,
             600
           ],
-          "landSamples": 1310,
+          "landSamples": 1264,
           "landViolations": 0,
           "waterControls": 258,
-          "waterChanged": 258,
+          "waterChanged": 254,
           "gapSamples": 69,
           "gapHoles": 0,
           "belowBeachSamples": 67,
@@ -1626,7 +1663,387 @@
           "gapHolesBelow": 0
         }
       },
-      "totalLandSamples": 4908
+      "totalLandSamples": 4508
+    },
+    "violations-B-ne-island": [],
+    "violations-A-crescent-inner-shore": [],
+    "violations-C-s-island": []
+  },
+  "region05a": {
+    "artifactHashTable": {
+      "height.r16": {
+        "cp05": "3cadb13ee9a6e421d211a827213951b4e25a6ed1f8d2252670067605118adead",
+        "cp05a": "fe00bb89b101f815800ce0053e46cec4d9a853126254e2c39b792cf4dc5265c5",
+        "changed": true
+      },
+      "shore.png": {
+        "cp05": "c640fbb71987dd763b18708ffc9070d9b5d7f0c970d097ba00eb4a43081c5d49",
+        "cp05a": "c640fbb71987dd763b18708ffc9070d9b5d7f0c970d097ba00eb4a43081c5d49",
+        "changed": false
+      },
+      "shore_sdf.r16": {
+        "cp05": "1d5384f5b1a9c9551a06ebee442fbedc9bd6511c8cca4a1a8f6076b50673bd93",
+        "cp05a": "1d5384f5b1a9c9551a06ebee442fbedc9bd6511c8cca4a1a8f6076b50673bd93",
+        "changed": false
+      },
+      "biome.png": {
+        "cp05": "32d8de82fb9452c0b6862fe5ae2438ff540ab04516f1958aa0d720d0c022956e",
+        "cp05a": "32d8de82fb9452c0b6862fe5ae2438ff540ab04516f1958aa0d720d0c022956e",
+        "changed": false
+      },
+      "placement.json": {
+        "cp05": "ac812947e3e606d4b890f25e4a77536fc3ecacc2baede3681dc05b6d164cf334",
+        "cp05a": "ac812947e3e606d4b890f25e4a77536fc3ecacc2baede3681dc05b6d164cf334",
+        "changed": false
+      },
+      "caves.json": {
+        "cp05": "92bf01c35f376ea43bf8de09928b566cf1ffa33c488bba373f0e9ed0f0a7c23a",
+        "cp05a": "ccaa550e5cbc5131c424f6a8981368ca244db967c9d6cf0dd7426404f2e9b9c7",
+        "changed": true
+      },
+      "world.json": {
+        "cp05": "0ce1d50e6ed2dad0d7e35bbeef40fb94a3f22295f67b60b406b5d87bc7f8adab",
+        "cp05a": "d593fcba42a6d26815e36aa13ef79ca64fc308d597847ca51fc728be740feb77",
+        "changed": true
+      }
+    },
+    "reliefChecks": [
+      {
+        "name": "cp05a-shore-mask-preserved",
+        "pass": true,
+        "agree": 4198401,
+        "texels": 4198401,
+        "note": "artifact land/water bit identical to the pre-relief CP05 field ⇒ shore.png byte-identical"
+      },
+      {
+        "name": "cp05a-relief-strong-zone",
+        "pass": true,
+        "rmsDeltaM": 8.459648,
+        "rmsFloorM": 4,
+        "gradientRatioNewOldOnSmoothBase": 2.032677,
+        "gradientRatioFloor": 1.6,
+        "sampledTexels": 28285,
+        "gradSamples": 3370,
+        "deltaRange": {
+          "min": -24.895074,
+          "max": 38.042609
+        }
+      },
+      {
+        "name": "cp05a-relief-protected-lagoon",
+        "pass": true,
+        "rmsDeltaM": 0.23333,
+        "rmsCapM": 0.9,
+        "sampledTexels": 8232
+      },
+      {
+        "name": "cp05a-loop-navigability",
+        "pass": true,
+        "minDepthNewM": 4.254542,
+        "minDepthFloorM": 2.5,
+        "worstDepthRatio": 0.90376,
+        "ratioFloor": 0.55,
+        "waterSamples": 303
+      },
+      {
+        "name": "island-centroid-ne-island",
+        "pass": true,
+        "target": [
+          480,
+          -560
+        ],
+        "centroid": [
+          479.022086,
+          -557.223679
+        ],
+        "deviationM": 2.943513,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-s-island",
+        "pass": true,
+        "target": [
+          -380,
+          640
+        ],
+        "centroid": [
+          -375.63232,
+          652.49757
+        ],
+        "deviationM": 13.238803,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-islet-1",
+        "pass": true,
+        "target": [
+          -80,
+          -70
+        ],
+        "centroid": [
+          -79.526667,
+          -69.895962
+        ],
+        "deviationM": 0.484632,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-islet-2",
+        "pass": true,
+        "target": [
+          90,
+          -80
+        ],
+        "centroid": [
+          87.36639,
+          -78.166753
+        ],
+        "deviationM": 3.208847,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-islet-3",
+        "pass": true,
+        "target": [
+          230,
+          -90
+        ],
+        "centroid": [
+          230.199353,
+          -89.439655
+        ],
+        "deviationM": 0.59475,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-e-wall-rock-1",
+        "pass": true,
+        "target": [
+          900,
+          -480
+        ],
+        "centroid": [
+          901.242898,
+          -481.397964
+        ],
+        "deviationM": 1.870588,
+        "boundM": 50
+      },
+      {
+        "name": "island-centroid-e-wall-rock-2",
+        "pass": true,
+        "target": [
+          905,
+          620
+        ],
+        "centroid": [
+          907.311481,
+          620.817765
+        ],
+        "deviationM": 2.451874,
+        "boundM": 50
+      },
+      {
+        "name": "summit-position-and-height",
+        "pass": true,
+        "peak": [
+          -759.765625,
+          -99.609375
+        ],
+        "target": [
+          -760,
+          -100
+        ],
+        "deviationM": 0.455543,
+        "heightM": 199.893187
+      },
+      {
+        "name": "trench-floor",
+        "pass": true,
+        "minAlongSpineM": -80,
+        "boundM": -70
+      },
+      {
+        "name": "lagoon-depth-band",
+        "pass": true,
+        "fracIn3to10": 1,
+        "waterTexels": 131769
+      }
+    ],
+    "placementYResample": {
+      "caveLipY": {
+        "cave-headland/south": {
+          "lipY": -32.63591,
+          "resampled": -32.635910093843
+        },
+        "cave-headland/north": {
+          "lipY": -45.126001,
+          "resampled": -45.12600106813153
+        },
+        "cave-trench-wall/west": {
+          "lipY": -78.401152,
+          "resampled": -78.40115236133363
+        }
+      },
+      "note": "placement.json carries no baked Y — runtime Y comes from terrainHeight (Master §2.2); caves.json lipY re-baked from the revised field"
+    },
+    "underwaterFamilies": [
+      "deep-sediment",
+      "mid-stone",
+      "reef-stone",
+      "shallow-sand",
+      "trench-rock"
+    ],
+    "substrateVocabulary": {
+      "seen": [
+        "cliff-rock",
+        "deep-sediment",
+        "exposed-rock",
+        "high-rock",
+        "mid-stone",
+        "reef-stone",
+        "shallow-sand",
+        "shore-stone",
+        "soil",
+        "trench-rock",
+        "wet-shoreline"
+      ],
+      "note": "automated proxy for addendum §4.12 item 20; the visual \"no asset-like silhouettes or patterns\" ruling belongs to the §9 manual review"
+    },
+    "substrateShaderAudit": {
+      "terrainHasSubstrate": true,
+      "waterAboveHasSubstrate": true,
+      "waterBelowHasSubstrate": true,
+      "anyLegacyTintLaw": false
+    },
+    "classificationEquivalence": {
+      "comparedProbes": 25,
+      "maxChannelError": 0.0030078347425777086,
+      "tolerance": 0.07,
+      "capture": "media/shared-world-cp05a/albedo-debug-probes.png",
+      "note": "GPU albedo-debug (the include shared verbatim by the water raymarch shaders — structural audit above) vs the fp32-exact CPU twin; equivalence of the direct and raymarched paths is by shared-source construction",
+      "samples": [
+        {
+          "xz": [
+            -240,
+            240
+          ],
+          "family": "shallow-sand",
+          "cpu": [
+            0.8582166589361878,
+            0.829516933146595,
+            0.637940326718965
+          ],
+          "gpu": [
+            0.8588235294117647,
+            0.8313725490196079,
+            0.6392156862745098
+          ],
+          "err": 0.0018556158730128613
+        },
+        {
+          "xz": [
+            -240,
+            270
+          ],
+          "family": "shallow-sand",
+          "cpu": [
+            0.8485013724404427,
+            0.8241055563947088,
+            0.6365742714031987
+          ],
+          "gpu": [
+            0.8470588235294118,
+            0.8235294117647058,
+            0.6352941176470588
+          ],
+          "err": 0.0014425489110309053
+        },
+        {
+          "xz": [
+            -240,
+            300
+          ],
+          "family": "deep-sediment",
+          "cpu": [
+            0.834143085538938,
+            0.8158482459296755,
+            0.6354583868105831
+          ],
+          "gpu": [
+            0.8352941176470589,
+            0.8156862745098039,
+            0.6352941176470588
+          ],
+          "err": 0.0011510321081208419
+        },
+        {
+          "xz": [
+            -240,
+            330
+          ],
+          "family": "deep-sediment",
+          "cpu": [
+            0.8173750074657903,
+            0.8049222718483543,
+            0.639969263551082
+          ],
+          "gpu": [
+            0.8156862745098039,
+            0.803921568627451,
+            0.6392156862745098
+          ],
+          "err": 0.0016887329559863717
+        },
+        {
+          "xz": [
+            -240,
+            360
+          ],
+          "family": "deep-sediment",
+          "cpu": [
+            0.8020974466925579,
+            0.7947238366784765,
+            0.6451458474684707
+          ],
+          "gpu": [
+            0.803921568627451,
+            0.796078431372549,
+            0.6470588235294118
+          ],
+          "err": 0.0019129760609410962
+        },
+        {
+          "xz": [
+            -210,
+            240
+          ],
+          "family": "deep-sediment",
+          "cpu": [
+            0.8269433879286442,
+            0.8092032753396999,
+            0.6469392782457306
+          ],
+          "gpu": [
+            0.8274509803921568,
+            0.807843137254902,
+            0.6470588235294118
+          ],
+          "err": 0.0013601380847979572
+        }
+      ]
+    },
+    "underwaterVariation": {
+      "probes": 856,
+      "families": [
+        "deep-sediment",
+        "mid-stone",
+        "reef-stone",
+        "shallow-sand",
+        "trench-rock"
+      ],
+      "slopeDelta": 0.33745149328954654,
+      "depthDelta": 0.2627509702585766
     }
   }
 }

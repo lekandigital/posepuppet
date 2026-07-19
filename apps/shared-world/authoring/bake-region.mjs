@@ -1,4 +1,15 @@
-// bake-region.mjs — Checkpoint 04A deterministic offline region bake.
+// bake-region.mjs — Checkpoint 04A deterministic offline region bake,
+// extended at Checkpoint 05A with the ZyFou-adapted relief stage
+// (region-relief.mjs) per the post-CP05 addendum §4:
+//
+//   pass 1: the approved CP05 field (fieldC base + cp04A bounded variation)
+//           — code below UNTOUCHED, reproduced bit-exactly;
+//   pass 2: shore mask + exact EDT of the CP05 field (the coastline that
+//           must be preserved);
+//   pass 3: + reliefAt(x, z, h05, shoreDist) — domain-warped ridged
+//           formations gated by protected masks, tapering to EXACTLY zero
+//           near the height = 0 contour, so shore.png stays byte-identical
+//           (asserted per-texel below and by --check).
 //
 // Turns the APPROVED LAYOUT (REGION_SKETCHES.md § "APPROVED LAYOUT":
 // Sketch C — Twin Bay, seed 60418003, no redlines, both caves, no E2 shaft,
@@ -53,6 +64,13 @@ import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MathUtils } from 'three';
+import {
+  reliefAt,
+  reliefMetadata,
+  protectionFactor,
+  ridgeZoneWeight,
+  loopWaypoints,
+} from './region-relief.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(HERE, '..', 'public', 'world');
@@ -303,7 +321,11 @@ function composeHeights() {
   const variation = buildVariationGrid();
   const h16 = new Uint16Array(N * N);
   const base = new Float64Array(N * N);
+  /** the approved CP05 field (base + cp04A variation) — the relief macro authority */
+  const h05 = new Float64Array(N * N);
   let signFlips = 0;
+
+  // --- pass 1: the approved CP05 field, bit-exact (cp04A compose, untouched) ---
   for (let j = 0; j < N; j++) {
     const z = texZ(j);
     for (let i = 0; i < N; i++) {
@@ -315,13 +337,42 @@ function composeHeights() {
       // immovable — assert it texel by texel (deviation is exactly 0 m).
       if (hb >= 0 !== h >= 0) signFlips++;
       base[j * N + i] = hb;
-      h16[j * N + i] = qEncode(h);
+      h05[j * N + i] = h;
     }
   }
   if (signFlips > 0) {
     throw new Error(`coastline moved: ${signFlips} texels changed land/water sign vs the approved sketch field`);
   }
-  return { h16, base };
+
+  // --- pass 2: the CP05 shore mask (quantized-sign law — the exact rule the
+  // committed cp05 shore.png used) + float EDT for the relief's coast taper ---
+  const mask05 = new Uint8Array(N * N);
+  for (let k = 0; k < N * N; k++) mask05[k] = qDecode(qEncode(h05[k])) >= 0 ? 1 : 0;
+  const sdfM = shoreSdfMeters(mask05);
+
+  // --- pass 3: CP05A relief (region-relief.mjs), coastline-preserving ---
+  let maskFlips = 0;
+  let deltaMax = 0;
+  let deltaMin = 0;
+  for (let j = 0; j < N; j++) {
+    const z = texZ(j);
+    for (let i = 0; i < N; i++) {
+      const k = j * N + i;
+      const x = texX(i);
+      const d = reliefAt(x, z, h05[k], sdfM[k]);
+      if (d > deltaMax) deltaMax = d;
+      if (d < deltaMin) deltaMin = d;
+      const q = qEncode(clamp(h05[k] + d, H_MIN, H_MAX));
+      // coastline law (addendum §4.5): the quantized land/water bit of every
+      // texel must match the CP05 mask — shore.png byte-identical.
+      if ((qDecode(q) >= 0 ? 1 : 0) !== mask05[k]) maskFlips++;
+      h16[k] = q;
+    }
+  }
+  if (maskFlips > 0) {
+    throw new Error(`CP05A relief moved the coastline: ${maskFlips} texels changed the quantized land/water bit`);
+  }
+  return { h16, base, h05, sdfM, reliefRange: { min: deltaMin, max: deltaMax } };
 }
 
 // ---------------------------------------------------------------------------
@@ -383,20 +434,30 @@ function edt2d(inside) {
   return g;
 }
 
-/** Signed shore distance in meters (+ = water), half-texel-centered so the
- *  bilinear zero level sits on the mask boundary; clamped ±SDF_CLAMP. */
-function signedShoreDistance(mask) {
+/** Signed shore distance in float meters (+ = water), half-texel-centered so
+ *  the bilinear zero level sits on the mask boundary; clamped ±SDF_CLAMP.
+ *  (cp05A refactor: the float field feeds both the relief stage's coast
+ *  taper and the quantized artifact — one EDT, one truth.) */
+function shoreSdfMeters(mask) {
   const water = new Uint8Array(N * N);
   for (let k = 0; k < N * N; k++) water[k] = mask[k] ? 0 : 1;
   const dLand = edt2d(mask);   // squared texel distance to nearest land
   const dWater = edt2d(water); // squared texel distance to nearest water
-  const sdf16 = new Uint16Array(N * N);
+  const sdfM = new Float64Array(N * N);
   for (let k = 0; k < N * N; k++) {
     let d;
     if (mask[k]) d = -(Math.sqrt(dWater[k]) - 0.5) * TEXEL; // land: negative
     else d = (Math.sqrt(dLand[k]) - 0.5) * TEXEL;           // water: positive
-    d = clamp(d, -SDF_CLAMP, SDF_CLAMP);
-    sdf16[k] = Math.round(((d + SDF_CLAMP) / (2 * SDF_CLAMP)) * 65535);
+    sdfM[k] = clamp(d, -SDF_CLAMP, SDF_CLAMP);
+  }
+  return sdfM;
+}
+
+/** Quantize the float SDF to the uint16 artifact encoding. */
+function signedShoreDistance(sdfM) {
+  const sdf16 = new Uint16Array(N * N);
+  for (let k = 0; k < N * N; k++) {
+    sdf16[k] = Math.round(((sdfM[k] + SDF_CLAMP) / (2 * SDF_CLAMP)) * 65535);
   }
   return sdf16;
 }
@@ -643,6 +704,20 @@ function bilinearH(h16, x, z) {
   return lerp(lerp(a, b, fu), lerp(c, d, fu), fv);
 }
 
+/** Bilinear over a Float64 height grid (cp05A check helper). */
+function bilinearF(g, x, z) {
+  const u = clamp((x + 1000) / TEXEL, 0, N - 1);
+  const v = clamp((z + 1000) / TEXEL, 0, N - 1);
+  const i0 = Math.min(Math.floor(u), N - 2);
+  const j0 = Math.min(Math.floor(v), N - 2);
+  const fu = u - i0, fv = v - j0;
+  const a = g[j0 * N + i0];
+  const b = g[j0 * N + i0 + 1];
+  const c = g[(j0 + 1) * N + i0];
+  const d = g[(j0 + 1) * N + i0 + 1];
+  return lerp(lerp(a, b, fu), lerp(c, d, fu), fv);
+}
+
 function bilinearSdf(sdf16, x, z) {
   const u = clamp((x + 1000) / TEXEL, 0, N - 1);
   const v = clamp((z + 1000) / TEXEL, 0, N - 1);
@@ -716,7 +791,9 @@ function buildWorldJson(h16, byteSizes) {
       'Region: original BodyArcade authored terrain, 2026',
       'Layout: Sketch C (Twin Bay), Checkpoint 03 decision gate, approved 2026-07-18',
       'Authoring algorithms: THREE.Terrain 2.0.0 (MIT, Isaac Sukin) noise passes over the approved analytic field',
+      'Relief techniques (CP05A) adapted from ZyFou/ProceduralTerrains (MIT, github.com/ZyFou/ProceduralTerrains, pinned 8b396f9c) into app-owned authoring code',
     ],
+    relief: reliefMetadata(),
     verification: {
       note: 'Loader round-trip targets (§8.6): terrainHeight bilinear over the dequantized uint16 grid at these points must match within 0.01 m.',
       probes: PROBES_XZ.map(([x, z]) => ({ x, z, h: r6(bilinearH(h16, x, z)) })),
@@ -729,9 +806,9 @@ function buildWorldJson(h16, byteSizes) {
 // ---------------------------------------------------------------------------
 
 function bake() {
-  const { h16, base } = composeHeights();
+  const { h16, base, h05, sdfM, reliefRange } = composeHeights();
   const mask = shoreMask(h16);
-  const sdf16 = signedShoreDistance(mask);
+  const sdf16 = signedShoreDistance(sdfM);
 
   const heightBuf = Buffer.from(h16.buffer, h16.byteOffset, h16.byteLength); // LE on all supported platforms
   const sdfBuf = Buffer.from(sdf16.buffer, sdf16.byteOffset, sdf16.byteLength);
@@ -765,7 +842,7 @@ function bake() {
       'caves.json': caves,
       'world.json': world,
     },
-    h16, base, mask, sdf16,
+    h16, base, h05, sdfM, mask, sdf16, reliefRange,
   };
 }
 
@@ -794,9 +871,97 @@ function landCentroid(h16, cx, cz, r) {
   return n ? { x: sx / n, z: sz / n, landTexels: n } : null;
 }
 
-function runChecks({ h16, base, mask, sdf16 }) {
+function runChecks({ h16, base, h05, mask, sdf16, reliefRange }) {
   const checks = [];
   const push = (name, pass, detail) => checks.push({ name, pass, ...detail });
+
+  // --- cp05A §8.3: coastline preservation — the artifact mask must equal the
+  // CP05 (pre-relief) quantized mask texel for texel (⇒ shore.png bytes) ---
+  let maskAgree = 0;
+  for (let k = 0; k < N * N; k++) {
+    if (mask[k] === (qDecode(qEncode(h05[k])) >= 0 ? 1 : 0)) maskAgree++;
+  }
+  push('cp05a-shore-mask-preserved', maskAgree === N * N, {
+    agree: maskAgree, texels: N * N,
+    note: 'artifact land/water bit identical to the pre-relief CP05 field ⇒ shore.png byte-identical',
+  });
+
+  // --- cp05A relief metrics (delta = final − CP05 field) ---
+  // strong zones: near an authored ridge line, unprotected, real relief room
+  let strongN = 0, strongSum2 = 0;
+  let lagoonRN = 0, lagoonSum2 = 0;
+  let gradOld = 0, gradNew = 0, gradSamples = 0;
+  for (let j = 4; j < N - 4; j += 4) {
+    const z = texZ(j);
+    for (let i = 4; i < N - 4; i += 4) {
+      const k = j * N + i;
+      const x = texX(i);
+      const d = qDecode(h16[k]) - h05[k];
+      if (hyp(x + 180, z + 380) < 200 && h05[k] < 0) {
+        lagoonRN++;
+        lagoonSum2 += d * d;
+      }
+      if (Math.abs(h05[k]) > 10 && ridgeZoneWeight(x, z) > 0.5 && protectionFactor(x, z) > 0.7) {
+        strongN++;
+        strongSum2 += d * d;
+        // roughness gain measured where the CP05 field was SMOOTH (base
+        // gradient < 0.35 — the "melted" areas the addendum §2.2 calls out;
+        // already-steep macro flanks would dilute the ratio)
+        const e = 4 * TEXEL;
+        const gxO = (h05[k + 4] - h05[k - 4]) / (2 * e);
+        const gzO = (h05[k + 4 * N] - h05[k - 4 * N]) / (2 * e);
+        const gO = hyp(gxO, gzO);
+        if (gO < 0.35) {
+          const gxN = (qDecode(h16[k + 4]) - qDecode(h16[k - 4])) / (2 * e);
+          const gzN = (qDecode(h16[k + 4 * N]) - qDecode(h16[k - 4 * N])) / (2 * e);
+          gradNew += hyp(gxN, gzN);
+          gradOld += gO;
+          gradSamples++;
+        }
+      }
+    }
+  }
+  const strongRms = strongN ? Math.sqrt(strongSum2 / strongN) : 0;
+  const lagoonRms = lagoonRN ? Math.sqrt(lagoonSum2 / lagoonRN) : 0;
+  const gradRatio = gradOld > 0 ? gradNew / gradOld : Infinity;
+  push('cp05a-relief-strong-zone', strongRms >= 4 && gradRatio >= 1.6, {
+    rmsDeltaM: r6(strongRms), rmsFloorM: 4,
+    gradientRatioNewOldOnSmoothBase: r6(gradRatio), gradientRatioFloor: 1.6,
+    sampledTexels: strongN, gradSamples,
+    deltaRange: { min: r6(reliefRange.min), max: r6(reliefRange.max) },
+  });
+  push('cp05a-relief-protected-lagoon', lagoonRms <= 0.9, {
+    rmsDeltaM: r6(lagoonRms), rmsCapM: 0.9, sampledTexels: lagoonRN,
+  });
+
+  // --- cp05A loop navigability: the approved swim route stays swimmable ---
+  const loopPts = loopWaypoints();
+  let loopMinDepthNew = Infinity;
+  let loopWorstRatio = Infinity;
+  let loopSamples = 0;
+  for (let s = 0; s < loopPts.length - 1; s++) {
+    const [ax, az] = loopPts[s];
+    const [bx, bz] = loopPts[s + 1];
+    const segLen = hyp(bx - ax, bz - az);
+    const steps = Math.max(1, Math.round(segLen / 10));
+    for (let t = 0; t <= steps; t++) {
+      const x = lerp(ax, bx, t / steps);
+      const z = lerp(az, bz, t / steps);
+      const hOld = bilinearF(h05, x, z);
+      if (hOld >= -2) continue; // land / cave-passage legs (cp09) skipped
+      const dNew = -bilinearH(h16, x, z);
+      const dOld = -hOld;
+      loopSamples++;
+      if (dNew < loopMinDepthNew) loopMinDepthNew = dNew;
+      const ratio = dNew / dOld;
+      if (ratio < loopWorstRatio) loopWorstRatio = ratio;
+    }
+  }
+  push('cp05a-loop-navigability', loopWorstRatio >= 0.55 && loopMinDepthNew >= 2.5, {
+    minDepthNewM: r6(loopMinDepthNew), minDepthFloorM: 2.5,
+    worstDepthRatio: r6(loopWorstRatio), ratioFloor: 0.55,
+    waterSamples: loopSamples,
+  });
 
   // --- §8.2 schema ---
   push('height-resolution', h16.length === N * N, { texels: h16.length, expected: N * N });
