@@ -585,9 +585,13 @@ test.describe('checkpoint 04B — pool to region water', () => {
     for (let x = 20; x < 120; x++) cornerBand.push(prof[x]!);
     for (let x = img.width - 120; x < img.width - 20; x++) cornerBand.push(prof[x]!);
     const surroundD = median(cornerBand);
-    // the cone is chromatically distinct from the TIR surround
-    expect(centerD, `cone B−G ${centerD}`).toBeGreaterThan(8);
-    expect(surroundD, `surround B−G ${surroundD}`).toBeLessThan(-3);
+    // Adaptive form (Fantasy-palette revision): the cone's ABSOLUTE B−G
+    // shifts with the approved substrate (the underwater Fresnel base 0.5
+    // always mixes half the TIR floor reflection into the upward view — a
+    // bright green floor tints the cone), so the invariant is the
+    // SEPARATION between cone and surround, and the edge threshold is
+    // their midpoint. Optics unchanged; diameter revalidated 97.28°.
+    expect(centerD - surroundD, `cone−surround B−G separation ${centerD} − ${surroundD}`).toBeGreaterThan(15);
     // Edge detector (cp05A instrument revision — the GATE below is
     // unchanged): the cp05 detector assumed a near-constant TIR surround;
     // the approved cp05A substrate variegation makes the reflected seabed
@@ -598,13 +602,15 @@ test.describe('checkpoint 04B — pool to region water', () => {
     // water-tinted seabed (G > B), the cone is blue sky / white-cyan cloud
     // (B ≥ G). Scan inward; the cone edge is where the sustained
     // green-dominance of the surround ends.
-    // edge scan from the CENTER OUTWARD: the first sustained clearly-
-    // surround run (B−G < −3 for ≥ 10 px — clouds inside the cone never
-    // sustain that) marks the outside; the edge is the run start
+    // edge scan from the CENTER OUTWARD: the first sustained run below the
+    // cone/surround MIDPOINT (≥ 10 px — clouds inside the cone never
+    // sustain a surround-level green dominance) marks the outside; the
+    // edge is the run start
+    const edgeThr = (centerD + surroundD) / 2;
     const scanOutward = (dir: 1 | -1): number => {
       let consecutive = 0;
       for (let x = Math.round(cx); x >= 0 && x < img.width; x += dir) {
-        if (prof[x]! < -3) {
+        if (prof[x]! < edgeThr) {
           consecutive++;
           if (consecutive >= 10) return x - dir * (consecutive - 1);
         } else {

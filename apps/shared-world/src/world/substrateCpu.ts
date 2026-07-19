@@ -24,7 +24,13 @@ const Z_SEED_OFFSET: [number, number] = [-646.3245668411255, -634.9020133018494]
 const Z_FREQ = 0.002197265625;
 const Z_HEIGHT_SCALE = 560;
 const Z_SEA = 160;
-const Z_SNOW_LINE = 0.7;
+const Z_SNOW_LINE = 0.82; // Fantasy/Cartoon preset snowLine
+/** frost restriction + tundra confinement (final art-direction correction —
+ *  mirror RegionSubstrate.glsl) */
+const Z_FROST_MIN_H01 = 0.86;
+const Z_FROST_STRENGTH = 0.85;
+const Z_TUNDRA_H01_LO = 0.55;
+const Z_TUNDRA_H01_HI = 0.75;
 const Z_ROCK_SLOPE_LO = 0.42;
 const Z_ROCK_SLOPE_HI = 0.72;
 const Z_SNOW_SLOPE_MIN = 0.30;
@@ -37,22 +43,25 @@ const Z_PAL_SATURATION = 1.0;
 const Z_PAL_CONTRAST = 1.0;
 const Z_PAL_TINT: V3 = [1, 1, 1];
 
-/* EARTH_PALETTE (ColorPalette.js, verbatim) */
+/* FANTASY-WORLD PALETTE (ColorPalettePresets.js 'Cartoon Terrain' — the 13
+ * terrain-albedo roles verbatim; `deep` keeps the Earth value because it is
+ * the approved deep-SEAFLOOR substrate ramp target, never a water color;
+ * Cartoon deep/shallow/foam water roles are excluded by user instruction) */
 const COL = {
   deep: [0.012, 0.075, 0.14] as V3,
-  sand: [0.56, 0.47, 0.3] as V3,
-  dune: [0.62, 0.49, 0.29] as V3,
-  dryGrass: [0.38, 0.33, 0.15] as V3,
-  grass: [0.13, 0.26, 0.085] as V3,
-  forest: [0.052, 0.14, 0.055] as V3,
-  jungle: [0.035, 0.125, 0.045] as V3,
-  swamp: [0.09, 0.13, 0.07] as V3,
-  tundra: [0.3, 0.29, 0.24] as V3,
-  redRock: [0.42, 0.235, 0.14] as V3,
-  redRock2: [0.56, 0.37, 0.21] as V3,
-  rock: [0.26, 0.235, 0.215] as V3,
-  rockHi: [0.38, 0.365, 0.355] as V3,
-  snow: [0.87, 0.89, 0.93] as V3,
+  sand: [1.0, 0.86, 0.32] as V3,
+  dune: [1.0, 0.68, 0.24] as V3,
+  dryGrass: [0.78, 0.86, 0.2] as V3,
+  grass: [0.18, 0.78, 0.18] as V3,
+  forest: [0.02, 0.5, 0.16] as V3,
+  jungle: [0.0, 0.4, 0.18] as V3,
+  swamp: [0.1, 0.44, 0.26] as V3,
+  tundra: [0.62, 0.86, 0.82] as V3,
+  redRock: [0.9, 0.3, 0.18] as V3,
+  redRock2: [1.0, 0.48, 0.22] as V3,
+  rock: [0.44, 0.42, 0.48] as V3,
+  rockHi: [0.64, 0.62, 0.7] as V3,
+  snow: [0.98, 0.98, 0.92] as V3,
 };
 
 const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
@@ -254,8 +263,10 @@ export function substrateSampleCpu(data: WorldData, x: number, z: number): Subst
   const midBand = mixV(COL.dryGrass,
     mixV(COL.grass, COL.forest, veg * (0.5 + 0.5 * sstep(0.35, 0.65, detail))),
     sstep(0.22, 0.52, cl.moist));
-  const coldBand = mixV(COL.tundra, mixV(COL.tundra, mulV(COL.forest, 0.85), veg),
+  let coldBand = mixV(COL.tundra, mixV(COL.tundra, mulV(COL.forest, 0.85), veg),
     sstep(0.30, 0.60, cl.moist));
+  // tundra confinement (art-direction correction): pale tundra only at altitude
+  coldBand = mixV(midBand, coldBand, sstep(Z_TUNDRA_H01_LO, Z_TUNDRA_H01_HI, h01));
 
   let lowland = mixV(coldBand, midBand, sstep(0.20, 0.38, tempEff + jt));
   lowland = mixV(lowland, hotBand, sstep(0.55, 0.72, tempEff + jt));
@@ -275,11 +286,13 @@ export function substrateSampleCpu(data: WorldData, x: number, z: number): Subst
   const slopeRock = mixV(mixV(COL.rock, COL.rockHi, detail), COL.redRock, bw.canyon * 0.8);
   albedo = mixV(albedo, slopeRock, rockBlend);
 
-  const snowLine01 = Z_SNOW_LINE * (0.40 + 1.20 * cl.temp);
+  // frost restriction (art-direction correction — mirror the GLSL): snow-
+  // line floor, sea-level cold-frost term removed, restrained strength
+  const snowLine01 = Math.max(Z_SNOW_LINE * (0.40 + 1.20 * cl.temp), Z_FROST_MIN_H01);
   const flatness = sstep(Z_SNOW_SLOPE_MAX, Z_SNOW_SLOPE_MIN, slope);
   let snow = sstep(snowLine01 - 0.03, snowLine01 + 0.05, h01 + jitter * 0.04) * flatness;
-  snow = Math.max(snow, sstep(0.10, 0.02, tempEff) * sstep(0.50, 0.25, slope));
   snow *= 1 - bw.desert;
+  snow *= Z_FROST_STRENGTH;
   albedo = mixV(albedo, COL.snow, snow);
 
   let floorW = 0;
