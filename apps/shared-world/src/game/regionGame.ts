@@ -33,11 +33,15 @@ import {
   SKIRT_DROP_M,
 } from '../water/RegionTerrainPass';
 import { loadDolphin } from './dolphinActor';
+import { attachDolphinWaterShading } from './dolphinWaterShading';
 import { AMBIENT, ambientSurfCpu } from '../water/ambientCpu';
+import { regionUniforms } from '../water/regionContext';
 import { substrateSampleCpu } from '../world/substrateCpu';
 import { createSwimControls } from '../input/swimControls';
 import { CREDITS_ATTRIBUTION } from '../credits';
 import { K, type EvalState } from './game';
+import regionContainerGlsl from '../water/shaders/RegionContainer.glsl';
+import regionAmbientGlsl from '../water/shaders/RegionAmbient.glsl';
 
 /** Region far plane (Master §7.5 [DERIVED]: region diagonal 2.83 km). */
 const REGION_FAR = 2500;
@@ -77,6 +81,26 @@ const EMITTER_GAIN = 0.09;
  *  0.08/0.05 and 0.1/0.06 → physical meters ×K (the same splash). */
 const DROP_EXIT = { radiusM: 0.08 * 2 * K, amplitudeM: 0.05 * K };
 const DROP_ENTRY = { radiusM: 0.1 * 2 * K, amplitudeM: 0.06 * K };
+/**
+ * CP06 §9.3 re-entry impulse scaling [DERIVED, flagged for review]: the
+ * entry drop amplitude scales with the deterministic impact speed
+ * (Track E "splash differs by speed/angle"; the fixed cp01 drop becomes
+ * the k ≈ 0.77 point of the new law). amp = DROP_ENTRY.amplitudeM ×
+ * (ENTRY_SCALE_MIN + ENTRY_SCALE_SPAN · impact/BURST): minimum-breach
+ * impacts (≈ 0.87×) stay above the exit drop (0.375 m ÷ 0.45 m ≈ 0.83×),
+ * preserving exit < entry; burst impacts reach 1.5× (0.675 m) — the
+ * strongest local impulse implemented so far, decaying through the
+ * untouched vendored sim back to the CP05B ambient baseline.
+ */
+const ENTRY_SCALE_MIN = 0.85;
+const ENTRY_SCALE_SPAN = 0.65;
+/**
+ * CP06 actor optics bounding sphere [DERIVED]: the vendored duck uses a
+ * fixed boundingRadius; the dolphin's is measuredLength × 0.65 ≈ 1.88 m —
+ * covers the posed body including fin/fluke excursion about the mid-body
+ * origin (skeleton root), without per-frame skinned-bounds recomputation.
+ */
+const ACTOR_RADIUS_FACTOR = 0.65;
 
 interface ShotMode {
   pos: [number, number, number];
@@ -139,6 +163,21 @@ export async function startRegionGame(
     `${dolphin.measuredLengthM.toFixed(3)} m (expected 2.89 ± 2 %; BL policy: measure, never rescale)`,
   );
 
+  // --- CP06 Phase One: the restored jeantimex mesh-object optics ---
+  // The dolphin joins the vendored optical system exactly as the stock
+  // duck does: per-fragment animated-waterline shading on the actor
+  // (dolphinWaterShading), texture passes (RegionObjectTexturePass), and
+  // the restored meshEnabled water/caustics branches. Region view only —
+  // the pool and stock views are untouched.
+  const actorRadiusM = dolphin.measuredLengthM * ACTOR_RADIUS_FACTOR;
+  const actorShading = attachDolphinWaterShading(
+    dolphin.group,
+    `${regionContainerGlsl}\n${regionAmbientGlsl}`,
+    regionUniforms(regionRenderer.ctx),
+    regionRenderer.lightDir,
+  );
+  let actorOpticsEnabled = true;
+
   // --- sim + controls + camera: the approved systems on RegionSampler ---
   const sampler = new RegionSampler(data);
   const sim = new SwimSim(sampler);
@@ -153,12 +192,32 @@ export async function startRegionGame(
   const bvh = new TerrainBvh(data);
   for (let k = 0; k < 9; k++) bvh.prefetch(spawn.x, spawn.z);
   const camCollision = new RegionCameraCollision(data, bvh, RIG.COLLISION_RADIUS);
+  // CP06 §11: the camera's waterline discipline follows the ANIMATED water
+  // height — the deterministic CP05B ambient CPU twin at the queried xz.
+  // (The windowed interactive-sim term would need a per-frame GPU readback;
+  // its ≤ ±SHIMMER_MIN_Y wake amplitudes stay inside the anti-shimmer
+  // clearance — recorded limitation.)
+  function cameraWaterlineAt(x: number, z: number): number {
+    const e = AMBIENT.SDF_GRAD_EPS_M;
+    return ambientSurfCpu(
+      x, z,
+      ambientTimeS,
+      data.shoreDistance(x, z),
+      data.shoreDistance(x + e, z) - data.shoreDistance(x - e, z),
+      data.shoreDistance(x, z + e) - data.shoreDistance(x, z - e),
+      ambient.y,
+      ambient.z,
+    ).h;
+  }
   const cam = new CameraRig(innerWidth / innerHeight, camCollision, REGION_FAR, {
     terrainCompression: true,
+    waterlineAt: cameraWaterlineAt,
+    reentryOverwatch: true,
   });
 
   const resize = () => {
     webglRenderer.setSize(innerWidth, innerHeight);
+    regionRenderer.setSize(innerWidth, innerHeight);
     cam.camera.aspect = innerWidth / innerHeight;
     cam.camera.updateProjectionMatrix();
   };
@@ -451,6 +510,108 @@ export async function startRegionGame(
        *  four-shot procedure matches the stock demo's post-seed state) */
       seedAmbient() { water.seedAmbient(); },
       /**
+       * CP06: toggle the restored actor mesh optics (texture passes,
+       * meshEnabled branches, per-fragment actor waterline shading) — the
+       * A/B instrument for the optical-restoration probes and stage
+       * attribution. true is the production state.
+       */
+      setActorOptics(v: boolean) { actorOpticsEnabled = v; },
+      /** CP06: the live actor-optics descriptor (assertion surface). */
+      actorOptics() {
+        return {
+          enabled: actorOpticsEnabled,
+          meshEnabled: regionRenderer.opticsState.meshEnabled,
+          center: [
+            regionRenderer.opticsState.meshCenter.x,
+            regionRenderer.opticsState.meshCenter.y,
+            regionRenderer.opticsState.meshCenter.z,
+          ] as [number, number, number],
+          boundingRadius: regionRenderer.opticsState.meshBoundingRadius,
+          shadowRadius: regionRenderer.opticsState.meshShadowRadius,
+        };
+      },
+      /**
+       * CP06 structural audit: the restored optical branches and the
+       * actor's injected waterline law share the vendored mechanisms —
+       * marker checks on the live shader sources.
+       */
+      opticsShaderAudit() {
+        const waterSrc = regionRenderer.surface.fragmentSources();
+        const sampleCausticBody = 'mix(vec4(0.2, 1.0, 0.0, 0.0), c, windowFalloff(wuvProj))';
+        return {
+          aboveHasMeshBranch: waterSrc.above.includes('meshEnabled'),
+          aboveHasObjectRefraction: waterSrc.above.includes('sampleObjectRefraction'),
+          aboveHasClippedReflection: waterSrc.above.includes('objectClippedReflectionTex'),
+          belowHasMeshBranch: waterSrc.below.includes('meshEnabled'),
+          belowHasObjectReflection: waterSrc.below.includes('sampleObjectReflection'),
+          actorHasWaterlineLaw: actorShading.injectedPars.includes('regionActorWaterline'),
+          actorCausticParity: actorShading.injectedPars.includes(sampleCausticBody),
+          actorHasAmbientTerm: actorShading.injectedPars.includes('ambientSurf'),
+        };
+      },
+      /**
+       * CP06 deterministic breach probe: a fresh SwimSim launched at a
+       * chosen speed with full pitch-up intent; returns the phase timeline
+       * (crossing → airborne arc → re-entry → recovery), the airtime, the
+       * apex height, and the impact speed — the §13 breach/airtime
+       * instrument (pure sim, camera-free, byte-deterministic).
+       */
+      breachRun(opts: { speed?: number; seconds?: number; burst?: boolean } = {}) {
+        const local = new SwimSim(sampler);
+        local.assist = 'expert'; // no auto-level: the preset pitch holds
+        const sp = opts.speed ?? 9;
+        local.state.x = spawn.x;
+        local.state.z = spawn.z;
+        local.state.y = -1.2; // short approach — exit speed tracks the request
+        local.state.yaw = 0;
+        local.state.speed = sp;
+        local.state.wvx = 0;
+        local.state.wvy = sp * Math.sin(0.6);
+        local.state.wvz = sp * Math.cos(0.6);
+        local.state.pitch = -0.6; // nose up (≈ 34°, inside Track E 10–45°)
+        // burst held by default: the un-burst speed cap is MAX_SPEED 5,
+        // whose vy ceiling (5·sin 34° ≈ 2.8) sits below BREACH_MIN_VY —
+        // breach is a burst maneuver by design (master §7.4 cross-check);
+        // burst:false is the deterministic negative case
+        const intent: SwimIntent = { ...NEUTRAL_INTENT, burst: opts.burst ?? true };
+        const seconds = opts.seconds ?? 8;
+        const steps = Math.round(seconds / SIM.DT);
+        let airStartT = -1;
+        let airEndT = -1;
+        let maxY = -Infinity;
+        let impactSpeed = 0;
+        const events: { t: number; phase: string; y: number; speed: number }[] = [];
+        let prevAir = false;
+        for (let k = 1; k <= steps; k++) {
+          local.step(intent);
+          const t = k * SIM.DT;
+          const st = local.state;
+          if (st.y > maxY) maxY = st.y;
+          const isAir = st.phase === 'air';
+          if (isAir && !prevAir) {
+            airStartT = t;
+            events.push({ t, phase: 'air', y: st.y, speed: st.speed });
+          }
+          if (!isAir && prevAir) {
+            airEndT = t;
+            impactSpeed = st.speed;
+            events.push({ t, phase: 'swim', y: st.y, speed: st.speed });
+          }
+          prevAir = isAir;
+          if (airEndT > 0 && t > airEndT + 1) break;
+        }
+        return {
+          breached: airStartT >= 0,
+          airStartT,
+          airEndT,
+          airtime: airStartT >= 0 && airEndT > 0 ? airEndT - airStartT : 0,
+          maxY,
+          impactSpeed,
+          breachCount: local.state.breachCount,
+          events,
+        };
+      },
+      /**
        * cp05B ambient-motion control (checkpoint prompt §9): production
        * values enabled/boundary = true, underMul = AMBIENT.UNDER_MUL;
        * enabled/boundary = false zero the additive contribution — the
@@ -742,7 +903,16 @@ export async function startRegionGame(
         water.addDropWorld(s.x, s.z, DROP_EXIT.radiusM, DROP_EXIT.amplitudeM);
       }
       if (s.splashed || (prevPhase === 'air' && s.phase === 'swim')) {
-        water.addDropWorld(s.x, s.z, DROP_ENTRY.radiusM, DROP_ENTRY.amplitudeM);
+        // CP06 §9.3: impact-speed-scaled entry impulse (deterministic —
+        // s.speed is the post-KEEP impact speed the sim just computed)
+        const impact = Math.min(s.speed / SIM.BREACH_REENTRY_KEEP, SIM.BURST_MAX_SPEED);
+        const kImpact = Math.min(Math.max(impact / SIM.BURST_MAX_SPEED, 0), 1);
+        water.addDropWorld(
+          s.x,
+          s.z,
+          DROP_ENTRY.radiusM,
+          DROP_ENTRY.amplitudeM * (ENTRY_SCALE_MIN + ENTRY_SCALE_SPAN * kImpact),
+        );
       }
     }
     prevPhase = s.phase;
@@ -771,6 +941,28 @@ export async function startRegionGame(
       rigN++;
     }
     cam.camera.updateMatrixWorld();
+
+    // --- CP06: actor optics descriptor + texture passes (the vendored
+    // updateObjectTextures step, before caustics — caustics consume the
+    // actor's shadow footprint) ---
+    if (actorOpticsEnabled) {
+      regionRenderer.setActorOptics({
+        center: dolphin.group.position,
+        boundingRadius: actorRadiusM,
+        shadowRadius: actorRadiusM,
+      });
+    } else {
+      regionRenderer.setActorOptics(null);
+    }
+    actorShading.uniforms.water.value = water.textureA.texture;
+    actorShading.uniforms.causticTex.value = regionRenderer.caustics.texture;
+    actorShading.uniforms.uActorWaterMask.value = actorOpticsEnabled ? 1 : 0;
+    regionRenderer.updateObjectTextures(
+      scene,
+      cam.camera,
+      dolphin.group,
+      actorShading,
+    );
 
     // --- region passes (the vendored draw order) ---
     const causT0 = performance.now();

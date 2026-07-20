@@ -23,6 +23,13 @@ uniform sampler2D causticTex;
 uniform sampler2D water;
 uniform samplerCube sky;
 uniform vec3 eye;
+// CP06 restored mesh-optics uniforms (vendored names; meshCenter /
+// meshShadowRadius / meshEnabled are declared in RegionWallColor.glsl)
+uniform float meshBoundingRadius;
+uniform sampler2D objectReflectionTex;
+uniform sampler2D objectRefractionTex;
+uniform mat4 viewProjectionMatrix;
+uniform mat4 reflectionViewProjectionMatrix;
 
 varying vec3 vPosition;
 
@@ -30,6 +37,50 @@ varying vec3 vPosition;
 #include ./RegionAmbient.glsl;
 #include ./RegionSubstrate.glsl;
 #include ./RegionWallColor.glsl;
+
+/**
+ * CP06 restored vendored helpers (WaterBelow.frag, byte-identical).
+ */
+float intersectSphereBounds(vec3 origin, vec3 ray, vec3 center, float radius) {
+  vec3 toSphere = origin - center;
+  float a = dot(ray, ray);
+  float b = 2.0 * dot(toSphere, ray);
+  float c = dot(toSphere, toSphere) - radius * radius;
+  float discriminant = b * b - 4.0 * a * c;
+  if (discriminant > 0.0) {
+    float root = sqrt(discriminant);
+    float near = (-b - root) / (2.0 * a);
+    float far = (-b + root) / (2.0 * a);
+    if (near > 0.0) return near;
+    if (far > 0.0) return 0.0;
+  }
+  return 1.0e6;
+}
+
+vec4 sampleProjectedTexture(sampler2D tex, mat4 matrix, vec3 point) {
+  vec4 clip = matrix * vec4(point, 1.0);
+  vec3 ndc = clip.xyz / max(clip.w, 1.0e-6);
+  vec2 uv = ndc.xy * 0.5 + 0.5;
+  float inBounds =
+    step(0.0, uv.x) * step(0.0, uv.y) * step(uv.x, 1.0) * step(uv.y, 1.0) * step(0.0, clip.w);
+  return texture2D(tex, clamp(uv, 0.0, 1.0)) * inBounds;
+}
+
+vec4 sampleObjectRefraction(vec3 origin, vec3 ray, vec3 center, float radius) {
+  float hit = intersectSphereBounds(origin, ray, center, radius);
+  if (hit >= 1.0e6) return vec4(0.0);
+  return sampleProjectedTexture(objectRefractionTex, viewProjectionMatrix, origin + ray * hit);
+}
+
+vec4 sampleObjectReflection(vec3 origin, vec3 ray, vec3 center, float radius) {
+  float hit = intersectSphereBounds(origin, ray, center, radius);
+  if (hit >= 1.0e6) return vec4(0.0);
+  return sampleProjectedTexture(
+    objectReflectionTex,
+    reflectionViewProjectionMatrix,
+    origin + ray * hit
+  );
+}
 
 /**
  * Vendored tracer with the pool box swapped for the seabed heightfield —
@@ -106,6 +157,26 @@ void main() {
   vec3 reflectedColor = getSurfaceRayColor(vPosition, reflectedRay, underwaterColor);
   vec3 refractedColor =
     getSurfaceRayColor(vPosition, refractedRay, vec3(1.0)) * vec3(0.8, 1.0, 1.1);
+
+  // 8 (CP06 restored): overlay the pre-rendered reflection/refraction
+  // passes for the mesh actor — the vendored WaterBelow.frag meshEnabled
+  // branch, byte-identical consumption
+  if (meshEnabled) {
+    vec4 reflectedObject = sampleObjectReflection(
+      vPosition,
+      reflectedRay,
+      meshCenter,
+      meshBoundingRadius
+    );
+    vec4 refractedObject = sampleObjectRefraction(
+      vPosition,
+      refractedRay,
+      meshCenter,
+      meshBoundingRadius
+    );
+    reflectedColor = mix(reflectedColor, reflectedObject.rgb, reflectedObject.a);
+    refractedColor = mix(refractedColor, refractedObject.rgb, refractedObject.a);
+  }
 
   // 9. Mix based on fresnel and refracted-ray thickness — vendored
   gl_FragColor = vec4(
