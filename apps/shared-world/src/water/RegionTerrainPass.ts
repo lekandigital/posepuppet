@@ -26,6 +26,7 @@
 // per-tile buffers).
 
 import * as THREE from 'three';
+import type { WaterOpticsState } from '../../vendor/threejs-water/src/rendering/WaterOpticsState';
 import type { WorldData } from '../world/WorldData';
 import type { RegionWater } from './RegionWater';
 import { regionUniforms, type RegionContext } from './regionContext';
@@ -88,6 +89,9 @@ export class RegionTerrainPass {
     lightDirection: THREE.Vector3,
     causticTexture: THREE.Texture,
     ctx: RegionContext,
+    // CP06: the shared vendored optics state — the terrain consumes the
+    // restored mesh contact shadow (RegionWallColor.meshProximityShadow)
+    private readonly opticsState: WaterOpticsState | null = null,
   ) {
     const t0 = performance.now();
     this.material = new THREE.ShaderMaterial({
@@ -97,6 +101,13 @@ export class RegionTerrainPass {
         light: { value: lightDirection.clone() },
         causticTex: { value: causticTexture },
         water: { value: null },
+        ...(opticsState
+          ? opticsState.createUniforms()
+          : {
+              meshCenter: { value: new THREE.Vector3() },
+              meshShadowRadius: { value: 1 },
+              meshEnabled: { value: false },
+            }),
         ...regionUniforms(ctx),
       },
       // FrontSide for the surface; skirt quads carry both windings so a
@@ -200,7 +211,8 @@ export class RegionTerrainPass {
   }
 
   prepare(water: RegionWater) {
-    this.material.uniforms.water.value = water.textureA.texture;
+    this.material.uniforms.water!.value = water.textureA.texture;
+    if (this.opticsState) this.opticsState.syncUniforms(this.material);
     this.material.uniformsNeedUpdate = true;
   }
 

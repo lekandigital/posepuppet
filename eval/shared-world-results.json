@@ -1,5 +1,5 @@
 {
-  "checkpoint": "04A-region-bake-loader",
+  "checkpoint": "06-optical-continuity-and-breach",
   "timestamp": "2026-07-18T05:37:35.848Z",
   "url": "/shared-world/?view=stock",
   "viewport": {
@@ -33,7 +33,7 @@
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
   "paintedPixels": 508275,
-  "generatedAt": "2026-07-19T20:28:11.157Z",
+  "generatedAt": "2026-07-20T03:33:29.647Z",
   "pool": {
     "modelLengthM": 2.8968250546579615,
     "bootConsoleErrors": 0,
@@ -758,7 +758,7 @@
       "windowTexelM": 0.5,
       "gpuTimerSource": "EXT_disjoint_timer_query_webgl2",
       "floatLinear": true,
-      "decodeMs": 96.39999997615814,
+      "decodeMs": 106.60000002384186,
       "consoleErrors": 0
     },
     "depthLaw": [
@@ -2223,6 +2223,153 @@
       "landViolations": 0,
       "waterControls": 60,
       "waterChanged": 59
+    }
+  },
+  "region06": {
+    "above-transmission": {
+      "actorDelta": 0.03133589492842777,
+      "controlDelta": 0.0000033340699164714743,
+      "px": 682.4999999999987,
+      "py": 383.9999999999976
+    },
+    "below-transmission": {
+      "actorDelta": 0.02128378274561228,
+      "controlDelta": 0.000008235053054074534,
+      "px": 682.5,
+      "py": 435.9009931721712
+    },
+    "structural-audit": {
+      "audit": {
+        "aboveHasMeshBranch": true,
+        "aboveHasObjectRefraction": true,
+        "aboveHasClippedReflection": true,
+        "belowHasMeshBranch": true,
+        "belowHasObjectReflection": true,
+        "actorHasWaterlineLaw": true,
+        "actorCausticParity": true,
+        "actorHasAmbientTerm": true
+      },
+      "boundingRadius": 1.882936285527675
+    },
+    "straddle-continuity": {
+      "above": 158,
+      "below": 1344,
+      "waterlineRow": 355.44885333486866
+    },
+    "crossing-deltas": [
+      0.007813957106358184,
+      0.0073340349324638844,
+      0.006535395333561428,
+      0.006799653138389505,
+      0.06267540378255675,
+      0.22285795897295768,
+      0.013249231225636033,
+      0.01541478625593504,
+      0.016534122647023027,
+      0.016221781801392412
+    ],
+    "cp05b-guard": {
+      "ambient": {
+        "timeS": 0.1510000000059605,
+        "ampScale": 1,
+        "boundaryScale": 1,
+        "underMul": 1.5,
+        "frozen": false
+      }
+    },
+    "breach-determinism": {
+      "s65": {
+        "breached": true,
+        "airStartT": 0.20833333333333334,
+        "airEndT": 1.3416666666666666,
+        "airtime": 1.1333333333333333,
+        "maxY": 0.8062618121989644,
+        "impactSpeed": 6.391352273417784,
+        "breachCount": 1,
+        "events": [
+          {
+            "t": 0.20833333333333334,
+            "phase": "air",
+            "y": -0.37351930397022953,
+            "speed": 7.50570671667155
+          },
+          {
+            "t": 1.3416666666666666,
+            "phase": "swim",
+            "y": -0.42248972488052233,
+            "speed": 6.391352273417784
+          }
+        ]
+      },
+      "s75": {
+        "breached": true,
+        "airStartT": 0.18333333333333332,
+        "airEndT": 1.4416666666666667,
+        "airtime": 1.2583333333333333,
+        "maxY": 1.0877018772501565,
+        "impactSpeed": 7.103402932582555,
+        "breachCount": 1,
+        "events": [
+          {
+            "t": 0.18333333333333332,
+            "phase": "air",
+            "y": -0.37703127950532134,
+            "speed": 8.356744795405348
+          },
+          {
+            "t": 1.4416666666666667,
+            "phase": "swim",
+            "y": -0.41657685723762605,
+            "speed": 7.103402932582555
+          }
+        ]
+      },
+      "s90": {
+        "breached": true,
+        "airStartT": 0.15833333333333333,
+        "airEndT": 1.5083333333333333,
+        "airtime": 1.35,
+        "maxY": 1.3051310504627647,
+        "impactSpeed": 7.631539063430314,
+        "breachCount": 1,
+        "events": [
+          {
+            "t": 0.15833333333333333,
+            "phase": "air",
+            "y": -0.39538447541207494,
+            "speed": 9
+          },
+          {
+            "t": 1.5083333333333333,
+            "phase": "swim",
+            "y": -0.41154092366239536,
+            "speed": 7.631539063430314
+          }
+        ]
+      },
+      "s30": {
+        "breached": false,
+        "airStartT": -1,
+        "airEndT": -1,
+        "airtime": 0,
+        "maxY": -0.4000000000000004,
+        "impactSpeed": 0,
+        "breachCount": 0,
+        "events": []
+      }
+    },
+    "camera-breach": {
+      "breaches": 2,
+      "airborneEntries": 3,
+      "maxStepM": 1.0285000000000397,
+      "overCapFrames": 4,
+      "statesSeen": [
+        "EmergencyRecenter",
+        "SurfaceTransition",
+        "Airborne",
+        "ReEntryRecovery",
+        "FastTravel"
+      ]
     }
   }
 }
