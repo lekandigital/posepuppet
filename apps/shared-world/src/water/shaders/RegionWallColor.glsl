@@ -30,6 +30,23 @@
  * 0.5 ambient floor.
  */
 
+/**
+ * CP06 restored mesh-object contact shadow (vendored getWallColor): the
+ * actor darkens nearby terrain with the vendored inverse-quartic falloff.
+ * Declared here so the terrain seen directly, refracted and reflected all
+ * consume the same factor.
+ */
+uniform vec3 meshCenter;
+uniform float meshShadowRadius;
+uniform bool meshEnabled;
+
+/** The vendored proximity factor: 1 − 0.6/max(d/r, 1)⁴ (WaterAbove.frag). */
+float meshProximityShadow(vec3 point) {
+  if (!meshEnabled) return 1.0;
+  float meshDistance = length(point - meshCenter);
+  return 1.0 - 0.6 / pow(max(meshDistance / meshShadowRadius, 1.0), 4.0);
+}
+
 /** cp05 exposed-terrain lighting [DERIVED initials, provisional-until-cp08] */
 const vec3 EXPOSED_SUN_COLOR = vec3(1.0, 0.956863, 0.878431); // #FFF4E0 [Track D 17.1 band]
 const float EXPOSED_SUN_INT = 0.55;                            // Track D 0.45–0.65 midpoint
@@ -86,18 +103,22 @@ vec4 sampleCaustic(vec3 point, vec3 refractedLight) {
 vec3 getWallColorShaded(vec3 point, vec3 tint, vec3 normal) {
   vec3 refractedLight = -refract(-light, vec3(0.0, 1.0, 0.0), IOR_AIR / IOR_WATER);
   if (point.y < surfaceHeightAt(point.xz)) {
-    // submerged: the vendored diffuse/caustic consumption — byte-identical
-    float scale = 0.5;
+    // submerged: the vendored diffuse/caustic consumption — byte-identical;
+    // CP06 restores the vendored mesh contact shadow on the ambient base
+    // (the vendored order: base scale × object factor, then + caustic term)
+    float scale = 0.5 * meshProximityShadow(point);
     float diffuse = max(0.0, dot(refractedLight, normal));
     vec4 caustic = sampleCaustic(point, refractedLight);
     scale += diffuse * caustic.r * 2.0 * caustic.g;
     return tint * scale;
   }
-  // exposed: single directional (the one vendored sun) + hemisphere (cp05)
+  // exposed: single directional (the one vendored sun) + hemisphere (cp05);
+  // CP06: the same vendored proximity factor (the vendored getWallColor
+  // applies it to walls above the waterline too)
   float hemiMix = normal.y * 0.5 + 0.5;
   vec3 hemi = EXPOSED_HEMI_SKY * (EXPOSED_HEMI_INT * mix(EXPOSED_HEMI_GROUND_FRAC, 1.0, hemiMix));
   vec3 sun = EXPOSED_SUN_COLOR * (EXPOSED_SUN_INT * max(0.0, dot(normal, light)));
-  return tint * (hemi + sun);
+  return tint * (hemi + sun) * meshProximityShadow(point);
 }
 
 /** cp05-signature wrapper: heightfield normal (the water raymarch path). */

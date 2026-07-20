@@ -17,12 +17,23 @@
 // snaps.
 
 import * as THREE from 'three';
+import type { WaterOpticsState } from '../../vendor/threejs-water/src/rendering/WaterOpticsState';
 import type { RegionWater } from './RegionWater';
 import { WINDOW_SIZE_M } from './RegionWater';
 import { regionUniforms, type RegionContext } from './regionContext';
 import regionWaterSurfaceVert from './shaders/RegionWaterSurface.vert';
 import regionWaterAboveFrag from './shaders/RegionWaterAbove.frag';
 import regionWaterBelowFrag from './shaders/RegionWaterBelow.frag';
+
+/** Object-pass texture/matrix inputs (the vendored WaterSurfacePass shape,
+ *  restored at CP06 for the regional actor's mesh optics). */
+export interface RegionObjectTextureInputs {
+  reflectionTexture: THREE.Texture;
+  clippedReflectionTexture: THREE.Texture;
+  refractionTexture: THREE.Texture;
+  viewProjectionMatrix: THREE.Matrix4;
+  reflectionViewProjectionMatrix: THREE.Matrix4;
+}
 
 export class RegionWaterSurfacePass {
   readonly aboveWindowMesh: THREE.Mesh;
@@ -40,6 +51,10 @@ export class RegionWaterSurfacePass {
     causticTexture: THREE.Texture,
     lightDirection: THREE.Vector3,
     private readonly ctx: RegionContext,
+    // CP06 restored object optics (vendored WaterSurfacePass inputs): the
+    // actor texture-pass targets + the shared optics state
+    private readonly objectTextures: RegionObjectTextureInputs | null = null,
+    private readonly opticsState: WaterOpticsState | null = null,
   ) {
     const makeMaterial = (fragmentShader: string, side: THREE.Side) =>
       new THREE.ShaderMaterial({
@@ -51,6 +66,23 @@ export class RegionWaterSurfacePass {
           water: { value: null },
           sky: { value: cubemap },
           eye: { value: new THREE.Vector3() },
+          // CP06: the vendored optics uniform family (mesh members consumed
+          // by the restored branches; primitive members inert, never enabled)
+          ...(opticsState
+            ? opticsState.createUniforms()
+            : {
+                meshCenter: { value: new THREE.Vector3() },
+                meshBoundingRadius: { value: 1 },
+                meshShadowRadius: { value: 1 },
+                meshEnabled: { value: false },
+              }),
+          objectReflectionTex: { value: objectTextures?.reflectionTexture ?? null },
+          objectClippedReflectionTex: {
+            value: objectTextures?.clippedReflectionTexture ?? null,
+          },
+          objectRefractionTex: { value: objectTextures?.refractionTexture ?? null },
+          viewProjectionMatrix: { value: new THREE.Matrix4() },
+          reflectionViewProjectionMatrix: { value: new THREE.Matrix4() },
           ...regionUniforms(ctx),
         },
         side,
@@ -132,13 +164,23 @@ export class RegionWaterSurfacePass {
     (this.borderGeometry.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
   }
 
-  /** Bind per-frame uniforms (the vendored prepare discipline). */
+  /** Bind per-frame uniforms (the vendored prepare discipline; CP06 adds
+   *  the vendored optics-state sync + object-pass matrices). */
   prepare(water: RegionWater, camera: THREE.Camera) {
     const eye = new THREE.Vector3();
     camera.getWorldPosition(eye);
     for (const material of [this.aboveMaterial, this.belowMaterial]) {
-      material.uniforms.water.value = water.textureA.texture;
-      (material.uniforms.eye.value as THREE.Vector3).copy(eye);
+      material.uniforms.water!.value = water.textureA.texture;
+      (material.uniforms.eye!.value as THREE.Vector3).copy(eye);
+      if (this.objectTextures) {
+        (material.uniforms.viewProjectionMatrix!.value as THREE.Matrix4).copy(
+          this.objectTextures.viewProjectionMatrix,
+        );
+        (material.uniforms.reflectionViewProjectionMatrix!.value as THREE.Matrix4).copy(
+          this.objectTextures.reflectionViewProjectionMatrix,
+        );
+      }
+      if (this.opticsState) this.opticsState.syncUniforms(material);
       material.uniformsNeedUpdate = true;
     }
   }
