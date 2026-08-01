@@ -1,5 +1,5 @@
 {
-  "checkpoint": "04B-pool-to-region-water",
+  "checkpoint": "06-optical-continuity-and-breach",
   "timestamp": "2026-07-18T05:37:35.848Z",
   "url": "/shared-world/?view=stock",
   "viewport": {
@@ -33,7 +33,7 @@
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
   "paintedPixels": 508275,
-  "generatedAt": "2026-08-01T04:12:22.310Z",
+  "generatedAt": "2026-08-01T05:08:54.656Z",
   "pool": {
     "modelLengthM": 2.8968250546579615,
     "bootConsoleErrors": 0,
@@ -2226,16 +2226,16 @@
   },
   "region06": {
     "above-transmission": {
-      "actorDelta": 0.046628684850899965,
-      "controlDelta": 0.000004348197581060952,
-      "px": 863.9999999999984,
-      "py": 539.9999999999966
+      "actorDelta": 0.03133508216920072,
+      "controlDelta": 0.0000033340699164714743,
+      "px": 682.4999999999987,
+      "py": 383.9999999999976
     },
     "below-transmission": {
-      "actorDelta": 0.02424428060827276,
-      "controlDelta": 0.000008903013428580208,
-      "px": 864,
-      "py": 612.9857716483657
+      "actorDelta": 0.04307615407599632,
+      "controlDelta": 0.0074191339657235355,
+      "px": 682.5,
+      "py": 435.9009931721712
     },
     "structural-audit": {
       "audit": {
@@ -2251,21 +2251,21 @@
       "boundingRadius": 1.882936285527675
     },
     "straddle-continuity": {
-      "above": 218,
-      "below": 2680,
-      "waterlineRow": 501.94600002797625
+      "above": 173,
+      "below": 1383,
+      "waterlineRow": 356.96389104016635
     },
     "crossing-deltas": [
-      0.007885619691569059,
-      0.007254240044293589,
-      0.00639144734169344,
-      0.006553536313301221,
-      0.0605567073024526,
-      0.22152572173317456,
-      0.01398935635118467,
-      0.015678153357329305,
-      0.016618441706013135,
-      0.016496980770827414
+      0.007865418411392787,
+      0.007324482002958528,
+      0.006530595550079699,
+      0.006792384211374207,
+      0.06270606536620749,
+      0.2229141725441754,
+      0.013319516112453364,
+      0.015455569106256454,
+      0.01656353069186506,
+      0.0162443156175892
     ],
     "cp05b-guard": {
       "ambient": {
