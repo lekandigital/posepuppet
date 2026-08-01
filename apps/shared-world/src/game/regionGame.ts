@@ -34,6 +34,8 @@ import {
 } from '../water/RegionTerrainPass';
 import { loadDolphin } from './dolphinActor';
 import { attachDolphinWaterShading } from './dolphinWaterShading';
+import { buildPlaceholderPlan, PH, PLACEHOLDER_LEGEND } from '../world/placeholders';
+import { buildPlaceholderMeshes } from './placeholderMeshes';
 import { AMBIENT, ambientSurfCpu } from '../water/ambientCpu';
 import { regionUniforms } from '../water/regionContext';
 import { substrateSampleCpu } from '../world/substrateCpu';
@@ -146,6 +148,14 @@ export async function startRegionGame(
   // §4: no atmosphere pass)
   scene.background = cubemap;
   for (const m of regionRenderer.sceneMeshes()) scene.add(m);
+
+  // --- CP07: the placeholder world — deterministic plan from
+  // placement.json + the approved layout densities, Y/normals resampled
+  // AT LOAD from the CP05A heightfield (addendum §7; Master §8.3) ---
+  const placeholderPlan = buildPlaceholderPlan(data);
+  const placeholders = buildPlaceholderMeshes(placeholderPlan);
+  scene.add(placeholders.group);
+  if (opts.debug) scene.add(placeholders.debugGroup);
 
   // lights for the dolphin only (vendored ShaderMaterials ignore scene
   // lights); direction matches the demo's light — the pool-view discipline
@@ -389,6 +399,19 @@ export async function startRegionGame(
       },
       gpuHeightProbe: (pts: [number, number][]) => gpuHeightProbe(pts),
       simTexProbe: () => water.probeSimTexture(),
+      // --- cp07 placeholder-world instrumentation ---
+      placeholders: {
+        constants: PH,
+        legend: PLACEHOLDER_LEGEND,
+        ySampling: placeholderPlan.ySampling,
+        census: () => placeholderPlan.census,
+        notPlaced: () => placeholderPlan.notPlaced,
+        placementMap: () => placeholderPlan.placementMap,
+        sites: () => placeholderPlan.sites,
+        instances: () => placeholderPlan.instances,
+        digest: () => placeholderPlan.digest,
+        drawStats: () => ({ ...placeholders.counts }),
+      },
       // --- cp05B ambient instrumentation ---
       ambient: {
         constants: AMBIENT,
@@ -475,6 +498,11 @@ export async function startRegionGame(
       setSurfaceVisible(v: boolean) {
         stageEnabled.surface = v;
         regionRenderer.surface.setVisible(v);
+      },
+      /** cp07: placeholder visibility toggle — frame-budget attribution
+       *  only; true is the production state. */
+      setPlaceholdersVisible(v: boolean) {
+        placeholders.setVisible(v);
       },
       /** cp05A: render raw classification albedo on the terrain (no
        *  lighting) — the probe surface the CPU twin compares against */
