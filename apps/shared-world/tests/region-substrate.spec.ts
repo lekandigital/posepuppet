@@ -329,6 +329,14 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       `shotMode({ pos: [${CAM.join(',')}], look: [${CAM[0] + 0.001}, 0, ${CAM[2]}], fov: 60, size: [1728, 1080] })`,
     );
     await testHook(page, 'setSurfaceVisible(false)');
+    // cp07 instrument isolation: the placeholder world (kelp/coral/school
+    // blocks) stands exactly on this probe shelf and would occlude the
+    // terrain pixels this instrument measures — hidden for the capture
+    // via the sanctioned visibility toggle (same discipline as the
+    // surface toggle above), restored after. The classification LAW and
+    // tolerance are unchanged; placeholder correctness has its own suite
+    // (region-placeholders.spec.ts).
+    await testHook(page, 'setPlaceholdersVisible(false)');
     await testHook(page, 'setAlbedoDebug(true)');
     await page.waitForTimeout(800);
     await page.addStyleTag({ content: '#region-overlay { display: none !important; }' });
@@ -354,6 +362,7 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     )) as { px: number; py: number; inFront: boolean }[];
 
     await testHook(page, 'setAlbedoDebug(false)');
+    await testHook(page, 'setPlaceholdersVisible(true)');
     await testHook(page, 'setSurfaceVisible(true)');
     await testHook(page, 'shotMode(null)');
     await testHook(page, 'setIntent(null)');
