@@ -1,4 +1,4 @@
-# CHECKPOINT 08 — Ecco Atmosphere and Final Water Optics (Pass A)
+<!-- # CHECKPOINT 08 — Ecco Atmosphere and Final Water Optics (Pass A)
 
 > **RE-SCOPED (2026-08-08)** by `../decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md`
 > §7. Checkpoint 05C owns the water look wholesale; CP08 becomes **Atmosphere
@@ -99,4 +99,4 @@ Every final value with its source label ([BVM]/[REC]/[DERIVED] provenance carrie
 
 Produce the end-of-checkpoint report (changes, final value tables, four-shot verdicts, Ecco-set comparisons, performance, placeholder confirmation, deviations), commit locally, then:
 
-STOP — wait for user review and approval. Approval of this checkpoint does not authorize starting the next checkpoint.
+STOP — wait for user review and approval. Approval of this checkpoint does not authorize starting the next checkpoint. -->

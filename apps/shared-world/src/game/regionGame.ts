@@ -29,6 +29,7 @@ import { Post } from '../ocean/Post';
 import { Clouds } from '../ocean/Clouds';
 import { FloatingBodies } from '../ocean/FloatingBodies';
 import { applyPreset, PRESETS, type SunParams } from '../ocean/presets';
+import { ECCO_GRADE, applyEccoGrade } from '../ocean/eccoGrade';
 import { createTimeOfDay, TOD, sunAnglesAt } from '../ocean/timeOfDay';
 import { buildRegionContext } from '../terrain/regionContext';
 import {
@@ -143,7 +144,10 @@ export async function startRegionGame(
   const terrain = new RegionTerrainPass(data, ctx, ocean.uniforms, sunDir);
   scene.add(terrain.group);
 
-  const particles = new Particles(5000, 160);
+  // Marine snow restrained vs the demo's 5000 (Ecco frames show sparse
+  // motes; Track D keeps particles subordinate to the fog) — count is a
+  // construction option, the field/shader untouched.
+  const particles = new Particles(2600, 160);
   scene.add(particles.points);
 
   // lights: the demo's pair — only the dolphin + dropped bodies
@@ -404,6 +408,7 @@ export async function startRegionGame(
     // --- cp05C ocean surface (the CPU mirrors are the eval contract) ---
     ocean: {
       config: OCEAN_CONFIG,
+      grade: ECCO_GRADE,
       TOD,
       heightAt: (x: number, z: number, t?: number) =>
         ocean.heightAt(x, z, t ?? oceanTimeS),
@@ -519,6 +524,11 @@ export async function startRegionGame(
           applySun();
         }
         return ok;
+      },
+      /** restore the boot-time Ecco grade (config-only) */
+      applyEccoGrade() {
+        applyEccoGrade({ ocean, post, clouds });
+        applySun();
       },
       presets: Object.keys(PRESETS),
       /** cp05A: render raw classification albedo on the terrain (no
@@ -709,6 +719,10 @@ export async function startRegionGame(
       mountOceanDebugGui({
         ocean, post, clouds, bodies, timeOfDay, sunParams, applySun,
         cloudShadowP, setCloudsEnabled, postExposure,
+        applyEccoGrade: () => {
+          applyEccoGrade({ ocean, post, clouds });
+          applySun();
+        },
         applyPreset: (name: string) => {
           const ok = applyPreset(name, { ocean, post, clouds, sunParams, applySun });
           const P = PRESETS[name];
@@ -740,6 +754,10 @@ export async function startRegionGame(
 
   applySun();
   setCloudsEnabled(true); // volumetric clouds on by default (GUI toggle)
+  // Ecco grade (user direction 2026-08-08): configuration-only tuning of
+  // the ported ocean toward the 13-frame Ecco set — see src/ocean/eccoGrade.ts
+  applyEccoGrade({ ocean, post, clouds });
+  applySun(); // re-derive the exposure dimmer over the graded base
 
   // --- loop: fixed-timestep accumulator (dolphin pattern, verbatim) ---
   let last = performance.now();

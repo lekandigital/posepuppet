@@ -28,11 +28,17 @@ export interface OceanDebugGuiCtx {
   dropAt: (type: 'sphere' | 'cube') => void;
   /** base exposure — applySun derives uExposure = base × night dimmer */
   postExposure: { base: number };
+  /** restore the boot-time Ecco grade after preset/slider experiments */
+  applyEccoGrade: () => void;
 }
 
 export function mountOceanDebugGui(ctx: OceanDebugGuiCtx): GUI {
   const { ocean, post, clouds, bodies, timeOfDay, sunParams, applySun } = ctx;
   const gui = new GUI({ title: 'Ocean (cp05C debug)' });
+
+  gui
+    .add({ ecco: () => { ctx.applyEccoGrade(); gui.controllersRecursive().forEach((c) => c.updateDisplay()); } }, 'ecco')
+    .name('↺ Ecco grade (default)');
 
   const fTod = gui.addFolder('Time of day');
   fTod.add(timeOfDay, 'speedMul', 0, 30, 0.5).name('cycle speed ×');
