@@ -22,7 +22,7 @@ Checkpoint 10 (amended by the post-CP05 addendum §10): the first asset-replacem
 
 ## 4. Out of scope
 
-- No invented substitute assets; no terrain-color substitution for any asset; no unapproved downloads or purchases; no new categories; no terrain/water/atmosphere retuning; no push/merge/rebase/PR.
+- No invented substitute assets; no terrain-color substitution for any asset; no unapproved downloads or purchases; no new categories; no terrain/water/atmosphere retuning (the 05C ocean and the re-scoped CP08 zone values are immutable here); no push/merge/rebase/PR.
 
 ## 5. Required inputs
 
@@ -48,7 +48,7 @@ Expected: approved vegetation categories now render as real assets exactly where
 2. Credits audit: every new asset in `CREDITS.md` with live-check record (master §11.1 credits-vs-assets audit).
 3. Ground-contact and slope checks for replaced instances on the authoritative heightfield.
 4. Budgets: instancing counts, texture sizes, material locks (roughness 0.95–1.0, metalness 0) asserted.
-5. Suite green (four-shot, containment, replay, 06 continuity, cave clearance); `simHz > 100`; sustained median `fps ≥ 58` with vegetation active (degradation order: flora instances cut before defining features).
+5. Suite green (`region-ocean` suite, containment, replay, re-run 06 continuity, cave clearance); `simHz > 100`; sustained median `fps ≥ 58` with vegetation active (degradation order: flora instances cut before defining features).
 
 ## 9. Manual review procedure
 

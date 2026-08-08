@@ -1,5 +1,16 @@
 # Ecco Waterline and Cross-Surface Visibility Reference
 
+> **Scope note (2026-08-08).** The ocean-replacement addendum
+> (`../../decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md`) replaced the
+> region water with the WaterThreeJS port at Checkpoint 05C. This document's
+> water-system prescriptions — the "Intended implementation hierarchy", the
+> "one coherent water system / do not introduce a separate replacement
+> renderer" rule, and the per-checkpoint implementation ownership — are
+> **superseded**. The 13 frames and the behavior-level acceptance requirements
+> (continuity across the waterline, smooth visibility variation, a surface
+> that never reads frozen, stock/pool demos remaining functional) remain valid
+> composition and behavior references for the re-scoped CP06/CP08.
+
 ## Purpose
 
 These selected frames from *Ecco the Dolphin: Defender of the Future* define the visual-behavior reference for BodyArcade's ocean surface, breach camera, cross-waterline visibility, and split-level rendering.

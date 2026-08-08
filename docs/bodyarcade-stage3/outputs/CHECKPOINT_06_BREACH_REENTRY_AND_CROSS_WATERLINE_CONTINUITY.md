@@ -1,5 +1,17 @@
 # CHECKPOINT 06 — Breach, Re-entry, and Cross-Waterline Continuity
 
+> **RE-SCOPED (2026-08-08)** by `../decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md`
+> §5. The side-branch implementation (`bodyarcade-shared-world-cp06-cp07`) is
+> superseded and not in this line's history. When CP06 runs after 05C: the
+> cross-waterline rendering law, split-level behavior, and Snell-window optics
+> (§§3.4–3.5 below) arrive largely free with the ported WaterThreeJS ocean;
+> remaining scope is the breach interaction chain, camera states, and splash —
+> which acts through the ocean's **contact-foam/splash-impulse mechanism**, not
+> `addDrop` sim injections. Every reference below to jeantimex compositing, the
+> sanctioned edit family, four-shot regressions, and "no new water renderer" is
+> void. The 13-frame Ecco set remains the composition/behavior reference; the
+> preconditions become "05C approved" instead of "05A + 05B approved".
+
 ## 1. Header
 
 Checkpoint 06 (renamed from "Breach over the region" by the post-CP05 addendum §6): breach and re-entry remain the central interaction, and this checkpoint now also owns the **first complete implementation of continuous geometry and camera-side-dependent visibility across the waterline** — the water is never modeled as simply opaque from above and transparent from below. Governing decision: `docs/bodyarcade-stage3/decisions/POST_CP05_TERRAIN_WATERLINE_CHECKPOINT_AMENDMENTS.md` (read in full).

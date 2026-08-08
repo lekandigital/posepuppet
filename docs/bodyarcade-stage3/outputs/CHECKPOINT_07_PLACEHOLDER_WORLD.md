@@ -1,5 +1,14 @@
 # CHECKPOINT 07 — Placeholder World
 
+> **RE-RUN REQUIRED (2026-08-08).** The side-branch implementation
+> (`bodyarcade-shared-world-cp06-cp07`) is superseded — this line (base
+> `fab3098`) has no placeholders yet. The prompt below remains largely valid
+> per `../decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md` §6; the
+> side-branch placement plan/census code may be cherry-picked or re-derived.
+> New at re-run: placeholders render into the 05C linear-HDR pipeline and are
+> seen through the ported water optics; "no water changes" refers to the 05C
+> ocean.
+
 ## 1. Header
 
 Checkpoint 07 (amended by the post-CP05 addendum §7): place a color-coded **rectangular placeholder** for every approved asset instance or cluster whose final asset is unavailable, across the revised 05A terrain. This checkpoint remains mandatory and is **not reduced by terrain coloring** in any way. Governing decision: `docs/bodyarcade-stage3/decisions/POST_CP05_TERRAIN_WATERLINE_CHECKPOINT_AMENDMENTS.md` (read in full).
