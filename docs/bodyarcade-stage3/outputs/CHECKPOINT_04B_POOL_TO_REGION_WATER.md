@@ -1,5 +1,12 @@
 # CHECKPOINT 04B — Pool to Region Water (the Canonical Minimal Edit)
 
+> **SUPERSEDED for the region view (2026-08-08).** The jeantimex-derived region
+> water this checkpoint built (container swap, windowed sim, four-shot fidelity)
+> was approved and later **replaced wholesale at Checkpoint 05C** by the
+> WaterThreeJS ocean port — see
+> `../decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md`. This prompt remains
+> historical record; the vendored stock/pool views it protected stay untouched.
+
 ## 1. Header
 
 Checkpoint 04B (second half of master-ladder checkpoint 4): the jeantimex water leaves the pool and owns the authored region — rectangular walls/floor become the coastline walls + seabed heightfield via the sanctioned container swap; the interactive sim becomes a 512² player-following window under one global calm surface; the four-shot fidelity comparison against the stock demo is run and reported. This is the single most protected step of the project: **everything not in the sanctioned edit family stays byte-identical.**

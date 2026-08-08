@@ -1,5 +1,13 @@
 # CHECKPOINT 05B — Ambient Ocean Surface Motion and Terrain-Boundary Interaction
 
+> **SUPERSEDED (2026-08-08).** Implemented at `fab3098`; its visual review was
+> mooted when the user rejected the region water's direction and authorized the
+> Checkpoint 05C ocean replacement
+> (`../decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md`). The jeantimex
+> ambient/boundary system this prompt specifies is retired; its core requirement
+> — the surface never reads frozen from below — carries forward as a 05C
+> acceptance item, satisfied by the ported Gerstner ocean.
+
 ## 1. Header
 
 Checkpoint 05B (inserted by the post-CP05 addendum §3, §5): keep the one approved jeantimex-derived water system and its overall appearance, while ensuring the ocean surface **never appears perfectly motionless from underwater** — slight continuous swell/ripple distortion even with the dolphin stationary — and that ambient wave motion **interacts visibly with static shorelines, cliffs, islands, rocks, and protruding terrain** as persistent low-level boundary ripples. Governing decision: `docs/bodyarcade-stage3/decisions/POST_CP05_TERRAIN_WATERLINE_CHECKPOINT_AMENDMENTS.md` (read in full).

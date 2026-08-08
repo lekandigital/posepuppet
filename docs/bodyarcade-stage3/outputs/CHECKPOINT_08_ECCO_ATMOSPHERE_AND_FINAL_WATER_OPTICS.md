@@ -1,5 +1,17 @@
 # CHECKPOINT 08 — Ecco Atmosphere and Final Water Optics (Pass A)
 
+> **RE-SCOPED (2026-08-08)** by `../decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md`
+> §7. Checkpoint 05C owns the water look wholesale; CP08 becomes **Atmosphere
+> Zones and Final Tuning**: per-zone underwater extinction/fog-density/palette
+> dials through the ported ocean's uniforms and post volumetrics (zone data from
+> `biome.png`/`world.json`), the final substrate palette pass, dark-zone
+> groundwork for cp09, particle budgets, and one recorded table of final values.
+> Void below: the four-shot re-run, "jeantimex mechanisms only", the FogExp2
+> mechanism prescription, "no post stack", R11, and the reflection/transmission
+> ownership (05C's). Track D zone tables remain starting-value references
+> re-expressed through the new uniforms; the Ecco frames remain a composition
+> reference; placeholder law unchanged.
+
 ## 1. Header
 
 Checkpoint 08 (amended by the post-CP05 addendum §8): the **finishing and art-direction pass** — underwater atmosphere per the Track D spec applied through jeantimex mechanisms, plus the **final water-optics tuning** (reflection/transmission balance, cross-surface visibility, split-level behavior). It operates **over the CP05A substrate-classification foundation** — it maps existing substrate classes into the final palette; it does not invent terrain categories, and it owns the final optical tuning that CP06 implemented structurally. Governing decision: `docs/bodyarcade-stage3/decisions/POST_CP05_TERRAIN_WATERLINE_CHECKPOINT_AMENDMENTS.md` (read in full).

@@ -1,7 +1,7 @@
 # BodyArcade Shared-World — Asset Credits
 
-_Last updated: 2026-07-18 (Checkpoint 01). This file is mirrored by the
-in-app credits panel (`/shared-world/?view=credits`)._
+_Last updated: 2026-08-08 (Checkpoint 05C docs pass). This file is mirrored
+by the in-app credits panel (`/shared-world/?view=credits`)._
 
 ## 3D Models
 
@@ -28,7 +28,20 @@ in-app credits panel (`/shared-world/?view=credits`)._
   Yong Su." Vendored pristine at
   `apps/shared-world/vendor/threejs-water/` (provenance + integrity
   manifest in its `VENDOR.md`). Pool tile texture from zooboing on
-  Flickr (per upstream README/help panel).
+  Flickr (per upstream README/help panel). Used by the `?view=stock` and
+  `?view=pool` views; the region view's water is the WaterThreeJS port
+  below as of Checkpoint 05C.
+- **Region ocean** — WaterThreeJS by mohamedachrefelouafi — **MIT**
+  (© 2026, license text preserved). Fully procedural Three.js ocean
+  (Gerstner surface, analytic atmosphere sky, underwater volumetrics,
+  HDR post chain); no upstream asset files (everything is shader code).
+  Pinned read-only reference snapshot with per-file SHA-256 manifest at
+  `docs/bodyarcade-stage3/references/waterthreejs/`
+  (`BODYARCADE_SOURCE_RECORD.md`). Ported into app-owned code at
+  `apps/shared-world/src/ocean/` with the upstream MIT text shipped
+  alongside (`WATERTHREEJS_LICENSE.txt`). Modifications: TypeScript
+  annotations, region-terrain integration, a time-of-day cycle, and a
+  night light-dimmer (recorded in the ocean-replacement addendum).
 
 ## Textures
 

@@ -1,5 +1,11 @@
 # CHECKPOINT 09 — Caves and Overhangs
 
+> **Amended (2026-08-08)** by `../decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md`
+> §8: "water" below means the **05C WaterThreeJS ocean**; dark-zone atmosphere
+> acts through the re-scoped CP08 zone system over the ported pipeline; suite
+> references to four-shot/06-continuity captures become the `region-ocean`
+> suite plus the re-run CP06 captures.
+
 ## 1. Header
 
 Checkpoint 09 (amended by the post-CP05 addendum §9): true cave, arch, ceiling, and overhang geometry — **separate volumetric/modular meshes, because a heightfield cannot fold over itself** — seamed into the revised 05A terrain, with Rapier collision and dark-zone atmosphere. Every seam is revalidated against the 05A heightfield. Governing decision: `docs/bodyarcade-stage3/decisions/POST_CP05_TERRAIN_WATERLINE_CHECKPOINT_AMENDMENTS.md` (read in full).
@@ -49,7 +55,7 @@ Expected: swim the bay-to-bay shortcut through the headland cave — a true inte
 4. X/Z preservation of cave mouths; only Y/seam-local changes vs the approved transforms (diff report).
 5. Dark-zone values match the approved zone table; shafts only at real apertures.
 6. Placeholder census: cave/arch placeholders replaced, all others unchanged.
-7. Suite green (four-shot, containment, replay, 06 continuity captures); `simHz > 100`; sustained median `fps ≥ 58` including cave interiors.
+7. Suite green (`region-ocean` suite, containment, replay, re-run 06 continuity captures); `simHz > 100`; sustained median `fps ≥ 58` including cave interiors.
 
 ## 9. Manual review procedure
 
@@ -71,7 +77,7 @@ Every seam stamp with its determinism proof; any transform that needed more than
 
 - Caves are hand-authored geometry in the Ecco tradition — never procedural substitutes; modules require prior user approval and recorded licenses.
 - The 05A heightfield outside seam bands is immutable; approved routes and mouth locations preserved.
-- Water, atmosphere (outside the new dark zones), breach, and placeholders untouched; local-only; tests never weakened.
+- The 05C ocean, atmosphere (outside the new dark zones), breach, and placeholders untouched; local-only; tests never weakened.
 
 ## 14. Stop
 

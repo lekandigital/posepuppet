@@ -1,5 +1,14 @@
 # CHECKPOINT 05A — Terrain Relief and Substrate Color Rework
 
+> **Amended (2026-08-08)** by `../decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md`:
+> the approved terrain relief and the substrate **classification** stand, but the
+> underwater palette law changes at Checkpoint 05C — the dark "Earth underwater"
+> palette, the `Z_COL_DEEP` navy depth ramp, and the shader display-gamma encode
+> are removed; underwater albedo becomes a sandy-dune blend of the classification
+> (ocean addendum §2.4), tinted only by physical water optics. The
+> `RegionWallColor` shared water-path architecture referenced below is deleted
+> with the jeantimex region water.
+
 ## 1. Header
 
 Checkpoint 05A (inserted after the approved CP05 by the post-CP05 addendum §3–§4): transform the approved-but-too-smooth Twin Bay heightfield into a sharper, rougher, more geological landscape via a **deterministic offline rebake** adapting ZyFou/ProceduralTerrains relief techniques, while preserving the approved world layout, baked-data architecture, height authority, runtime LOD system, water integration, and collision/query behavior — and replace the provisional two-tint terrain treatment with one shared deterministic **substrate classification and color system** for exposed land and underwater terrain. Governing decision: `docs/bodyarcade-stage3/decisions/POST_CP05_TERRAIN_WATERLINE_CHECKPOINT_AMENDMENTS.md` (read in full; it wins over the master and this prompt wherever they conflict).

@@ -16,6 +16,16 @@ This document governs the checkpoint prompt sequence `CHECKPOINT_00 … CHECKPOI
 >
 > The one-checkpoint-per-session rule and every explicit user approval gate are unchanged. Neither this notice nor the addendum authorizes starting CP05A, CP06, or any other checkpoint.
 
+> **Post-CP05B amendment (2026-08-08) — ocean replacement; newest governing context.** After Checkpoint 05B was implemented (`fab3098`), the user rejected the region water's visual direction and recorded
+> `docs/bodyarcade-stage3/decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md` (the "ocean-replacement addendum"). Where it conflicts with this master, the post-CP05 addendum, or any older checkpoint prompt, **it wins**, and it is required reading before CP05C and every later checkpoint. Its effects:
+>
+> 1. The entire jeantimex-derived **region** water (surface, sim, caustics, optics) is replaced at the new **Checkpoint 05C — Ocean Replacement (WaterThreeJS Port)** by a faithful port of the pinned WaterThreeJS procedural ocean (`docs/bodyarcade-stage3/references/waterthreejs/`). §4 of this master is superseded for the region view; the vendored pristine tree, `?view=stock`, and `?view=pool` remain byte-identical and untouched.
+> 2. For the region view the user lifts the §6.8 bans on a modern ocean, sun disc, bloom, god rays, HDR post/tone mapping, SSR, and day/night — a continuous time-of-day cycle is now a governed feature. R11 / open item 9 (sky) is resolved by the procedural atmosphere. The §2.1 "one time of day" line is superseded.
+> 3. Underwater color law: terrain and objects keep their own albedo, tinted only by physical water optics; the CP05A substrate classification survives with its underwater palette re-based on a sandy-dune blend (ocean-replacement addendum §2.4).
+> 4. The side-branch CP06/CP07 implementations are superseded; CP06/07/08 are re-scoped per the ocean-replacement addendum §§5–7; the four-shot fidelity test and fallback ladder are retired.
+>
+> Nothing in this notice authorizes any checkpoint beyond 05C.
+
 **Source-label key** (carried from the reports, never flattened):
 - **[MEASURED]** — measured directly (repository fact, local-file audit, or primary-source verification).
 - **[DOC]** — documented in a governing document or authoritative external source.
@@ -92,7 +102,7 @@ Spot-checks confirming Track A's conclusions still hold: root `package.json` pin
 - Region: **2 km × 2 km**, origin at region center; X,Z ∈ [−1000, +1000]. Max depth **−80 m**; tallest peak **+200 m**.
 - Heightmap texel (i,j) → world: `x = −1000 + i·(2000/2048)`, `z = −1000 + j·(2000/2048)`; value → `y = −80 + h16/65535·280` [Track B Table 10].
 - Dolphin cruise **5 m/s**, burst **9 m/s** [GOVERNED §7.2] → 5–10 min traversal across the region.
-- One time of day (bright tropical sun); no day/night; no weather [GOVERNED].
+- ~~One time of day (bright tropical sun); no day/night; no weather [GOVERNED].~~ **Superseded 2026-08-08** (ocean-replacement addendum §2.3/§2.6): the region runs a continuous deterministic time-of-day cycle (~11 min period). Weather remains out of scope beyond the ported ocean's own cloud layer.
 
 ### 2.2 Single source of truth [Track B "Q14" data flow; law from master context §6.1]
 
@@ -163,6 +173,8 @@ No `DISPLAY` env anywhere; headed Chromium on native macOS; `USE_SWIFTSHADER`/`P
 ---
 
 ## 4. The water plan [Track B, entire WATER section; fidelity hierarchy master context §3.3]
+
+> **SUPERSEDED for the region view (2026-08-08)** by the ocean-replacement addendum: the region water is the CP05C WaterThreeJS port; the fidelity hierarchy (§4.1), sanctioned edit family (§4.2), windowed sim (§4.3), four-shot test (§4.4), and fallback ladder (§4.5) below are retired for `?view=region`. They remain historical record and still describe the untouched `?view=stock` / `?view=pool` vendored views.
 
 ### 4.1 Fidelity hierarchy (binding at every water checkpoint)
 
@@ -280,6 +292,8 @@ Marine snow 30–80 motes in a 12 m camera bubble, 1–3 cm, drift 1–3 cm/s, o
 Corridors (2–4 landmark masses, lit gap center) alternate with open plains (0–2 silhouettes in fog). Arch openings 4–8 m wide; spires 6–16 m tall [BVM ±50 %]. Landmarks placed just inside the fog boundary; navigation by value contrast (bright apertures), never markers. A distinctive formation roughly every 30–60 s of normal exploration, no rigid quota.
 
 ### 6.8 Banned failure modes (fail review regardless of other qualities) [Track D §18]
+
+> **Amended 2026-08-08** (ocean-replacement addendum §2.3): for the region view the user lifts the bans on a modern ocean look, sun disc, bloom, open-water god rays, SSR, HDR post/tone mapping, and day/night — these are now the governed region water direction. The remaining bans (retro-hardware emulation, lifted cave darkness, presenting estimates as measurements, etc.) stand.
 
 Neutral-grey fog; retro-hardware emulation (forced low poly, flat-shaded identity, affine wobble, dither/CRT filters, 4:3); generic modern ocean; modern lighting tells (pin-point speculars, gloss/metalness, hard shadows, SSR, AO-as-look, bloom, lens flare, sun discs, open-water god rays, exposure adaptation); lifted cave darkness; uniform fill; day/night or weather; touching jeantimex beyond the sanctioned edits; presenting estimates as native measurements.
 
@@ -434,10 +448,11 @@ Base sequence = master context §13.2 (0–14). Adjustments, each with its resea
 | 04B | Pool → region water (container swap §4.2; windowed sim §4.3; four-shot §4.4) | Demo review |
 | 05 | Terrain across the waterline (chunked LOD; islands; masking above+below; BVH camera collision; slide/anti-wedge) — **completed**; approved as the technical terrain foundation, explicitly **not** the final terrain geology or material appearance [addendum §2.2] | Demo review (approved) |
 | **05A** | Terrain relief and substrate color rework (deterministic ZyFou-adapted ridged/domain-warped rebake preserving the approved Twin Bay layout; one shared above/below-water substrate classification and color system expanding `RegionWallColor`) [addendum §4] | Demo review |
-| **05B** | Ambient ocean surface motion and terrain-boundary interaction (continuous restrained swell + animated underside refraction at idle; persistent low-level shoreline/terrain-contact ripples; jeantimex system and approved water character preserved) [addendum §5] | Demo review |
-| 06 | **Breach, re-entry, and cross-waterline continuity** (Track E §15 chain; splash injection; continuous geometry and camera-side-dependent visibility across the waterline; split-level rendering; the 13-frame Ecco acceptance set) [addendum §6] | Demo review |
-| 07 | Placeholder world (every §8.3 category per approved layout + Track D densities; X/Z preserved, Y/normals resampled from the 05A heightfield; terrain color never reduces the placeholder requirement) [addendum §7] | Demo review |
-| 08 | **Ecco atmosphere and final water optics** (§6 applied through jeantimex mechanisms over the 05A substrate classes; final reflection/transmission balance and split-level tuning against the Ecco set; four-shot re-run) [addendum §8] | Demo review |
+| **05B** | Ambient ocean surface motion and terrain-boundary interaction (continuous restrained swell + animated underside refraction at idle; persistent low-level shoreline/terrain-contact ripples; jeantimex system and approved water character preserved) [addendum §5] — implemented at `fab3098`; visual gate mooted by the ocean replacement [ocean addendum §3] | Demo review |
+| **05C** | **Ocean replacement (WaterThreeJS port)** — region water/sky/optics/post replaced wholesale by the ported procedural ocean; sandy-blend seafloor albedo; time-of-day cycle; terrain relit linear-HDR; suite replaced [ocean addendum §4] | Demo review |
+| 06 | **Breach, re-entry, and cross-waterline continuity** — re-scoped: cross-waterline optics arrive with the 05C ocean; remaining scope is the breach chain, camera states, splash/foam via the contact-foam mechanism, and validation [ocean addendum §5; addendum §6 for the behavior law] | Demo review |
+| 07 | Placeholder world (every §8.3 category per approved layout + Track D densities; X/Z preserved, Y/normals resampled; terrain color never reduces the placeholder requirement) — re-run on this line over the 05C pipeline [addendum §7; ocean addendum §6] | Demo review |
+| 08 | **Atmosphere zones and final tuning** — re-scoped: per-zone underwater extinction/palette dials through the 05C ocean/post mechanisms; final substrate palette pass; four-shot and "jeantimex mechanisms only" retired [ocean addendum §7] | Demo review |
 | 09 | Caves and overhangs (Kenney kit + Blender; Rapier heightfield+trimesh; BVH queries; dark-zone atmosphere; shafts; every seam revalidated against the 05A heightfield) [addendum §9] | Demo review |
 | 10 | Vegetation and later asset passes (user-supplied or explicitly approved assets/workflows only; SeedThree only for categories it actually produces; replaces placeholders category by category) [addendum §10] | Demo review |
 | 11 | Fish and ambient life motion (schooling/drift on placeholders or supplied models; Track D budgets) | Demo review |
@@ -447,7 +462,7 @@ Base sequence = master context §13.2 (0–14). Adjustments, each with its resea
 | 14B | Walking view over the region | Demo review |
 | 14C | Flight view over the region | Demo review |
 
-Revised-order provenance: 05A/05B insertion, the 06 and 08 renames, and the 07/09/10 amendments come from the post-CP05 addendum (§3 there), the newest user decision. Rows 11–14C are unchanged in identity; the addendum §10.3 asset gate (no invented substitutes, no terrain-color substitution, placeholders until explicit approval, category-by-category replacement) binds every asset pass from 10 onward. Authoritative prompt files live in this directory (`CHECKPOINT_05A_TERRAIN_RELIEF_AND_SUBSTRATE_COLOR.md`, `CHECKPOINT_05B_AMBIENT_OCEAN_SURFACE_MOTION_AND_BOUNDARY_INTERACTION.md`, `CHECKPOINT_06_BREACH_REENTRY_AND_CROSS_WATERLINE_CONTINUITY.md`, and so on — see `CHECKPOINT_INDEX.md`). CP06 requires explicit prior approval of both 05A and 05B. Nothing in this table authorizes starting any checkpoint.
+Revised-order provenance: 05A/05B insertion, the 06 and 08 renames, and the 07/09/10 amendments come from the post-CP05 addendum (§3 there); the 05C insertion, the 06/07/08 re-scopes, and the retirement of the four-shot/fallback-ladder machinery come from the ocean-replacement addendum (`decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md`), the newest user decision. The side-branch CP06/CP07 implementations (`bodyarcade-shared-world-cp06-cp07`) are superseded and not in this line's history. Rows 11–14C are unchanged in identity; the addendum §10.3 asset gate (no invented substitutes, no terrain-color substitution, placeholders until explicit approval, category-by-category replacement) binds every asset pass from 10 onward. Authoritative prompt files live in this directory (`CHECKPOINT_05A_TERRAIN_RELIEF_AND_SUBSTRATE_COLOR.md`, `CHECKPOINT_05B_AMBIENT_OCEAN_SURFACE_MOTION_AND_BOUNDARY_INTERACTION.md`, `CHECKPOINT_06_BREACH_REENTRY_AND_CROSS_WATERLINE_CONTINUITY.md`, and so on — see `CHECKPOINT_INDEX.md`). CP06 requires explicit prior approval of both 05A and 05B. Nothing in this table authorizes starting any checkpoint.
 
 Definition of done for the slice [GOVERNED §13.3]: full region loop in ~5–10 min; breach at ≥3 sightline spots seeing islands/terrain; ≥1 cave and ≥1 arch passed through; placeholders present for every category; four-shot fidelity passes; 60 fps sustained per §10.
 
@@ -498,7 +513,7 @@ Carry every dolphin-suite assertion: boot (drop the OSM-attribution check; asser
 6. Native movement captures (Track E §24, P1 items first) — replace impulse/drag/camera-constant estimates.
 7. GAMICO 8-vs-"25+" clip re-download check / creator contact (Track C Item 2).
 8. Dolphin metallic-roughness flank-sheen + normal-map lit-sphere check — cp01 review item (repair path from ZIP originals documented in Track C Item 4).
-9. Track D above-water sky values — deferred, approval-pending (R11).
+9. ~~Track D above-water sky values — deferred, approval-pending (R11).~~ **Resolved 2026-08-08**: the region sky is the WaterThreeJS procedural atmosphere (ocean-replacement addendum §2.3).
 10. Track E comparison candidates at reviews: speeds 10/17.5, GLIDE_TAU ≈ 2.9 s, PITCH_RATE 100°/s, KICK_IMPULSE 2.25 (§7.2/§7.4).
 11. 180° quick turn (R10) and body-brake remap (R9) — pending user-assigned bindings/decision.
 12. Pitch-inversion default: shipped W-dives semantics kept; toggle is a user decision [Track E §27].
