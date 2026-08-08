@@ -1,9 +1,15 @@
 // substrateCpu — CP05A-correction CPU twin of the shared ZyFou-Blank
-// substrate color (RegionSubstrate.glsl). Mirrors the CLASSIFICATION
-// (substrateAlbedo: climate → biome weights → computeTerrainAlbedo →
-// palette post → display encode); the close-range detail layer is excluded
-// by design (it fades with camera distance; the probe comparisons run
-// against the pre-detail albedo-debug render).
+// substrate color (src/terrain/shaders.ts SUBSTRATE chunk). Mirrors the
+// CLASSIFICATION (substrateAlbedo: climate → biome weights →
+// computeTerrainAlbedo → palette post); the close-range detail layer is
+// excluded by design (it fades with camera distance; the probe comparisons
+// run against the pre-detail albedo-debug render).
+//
+// CP05C revision (ocean-replacement addendum §2.4): LINEAR albedo (the
+// ZyFou display encode is removed — the post composite is the one encode);
+// ONE palette across the waterline (the Fantasy roles everywhere; the Earth
+// underwater arm, the Z_COL_DEEP navy ramp, and the waterline palette split
+// are deleted); sandy WaterThreeJS dune blend on the seafloor.
 //
 // Parity contract: the lattice hash is fp32-exact on both sides (mod-289
 // permutation polynomial; Math.fround emulates the GPU's single fp32
@@ -24,27 +30,6 @@ const Z_SEED_OFFSET: [number, number] = [-646.3245668411255, -634.9020133018494]
 const Z_FREQ = 0.002197265625;
 const Z_HEIGHT_SCALE = 560;
 const Z_SEA = 160;
-/** waterline-split palette/laws selection (mirror zSelectSubstratePalette):
- *  landness 0 → the approved pre-recolor 6274982 values exactly;
- *  landness 1 → Fantasy + frost/tundra confinement */
-function selectSubstrate(landness: number): { P: PaletteRoles; L: SubstrateLaws } {
-  const t = landness;
-  const P = {} as PaletteRoles;
-  for (const k of Object.keys(COL_E) as (keyof PaletteRoles)[]) {
-    P[k] = mixV(COL_E[k], COL_F[k], t);
-  }
-  return {
-    P,
-    L: {
-      snowLine: mixN(0.7, 0.82, t),
-      frostMinH01: mixN(0.0, 0.86, t),
-      frostStrength: mixN(1.0, 0.85, t),
-      seaFrost: 1 - t,
-      tundraLo: mixN(-1.0, 0.55, t),
-      tundraHi: mixN(-0.5, 0.75, t),
-    },
-  };
-}
 const Z_ROCK_SLOPE_LO = 0.42;
 const Z_ROCK_SLOPE_HI = 0.72;
 const Z_SNOW_SLOPE_MIN = 0.30;
@@ -57,33 +42,9 @@ const Z_PAL_SATURATION = 1.0;
 const Z_PAL_CONTRAST = 1.0;
 const Z_PAL_TINT: V3 = [1, 1, 1];
 
-/* WATERLINE-SPLIT PALETTE (underwater-restoration correction — mirror
- * RegionSubstrate.glsl zSelectSubstratePalette):
- *   submerged (h ≤ 0) → the approved pre-recolor EARTH_PALETTE terrain
- *     roles + the original 6274982 snow/tundra laws, bit-exact;
- *   exposed (h ≥ 0.4 m) → the Fantasy 'Cartoon Terrain' roles + the
- *     approved frost/tundra confinement;
- *   0..0.4 m → wet-band parameter blend.
- * `deep` is a single Earth value (the approved deep-seafloor ramp target);
- * Cartoon deep/shallow/foam water roles remain excluded. */
-const COL_DEEP: V3 = [0.012, 0.075, 0.14];
-/** submerged (approved pre-recolor) terrain roles — EARTH_PALETTE */
-const COL_E = {
-  sand: [0.56, 0.47, 0.3] as V3,
-  dune: [0.62, 0.49, 0.29] as V3,
-  dryGrass: [0.38, 0.33, 0.15] as V3,
-  grass: [0.13, 0.26, 0.085] as V3,
-  forest: [0.052, 0.14, 0.055] as V3,
-  jungle: [0.035, 0.125, 0.045] as V3,
-  swamp: [0.09, 0.13, 0.07] as V3,
-  tundra: [0.3, 0.29, 0.24] as V3,
-  redRock: [0.42, 0.235, 0.14] as V3,
-  redRock2: [0.56, 0.37, 0.21] as V3,
-  rock: [0.26, 0.235, 0.215] as V3,
-  rockHi: [0.38, 0.365, 0.355] as V3,
-  snow: [0.87, 0.89, 0.93] as V3,
-};
-/** exposed (Fantasy 'Cartoon Terrain') terrain roles */
+/* CP05C: ONE palette across the waterline — the Fantasy 'Cartoon Terrain'
+ * roles + frost/tundra confinement everywhere (mirror the SUBSTRATE chunk).
+ * The Earth palette arm and COL_DEEP are deleted with the navy ramp. */
 const COL_F = {
   sand: [1.0, 0.86, 0.32] as V3,
   dune: [1.0, 0.68, 0.24] as V3,
@@ -99,16 +60,18 @@ const COL_F = {
   rockHi: [0.64, 0.62, 0.7] as V3,
   snow: [0.98, 0.98, 0.92] as V3,
 };
-type PaletteRoles = typeof COL_E;
-interface SubstrateLaws {
-  snowLine: number;
-  frostMinH01: number;
-  frostStrength: number;
-  seaFrost: number;
-  tundraLo: number;
-  tundraHi: number;
-}
-const Z_LAND_BLEND_M = 0.4;
+/** CP05C fixed laws (Fantasy frost/tundra confinement, everywhere) */
+const LAWS = {
+  snowLine: 0.82,
+  frostMinH01: 0.86,
+  frostStrength: 0.85,
+  seaFrost: 0,
+  tundraLo: 0.55,
+  tundraHi: 0.75,
+} as const;
+/** CP05C sandy seafloor (WaterThreeJS Floor.js sand values) */
+const DUNE_SAND: V3 = [0.66, 0.58, 0.44];
+const DUNE_SAND2: V3 = [0.46, 0.41, 0.31];
 
 const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
 const mixN = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -266,7 +229,7 @@ export function seabedNormalCpu(data: WorldData, x: number, z: number): V3 {
 }
 
 export interface SubstrateSample {
-  /** display-encoded classification albedo (matches uAlbedoDebug render) */
+  /** LINEAR classification albedo (matches the uAlbedoDebug render, CP05C) */
   albedo: V3;
   /** dominant coloration family (diagnostic; from the ZyFou blend weights) */
   family: string;
@@ -289,9 +252,9 @@ export function substrateSampleCpu(data: WorldData, x: number, z: number): Subst
   const hRel = hZ - Z_SEA;
   const h01 = hZ / Z_HEIGHT_SCALE;
 
-  // waterline split (mirror the GLSL): submerged = the approved 6274982
-  // parameterization exactly; exposed = Fantasy; 0..0.4 m wet-band blend
-  const { P, L } = selectSubstrate(sstep(0, Z_LAND_BLEND_M, h));
+  // CP05C: one palette + one set of laws everywhere
+  const P = COL_F;
+  const L = LAWS;
 
   const px = x * Z_FREQ + Z_SEED_OFFSET[0];
   const py = z * Z_FREQ + Z_SEED_OFFSET[1];
@@ -301,6 +264,8 @@ export function substrateSampleCpu(data: WorldData, x: number, z: number): Subst
     (vnoiseQ(x * 0.045 + Z_SEED_OFFSET[0], z * 0.045 + Z_SEED_OFFSET[1], 0) - 0.5) * 0.6;
   const detail = vnoiseQ(x * 0.35 + Z_SEED_OFFSET[1], z * 0.35 + Z_SEED_OFFSET[0], 0);
   const microN = vnoiseQ(x * 0.9, z * 0.9, 0);
+  // CP05C sandy-seafloor mottle (mirror zColorInputs duneM)
+  const duneM = vnoiseQ(x * 0.06 + Z_SEED_OFFSET[0], z * 0.06 + Z_SEED_OFFSET[1], 0);
 
   // ---- computeTerrainAlbedo (terrainColor.glsl.js), verbatim structure ----
   const tempEff = clamp(cl.temp - h01 * 0.55, 0, 1);
@@ -347,14 +312,17 @@ export function substrateSampleCpu(data: WorldData, x: number, z: number): Subst
   snow *= L.frostStrength;
   albedo = mixV(albedo, P.snow, snow);
 
-  let floorW = 0;
+  let sandW = 0;
   if (hRel < 0) {
-    // floor ramp on REAL meters (adaptation A2b — mirrors the GLSL
-    // hRelFloor parameter; keeps mid-depth substrate readable)
-    const depth01 = clamp(-h / 55, 0, 1);
-    const floorCol = mixV(mulV(mixV(P.sand, P.swamp, bw.wetland * 0.7), 0.65), COL_DEEP, depth01);
-    albedo = mixV(albedo, floorCol, 0.92);
-    floorW = 0.92;
+    // CP05C sandy seafloor (ocean-replacement addendum §2.4): WaterThreeJS
+    // dune sand blends over the classification with depth; steep rock and
+    // wetland silt retain more class identity; NO depth darkening.
+    const dune = mulV(
+      mixV(DUNE_SAND2, DUNE_SAND, sstep(0.30, 0.75, duneM)),
+      0.90 + 0.20 * microN,
+    );
+    sandW = sstep(0, 8, -h) * 0.85 * (1 - rockBlend * 0.6) * (1 - bw.wetland * 0.45);
+    albedo = mixV(albedo, dune, sandW);
   }
 
   let micro = mixN(0.20, 0.06, Math.max(bw.desert * (1 - rockBlend), bw.wetland * 0.8));
@@ -362,20 +330,16 @@ export function substrateSampleCpu(data: WorldData, x: number, z: number): Subst
   const microMul = (1 - micro * 0.5) + micro * microN;
   albedo = mulV(albedo, microMul);
 
-  const post = zApplyPalettePost(albedo);
-  const encoded: V3 = [
-    Math.pow(Math.max(post[0], 0), 1 / 2.2),
-    Math.pow(Math.max(post[1], 0), 1 / 2.2),
-    Math.pow(Math.max(post[2], 0), 1 / 2.2),
-  ];
+  // CP05C: LINEAR albedo — no display encode (the post composite encodes)
+  const encoded = zApplyPalettePost(albedo);
 
   // dominant-family diagnostic (from the same blend weights; substrate/
   // ground-coloration labels only)
   let family: string;
   if (hRel < 0) {
-    const depth01 = clamp(-h / 55, 0, 1);
-    family = depth01 > 0.6 ? 'deep-floor' : depth01 > 0.25 ? 'mid-floor' : 'shallow-floor';
-    if (rockBlend > 0.5 && floorW < 1) family = depth01 > 0.6 ? 'deep-floor' : 'rocky-floor';
+    family = sandW > 0.5 ? 'sandy-floor' : 'shallow-floor';
+    if (rockBlend > 0.5) family = 'rocky-floor';
+    else if (bw.wetland > 0.5) family = 'silt-floor';
   } else if (snow > 0.5) {
     family = 'snow';
   } else if (rockBlend > 0.5) {

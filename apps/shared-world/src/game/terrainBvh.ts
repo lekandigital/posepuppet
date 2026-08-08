@@ -14,7 +14,7 @@
 import * as THREE from 'three';
 import { MeshBVH } from 'three-mesh-bvh';
 import type { WorldData } from '../world/WorldData';
-import { TILES, CELLS_PER_TILE } from '../water/RegionTerrainPass';
+import { TILES, CELLS_PER_TILE } from '../terrain/RegionTerrainPass';
 
 /** LRU capacity [DERIVED memory bound, reported]: must exceed the working
  *  set (prefetch ring up to 4×4 = 16 tiles + camera/LOS tiles behind the

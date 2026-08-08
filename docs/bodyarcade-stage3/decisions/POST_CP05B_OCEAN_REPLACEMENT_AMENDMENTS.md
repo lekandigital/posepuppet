@@ -196,7 +196,12 @@ role); it is the template for the terrain caustics/lighting edits.
   surface and particles, skipped while submerged) → main HDR pass → volumetric
   clouds → post composite (underwater volumetrics + bloom + ACES + sRGB).
   Half-float render targets with depth textures. Renderer stays
-  `NoToneMapping`; the composite is the single encode.
+  `NoToneMapping`; the composite is the single encode. Two recorded perf
+  adaptations (master §10 allows resolution scaling; march math verbatim):
+  the underwater god-ray march runs at half resolution and is upsampled into
+  the full-res absorption pass (measured: the full-res march alone cost
+  ~half the frame over the region terrain), and the live pixel ratio clamps
+  at 1.5 instead of the demo's 2.
 - The region terrain renders in both passes; shore foam falls out of the
   demo's depth-buffer water-column term with no terrain-side work.
 - The demo's endless sandy `Floor` sits below the region's minimum baked
@@ -234,11 +239,15 @@ Phase ∈ [0,1) advanced by frame dt × speed multiplier; period 660 s; day
 occupies ~82 % of the cycle (night ≈ 2 min); elevation dawn 0° → noon ≈ 62° →
 sunset 0° → night dip ≈ −12°; azimuth rotates continuously 360° per cycle.
 Per frame the cycle writes the demo's `sunParams` and calls `applySun`.
-**Sanctioned non-verbatim addition:** `applySun` gains a night dimmer scaling
-the two scene lights by `smoothstep(−8°, +8°, elevation)` (the analytic
-atmosphere clamps at elevation 0 and would otherwise leave night reading as
-dusk). Debug GUI (`?debug=1` only): cycle speed/pause/phase scrub, the demo's
-six sun presets and parameter folders, body drop buttons.
+**Sanctioned non-verbatim addition:** `applySun` gains a night dimmer driven
+by `smoothstep(−8°, +8°, elevation)` that scales the two scene lights AND the
+post composite's exposure (floor 0.15× — the scotopic knob of the
+single-tone-map pipeline). The analytic atmosphere clamps at elevation 0 and
+has no night model, so without the exposure arm the sky would stay
+dusk-bright all night (measured during 05C implementation). Debug GUI
+(`?debug=1` only): cycle speed/pause/phase scrub, the demo's six sun presets
+and parameter folders, body drop buttons; the GUI's exposure slider edits the
+pre-dimmer base value.
 
 ### 4.7 Determinism
 

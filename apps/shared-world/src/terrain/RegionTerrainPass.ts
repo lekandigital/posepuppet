@@ -1,36 +1,27 @@
 // RegionTerrainPass — Checkpoint 05 chunked-LOD terrain renderer (Master
-// §5.4, Track B Q16), replacing the cp04A/04B graybox grid in the water
-// pipeline. The water pipeline consumes this pass exactly as it consumed
-// the graybox (sceneMeshes → scene draw; prepare(water) binds the sim
-// texture): only the terrain geometry/material changed.
+// §5.4, Track B Q16), CP05C revision: the pass is decoupled from the
+// retired jeantimex water (no caustics RT, no sim-texture binding, no
+// WaterOpticsState sun) and relit for the WaterThreeJS linear-HDR pipeline.
+// The material shares the ocean's wave-shape uniform objects BY REFERENCE
+// (the demo Island.js pattern) so submerged lighting/caustics track the
+// real Gerstner surface, and takes the dynamic sun via setSun().
 //
-//  - 16×16 tiles: each tile spans 128 heightmap cells = 125 m (the 2049²
-//    grid over 2000 m — the checkpoint's nominal "128 m" tile is the
-//    128-cell tile; the ~0.977 m texel makes it 125 m physical. Reported.)
+// Geometry is unchanged from CP05:
+//  - 16×16 tiles: each tile spans 128 heightmap cells = 125 m.
 //  - 4 static LOD levels, grid steps 1/2/4/8; selection by camera distance
 //    to the tile AABB: 0–256 m → LOD 0, 256–512 → 1, 512–1024 → 2,
-//    > 1024 → 3 [cp05 §6 thresholds, DERIVED, flagged].
-//  - Skirt rings: border vertices duplicated and dropped 2 m [DERIVED] so
-//    LOD seams (T-junctions) never open cracks; skirt quads are emitted
-//    with both windings so they read from either side.
-//  - Per-tile frustum culling: manual Frustum×AABB test per tile (shared
-//    LOD geometries make three's per-geometry bounds unusable per tile).
-//  - Silhouette protection: tiles whose texel range contains a land/water
-//    transition (shore.png) or that are crossed by a world.json ridgeLine
-//    are pinned to LOD 0 regardless of distance (Master §5.4).
+//    > 1024 → 3.
+//  - Skirt rings: border vertices duplicated and dropped 2 m so LOD seams
+//    never open cracks; skirt quads carry both windings.
+//  - Per-tile frustum culling; coastline/ridge tiles pinned to LOD 0.
 //
 // Geometry heights live in uHeightTex, sampled in the chunk vertex shader —
-// the same decoded field WorldData/collision/water read (§2.2 law). The
-// four shared LOD geometries carry only tile-local xz + a skirt flag, so
-// swapping a tile's LOD is a geometry-pointer swap (no rebuilds, no
-// per-tile buffers).
+// the same decoded field WorldData/collision read (§2.2 law).
 
 import * as THREE from 'three';
 import type { WorldData } from '../world/WorldData';
-import type { RegionWater } from './RegionWater';
 import { regionUniforms, type RegionContext } from './regionContext';
-import regionTerrainChunkVert from './shaders/RegionTerrainChunk.vert';
-import regionTerrainFrag from './shaders/RegionTerrain.frag';
+import { TERRAIN_VERT, TERRAIN_FRAG } from './shaders';
 
 export const TILES = 16;
 /** heightmap cells per tile side (2048 / 16) */
@@ -39,8 +30,7 @@ export const CELLS_PER_TILE = 128;
 export const LOD_STEPS = [1, 2, 4, 8] as const;
 /** camera-distance upper bounds for LODs 0/1/2 (m); beyond → LOD 3 */
 export const LOD_DISTANCES_M = [256, 512, 1024] as const;
-/** skirt drop below the surface, m [cp05 §6 DERIVED] — must match the
- *  SKIRT_DROP constant in RegionTerrainChunk.vert */
+/** skirt drop below the surface, m — must match SKIRT_DROP in TERRAIN_VERT */
 export const SKIRT_DROP_M = 2;
 
 export interface TileInfo {
@@ -85,18 +75,32 @@ export class RegionTerrainPass {
 
   constructor(
     data: WorldData,
-    lightDirection: THREE.Vector3,
-    causticTexture: THREE.Texture,
     ctx: RegionContext,
+    /** the ocean's wave-shape uniforms, shared by reference (Island pattern):
+     *  uTime, uWindDir, uWaveCount, uBaseFreq, uAmplitude, uDirSpread,
+     *  uFreqMul, uAmpMul, uSpeed, uSurfaceY */
+    oceanUniforms: Record<string, THREE.IUniform>,
+    sunDir: THREE.Vector3,
   ) {
     const t0 = performance.now();
     this.material = new THREE.ShaderMaterial({
-      vertexShader: regionTerrainChunkVert,
-      fragmentShader: regionTerrainFrag,
+      vertexShader: TERRAIN_VERT,
+      fragmentShader: TERRAIN_FRAG,
+      toneMapped: false, // linear HDR — the post composite is the one encode
       uniforms: {
-        light: { value: lightDirection.clone() },
-        causticTex: { value: causticTexture },
-        water: { value: null },
+        uSunDir: { value: sunDir.clone() },
+        uCausticColor: { value: new THREE.Color(1.0, 0.98, 0.85) },
+        // shared, by reference — auto-synced with the ocean's wave settings
+        uTime: oceanUniforms.uTime!,
+        uWindDir: oceanUniforms.uWindDir!,
+        uWaveCount: oceanUniforms.uWaveCount!,
+        uBaseFreq: oceanUniforms.uBaseFreq!,
+        uAmplitude: oceanUniforms.uAmplitude!,
+        uDirSpread: oceanUniforms.uDirSpread!,
+        uFreqMul: oceanUniforms.uFreqMul!,
+        uAmpMul: oceanUniforms.uAmpMul!,
+        uSpeed: oceanUniforms.uSpeed!,
+        uSurfaceY: oceanUniforms.uSurfaceY!,
         ...regionUniforms(ctx),
       },
       // FrontSide for the surface; skirt quads carry both windings so a
@@ -155,7 +159,8 @@ export class RegionTerrainPass {
     this.buildMs = performance.now() - t0;
   }
 
-  /** Per-frame LOD selection + frustum culling (call before rendering). */
+  /** Per-frame LOD selection + frustum culling (call once per frame,
+   *  before either render pass). */
   update(camera: THREE.Camera): void {
     camera.updateMatrixWorld();
     this.frustumMatrix.multiplyMatrices(
@@ -199,9 +204,8 @@ export class RegionTerrainPass {
     this.stats.drawnTriangles = drawnTris;
   }
 
-  prepare(water: RegionWater) {
-    this.material.uniforms.water.value = water.textureA.texture;
-    this.material.uniformsNeedUpdate = true;
+  setSun(sunDir: THREE.Vector3) {
+    this.material.uniforms.uSunDir!.value.copy(sunDir);
   }
 
   setVisible(v: boolean) {
@@ -214,8 +218,7 @@ export class RegionTerrainPass {
     this.material.uniformsNeedUpdate = true;
   }
 
-  /** cp05A structural audit: the compiled fragment source (include-marker
-   *  checks — the substrate include must be shared with the water path). */
+  /** structural audit: the compiled fragment source (include-marker checks) */
   fragmentSource(): string {
     return this.material.fragmentShader;
   }

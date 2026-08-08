@@ -1,19 +1,15 @@
-// RegionContext — the GPU-side face of the baked region (Checkpoint 04B):
-// the decoded heightfield uploaded ONCE as a float DataTexture (cp04B §5:
-// "height.r16 → a DataTexture uploaded once"), the shore mask as uShoreMask,
-// and the shared uniform values every region material binds (the required
-// §4.2 additive uniform family: uSeaLevel, uHeightTex, uRegionSize,
-// uWindowOrigin, uShoreMask — plus the documented window/scale helpers).
+// RegionContext (Checkpoint 05C revision) — the GPU-side face of the baked
+// region: the decoded heightfield uploaded ONCE as a float DataTexture, the
+// shore mask, the CP05A substrate inputs (SDF / biome / climate LUT), and
+// the shared uniform family every terrain material binds.
 //
-// The window-origin Vector2 is shared BY REFERENCE with RegionWater, so a
-// single scroll update propagates to every material without per-material
-// bookkeeping.
+// The jeantimex-era water members (window origin/size, sim displacement
+// scale, the CP05B ambient vector) are deleted with the region water — the
+// ocean is the WaterThreeJS port and needs none of them.
 
 import * as THREE from 'three';
 import type { WorldData } from '../world/WorldData';
 import { bakeClimateLut } from '../world/substrateCpu';
-import { AMBIENT } from './ambientCpu';
-import { SIM_UNIT_M, WINDOW_SIZE_M } from './RegionWater';
 
 /** climate LUT side (7.8 m/texel — the finest climate octave is ~143 m) */
 const CLIMATE_LUT_N = 256;
@@ -30,13 +26,6 @@ export interface RegionContext {
   climateBTex: THREE.DataTexture;
   /** LUT bake wall-clock, ms (performance report) */
   climateBakeMs: number;
-  /** CP05B ambient-motion uniform value, shared BY REFERENCE with every
-   *  region material: x = clock s (wrapped AMBIENT.WRAP_S), y = amplitude
-   *  scale (production 1; 0 = pre-CP05B), z = boundary scale, w =
-   *  underwater slope multiplier. regionGame owns the clock. */
-  ambient: THREE.Vector4;
-  /** shared with RegionWater.windowOrigin (min corner, meters) */
-  windowOrigin: THREE.Vector2;
   regionSize: number;
   heightN: number;
   /** true when the height texture filters linearly (float-linear ext) */
@@ -46,7 +35,6 @@ export interface RegionContext {
 export function buildRegionContext(
   renderer: THREE.WebGLRenderer,
   data: WorldData,
-  windowOrigin: THREE.Vector2,
 ): RegionContext {
   const n = data.header.artifacts['height.r16']!.resolution!;
   const floatLinear =
@@ -78,8 +66,7 @@ export function buildRegionContext(
   shoreTex.unpackAlignment = 1;
   shoreTex.needsUpdate = true;
 
-  // cp05A: shore_sdf.r16 → float texture (meters, + = water) — the substrate
-  // classification's shoreline-band input (same half-texel law as height)
+  // cp05A: shore_sdf.r16 → float texture (meters, + = water)
   const shoreSdfTex = new THREE.DataTexture(
     data.sdf, n, n, THREE.RedFormat, THREE.FloatType,
   );
@@ -133,10 +120,6 @@ export function buildRegionContext(
     climateATex,
     climateBTex,
     climateBakeMs,
-    ambient: new THREE.Vector4(
-      0, AMBIENT.AMP_SCALE, AMBIENT.BOUNDARY_SCALE, AMBIENT.UNDER_MUL,
-    ),
-    windowOrigin,
     regionSize: data.header.sizeMeters[0],
     heightN: n,
     floatLinear,
@@ -144,7 +127,7 @@ export function buildRegionContext(
 }
 
 /** The shared region uniform family (fresh descriptor object per material;
- *  texture/vector VALUES shared so one update reaches every material). */
+ *  texture VALUES shared so one update reaches every material). */
 export function regionUniforms(ctx: RegionContext): Record<string, THREE.IUniform> {
   return {
     uHeightTex: { value: ctx.heightTex },
@@ -152,12 +135,7 @@ export function regionUniforms(ctx: RegionContext): Record<string, THREE.IUnifor
     uSeaLevel: { value: 0.0 },
     uRegionSize: { value: ctx.regionSize },
     uHeightN: { value: ctx.heightN },
-    uWindowOrigin: { value: ctx.windowOrigin },
-    uWindowSize: { value: WINDOW_SIZE_M },
-    uDispScale: { value: SIM_UNIT_M },
-    // cp05B ambient-motion input (consumed by RegionAmbient.glsl)
-    uAmbient: { value: ctx.ambient },
-    // cp05A substrate inputs (consumed by materials including RegionSubstrate.glsl)
+    // cp05A substrate inputs (consumed by the SUBSTRATE chunk)
     uShoreSdf: { value: ctx.shoreSdfTex },
     uBiomeTex: { value: ctx.biomeTex },
     uClimateA: { value: ctx.climateATex },

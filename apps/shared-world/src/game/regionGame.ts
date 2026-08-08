@@ -1,23 +1,44 @@
-// Checkpoint 04B — the region game shell (`?view=region`): the approved
-// Twin Bay baked region becomes the water container. Recreates the pool
-// shell's orchestration (fixed-timestep accumulator, kick-on-first-substep,
-// eval handle, fps/simHz counters — the dolphin pattern, Master §3.2)
-// around the app-owned region water pipeline:
+// Checkpoint 05C — the region game shell (`?view=region`): the approved
+// Twin Bay baked region under the ported WaterThreeJS ocean (ocean-
+// replacement addendum §4). Recreates the pool shell's orchestration
+// (fixed-timestep accumulator, kick-on-first-substep, eval handle, fps/
+// simHz counters — the dolphin pattern, Master §3.2) around the demo's
+// linear-HDR pass pipeline:
 //
-//   RegionWater  — vendored sim shaders on the 512² player-following window
-//   RegionRenderer — caustics / terrain / surface passes (container swap)
+//   refraction pass  — everything except the ocean surface + particles,
+//                      into a half-float RT with depth (what makes the
+//                      dolphin visible THROUGH the surface, absorbed)
+//   main pass        — full scene into the HDR RT
+//   clouds           — half-res volumetric raymarch, temporally resolved
+//   post             — underwater volumetrics + bloom + ACES/sRGB composite
 //
-// The dolphin, sim, swim controls and cp02 camera rig are the approved
-// cp01/cp02 systems on RegionSampler (cp04A), unmodified. Water interaction
-// stays the sanctioned displacement-input path: the 3-sphere spine
-// compound emitter (cp01 §6.2) through RegionWater.moveSphereWorld, breach
-// splashes through addDropWorld — physical radii/amplitudes carry the
-// approved pool calibration ×K (see the conversion notes below).
+// The dolphin, sim, swim controls, cp02 camera rig, cp05 terrain LOD/BVH,
+// and the baked world artifacts are the approved systems, unmodified except
+// where the addendum records it: the camera rig gains a surface-relative
+// waterline, and the terrain material is relit for linear HDR. The dolphin
+// couples to the water through the ocean's contact-foam body slots (wake
+// while surface-swimming; splash impulses on air↔water transitions) —
+// replacing the jeantimex sim injections wholesale.
 
 import * as THREE from 'three';
-import { loadSceneAssets } from '../../vendor/threejs-water/src/app/LoadSceneAssets';
-import { RegionWater, WINDOW_SIZE_M, WINDOW_TEXEL_M, SIM_UNIT_M } from '../water/RegionWater';
-import { RegionRenderer } from '../water/RegionRenderer';
+import { Sky } from '../ocean/Sky';
+import { Ocean, OCEAN_CONFIG, MAX_FOAM_BODIES } from '../ocean/Ocean';
+import { Floor } from '../ocean/Floor';
+import { Particles } from '../ocean/Particles';
+import { Post } from '../ocean/Post';
+import { Clouds } from '../ocean/Clouds';
+import { FloatingBodies } from '../ocean/FloatingBodies';
+import { applyPreset, PRESETS, type SunParams } from '../ocean/presets';
+import { createTimeOfDay, TOD, sunAnglesAt } from '../ocean/timeOfDay';
+import { buildRegionContext } from '../terrain/regionContext';
+import {
+  RegionTerrainPass,
+  TILES,
+  CELLS_PER_TILE,
+  LOD_STEPS,
+  LOD_DISTANCES_M,
+  SKIRT_DROP_M,
+} from '../terrain/RegionTerrainPass';
 import { WorldData } from '../world/WorldData';
 import { RegionSampler } from '../world/RegionSampler';
 import { SwimSim, SIM, NEUTRAL_INTENT, type AssistMode, type SwimIntent } from './sim';
@@ -25,58 +46,21 @@ import type { WorldSampler } from './worldSampler';
 import { CameraRig, RIG, type CameraEvalState } from './cameraRig';
 import { RegionCameraCollision } from './regionCameraCollision';
 import { TerrainBvh } from './terrainBvh';
-import {
-  TILES,
-  CELLS_PER_TILE,
-  LOD_STEPS,
-  LOD_DISTANCES_M,
-  SKIRT_DROP_M,
-} from '../water/RegionTerrainPass';
 import { loadDolphin } from './dolphinActor';
-import { AMBIENT, ambientSurfCpu } from '../water/ambientCpu';
 import { substrateSampleCpu } from '../world/substrateCpu';
 import { createSwimControls } from '../input/swimControls';
 import { CREDITS_ATTRIBUTION } from '../credits';
-import { K, type EvalState } from './game';
+import type { EvalState } from './game';
 
-/** Region far plane (Master §7.5 [DERIVED]: region diagonal 2.83 km). */
-const REGION_FAR = 2500;
+/** Region far plane — the demo's own (sky dome r 6000, ocean plane 6000). */
+const REGION_FAR = 8000;
 
-/** cp01 §6.2 compound emitter: 3 spheres along the spine (unchanged). */
-const SPINE_OFFSETS_M = [1.0, 0, -1.0];
-/**
- * Region emitter radius [DERIVED texel-scale adaptation, reported]: the
- * pool's 0.45 m spheres span 7.7 sim texels at the pool's 5.9 cm texel but
- * are SUB-texel at the window's 0.5 m/texel — the vendored super-Gaussian
- * add/subtract then cancels on the grid and the wake vanishes (measured
- * ≤ 1.6 mm at burst). 3.0 m puts the profile's steep skirt (≈ 0.3·r) at
- * ≈ 1.8 texels so the injection is grid-resolved and free of texel-scale
- * checkerboard energy; the injection MATH is untouched.
- */
-const SPHERE_RADIUS_M = 3.0;
-/**
- * Emitter gain [DERIVED, tuned against the measured window response and
- * reported]: at the resolved radius the vendored column-volume injection
- * over-drives the 0.5 m grid (3.7 m crest measured at r 1.8/gain 1).
- *
- * cp05B retune 0.025 → 0.09 (sanctioned: checkpoint prompt §3.4 "stronger
- * local dolphin wake … the existing compound-sphere injection retuned as
- * needed"): with the always-present ambient swell (bound 0.07 m), ordinary
- * near-surface swimming must stay CLEARLY the stronger local disturbance.
- * Measured on the authoritative acceptance tier (built-in display,
- * ~120 Hz — the tier every water approval was made on): cruise crest
- * 0.028 m at the old gain (below the ambient bound) → ≈ 0.10 m at 0.09;
- * burst ≈ 0.33 m. The vendored sim is frame-driven, so the 60 Hz
- * secondary display runs fewer, larger injections and slower decay —
- * wake amplitudes there read stronger (inherited stock-demo property,
- * recorded in the cp05B report; final breach-family balance is cp06).
- */
-const EMITTER_GAIN = 0.09;
-
-/** cp01 breach-splash drops (game.ts): radius/strength in pool demo units
- *  0.08/0.05 and 0.1/0.06 → physical meters ×K (the same splash). */
-const DROP_EXIT = { radiusM: 0.08 * 2 * K, amplitudeM: 0.05 * K };
-const DROP_ENTRY = { radiusM: 0.1 * 2 * K, amplitudeM: 0.06 * K };
+/** dolphin contact-foam descriptor (slot 0 of the ocean's uBodies field):
+ *  radius ≈ half the 2.89 m body, ×1.15 like the demo's bodies feed */
+const DOLPHIN_FOAM_RADIUS_M = 1.5;
+/** splash impulse spiked on air↔water transitions (demo b.splash pattern) */
+const SPLASH_IMPULSE = 1.5;
+const SPLASH_DECAY_PER_S = 3;
 
 interface ShotMode {
   pos: [number, number, number];
@@ -86,16 +70,14 @@ interface ShotMode {
 }
 
 export interface StageMs {
-  sim: number;
-  caustics: number;
-  prepare: number;
-  render: number;
+  refraction: number;
+  main: number;
+  clouds: number;
+  post: number;
   frame: number;
 }
 
-export interface RegionEvalState extends EvalState {
-  windowOrigin: [number, number];
-}
+export type RegionEvalState = EvalState;
 
 export async function startRegionGame(
   root: HTMLElement,
@@ -106,30 +88,126 @@ export async function startRegionGame(
   const data = await WorldData.load(`${import.meta.env.BASE_URL}world/`);
   const spawn = data.header.spawn;
 
-  // --- renderer: the vendored demo's own settings (fidelity parity) ---
-  const webglRenderer = new THREE.WebGLRenderer({ antialias: true });
-  webglRenderer.setPixelRatio(window.devicePixelRatio);
-  webglRenderer.setClearColor(0x000000);
+  // --- renderer: the WaterThreeJS demo's own settings (linear HDR — the
+  // one tone-map + sRGB encode lives in the post composite) ---
+  const webglRenderer = new THREE.WebGLRenderer({
+    antialias: true,
+    powerPreference: 'high-performance',
+    stencil: false,
+  });
+  // Perf adaptation (recorded): the demo clamps dpr ≤ 2, but this pipeline
+  // renders the scene twice (refraction + main) plus terrain/post/clouds.
+  // A live retina window at dpr 2 is 4× the master §10 budget target of
+  // ≈1728×1080 render pixels; dpr ≤ 1.5 keeps some retina sharpening while
+  // protecting the 58 fps floor (the master explicitly allows resolution
+  // scaling; the Playwright tiers emulate dpr 1 and are unaffected).
+  webglRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  webglRenderer.toneMapping = THREE.NoToneMapping;
+  webglRenderer.autoClear = true;
   root.appendChild(webglRenderer.domElement);
 
-  const { cubemap } = await loadSceneAssets();
-  const water = new RegionWater(webglRenderer, spawn.x, spawn.z);
-  const regionRenderer = new RegionRenderer(webglRenderer, cubemap, data, water.windowOrigin);
+  // --- sun / time of day (demo main.js transplant + the cycle) ---
+  const sunParams: SunParams = { elevation: 22, azimuth: 108 };
+  const sunDir = new THREE.Vector3();
+  function updateSunDir() {
+    const el = THREE.MathUtils.degToRad(sunParams.elevation);
+    const az = THREE.MathUtils.degToRad(sunParams.azimuth);
+    const h = Math.cos(el);
+    sunDir.set(Math.cos(az) * h, Math.sin(el), Math.sin(az) * h).normalize();
+  }
+  updateSunDir();
 
+  // --- scene graph ---
   const scene = new THREE.Scene();
-  // above-water background = the vendored sky the reflections sample (the
-  // ONE sky, R11); underwater fog stays the demo's own shader look (cp04B
-  // §4: no atmosphere pass)
-  scene.background = cubemap;
-  for (const m of regionRenderer.sceneMeshes()) scene.add(m);
+  scene.background = null; // the Sky dome (renderOrder -1000) is the background
 
-  // lights for the dolphin only (vendored ShaderMaterials ignore scene
-  // lights); direction matches the demo's light — the pool-view discipline
-  const lightDir = regionRenderer.lightDir.clone().normalize();
-  const sun = new THREE.DirectionalLight(0xffffff, 2.2);
-  sun.position.copy(lightDir.clone().multiplyScalar(50));
-  const hemi = new THREE.HemisphereLight(0xbfe8ff, 0x1a3a4a, 0.9);
-  scene.add(sun, hemi);
+  const sky = new Sky(sunDir);
+  scene.add(sky.mesh);
+
+  const ocean = new Ocean(sunDir, new THREE.Vector2(innerWidth, innerHeight));
+  scene.add(ocean.mesh);
+
+  // Endless sandy seabed below the region's deepest baked point — the demo
+  // Floor plays its usual role beyond the 2000 m region edge and is depth-
+  // occluded by the terrain inside it.
+  let minBakedH = Infinity;
+  for (let i = 0; i < data.heights.length; i++) {
+    const h = data.heights[i]!;
+    if (h < minBakedH) minBakedH = h;
+  }
+  const FLOOR_DEPTH = Math.max(30, Math.ceil(-minBakedH) + 5);
+  const floor = new Floor(sunDir, FLOOR_DEPTH);
+  scene.add(floor.mesh);
+
+  const ctx = buildRegionContext(webglRenderer, data);
+  const terrain = new RegionTerrainPass(data, ctx, ocean.uniforms, sunDir);
+  scene.add(terrain.group);
+
+  const particles = new Particles(5000, 160);
+  scene.add(particles.points);
+
+  // lights: the demo's pair — only the dolphin + dropped bodies
+  // (MeshStandardMaterial) use them; every ShaderMaterial ignores them
+  const sunLight = new THREE.DirectionalLight(0xfff2e0, 3.0);
+  scene.add(sunLight, sunLight.target);
+  const skyLight = new THREE.HemisphereLight(0xbfe4ff, 0x24424e, 1.1);
+  scene.add(skyLight);
+
+  const bodies = new FloatingBodies(scene);
+  const terrainAt = (x: number, z: number) => data.terrainHeight(x, z);
+
+  // --- render targets (demo makeSceneRT) ---
+  function makeSceneRT(w: number, h: number) {
+    const rt = new THREE.WebGLRenderTarget(w, h, {
+      type: THREE.HalfFloatType,
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      depthBuffer: true,
+    });
+    rt.depthTexture = new THREE.DepthTexture(w, h);
+    rt.depthTexture.type = THREE.UnsignedIntType;
+    return rt;
+  }
+  let refractionRT = makeSceneRT(innerWidth, innerHeight);
+  let hdrRT = makeSceneRT(innerWidth, innerHeight);
+  ocean.uniforms.uRefractionTex.value = refractionRT.texture;
+  ocean.uniforms.uDepthTex.value = refractionRT.depthTexture;
+
+  const post = new Post(webglRenderer, innerWidth, innerHeight, sunDir, OCEAN_CONFIG.deepColor);
+  const clouds = new Clouds(webglRenderer, innerWidth, innerHeight, { scale: 0.5 });
+  const cloudShadowP = { strength: 0.5 };
+  const cu = clouds.uniforms;
+  function setCloudsEnabled(on: boolean) {
+    clouds.enabled = on;
+    const cover = on ? 0.25 : 1.0;
+    sky.uniforms.uCloudCover.value = cover;
+    ocean.uniforms.uCloudCover.value = cover;
+    if (!on) ocean.uniforms.uCloudShadow.value = 0;
+  }
+
+  // --- sun propagation (demo applySun + terrain + the sanctioned night
+  // dimmer — the demo atmosphere clamps at elevation 0 and has no night
+  // model, so without dimming, night would read as dusk. The dimmer scales
+  // the two scene lights AND the post exposure (the single scotopic knob in
+  // a single-tone-map pipeline); ocean addendum §4.6) ---
+  const postExposure = { base: 1.05 }; // presets/GUI set this, never uExposure
+  function applySun() {
+    updateSunDir();
+    sky.setSun(sunDir);
+    ocean.setSun(sunDir);
+    floor.setSun(sunDir);
+    terrain.setSun(sunDir);
+    post.underwaterMat.uniforms.uSunDir.value.copy(sunDir);
+    clouds.setSun(sunDir);
+    sunLight.position.copy(sunDir).multiplyScalar(300);
+    sunLight.target.position.set(0, 0, 0);
+    const night = THREE.MathUtils.smoothstep(sunParams.elevation, -8, 8);
+    sunLight.intensity = (0.6 + 3.0 * Math.max(sunDir.y, 0.0)) * Math.max(night, 0.2);
+    skyLight.intensity = 1.1 * (0.18 + 0.82 * night);
+    post.compositeMat.uniforms.uExposure.value = postExposure.base * (0.15 + 0.85 * night);
+  }
+
+  const timeOfDay = createTimeOfDay(sunParams, applySun);
 
   // --- the dolphin: loaded, SwimForward running, THEN first render ---
   const dolphin = await loadDolphin(`${import.meta.env.BASE_URL}models/dolphin/dolphin.glb`);
@@ -148,34 +226,40 @@ export async function startRegionGame(
   sim.state.wvx = Math.sin(spawn.yaw) * sim.state.speed;
   sim.state.wvz = Math.cos(spawn.yaw) * sim.state.speed;
   const controls = createSwimControls();
-  // cp05: BVH camera collision (presentation-only — the sim never touches
-  // it); spawn neighborhood prebuilt so the first frames pay no build cost
   const bvh = new TerrainBvh(data);
   for (let k = 0; k < 9; k++) bvh.prefetch(spawn.x, spawn.z);
   const camCollision = new RegionCameraCollision(data, bvh, RIG.COLLISION_RADIUS);
+
+  // --- deterministic ocean clock (test-controllable; never wall clock) ---
+  let oceanTimeS = 0;
+  let oceanFrozen = false;
+
   const cam = new CameraRig(innerWidth / innerHeight, camCollision, REGION_FAR, {
     terrainCompression: true,
+    // cp05C: the visual waterline is the Gerstner surface (CPU mirror)
+    waterlineAt: (x, z) => ocean.heightAt(x, z, oceanTimeS),
   });
+  ocean.uniforms.uNear.value = cam.camera.near;
+  ocean.uniforms.uFar.value = cam.camera.far;
 
   const resize = () => {
-    webglRenderer.setSize(innerWidth, innerHeight);
-    cam.camera.aspect = innerWidth / innerHeight;
+    const w = innerWidth;
+    const h = innerHeight;
+    webglRenderer.setSize(w, h);
+    cam.camera.aspect = w / h;
     cam.camera.updateProjectionMatrix();
+    refractionRT.dispose();
+    hdrRT.dispose();
+    refractionRT = makeSceneRT(w, h);
+    hdrRT = makeSceneRT(w, h);
+    ocean.uniforms.uRefractionTex.value = refractionRT.texture;
+    ocean.uniforms.uDepthTex.value = refractionRT.depthTexture;
+    ocean.setResolution(w, h);
+    post.setSize(w, h);
+    clouds.setSize(w, h);
   };
   addEventListener('resize', resize);
   resize();
-
-  // ambient starting ripples: the demo's seedWater pattern in the window
-  water.seedAmbient();
-
-  // --- cp05B ambient-motion clock (deterministic; test-controllable) ---
-  // The analytic ambient field (RegionAmbient.glsl / ambientCpu.ts) is a
-  // pure function of world position and THIS clock; regionGame advances it
-  // with the render frame delta and wraps it at AMBIENT.WRAP_S (every
-  // field frequency is an integer multiple of 2π/WRAP_S — seamless wrap).
-  const ambient = regionRenderer.ctx.ambient;
-  let ambientTimeS = 0;
-  let ambientFrozen = false;
 
   // assist keys (dolphin parity) + R recenter (cp02)
   addEventListener('keydown', (e) => {
@@ -188,16 +272,16 @@ export async function startRegionGame(
   const qa = qs.get('assist');
   if (qa === 'full' || qa === 'standard' || qa === 'expert') sim.assist = qa;
 
-  // --- per-stage instrumentation (cp04B §6.4): EXT_disjoint_timer_query
-  // where available, else CPU-side stage timing ---
+  // --- per-stage instrumentation: EXT_disjoint_timer_query where
+  // available, else CPU-side stage timing ---
   const gl = webglRenderer.getContext() as WebGL2RenderingContext;
   const timerExt = gl.getExtension('EXT_disjoint_timer_query_webgl2') as {
     TIME_ELAPSED_EXT: number;
     GPU_DISJOINT_EXT: number;
   } | null;
   const gpuTimer = timerExt ? new GpuStageTimer(gl, timerExt) : null;
-  const stageAvg: StageMs = { sim: 0, caustics: 0, prepare: 0, render: 0, frame: 0 };
-  const stageAcc: StageMs = { sim: 0, caustics: 0, prepare: 0, render: 0, frame: 0 };
+  const stageAvg: StageMs = { refraction: 0, main: 0, clouds: 0, post: 0, frame: 0 };
+  const stageAcc: StageMs = { refraction: 0, main: 0, clouds: 0, post: 0, frame: 0 };
   let stageN = 0;
 
   // --- eval / test surface (__SHARED_WORLD, the pool shape + region) ---
@@ -207,7 +291,15 @@ export async function startRegionGame(
   let splashes = 0;
   let firstFrame: { actionRunning: boolean; base: string } | null = null;
   let shot: ShotMode | null = null;
-  const stageEnabled = { sim: true, caustics: true, surface: true, terrain: true };
+  let flatBackground: THREE.Color | null = null;
+  const stageEnabled = {
+    refraction: true,
+    clouds: true,
+    post: true,
+    particles: true,
+    oceanMesh: true,
+    terrain: true,
+  };
 
   // cp02 coverage probe (unchanged from the pool shell)
   const corner = new THREE.Vector3();
@@ -280,9 +372,9 @@ export async function startRegionGame(
     return samples;
   }
 
-  // GPU depth-law probe (cp04B §8.6): sample uHeightTex through the same
-  // uv law the shaders use, on the GPU, and read the heights back.
-  const gpuHeightProbe = makeGpuHeightProbe(webglRenderer, regionRenderer);
+  // GPU depth-law probe: sample uHeightTex through the same uv law the
+  // terrain shaders use, on the GPU, and read the heights back.
+  const gpuHeightProbe = makeGpuHeightProbe(webglRenderer, ctx);
 
   const handle = {
     state: (): RegionEvalState => ({
@@ -301,7 +393,6 @@ export async function startRegionGame(
       splashes,
       modelLengthM: dolphin.measuredLengthM,
       animation: { base: dolphin.activeActionName(), running: dolphin.actionRunning() },
-      windowOrigin: [water.windowOrigin.x, water.windowOrigin.y],
     }),
     transport: () => controls.debug(),
     credits: CREDITS_ATTRIBUTION,
@@ -310,18 +401,34 @@ export async function startRegionGame(
     coverage,
     RIG,
     SIM,
+    // --- cp05C ocean surface (the CPU mirrors are the eval contract) ---
+    ocean: {
+      config: OCEAN_CONFIG,
+      TOD,
+      heightAt: (x: number, z: number, t?: number) =>
+        ocean.heightAt(x, z, t ?? oceanTimeS),
+      surfaceSample: (x: number, z: number, t?: number) =>
+        ocean.surfaceSample(x, z, t ?? oceanTimeS, {} as never),
+      sunAnglesAt,
+      state: () => ({ timeS: oceanTimeS, frozen: oceanFrozen }),
+      /** the LIVE shader clock (diagnostic: must equal state().timeS) */
+      uniformTime: () => ocean.uniforms.uTime.value as number,
+      timeOfDay: () => ({ ...timeOfDay.state(), sunDir: [sunDir.x, sunDir.y, sunDir.z] }),
+      bodies: () =>
+        bodies.bodies.map((b) => ({
+          x: b.mesh.position.x, y: b.mesh.position.y, z: b.mesh.position.z,
+          r: b.r, wet: b.wet ?? 0,
+        })),
+    },
     region: {
       header: data.header,
       decodeMs: data.decodeMs,
       decodedBytes: data.decodedBytes(),
-      windowTexelM: WINDOW_TEXEL_M,
-      windowSizeM: WINDOW_SIZE_M,
-      simUnitM: SIM_UNIT_M,
-      floatLinearHeightTex: regionRenderer.ctx.floatLinear,
+      floatLinearHeightTex: ctx.floatLinear,
+      floorDepthM: FLOOR_DEPTH,
       gpuTimerSource: (timerExt ? 'EXT_disjoint_timer_query_webgl2' : 'cpu') as string,
       stageMs: (): StageMs => ({ ...stageAvg }),
       gpuStageMs: () => (gpuTimer ? gpuTimer.averages() : null),
-      windowOrigin: () => [water.windowOrigin.x, water.windowOrigin.y] as [number, number],
       world: {
         terrainHeight: (x: number, z: number) => data.terrainHeight(x, z),
         inWater: (x: number, z: number) => data.inWater(x, z),
@@ -329,49 +436,21 @@ export async function startRegionGame(
         depthAt: (x: number, z: number) => data.depthAt(x, z),
       },
       gpuHeightProbe: (pts: [number, number][]) => gpuHeightProbe(pts),
-      simTexProbe: () => water.probeSimTexture(),
-      // --- cp05B ambient instrumentation ---
-      ambient: {
-        constants: AMBIENT,
-        state: () => ({
-          timeS: ambientTimeS,
-          ampScale: ambient.y,
-          boundaryScale: ambient.z,
-          underMul: ambient.w,
-          frozen: ambientFrozen,
-        }),
-        /** CPU-twin field probe at world points (optional time override);
-         *  sdf + central-difference gradient come from the same baked
-         *  shore_sdf.r16 the shader samples */
-        probe: (pts: [number, number][], tOverride?: number) =>
-          pts.map(([x, z]) => {
-            const e = AMBIENT.SDF_GRAD_EPS_M;
-            return ambientSurfCpu(
-              x, z,
-              tOverride ?? ambientTimeS,
-              data.shoreDistance(x, z),
-              data.shoreDistance(x + e, z) - data.shoreDistance(x - e, z),
-              data.shoreDistance(x, z + e) - data.shoreDistance(x, z - e),
-              ambient.y,
-              ambient.z,
-            );
-          }),
-      },
       // --- cp05 terrain instrumentation ---
       terrain: {
         constants: {
           tiles: TILES,
           cellsPerTile: CELLS_PER_TILE,
-          tileSizeM: regionRenderer.terrain.tileSizeM,
+          tileSizeM: terrain.tileSizeM,
           lodSteps: [...LOD_STEPS],
           lodDistancesM: [...LOD_DISTANCES_M],
           skirtDropM: SKIRT_DROP_M,
         },
-        buildMs: regionRenderer.terrain.buildMs,
-        stats: () => regionRenderer.terrain.terrainStats(),
-        lodMap: () => regionRenderer.terrain.lodMap(),
+        buildMs: terrain.buildMs,
+        stats: () => terrain.terrainStats(),
+        lodMap: () => terrain.lodMap(),
         tiles: () =>
-          regionRenderer.terrain.tiles.map((t) => ({
+          terrain.tiles.map((t) => ({
             i: t.i,
             j: t.j,
             minH: t.minH,
@@ -386,7 +465,7 @@ export async function startRegionGame(
       },
     },
     test: {
-      /** fixed-camera fidelity-shot mode (cp04B §8.1); null restores */
+      /** fixed-camera fidelity-shot mode; null restores */
       shotMode(optsIn: ShotMode | null) {
         shot = optsIn;
         if (optsIn) {
@@ -407,75 +486,61 @@ export async function startRegionGame(
         sim.state.wvx = Math.sin(yaw) * sp;
         sim.state.wvz = Math.cos(yaw) * sp;
       },
-      /** per-stage visibility toggles for frame-budget attribution */
+      /** per-stage toggles for frame-budget attribution */
       setStageEnabled(patch: Partial<typeof stageEnabled>) {
         Object.assign(stageEnabled, patch);
-        regionRenderer.surface.setVisible(stageEnabled.surface);
-        regionRenderer.terrain.setVisible(stageEnabled.terrain);
+        terrain.setVisible(stageEnabled.terrain);
       },
-      setSurfaceVisible(v: boolean) {
-        stageEnabled.surface = v;
-        regionRenderer.surface.setVisible(v);
+      /** post on/off — off renders the main pass straight to the canvas
+       *  (raw linear values; the flat-background/seam scans use this) */
+      setPostEnabled(v: boolean) {
+        stageEnabled.post = v;
       },
+      /** cp05C ocean clock control — the deterministic fixed-time capture
+       *  mechanism (the setAmbient/frozen-surface heir) */
+      setOcean(patch: { timeS?: number; frozen?: boolean }) {
+        if (patch.timeS !== undefined) oceanTimeS = patch.timeS;
+        if (patch.frozen !== undefined) oceanFrozen = patch.frozen;
+      },
+      /** cp05C time-of-day control (deterministic phase/speed/pause) */
+      setTimeOfDay(patch: { phase?: number; speedMul?: number; frozen?: boolean }) {
+        timeOfDay.set(patch);
+      },
+      /** drop a WaterThreeJS floating body (the underwater-albedo probe) */
+      dropBody(type: 'sphere' | 'cube', x: number, z: number) {
+        bodies.spawn(type, x, z, ocean.heightAt(x, z, oceanTimeS));
+      },
+      clearBodies() { bodies.clear(); },
+      applyOceanPreset(name: string) {
+        const ok = applyPreset(name, { ocean, post, clouds, sunParams, applySun });
+        const P = PRESETS[name];
+        if (ok && P?.exposure !== undefined) {
+          postExposure.base = P.exposure;
+          applySun();
+        }
+        return ok;
+      },
+      presets: Object.keys(PRESETS),
       /** cp05A: render raw classification albedo on the terrain (no
        *  lighting) — the probe surface the CPU twin compares against */
       setAlbedoDebug(v: boolean) {
-        regionRenderer.terrain.setAlbedoDebug(v);
+        terrain.setAlbedoDebug(v);
       },
-      /** cp05A: the classification CPU twin at world points (albedo,
-       *  dominant family, classifier inputs) */
+      /** cp05A: the classification CPU twin at world points */
       substrateProbe(pts: [number, number][]) {
         return pts.map(([x, z]) => substrateSampleCpu(data, x, z));
       },
-      /** cp05A structural audit: every terrain-consuming fragment shader
-       *  must carry the ONE substrate include (addendum §4.7 equivalence
-       *  by construction — direct, refracted and reflected paths) */
+      /** structural audit: the terrain fragment carries the ONE substrate
+       *  entry point and no legacy tint law */
       substrateShaderAudit() {
-        // code-level markers (comments may be stripped by the glsl plugin):
-        // the classification entry point and the deleted cp05 tint law
         const marker = 'substrateAlbedo(';
-        const legacyTint = 'terrainTint(';
-        const water = regionRenderer.surface.fragmentSources();
-        const terrain = regionRenderer.terrain.fragmentSource();
+        const legacyTint = 'waterPathTint(';
+        const terrainSrc = terrain.fragmentSource();
         return {
-          terrainHasSubstrate: terrain.includes(marker),
-          waterAboveHasSubstrate: water.above.includes(marker),
-          waterBelowHasSubstrate: water.below.includes(marker),
-          anyLegacyTintLaw:
-            terrain.includes(legacyTint) ||
-            water.above.includes(legacyTint) ||
-            water.below.includes(legacyTint),
+          terrainHasSubstrate: terrainSrc.includes(marker),
+          anyLegacyTintLaw: terrainSrc.includes(legacyTint),
         };
       },
-      /** re-run the demo's ambient seeding in the current window (the
-       *  four-shot procedure matches the stock demo's post-seed state) */
-      seedAmbient() { water.seedAmbient(); },
-      /**
-       * cp05B ambient-motion control (checkpoint prompt §9): production
-       * values enabled/boundary = true, underMul = AMBIENT.UNDER_MUL;
-       * enabled/boundary = false zero the additive contribution — the
-       * documented pre-CP05B comparison state. timeS/frozen give the
-       * deterministic fixed-time capture mechanism.
-       */
-      setAmbient(patch: {
-        enabled?: boolean;
-        boundary?: boolean;
-        underMul?: number;
-        timeS?: number;
-        frozen?: boolean;
-      }) {
-        if (patch.enabled !== undefined) ambient.y = patch.enabled ? AMBIENT.AMP_SCALE : 0;
-        if (patch.boundary !== undefined) ambient.z = patch.boundary ? AMBIENT.BOUNDARY_SCALE : 0;
-        if (patch.underMul !== undefined) ambient.w = patch.underMul;
-        if (patch.timeS !== undefined) {
-          ambientTimeS = ((patch.timeS % AMBIENT.WRAP_S) + AMBIENT.WRAP_S) % AMBIENT.WRAP_S;
-          ambient.x = ambientTimeS;
-        }
-        if (patch.frozen !== undefined) ambientFrozen = patch.frozen;
-      },
-      /** cp05B: reset the interactive sim window to flat calm so captures
-       *  isolate the analytic ambient field (see RegionWater.clearSim) */
-      clearSim() { water.clearSim(); },
       /** project world points through the live camera → pixel coords */
       projectPoints(pts: [number, number, number][]) {
         const size = new THREE.Vector2();
@@ -497,7 +562,7 @@ export async function startRegionGame(
        * baked terrain; per-step displacement is tracked for the jitter
        * bound, samples every 0.05 s for the slide-retention analysis.
        */
-      contactRun(opts: {
+      contactRun(opts2: {
         x: number;
         z: number;
         y: number;
@@ -508,16 +573,16 @@ export async function startRegionGame(
         assist?: AssistMode;
       }) {
         const local = new SwimSim(sampler);
-        local.assist = opts.assist ?? 'expert';
-        local.state.x = opts.x;
-        local.state.z = opts.z;
-        local.state.y = opts.y;
-        local.state.yaw = opts.yaw;
-        local.state.speed = opts.speed ?? 5;
-        local.state.wvx = Math.sin(opts.yaw) * local.state.speed;
-        local.state.wvz = Math.cos(opts.yaw) * local.state.speed;
-        const intent: SwimIntent = { ...NEUTRAL_INTENT, ...(opts.intent ?? {}) };
-        const seconds = opts.seconds ?? 8;
+        local.assist = opts2.assist ?? 'expert';
+        local.state.x = opts2.x;
+        local.state.z = opts2.z;
+        local.state.y = opts2.y;
+        local.state.yaw = opts2.yaw;
+        local.state.speed = opts2.speed ?? 5;
+        local.state.wvx = Math.sin(opts2.yaw) * local.state.speed;
+        local.state.wvz = Math.cos(opts2.yaw) * local.state.speed;
+        const intent: SwimIntent = { ...NEUTRAL_INTENT, ...(opts2.intent ?? {}) };
+        const seconds = opts2.seconds ?? 8;
         const steps = Math.round(seconds / SIM.DT);
         const every = Math.round(0.05 / SIM.DT);
         let maxStepDispM = 0;
@@ -553,12 +618,9 @@ export async function startRegionGame(
         return { samples, maxStepDispM, firstContactT, dt: SIM.DT };
       },
       /**
-       * cp05 anti-wedge mechanism scenario: the baked region offers no
-       * guaranteed tight concave pocket at dolphin scale yet (caves are
-       * cp09), so the wedge detector/escape runs against a deterministic
-       * analytic V-pocket sampler (45° walls + closed end — two contact
-       * normals 90° apart). The SIM CODE under test is the real SwimSim;
-       * only the terrain is synthetic. Reported as such.
+       * cp05 anti-wedge mechanism scenario: deterministic analytic V-pocket
+       * sampler (45° walls + closed end); the SIM CODE under test is the
+       * real SwimSim; only the terrain is synthetic. Reported as such.
        */
       wedgeMechanismRun() {
         const pocketHeight = (x: number, z: number) =>
@@ -611,13 +673,13 @@ export async function startRegionGame(
         return { samples, wedgeOnsetT, escapeT };
       },
       /**
-       * cp05 crack-scan aid: paint the scene background a flat color so
-       * background pixels are exactly detectable in captures (test-only;
-       * null restores the vendored cubemap — approved visuals untouched
-       * outside the scan).
+       * crack-scan aid: paint a flat background so background pixels are
+       * exactly detectable in captures (hides the sky dome; combine with
+       * setPostEnabled(false) + setStageEnabled({oceanMesh:false}) for raw
+       * scans; null restores).
        */
       setFlatBackground(hex: number | null) {
-        scene.background = hex === null ? cubemap : new THREE.Color(hex);
+        flatBackground = hex === null ? null : new THREE.Color(hex);
       },
       /** deterministic region replay — the cp04A region-preview contract
        *  verbatim (fresh sim at the approved spawn; digest format shared) */
@@ -640,17 +702,44 @@ export async function startRegionGame(
   };
   (window as unknown as { __SHARED_WORLD: typeof handle }).__SHARED_WORLD = handle;
 
-  // --- debug overlay (?debug=1) — cp04B §6.4 ---
+  // --- debug overlay + GUI (?debug=1) ---
   const overlay = opts.debug ? makeDebugOverlay() : null;
+  if (opts.debug) {
+    void import('../ocean/oceanDebugGui').then(({ mountOceanDebugGui }) => {
+      mountOceanDebugGui({
+        ocean, post, clouds, bodies, timeOfDay, sunParams, applySun,
+        cloudShadowP, setCloudsEnabled, postExposure,
+        applyPreset: (name: string) => {
+          const ok = applyPreset(name, { ocean, post, clouds, sunParams, applySun });
+          const P = PRESETS[name];
+          if (ok && P?.exposure !== undefined) {
+            postExposure.base = P.exposure;
+            applySun();
+          }
+          return ok;
+        },
+        dropAt: (type: 'sphere' | 'cube') => {
+          const s = sim.state;
+          bodies.spawn(
+            type,
+            s.x + (Math.random() - 0.5) * 14,
+            s.z + (Math.random() - 0.5) * 14,
+            ocean.heightAt(s.x, s.z, oceanTimeS),
+          );
+        },
+      });
+    });
+  }
 
-  // --- per-frame water-displacement state (world-space spheres; window-
-  // relative conversion happens at injection time so scrolls are safe) ---
-  const prevSpheres: (THREE.Vector3 | null)[] = [null, null, null];
-  const newWorld = new THREE.Vector3();
+  // --- dolphin splash impulse (air↔water transitions → contact foam) ---
   let prevPhase: 'swim' | 'air' = 'swim';
+  let splashImpulse = 0;
   let prevPitch = sim.state.pitch;
 
   if (loading) loading.innerHTML = '';
+
+  applySun();
+  setCloudsEnabled(true); // volumetric clouds on by default (GUI toggle)
 
   // --- loop: fixed-timestep accumulator (dolphin pattern, verbatim) ---
   let last = performance.now();
@@ -660,6 +749,22 @@ export async function startRegionGame(
   let statAt = last;
   let rigUs = 0;
   let rigN = 0;
+  const invProjView = new THREE.Matrix4();
+
+  function setVisible(underwater: boolean, refractionPass: boolean) {
+    if (refractionPass) {
+      // background behind the water: everything except the surface itself
+      ocean.mesh.visible = false;
+      sky.mesh.visible = flatBackground === null;
+      floor.mesh.visible = true;
+      particles.points.visible = false;
+    } else {
+      ocean.mesh.visible = stageEnabled.oceanMesh;
+      sky.mesh.visible = !underwater && flatBackground === null;
+      floor.mesh.visible = true;
+      particles.points.visible = underwater && stageEnabled.particles;
+    }
+  }
 
   function frame(now: number): void {
     requestAnimationFrame(frame);
@@ -686,11 +791,9 @@ export async function startRegionGame(
     const s = sim.state;
     const frameDt = dtMs / 1000;
 
-    // --- cp05B ambient clock (frozen only through the test surface) ---
-    if (!ambientFrozen) {
-      ambientTimeS = (ambientTimeS + frameDt) % AMBIENT.WRAP_S;
-      ambient.x = ambientTimeS;
-    }
+    // --- deterministic clocks (frozen only through the test surface) ---
+    if (!oceanFrozen) oceanTimeS += frameDt;
+    timeOfDay.advance(frameDt);
 
     // --- dolphin transform + animation (presentation only) ---
     dolphin.group.position.set(s.x, s.y, s.z);
@@ -712,50 +815,6 @@ export async function startRegionGame(
       firstFrame = { actionRunning: dolphin.actionRunning(), base: dolphin.activeActionName() };
     }
 
-    // --- windowed sim: follow, inject, step (cp04B §6.2) ---
-    const simT0 = performance.now();
-    gpuTimer?.begin('sim');
-    const windowMoved = water.setWindowCenter(s.x, s.z);
-    if (windowMoved) regionRenderer.surface.updateBorder();
-
-    const speedNorm = Math.min(1, s.speed / SIM.MAX_SPEED);
-    if (s.phase === 'swim' && !shot) {
-      const dirX = Math.sin(s.yaw) * Math.cos(s.pitch);
-      const dirY = -Math.sin(s.pitch);
-      const dirZ = Math.cos(s.yaw) * Math.cos(s.pitch);
-      for (let i = 0; i < SPINE_OFFSETS_M.length; i++) {
-        const off = SPINE_OFFSETS_M[i]!;
-        newWorld.set(s.x + dirX * off, s.y + dirY * off, s.z + dirZ * off);
-        const prev = prevSpheres[i];
-        if (prev) {
-          water.moveSphereWorld(prev, newWorld, SPHERE_RADIUS_M, speedNorm * EMITTER_GAIN);
-          prev.copy(newWorld);
-        } else {
-          prevSpheres[i] = newWorld.clone();
-        }
-      }
-    } else {
-      for (let i = 0; i < prevSpheres.length; i++) prevSpheres[i] = null;
-    }
-    if (!shot) {
-      if (prevPhase === 'swim' && s.phase === 'air') {
-        water.addDropWorld(s.x, s.z, DROP_EXIT.radiusM, DROP_EXIT.amplitudeM);
-      }
-      if (s.splashed || (prevPhase === 'air' && s.phase === 'swim')) {
-        water.addDropWorld(s.x, s.z, DROP_ENTRY.radiusM, DROP_ENTRY.amplitudeM);
-      }
-    }
-    prevPhase = s.phase;
-
-    if (stageEnabled.sim) {
-      // the demo's per-frame cadence: 2 steps + normals (byte-identical)
-      water.stepSimulation();
-      water.stepSimulation();
-      water.updateNormals();
-    }
-    gpuTimer?.end();
-    stageAcc.sim += performance.now() - simT0;
-
     // --- camera ---
     if (shot) {
       cam.camera.position.set(shot.pos[0], shot.pos[1], shot.pos[2]);
@@ -772,24 +831,117 @@ export async function startRegionGame(
     }
     cam.camera.updateMatrixWorld();
 
-    // --- region passes (the vendored draw order) ---
-    const causT0 = performance.now();
-    gpuTimer?.begin('caustics');
-    if (stageEnabled.caustics) regionRenderer.updateCaustics(water);
-    gpuTimer?.end();
-    stageAcc.caustics += performance.now() - causT0;
+    // --- immersion test (exact CPU wave height at the camera column) ---
+    const camP = cam.camera.position;
+    const surfaceH = ocean.heightAt(camP.x, camP.z, oceanTimeS);
+    const underwater = camP.y < surfaceH - 0.15;
 
-    const prepT0 = performance.now();
-    bvh.prefetch(s.x, s.z); // amortized: at most one tile build per frame
-    regionRenderer.renderTerrain(water, cam.camera); // cp05: LOD + culling
-    regionRenderer.renderWater(water, cam.camera);
-    stageAcc.prepare += performance.now() - prepT0;
+    // --- per-frame updates (demo animate() transplant) ---
+    ocean.update(oceanTimeS, cam.camera);
+    floor.update(oceanTimeS, cam.camera);
+    particles.update(oceanTimeS, cam.camera);
+    sky.update(cam.camera, oceanTimeS);
+    bodies.update(frameDt, oceanTimeS, ocean, terrainAt);
+    terrain.update(cam.camera); // LOD + culling, once per frame (both passes)
 
-    const renderT0 = performance.now();
-    gpuTimer?.begin('render');
+    ocean.uniforms.uCameraUnderwater.value = underwater ? 1 : 0;
+    ocean.uniforms.uProjMatrix.value.copy(cam.camera.projectionMatrix);
+    post.underwaterMat.uniforms.uTime.value = oceanTimeS;
+
+    // --- contact-foam feed: slot 0 = the dolphin, then the bodies ---
+    if (prevPhase !== s.phase) {
+      splashImpulse = Math.min(2, splashImpulse + SPLASH_IMPULSE);
+    }
+    if (s.splashed) splashImpulse = Math.min(2, splashImpulse + SPLASH_IMPULSE * 0.6);
+    splashImpulse *= Math.exp(-SPLASH_DECAY_PER_S * frameDt);
+    prevPhase = s.phase;
+
+    const ou = ocean.uniforms;
+    const dolphinWH = ocean.heightAt(s.x, s.z, oceanTimeS);
+    // "wet" ≈ near the surface: full within 0.6 m, fading out by 2.2 m depth
+    const dolphinWet =
+      s.phase === 'swim'
+        ? 1 - THREE.MathUtils.smoothstep(dolphinWH - s.y, 0.6, 2.2)
+        : 0;
+    const dolphinSpeed = Math.hypot(s.wvx, s.wvz);
+    const dolphinStrength =
+      dolphinWet > 0.02
+        ? Math.min(2, (0.3 + dolphinSpeed * 0.22 + splashImpulse) * Math.min(dolphinWet * 3, 1))
+        : Math.min(2, splashImpulse);
+    ou.uBodies.value[0].set(s.x, s.z, DOLPHIN_FOAM_RADIUS_M * 1.15, dolphinStrength);
+    ou.uBodyVel.value[0].set(s.wvx, s.wvz);
+
+    const blist = bodies.bodies;
+    const bn = Math.min(blist.length, MAX_FOAM_BODIES - 1);
+    for (let i = 0; i < bn; i++) {
+      const b = blist[i]!;
+      const spd = Math.hypot(b.vx, b.vz);
+      const wet = b.wet || 0;
+      const strength = wet > 0.02
+        ? Math.min(2, (0.3 + spd * 0.22 + (b.splash || 0)) * Math.min(wet * 3, 1))
+        : Math.min(2, b.splash || 0);
+      ou.uBodies.value[i + 1].set(b.mesh.position.x, b.mesh.position.z, b.r * 1.15, strength);
+      ou.uBodyVel.value[i + 1].set(b.vx, b.vz);
+    }
+    ou.uBodyCount.value = bn + 1;
+
+    // --- sync the sea's cloud shadows with the volumetric layer ---
+    if (clouds.enabled) {
+      ou.uCloudShadow.value = cloudShadowP.strength;
+      ou.uCloudPlaneY.value = cu.uBase!.value + cu.uHeight!.value * 0.5;
+      ou.uCloudScale.value = cu.uNoiseScale!.value;
+      ou.uCloudCoverage.value = cu.uCoverage!.value * (1 - cu.uHeightFalloff!.value * 0.5);
+      ou.uCloudDrift.value.copy(cu.uDrift!.value);
+    }
+
+    webglRenderer.setClearColor(flatBackground ?? OCEAN_CONFIG.deepColor, 1);
+
+    // --- Pass A: refraction background (skip while submerged) ---
+    const refrT0 = performance.now();
+    if (!underwater && stageEnabled.refraction) {
+      gpuTimer?.begin('refraction');
+      setVisible(underwater, true);
+      webglRenderer.setRenderTarget(refractionRT);
+      webglRenderer.render(scene, cam.camera);
+      gpuTimer?.end();
+    }
+    stageAcc.refraction += performance.now() - refrT0;
+
+    // --- Pass B: full scene → HDR (or straight to canvas with post off) ---
+    const mainT0 = performance.now();
+    gpuTimer?.begin('main');
+    setVisible(underwater, false);
+    webglRenderer.setRenderTarget(stageEnabled.post ? hdrRT : null);
     webglRenderer.render(scene, cam.camera);
     gpuTimer?.end();
-    stageAcc.render += performance.now() - renderT0;
+    stageAcc.main += performance.now() - mainT0;
+
+    if (stageEnabled.post) {
+      // --- volumetric clouds: raymarch from the scene depth ---
+      const cloudsT0 = performance.now();
+      if (clouds.enabled && stageEnabled.clouds) {
+        gpuTimer?.begin('clouds');
+        clouds.render(frameDt, cam.camera, hdrRT.depthTexture!);
+        gpuTimer?.end();
+      }
+      stageAcc.clouds += performance.now() - cloudsT0;
+
+      // --- post: underwater volumetrics + clouds + bloom + tone-map ---
+      const postT0 = performance.now();
+      gpuTimer?.begin('post');
+      invProjView.multiplyMatrices(cam.camera.projectionMatrix, cam.camera.matrixWorldInverse).invert();
+      post.render(hdrRT, {
+        invProjView,
+        cameraPos: cam.camera.position,
+        sunDir,
+        time: oceanTimeS,
+        underwater,
+        surfaceY: OCEAN_CONFIG.surfaceY,
+        cloudTexture: clouds.enabled && stageEnabled.clouds ? clouds.texture : null,
+      });
+      gpuTimer?.end();
+      stageAcc.post += performance.now() - postT0;
+    }
     gpuTimer?.poll();
 
     stageAcc.frame += performance.now() - frameT0;
@@ -801,13 +953,13 @@ export async function startRegionGame(
       simHz = (steps * 1000) / (now - statAt);
       if (rigN > 0) cam.updateUsAvg = rigUs / rigN;
       if (stageN > 0) {
-        stageAvg.sim = stageAcc.sim / stageN;
-        stageAvg.caustics = stageAcc.caustics / stageN;
-        stageAvg.prepare = stageAcc.prepare / stageN;
-        stageAvg.render = stageAcc.render / stageN;
+        stageAvg.refraction = stageAcc.refraction / stageN;
+        stageAvg.main = stageAcc.main / stageN;
+        stageAvg.clouds = stageAcc.clouds / stageN;
+        stageAvg.post = stageAcc.post / stageN;
         stageAvg.frame = stageAcc.frame / stageN;
       }
-      stageAcc.sim = stageAcc.caustics = stageAcc.prepare = stageAcc.render = stageAcc.frame = 0;
+      stageAcc.refraction = stageAcc.main = stageAcc.clouds = stageAcc.post = stageAcc.frame = 0;
       stageN = 0;
       frames = 0;
       steps = 0;
@@ -820,11 +972,12 @@ export async function startRegionGame(
       const sd = sim.shoreDistance(s.x, s.z);
       const t = Math.min(Math.max(1 - sd / SIM.SHORE_BAND, 0), 1);
       const gpu = gpuTimer?.averages();
-      const ts = regionRenderer.terrain.terrainStats();
+      const ts = terrain.terrainStats();
       const camEval = cam.evalState(s);
       const contact = sim.contactState();
+      const tod = timeOfDay.state();
       overlay.textContent =
-        `REGION ?debug — cp04B/cp05 instrumentation\n` +
+        `REGION ?debug — cp05C instrumentation\n` +
         `terrain tiles ${ts.drawnTiles}/${ts.totalTiles} ` +
         `(lod ${ts.drawnPerLod.join('/')}) · ${(ts.drawnTriangles / 1000).toFixed(0)}k tris · ` +
         `protected ${ts.protectedTiles}${ts.protectedAlwaysLod0 ? '' : ' ⚠lod>0'}\n` +
@@ -837,12 +990,16 @@ export async function startRegionGame(
         `speed ${s.speed.toFixed(2)} m/s · depth under ${sim.depthAt(s.x, s.z).toFixed(1)} m · y ${s.y.toFixed(1)}\n` +
         `shore dist ${sd.toFixed(1)} m · containment ${(SIM.SHORE_PUSH * t * t).toFixed(2)} m/s² ` +
         `(SHORE_BAND ${SIM.SHORE_BAND} / SHORE_PUSH ${SIM.SHORE_PUSH})\n` +
-        `window origin (${water.windowOrigin.x.toFixed(1)}, ${water.windowOrigin.y.toFixed(1)}) · texel ${WINDOW_TEXEL_M} m\n` +
+        `ocean t ${oceanTimeS.toFixed(1)} s${oceanFrozen ? ' (frozen)' : ''} · ` +
+        `tod phase ${tod.phase.toFixed(3)} el ${tod.elevationDeg.toFixed(1)}° az ${tod.azimuthDeg.toFixed(0)}° ×${tod.speedMul}\n` +
+        `camera ${underwater ? 'BELOW' : 'ABOVE'} · surface ${surfaceH.toFixed(2)} m · ` +
+        `foam bodies ${ou.uBodyCount.value}\n` +
         `fps ${fps.toFixed(0)} · simHz ${simHz.toFixed(0)}\n` +
-        `cpu ms — sim ${stageAvg.sim.toFixed(2)} · caustics ${stageAvg.caustics.toFixed(2)} · ` +
-        `prep ${stageAvg.prepare.toFixed(2)} · render ${stageAvg.render.toFixed(2)} · frame ${stageAvg.frame.toFixed(2)}\n` +
+        `cpu ms — refr ${stageAvg.refraction.toFixed(2)} · main ${stageAvg.main.toFixed(2)} · ` +
+        `clouds ${stageAvg.clouds.toFixed(2)} · post ${stageAvg.post.toFixed(2)} · frame ${stageAvg.frame.toFixed(2)}\n` +
         (gpu
-          ? `gpu ms — sim ${gpu.sim?.toFixed(2) ?? '—'} · caustics ${gpu.caustics?.toFixed(2) ?? '—'} · render ${gpu.render?.toFixed(2) ?? '—'}\n`
+          ? `gpu ms — refr ${gpu.refraction?.toFixed(2) ?? '—'} · main ${gpu.main?.toFixed(2) ?? '—'} · ` +
+            `clouds ${gpu.clouds?.toFixed(2) ?? '—'} · post ${gpu.post?.toFixed(2) ?? '—'}\n`
           : `gpu timers unavailable (${timerExt ? 'ext idle' : 'no EXT_disjoint_timer_query_webgl2'}) — CPU-side stage timing\n`);
     }
   }
@@ -863,10 +1020,13 @@ function makeDebugOverlay(): HTMLElement {
 /**
  * GPU height-texture probe: renders a 32×1 float target where fragment i
  * samples uHeightTex at the i-th world point through the shader uv law —
- * the §8.6 single-source-of-truth check (`depthAt` vs the texture the
- * water/caustics shaders march against).
+ * the single-source-of-truth check (`depthAt` vs the texture the terrain
+ * shaders sample).
  */
-function makeGpuHeightProbe(renderer: THREE.WebGLRenderer, region: RegionRenderer) {
+function makeGpuHeightProbe(
+  renderer: THREE.WebGLRenderer,
+  ctx: { heightTex: THREE.DataTexture; regionSize: number; heightN: number },
+) {
   const MAX = 32;
   const target = new THREE.WebGLRenderTarget(MAX, 1, {
     type: THREE.FloatType,
@@ -895,9 +1055,9 @@ function makeGpuHeightProbe(renderer: THREE.WebGLRenderer, region: RegionRendere
       '  gl_FragColor = vec4(texture2D(uHeightTex, uv).r, 0.0, 0.0, 1.0);\n' +
       '}',
     uniforms: {
-      uHeightTex: { value: region.ctx.heightTex },
-      uRegionSize: { value: region.ctx.regionSize },
-      uHeightN: { value: region.ctx.heightN },
+      uHeightTex: { value: ctx.heightTex },
+      uRegionSize: { value: ctx.regionSize },
+      uHeightN: { value: ctx.heightN },
       uPts: { value: Array.from({ length: MAX }, () => new THREE.Vector2()) },
     },
     depthTest: false,
@@ -908,7 +1068,7 @@ function makeGpuHeightProbe(renderer: THREE.WebGLRenderer, region: RegionRendere
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
   return (pts: [number, number][]): number[] => {
-    const uPts = material.uniforms.uPts.value as THREE.Vector2[];
+    const uPts = material.uniforms.uPts!.value as THREE.Vector2[];
     for (let i = 0; i < MAX; i++) {
       const p = pts[Math.min(i, pts.length - 1)] ?? [0, 0];
       uPts[i]!.set(p[0], p[1]);
@@ -929,11 +1089,9 @@ function makeGpuHeightProbe(renderer: THREE.WebGLRenderer, region: RegionRendere
 class GpuStageTimer {
   private readonly queries = new Map<string, WebGLQuery>();
   private readonly pending = new Set<string>();
-  /** cp05A correction: ring of the most recent samples per stage — the
-   *  reported figure is the ring MEDIAN, so occasional disjoint-timer
-   *  spikes and pre-state samples from before a stage toggle (both of
-   *  which poisoned the old decaying mean into physically impossible
-   *  stage times) cannot contaminate the measurement. */
+  /** ring of the most recent samples per stage — the reported figure is the
+   *  ring MEDIAN, so occasional disjoint-timer spikes cannot contaminate
+   *  the measurement. */
   private readonly rings = new Map<string, number[]>();
   private static readonly RING_N = 90;
   private active: string | null = null;
