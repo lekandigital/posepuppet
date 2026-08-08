@@ -4,6 +4,7 @@ import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import { Game } from "./game/Game";
+import { installSphericalOceanReplacement } from "./game/SphericalOcean";
 import { ProgressionManager } from "./game/ProgressionManager";
 import { createPoseRuntime } from "@bodyarcade/pose-runtime";
 import { mountPoseHud } from "@bodyarcade/pose-hud";
@@ -26,6 +27,7 @@ if (import.meta.env.DEV) {
 }
 
 const app = document.getElementById("app")!;
+installSphericalOceanReplacement();
 const game = new Game(app);
 game.start();
 

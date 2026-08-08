@@ -6,6 +6,7 @@
 // format (cp04B §6.3).
 
 import * as THREE from 'three';
+import type { WaterOpticsState } from '../../vendor/threejs-water/src/rendering/WaterOpticsState';
 import type { RegionWater } from './RegionWater';
 import { regionUniforms, type RegionContext } from './regionContext';
 import regionCausticsVert from './shaders/RegionCaustics.vert';
@@ -23,6 +24,10 @@ export class RegionCausticsPass {
     private readonly renderer: THREE.WebGLRenderer,
     lightDirection: THREE.Vector3,
     ctx: RegionContext,
+    // CP06 restored object optics: the actor shadow footprint + the shared
+    // vendored optics state (mesh uniforms synced per update)
+    objectShadowTexture: THREE.Texture | null = null,
+    private readonly opticsState: WaterOpticsState | null = null,
   ) {
     // vendored resolution and filtering (CausticsPass.ts:50)
     this.target = new THREE.WebGLRenderTarget(1024, 1024, {
@@ -38,6 +43,9 @@ export class RegionCausticsPass {
       uniforms: {
         light: { value: lightDirection.clone() },
         water: { value: null },
+        // CP06: vendored mesh-shadow inputs (synced from the optics state)
+        meshEnabled: { value: false },
+        objectShadowTex: { value: objectShadowTexture },
         ...regionUniforms(ctx),
       },
       blending: THREE.NoBlending,
@@ -53,7 +61,10 @@ export class RegionCausticsPass {
   }
 
   update(water: RegionWater) {
-    this.material.uniforms.water.value = water.textureA.texture;
+    this.material.uniforms.water!.value = water.textureA.texture;
+    if (this.opticsState) {
+      this.material.uniforms.meshEnabled!.value = this.opticsState.meshEnabled;
+    }
     this.material.uniformsNeedUpdate = true;
     this.renderer.setRenderTarget(this.target);
     this.renderer.setClearColor(0x000000, 1);

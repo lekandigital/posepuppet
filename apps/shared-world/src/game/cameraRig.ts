@@ -208,6 +208,10 @@ export class CameraRig {
   private rollRad = 0;
   private initialized = false;
 
+  // --- cp06 surface-relative waterline discipline (inert without adapter) ---
+  private readonly waterlineAt: ((x: number, z: number) => number) | null;
+  private readonly reentryOverwatch: boolean;
+
   // --- TerrainCompressed (cp05; inert unless terrainCompression is on) ---
   private readonly terrainCompression: boolean;
   private compressT = 0;
@@ -234,12 +238,28 @@ export class CameraRig {
     // additive cp04B parameter; the pool default is unchanged)
     far: number = RIG.FAR,
     // cp05: TerrainCompressed is region-only; the pool rig stays exactly
-    // the approved cp02 behavior (the state remains a stub there)
-    opts: { terrainCompression?: boolean } = {},
+    // the approved cp02 behavior (the state remains a stub there).
+    // cp06 (region-only, defaults preserve the approved pool rig exactly):
+    //  - waterlineAt: local ANIMATED water height (CP06 §11 "use animated
+    //    water height rather than only sea level") — the waterline
+    //    discipline, crossing detection and anti-shimmer become
+    //    surface-relative; absent → the constant y = 0 law (bit-identical
+    //    pool behavior);
+    //  - reentryOverwatch: during ReEntryRecovery the eye holds the
+    //    above-water side, watching the submerged dolphin through the
+    //    restored surface optics (the Ecco frame-3 beat), then descends
+    //    continuously through the standard springs.
+    opts: {
+      terrainCompression?: boolean;
+      waterlineAt?: (x: number, z: number) => number;
+      reentryOverwatch?: boolean;
+    } = {},
   ) {
     this.camera = new THREE.PerspectiveCamera(RIG.FOV, aspect, RIG.NEAR, far);
     this.collision = collision;
     this.terrainCompression = opts.terrainCompression ?? false;
+    this.waterlineAt = opts.waterlineAt ?? null;
+    this.reentryOverwatch = opts.reentryOverwatch ?? false;
   }
 
   /** R key: ease the camera directly behind facing over RECENTER_S. */
@@ -268,10 +288,14 @@ export class CameraRig {
     if (this.surfaceT > 0) this.surfaceT = Math.max(0, this.surfaceT - dt);
     if (this.shimmerHoldT > 0) this.shimmerHoldT = Math.max(0, this.shimmerHoldT - dt);
     if (!air && this.prevWasAir) this.reentryT = RIG.REENTRY_S;
-    if (Math.sign(s.y) !== Math.sign(this.prevDolphinY) && Math.abs(s.y - this.prevDolphinY) < 2) {
-      this.surfaceT = RIG.SURFACE_BLEND_S; // dolphin crossed y 0
+    // cp06: crossing detection against the ANIMATED local waterline (falls
+    // back to the constant y = 0 law when no adapter is present — pool)
+    const wlD = this.waterlineAt ? this.waterlineAt(d.x, d.z) : 0;
+    const relY = s.y - wlD;
+    if (Math.sign(relY) !== Math.sign(this.prevDolphinY) && Math.abs(relY - this.prevDolphinY) < 2) {
+      this.surfaceT = RIG.SURFACE_BLEND_S; // dolphin crossed the waterline
     }
-    this.prevDolphinY = s.y;
+    this.prevDolphinY = relY;
     this.prevWasAir = air;
 
     // --- state parameter targets ---
@@ -313,13 +337,15 @@ export class CameraRig {
       d.y + RIG.HEIGHT * this.compressFactor,
       d.z - fz * this.dist,
     );
-    // waterline discipline (carried cp01 virtue): while swimming, the eye
-    // stays on the underwater side of the anti-shimmer band (the vendored
-    // surface hides a submerged dolphin from an above-water eye); while
-    // airborne it lifts above (breach air-lift) — the crossing itself is
-    // sprung and continuous.
-    if (air) desired.y = Math.max(desired.y, RIG.SHIMMER_MIN_Y + 0.15);
-    else desired.y = Math.min(desired.y, -RIG.SHIMMER_MIN_Y);
+    // waterline discipline (carried cp01 virtue), cp06 surface-relative:
+    // while swimming the eye keeps to the underwater side of the
+    // anti-shimmer band around the ANIMATED waterline; while airborne it
+    // lifts above (breach air-lift); with reentryOverwatch, ReEntryRecovery
+    // also holds the eye above so the submerged dolphin is watched through
+    // the restored surface optics before the continuous sprung descent.
+    const holdAbove = air || (this.reentryOverwatch && this.reentryT > 0);
+    if (holdAbove) desired.y = Math.max(desired.y, wlD + RIG.SHIMMER_MIN_Y + 0.15);
+    else desired.y = Math.min(desired.y, wlD - RIG.SHIMMER_MIN_Y);
 
     // --- collision on the desired point (pool walls / region BVH
     // sphere-cast; dolly-in on block) ---
@@ -340,7 +366,7 @@ export class CameraRig {
         const distU = this.dist / this.compressFactor;
         const probe = this.tmpV.set(
           d.x - fx * distU,
-          Math.min(d.y + RIG.HEIGHT, air ? Infinity : -RIG.SHIMMER_MIN_Y),
+          Math.min(d.y + RIG.HEIGHT, holdAbove ? Infinity : wlD - RIG.SHIMMER_MIN_Y),
           d.z - fz * distU,
         );
         const probeLen = probe.distanceTo(d);
@@ -481,20 +507,27 @@ export class CameraRig {
   }
 
   /**
-   * Waterline anti-shimmer (cp02 §6 [DERIVED], flagged): within ±SURFACE_BAND
-   * of y 0 the eye holds |y| ≥ SHIMMER_MIN_Y on its current side for at least
-   * SHIMMER_HOLD_S per crossing — a committed crossing passes straight
-   * through (continuous, never a cut) and then holds on the new side.
+   * Waterline anti-shimmer (cp02 §6 [DERIVED], flagged): within
+   * ±SURFACE_BAND of the local waterline the eye holds ≥ SHIMMER_MIN_Y from
+   * it on its current side for at least SHIMMER_HOLD_S per crossing — a
+   * committed crossing passes straight through (continuous, never a cut)
+   * and then holds on the new side. cp06: evaluated relative to the
+   * ANIMATED waterline at the camera's xz (wl = 0 without an adapter — the
+   * approved pool law, bit-identical).
    */
   private applyAntiShimmer(desiredY: number): void {
-    const y = this.camPos.y;
+    const wl = this.waterlineAt ? this.waterlineAt(this.camPos.x, this.camPos.z) : 0;
+    const y = this.camPos.y - wl;
+    const relDesired = desiredY - wl;
     if (Math.abs(y) >= RIG.SURFACE_BAND) {
       this.side = y >= 0 ? 1 : -1;
       return;
     }
-    const wantSide: -1 | 1 = desiredY >= 0 ? 1 : -1;
+    const wantSide: -1 | 1 = relDesired >= 0 ? 1 : -1;
     const committed =
-      wantSide !== this.side && Math.abs(desiredY) >= RIG.SHIMMER_MIN_Y && this.shimmerHoldT === 0;
+      wantSide !== this.side &&
+      Math.abs(relDesired) >= RIG.SHIMMER_MIN_Y &&
+      this.shimmerHoldT === 0;
     if (committed) {
       const crossed = Math.sign(y) === wantSide && Math.abs(y) > 0;
       if (crossed) {
@@ -504,13 +537,13 @@ export class CameraRig {
       }
       return; // passing through the band — do not clamp mid-crossing
     }
-    // not crossing: hold clear of the plane on the current side
+    // not crossing: hold clear of the local waterline on the current side
     if (this.side === -1 && y > -RIG.SHIMMER_MIN_Y) {
-      this.camPos.y = -RIG.SHIMMER_MIN_Y;
+      this.camPos.y = wl - RIG.SHIMMER_MIN_Y;
       if (this.camVel.y > 0) this.camVel.y = 0;
       this.antiShimmerCount++;
     } else if (this.side === 1 && y < RIG.SHIMMER_MIN_Y) {
-      this.camPos.y = RIG.SHIMMER_MIN_Y;
+      this.camPos.y = wl + RIG.SHIMMER_MIN_Y;
       if (this.camVel.y < 0) this.camVel.y = 0;
       this.antiShimmerCount++;
     }
