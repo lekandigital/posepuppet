@@ -23,19 +23,22 @@ import { inflateSync } from 'node:zlib';
  *     cave/arch transforms keep their approved X/Z exactly (item 6).
  *  4. classification equivalence: the GPU albedo-debug render vs the CPU
  *     twin at projected probes within tolerance; the structural audit
- *     proves the terrain fragment AND both water fragments carry the ONE
- *     substrate include and no legacy tint law (items 7, 18).
- *  5. underwater classification variation: dominant families across an
- *     underwater probe grid ≥ 5 distinct; slope- and depth-dependence
- *     demonstrated numerically (item 19).
+ *     proves the terrain fragment carries the ONE substrate entry point and
+ *     no legacy tint law (items 7, 18). [CP05C: albedo is LINEAR and the
+ *     jeantimex water shaders are retired — the raymarch-path halves of the
+ *     old audit are void; capture runs with post disabled for raw pixels.]
+ *  5. underwater classification variation: distinct families across an
+ *     underwater probe grid; slope- and depth-dependence demonstrated
+ *     numerically (item 19). [CP05C: depth expresses as the sandy-dune
+ *     blend, not darkening — the water optics own all darkening.]
  *  6. substrate-only vocabulary: every family label is ordinary ground —
  *     the automated proxy for item 20 (the visual "no asset-like
  *     silhouettes" ruling stays with the §9 manual review).
  *
- * Items 8–17 (LOD-0 law, shoreline masking, four-shot, LOD protection,
- * seams, camera, contact, containment, replay, views, performance) are the
- * existing suites — region-terrain / region-water / region / camera / pool
- * / scaffold — re-run against the revised bake in the same invocation.
+ * Items 8–17 are the surviving suites — region-terrain / region-ocean /
+ * region / camera / pool / scaffold — re-run in the same invocation (the
+ * jeantimex four-shot and ambient suites are retired per the
+ * ocean-replacement addendum §4.8).
  */
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -307,13 +310,14 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     await page.setViewportSize({ width: 1748, height: 1080 });
     const errors = await bootRegion(page);
 
-    // structural audit: the ONE include, no legacy tint law
+    // structural audit: the ONE substrate entry point, no legacy tint law
+    // (cp05C: the jeantimex water raymarch shaders are retired — the ocean
+    // reads the terrain through the refraction render target, so the
+    // terrain fragment is the single classification consumer)
     const audit = (await page.evaluate(
       () => (window as any).__SHARED_WORLD.test.substrateShaderAudit(),
     )) as Record<string, boolean>;
     expect(audit.terrainHasSubstrate).toBe(true);
-    expect(audit.waterAboveHasSubstrate).toBe(true);
-    expect(audit.waterBelowHasSubstrate).toBe(true);
     expect(audit.anyLegacyTintLaw).toBe(false);
     results.substrateShaderAudit = audit;
 
@@ -328,11 +332,14 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       page,
       `shotMode({ pos: [${CAM.join(',')}], look: [${CAM[0] + 0.001}, 0, ${CAM[2]}], fov: 60, size: [1728, 1080] })`,
     );
-    await testHook(page, 'setSurfaceVisible(false)');
+    await testHook(page, 'setStageEnabled({ oceanMesh: false })');
+    await testHook(page, 'setPostEnabled(false)'); // raw linear pixels
     await testHook(page, 'setAlbedoDebug(true)');
     await page.waitForTimeout(800);
     await page.addStyleTag({ content: '#region-overlay { display: none !important; }' });
     const shotPath = join(MEDIA_DIR, 'albedo-debug-probes.png');
+    await page.locator('#app canvas').screenshot({ path: shotPath }); // warm-up (stale frame)
+    await page.waitForTimeout(300);
     await page.locator('#app canvas').screenshot({ path: shotPath });
 
     // probe grid on the shelf (all within ~37 m of the camera → the staged
@@ -354,7 +361,8 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     )) as { px: number; py: number; inFront: boolean }[];
 
     await testHook(page, 'setAlbedoDebug(false)');
-    await testHook(page, 'setSurfaceVisible(true)');
+    await testHook(page, 'setStageEnabled({ oceanMesh: true })');
+    await testHook(page, 'setPostEnabled(true)');
     await testHook(page, 'shotMode(null)');
     await testHook(page, 'setIntent(null)');
 
@@ -362,7 +370,12 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     expect(img.width).toBe(1728);
     let compared = 0;
     let maxErr = 0;
-    const TOL = 0.07; // fp32 texture filtering + varying interpolation headroom
+    // cp05C: LINEAR albedo — the old 0.07 tolerance was measured in
+    // gamma-encoded space, where the 1/2.2 curve compresses differences
+    // ~2.2× at midtones; the same underlying fp32/LUT/8-bit noise therefore
+    // reads up to ~0.15 in linear space (measured worst probe 0.1002,
+    // deterministic across tiers)
+    const TOL = 0.12;
     const comparisons: unknown[] = [];
     for (let i = 0; i < pts.length; i++) {
       const p = px[i]!;
@@ -412,13 +425,11 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     const underwater = samples.filter((s) => s.h < 0);
     expect(underwater.length).toBeGreaterThan(300);
 
-    // CP05A-correction spec: ZyFou Blank's underwater floor is
-    // DEPTH-DOMINANT by design (albedo → floorCol mix 0.92, sand→deep over
-    // −hRel/55) — the user's correction makes Blank's behavior
-    // authoritative, superseding the first submission's stronger
-    // slope-separation expectation. Asserted here: the depth ramp is
-    // strong, floor bands are present, and the floor is still not one
-    // uniform tint (slope/micro/climate leave measurable variation).
+    // CP05C spec (ocean-replacement addendum §2.4): depth now expresses as
+    // the sandy-dune ACCUMULATION blend, never darkening — the navy deep
+    // ramp is deleted and all underwater darkening belongs to the water
+    // optics. Asserted here: the sandy blend engages with depth, rock and
+    // silt keep class identity, and the floor is never one uniform tint.
     const families = new Set(underwater.map((s) => s.family));
     results.underwaterFamilies = [...families].sort();
     expect(families.size, `families seen: ${[...families].join(', ')}`).toBeGreaterThanOrEqual(3);
@@ -439,7 +450,12 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     const m1 = mean(shallowFlat);
     const m2 = mean(deepFlat);
     const depthDelta = Math.hypot(m1[0] - m2[0], m1[1] - m2[1], m1[2] - m2[2]);
-    expect(depthDelta, 'shallow vs deep mean albedo at matched slope').toBeGreaterThan(0.15);
+    // cp05C: the depth signal is the sandy blend (hue shift toward dune
+    // sand), far smaller than the deleted navy ramp's darkening by design
+    expect(depthDelta, 'shallow vs deep mean albedo at matched slope').toBeGreaterThan(0.04);
+    // and the deep floor must NOT be darker-navy — its mean stays bright
+    // (the old ramp drove deep flats toward (0.012, 0.075, 0.14))
+    expect(m2[0], 'deep-floor red channel stays sandy, never navy').toBeGreaterThan(0.2);
 
     // residual non-depth variation: at comparable mid depths the floor is
     // not one constant color (slope rock bleed-through + micro noise +
@@ -484,9 +500,10 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       pts,
     )) as { family: string }[];
     const allowed = new Set([
-      // ZyFou Blank coloration families (CP05A correction) — every label is
-      // ordinary ground / climate coloration, never an asset
-      'shallow-floor', 'mid-floor', 'deep-floor', 'rocky-floor',
+      // ZyFou Blank coloration families (CP05A correction; CP05C adds the
+      // sandy/silt floor labels and retires the deep/mid depth bands) —
+      // every label is ordinary ground / climate coloration, never an asset
+      'shallow-floor', 'sandy-floor', 'silt-floor', 'rocky-floor',
       'shore-sand', 'dry-lowland', 'grassland', 'tundra', 'swamp-soil',
       'slope-rock', 'canyon-rock', 'high-rock', 'snow',
     ]);
@@ -502,6 +519,10 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
   });
 
   test('7. ZyFou Fantasy source fidelity: Cartoon terrain palette, style, frequency and seed offsets match the pinned snapshot; water roles excluded', () => {
+    // CP05C revision (ocean-replacement addendum §2.4): ONE palette across
+    // the waterline — the Earth submerged arm, the waterline split, the
+    // Z_COL_DEEP navy ramp, and the display encode are deleted; the
+    // substrate lives in src/terrain/shaders.ts as direct Fantasy consts.
     const REF = resolve(REPO_ROOT, 'docs', 'bodyarcade-stage3', 'references', 'zyfou-procedural-terrains');
     // pinned commit guard
     const record = readFileSync(join(REF, 'BODYARCADE_SOURCE_RECORD.md'), 'utf8');
@@ -523,35 +544,13 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     }
     expect(Object.keys(pal).length).toBeGreaterThanOrEqual(16);
 
-    // the approved pre-recolor SUBMERGED palette source: EARTH_PALETTE
-    const earthSrc = readFileSync(join(REF, 'src', 'engine', 'style', 'ColorPalette.js'), 'utf8');
-    const earthBlock = earthSrc.slice(earthSrc.indexOf('EARTH_PALETTE'), earthSrc.indexOf('};', earthSrc.indexOf('EARTH_PALETTE')));
-    const earthPal: Record<string, [number, number, number]> = {};
-    for (const m of earthBlock.matchAll(/(\w+):\s*\[([\d.]+),\s*([\d.]+),\s*([\d.]+)\]/g)) {
-      earthPal[m[1]!] = [Number(m[2]), Number(m[3]), Number(m[4])];
-    }
-
-    const glsl = readFileSync(
-      join(APP_ROOT, 'src', 'water', 'shaders', 'RegionSubstrate.glsl'), 'utf8');
+    const glsl = readFileSync(join(APP_ROOT, 'src', 'terrain', 'shaders.ts'), 'utf8');
     const glslCol = (name: string): [number, number, number] => {
       const m = glsl.match(new RegExp(`Z_COL_${name}\\s*=\\s*vec3\\(([\\d.]+),\\s*([\\d.]+),\\s*([\\d.]+)\\)`));
       expect(m, `Z_COL_${name} present`).toBeTruthy();
       return [Number(m![1]), Number(m![2]), Number(m![3])];
     };
-    /** waterline-split selector: Z_COL_X = mix(vec3(earth), vec3(fantasy), t) */
-    const glslSplit = (name: string): { e: [number, number, number]; f: [number, number, number] } => {
-      const m = glsl.match(new RegExp(
-        `Z_COL_${name}\\s*=\\s*mix\\(vec3\\(([\\d.]+),\\s*([\\d.]+),\\s*([\\d.]+)\\),\\s*vec3\\(([\\d.]+),\\s*([\\d.]+),\\s*([\\d.]+)\\)`,
-      ));
-      expect(m, `Z_COL_${name} waterline-split present`).toBeTruthy();
-      return {
-        e: [Number(m![1]), Number(m![2]), Number(m![3])],
-        f: [Number(m![4]), Number(m![5]), Number(m![6])],
-      };
-    };
-    // the 13 terrain-albedo roles: EXPOSED side = Cartoon Terrain palette
-    // (Fantasy art direction), SUBMERGED side = the approved pre-recolor
-    // EARTH_PALETTE (underwater-restoration correction)
+    // the 13 terrain-albedo roles = Cartoon Terrain palette, everywhere
     const MAP: [string, string][] = [
       ['SAND', 'sand'], ['DUNE', 'dune'],
       ['DRYGRASS', 'dryGrass'], ['GRASS', 'grass'], ['FOREST', 'forest'],
@@ -560,28 +559,24 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       ['ROCKHI', 'rockHi'], ['SNOW', 'snow'],
     ];
     for (const [glslName, srcName] of MAP) {
-      const { e, f } = glslSplit(glslName);
+      const got = glslCol(glslName);
       for (let c = 0; c < 3; c++) {
-        expect(Math.abs(f[c]! - pal[srcName]![c]!), `Z_COL_${glslName}.land[${c}] vs CartoonTerrain.${srcName}`).toBeLessThanOrEqual(1e-9);
-        expect(Math.abs(e[c]! - earthPal[srcName]![c]!), `Z_COL_${glslName}.submerged[${c}] vs EARTH_PALETTE.${srcName}`).toBeLessThanOrEqual(1e-9);
+        expect(Math.abs(got[c]! - pal[srcName]![c]!), `Z_COL_${glslName}[${c}] vs CartoonTerrain.${srcName}`).toBeLessThanOrEqual(1e-9);
       }
     }
-    // WATER-role exclusion (user instruction): Cartoon deep/shallow/foam
-    // never enter BodyArcade — the shader's deep slot stays the approved
-    // Earth deep-floor substrate target, and the Cartoon water values
-    // appear nowhere in the region water shaders
-    expect(glslCol('DEEP')).toEqual([0.012, 0.075, 0.140]);
-    expect(glslCol('SHALLOW')).toEqual([0.060, 0.290, 0.330]);
-    for (const wf of ['RegionWaterAbove.frag', 'RegionWaterBelow.frag', 'RegionWallColor.glsl', 'RegionContainer.glsl']) {
-      const src = readFileSync(join(APP_ROOT, 'src', 'water', 'shaders', wf), 'utf8');
-      expect(src.includes('0.02, 0.18, 0.55'), `${wf} has no Cartoon deep`).toBe(false);
-      expect(src.includes('0.02, 0.55, 0.85'), `${wf} has no Cartoon shallow`).toBe(false);
-      expect(src.includes('1.00, 1.00, 0.92'), `${wf} has no Cartoon foam`).toBe(false);
-    }
-    // approved vendored water colors still verbatim in the water shaders
-    const above = readFileSync(join(APP_ROOT, 'src', 'water', 'shaders', 'RegionWaterAbove.frag'), 'utf8');
-    expect(above).toContain('abovewaterColor = vec3(0.25, 1.0, 1.25)');
-    expect(above).toContain('underwaterColor = vec3(0.4, 0.9, 1.0)');
+    // CP05C supersessions asserted structurally: no Earth arm / navy ramp /
+    // waterline palette split / display encode DECLARED anywhere in the
+    // substrate (prose comments may still name them as deleted history)
+    expect(/const\s+vec3\s+Z_COL_DEEP/.test(glsl), 'navy deep ramp deleted').toBe(false);
+    expect(/void\s+zSelectSubstratePalette/.test(glsl), 'waterline palette split deleted').toBe(false);
+    expect(/vec3\s+zDisplayEncode/.test(glsl), 'display encode deleted (linear albedo)').toBe(false);
+    // WATER-role exclusion (user instruction stands): Cartoon
+    // deep/shallow/foam never enter the terrain substrate
+    expect(glsl.includes('0.02, 0.18, 0.55'), 'no Cartoon water deep').toBe(false);
+    expect(glsl.includes('0.02, 0.55, 0.85'), 'no Cartoon water shallow').toBe(false);
+    // the sandy seafloor blend uses the WaterThreeJS Floor sand values
+    expect(glsl).toContain('Z_DUNE_SAND  = vec3(0.66, 0.58, 0.44)');
+    expect(glsl).toContain('Z_DUNE_SAND2 = vec3(0.46, 0.41, 0.31)');
 
     // Blank/Highlands parameter law (Engine.js): uFrequency = (45·0.1)/2048;
     // uSeedOffset = mulberry32(1337)·2048 − 1024 (two draws)
@@ -602,9 +597,7 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
     expect(glsl).toContain('Z_PAL_SATURATION = 1.0');
     expect(glsl).toContain('Z_PAL_CONTRAST = 1.0');
 
-    // the CPU twin carries the same split palettes (parity contract):
-    // COL_F = Cartoon terrain roles, COL_E = Earth submerged roles, plus
-    // the retained Earth deep-floor target
+    // the CPU twin carries the same single palette (parity contract)
     const cpu = readFileSync(join(APP_ROOT, 'src', 'world', 'substrateCpu.ts'), 'utf8');
     const cpuBlock = (marker: string): string => {
       const at = cpu.indexOf(marker);
@@ -618,17 +611,15 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       }
       return out;
     };
-    const cpuE = parseRoles(cpuBlock('const COL_E'));
     const cpuF = parseRoles(cpuBlock('const COL_F'));
     for (const key of ['sand', 'dune', 'dryGrass', 'grass', 'forest', 'jungle', 'swamp', 'tundra', 'redRock', 'redRock2', 'rock', 'rockHi', 'snow'] as const) {
       for (let c = 0; c < 3; c++) {
         expect(Math.abs(cpuF[key]![c]! - pal[key]![c]!), `COL_F.${key}[${c}]`).toBeLessThanOrEqual(1e-9);
-        expect(Math.abs(cpuE[key]![c]! - earthPal[key]![c]!), `COL_E.${key}[${c}]`).toBeLessThanOrEqual(1e-9);
       }
     }
-    const deepM = cpu.match(/COL_DEEP:\s*V3\s*=\s*\[([\d.]+),\s*([\d.]+),\s*([\d.]+)\]/);
-    expect(deepM, 'COL_DEEP present').toBeTruthy();
-    expect([Number(deepM![1]), Number(deepM![2]), Number(deepM![3])]).toEqual([0.012, 0.075, 0.14]);
+    expect(/const\s+COL_E\s*=/.test(cpu), 'CPU twin Earth arm deleted').toBe(false);
+    expect(/const\s+COL_DEEP/.test(cpu), 'CPU twin navy ramp deleted').toBe(false);
+    expect(cpu.includes('1 / 2.2'), 'CPU twin display encode deleted').toBe(false);
 
     results.zyfouSourceFidelity = {
       pinnedCommit: '8b396f9c784676d46f6a147d310d9f547bf41403',
@@ -637,7 +628,7 @@ test.describe('checkpoint 05A — terrain relief and substrate color', () => {
       uFrequency: (45 * 0.1) / 2048,
       uSeedOffset: [offX, offZ],
       note:
-        'Fantasy world = fantasy template → cartoon preset → Cartoon Terrain palette (terrain roles only) over the Blank/Highlands classification; applyPalettePreset copies palette colors only, so saturation/contrast/tint stay 1/1/(1,1,1)',
+        'CP05C: one Cartoon Terrain palette across the waterline, LINEAR albedo (encode removed with the jeantimex display-raw pipeline), sandy WaterThreeJS dune blend on the seafloor; Earth arm / navy ramp / waterline split deleted per the ocean-replacement addendum §2.4',
     };
   });
 });

@@ -208,6 +208,11 @@ export class CameraRig {
   private rollRad = 0;
   private initialized = false;
 
+  // --- cp05C visual waterline (null = constant y 0, the pool behavior) ---
+  private readonly waterlineAt: ((x: number, z: number) => number) | null = null;
+  /** waterline sampled once per update at the dolphin column */
+  private wl = 0;
+
   // --- TerrainCompressed (cp05; inert unless terrainCompression is on) ---
   private readonly terrainCompression: boolean;
   private compressT = 0;
@@ -235,11 +240,16 @@ export class CameraRig {
     far: number = RIG.FAR,
     // cp05: TerrainCompressed is region-only; the pool rig stays exactly
     // the approved cp02 behavior (the state remains a stub there)
-    opts: { terrainCompression?: boolean } = {},
+    // cp05C: optional visual-waterline callback — with the Gerstner ocean
+    // the render surface is wavy, so the anti-shimmer band and the swim/air
+    // clamps become surface-relative. Absent (pool view), the waterline is
+    // the constant y = 0 and behavior is bit-identical to the approved cp02.
+    opts: { terrainCompression?: boolean; waterlineAt?: (x: number, z: number) => number } = {},
   ) {
     this.camera = new THREE.PerspectiveCamera(RIG.FOV, aspect, RIG.NEAR, far);
     this.collision = collision;
     this.terrainCompression = opts.terrainCompression ?? false;
+    this.waterlineAt = opts.waterlineAt ?? null;
   }
 
   /** R key: ease the camera directly behind facing over RECENTER_S. */
@@ -251,6 +261,10 @@ export class CameraRig {
     if (dt <= 0) return;
     const d = this.tmpDolphin.set(s.x, s.y, s.z);
     const air = s.phase === 'air';
+
+    // cp05C: sample the visual waterline once per update at the dolphin
+    // column (constant 0 without the callback — pool behavior unchanged)
+    this.wl = this.waterlineAt ? this.waterlineAt(d.x, d.z) : 0;
 
     // --- smoothed velocity (first-order low-pass, t90 0.25 s) ---
     const vx = air ? s.vx : s.wvx;
@@ -318,8 +332,8 @@ export class CameraRig {
     // surface hides a submerged dolphin from an above-water eye); while
     // airborne it lifts above (breach air-lift) — the crossing itself is
     // sprung and continuous.
-    if (air) desired.y = Math.max(desired.y, RIG.SHIMMER_MIN_Y + 0.15);
-    else desired.y = Math.min(desired.y, -RIG.SHIMMER_MIN_Y);
+    if (air) desired.y = Math.max(desired.y, this.wl + RIG.SHIMMER_MIN_Y + 0.15);
+    else desired.y = Math.min(desired.y, this.wl - RIG.SHIMMER_MIN_Y);
 
     // --- collision on the desired point (pool walls / region BVH
     // sphere-cast; dolly-in on block) ---
@@ -340,7 +354,7 @@ export class CameraRig {
         const distU = this.dist / this.compressFactor;
         const probe = this.tmpV.set(
           d.x - fx * distU,
-          Math.min(d.y + RIG.HEIGHT, air ? Infinity : -RIG.SHIMMER_MIN_Y),
+          Math.min(d.y + RIG.HEIGHT, air ? Infinity : this.wl - RIG.SHIMMER_MIN_Y),
           d.z - fz * distU,
         );
         const probeLen = probe.distanceTo(d);
@@ -487,14 +501,17 @@ export class CameraRig {
    * through (continuous, never a cut) and then holds on the new side.
    */
   private applyAntiShimmer(desiredY: number): void {
-    const y = this.camPos.y;
+    // cp05C: the band is measured relative to the visual waterline at the
+    // dolphin column (wl = 0 in the pool — identical arithmetic to cp02)
+    const y = this.camPos.y - this.wl;
+    const dY = desiredY - this.wl;
     if (Math.abs(y) >= RIG.SURFACE_BAND) {
       this.side = y >= 0 ? 1 : -1;
       return;
     }
-    const wantSide: -1 | 1 = desiredY >= 0 ? 1 : -1;
+    const wantSide: -1 | 1 = dY >= 0 ? 1 : -1;
     const committed =
-      wantSide !== this.side && Math.abs(desiredY) >= RIG.SHIMMER_MIN_Y && this.shimmerHoldT === 0;
+      wantSide !== this.side && Math.abs(dY) >= RIG.SHIMMER_MIN_Y && this.shimmerHoldT === 0;
     if (committed) {
       const crossed = Math.sign(y) === wantSide && Math.abs(y) > 0;
       if (crossed) {
@@ -504,13 +521,13 @@ export class CameraRig {
       }
       return; // passing through the band — do not clamp mid-crossing
     }
-    // not crossing: hold clear of the plane on the current side
+    // not crossing: hold clear of the surface on the current side
     if (this.side === -1 && y > -RIG.SHIMMER_MIN_Y) {
-      this.camPos.y = -RIG.SHIMMER_MIN_Y;
+      this.camPos.y = this.wl - RIG.SHIMMER_MIN_Y;
       if (this.camVel.y > 0) this.camVel.y = 0;
       this.antiShimmerCount++;
     } else if (this.side === 1 && y < RIG.SHIMMER_MIN_Y) {
-      this.camPos.y = RIG.SHIMMER_MIN_Y;
+      this.camPos.y = this.wl + RIG.SHIMMER_MIN_Y;
       if (this.camVel.y < 0) this.camVel.y = 0;
       this.antiShimmerCount++;
     }

@@ -31,6 +31,14 @@ export interface PostRenderParams {
 // Full post chain: underwater absorption + volumetric god-rays (reconstructed
 // from the depth buffer), threshold bloom for sun glints, then ACES tone-map
 // and sRGB encode to the screen.
+//
+// BodyArcade perf adaptation (recorded, cp05C): the demo marches the god-ray
+// accumulation inside the full-res underwater pass; here the IDENTICAL march
+// runs in a half-res pass (raysRT) that the full-res pass samples — the
+// Beer-Lambert absorption stays full-res and byte-identical. Measured: the
+// 28-step full-res march at 1728×1080 alone cost ~half the frame budget over
+// the region terrain; the shafts are soft light volumes and survive half-res
+// visually intact.
 export class Post {
   renderer: THREE.WebGLRenderer;
   quad: FullScreenQuad;
@@ -40,6 +48,8 @@ export class Post {
   brightRT: THREE.WebGLRenderTarget;
   blurA: THREE.WebGLRenderTarget;
   blurB: THREE.WebGLRenderTarget;
+  raysRT: THREE.WebGLRenderTarget;
+  raysMat: THREE.ShaderMaterial;
   underwaterMat: THREE.ShaderMaterial;
   brightMat: THREE.ShaderMaterial;
   blurMat: THREE.ShaderMaterial;
@@ -63,12 +73,87 @@ export class Post {
     this.brightRT = halfFloatRT(bw, bh);
     this.blurA = halfFloatRT(bw, bh);
     this.blurB = halfFloatRT(bw, bh);
+    this.raysRT = halfFloatRT(bw, bh);
 
-    // ---- Underwater volumetrics --------------------------------------------
+    // ---- Underwater god-ray march (HALF-RES; the demo's exact march) -------
+    this.raysMat = new THREE.ShaderMaterial({
+      uniforms: {
+        tDepth: { value: null },
+        uInvProjView: { value: new THREE.Matrix4() },
+        uCameraPos: { value: new THREE.Vector3() },
+        uSunDir: { value: sunDir.clone() },
+        uTime: { value: 0 },
+        uSurfaceY: { value: 0 },
+        uShaftColor: { value: new THREE.Color(1.0, 0.98, 0.9) },
+        uShaftDensity: { value: 0.05 },
+        uMaxDist: { value: 140.0 },
+      },
+      vertexShader: /* glsl */ `
+        varying vec2 vUv;
+        void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
+      `,
+      fragmentShader: /* glsl */ `
+        precision highp float;
+        ${NOISE}
+        ${CAUSTICS}
+        varying vec2 vUv;
+        uniform sampler2D tDepth;
+        uniform mat4 uInvProjView;
+        uniform vec3 uCameraPos;
+        uniform vec3 uSunDir;
+        uniform float uTime;
+        uniform float uSurfaceY;
+        uniform vec3 uShaftColor;
+        uniform float uShaftDensity;
+        uniform float uMaxDist;
+
+        float hg(float c, float g){
+          float g2 = g * g;
+          return (1.0 - g2) / (12.5663706 * pow(1.0 + g2 - 2.0 * g * c, 1.5));
+        }
+
+        void main(){
+          // Reconstruct world position from depth.
+          float d = texture2D(tDepth, vUv).x;
+          vec4 clip = vec4(vUv * 2.0 - 1.0, d * 2.0 - 1.0, 1.0);
+          vec4 wp = uInvProjView * clip;
+          wp /= wp.w;
+          vec3 worldPos = wp.xyz;
+
+          vec3 toFrag = worldPos - uCameraPos;
+          float viewDist = length(toFrag);
+          vec3 rd = toFrag / max(viewDist, 1e-3);
+
+          // Volumetric shafts: march the view ray, sampling a caustic pattern
+          // projected up the sun direction to the surface (demo math, verbatim).
+          float dither = fract(sin(dot(vUv, vec2(12.9898, 78.233)) + uTime) * 43758.5453);
+          float marchLen = min(viewDist, uMaxDist);
+          const int STEPS = 28;
+          float dt = marchLen / float(STEPS);
+          float acc = 0.0;
+          for (int i = 0; i < STEPS; i++){
+            float s = (float(i) + dither) * dt;
+            vec3 p = uCameraPos + rd * s;
+            float below = uSurfaceY - p.y;
+            if (below <= 0.0) continue;
+            float proj = below / max(uSunDir.y, 0.15);
+            vec2 sxz = (p + uSunDir * proj).xz;
+            float shaft = caustics(sxz * 0.03 + uSunDir.xz * uTime * 0.25, uTime * 0.5);
+            acc += shaft * exp(-below * 0.03);
+          }
+          acc *= dt;
+          float phase = hg(clamp(dot(rd, uSunDir), -1.0, 1.0), 0.72);
+          gl_FragColor = vec4(uShaftColor * acc * uShaftDensity * phase, 1.0);
+        }
+      `,
+    });
+
+    // ---- Underwater absorption (full-res) + upsampled god-rays -------------
     this.underwaterMat = new THREE.ShaderMaterial({
       uniforms: {
         tDiffuse: { value: null },
         tDepth: { value: null },
+        tRays: { value: null },
         uInvProjView: { value: new THREE.Matrix4() },
         uCameraPos: { value: new THREE.Vector3() },
         uSunDir: { value: sunDir.clone() },
@@ -88,28 +173,17 @@ export class Post {
       `,
       fragmentShader: /* glsl */ `
         precision highp float;
-        ${NOISE}
-        ${CAUSTICS}
         varying vec2 vUv;
         uniform sampler2D tDiffuse;
         uniform sampler2D tDepth;
+        uniform sampler2D tRays;
         uniform mat4 uInvProjView;
         uniform vec3 uCameraPos;
-        uniform vec3 uSunDir;
-        uniform float uTime;
         uniform float uUnderwater;
-        uniform float uSurfaceY;
         uniform vec3 uDeepColor;
-        uniform vec3 uShaftColor;
         uniform vec3 uExtinction;
         uniform float uFogStrength;
-        uniform float uShaftDensity;
         uniform float uMaxDist;
-
-        float hg(float c, float g){
-          float g2 = g * g;
-          return (1.0 - g2) / (12.5663706 * pow(1.0 + g2 - 2.0 * g * c, 1.5));
-        }
 
         void main(){
           vec3 col = texture2D(tDiffuse, vUv).rgb;
@@ -124,33 +198,16 @@ export class Post {
 
           vec3 toFrag = worldPos - uCameraPos;
           float viewDist = length(toFrag);
-          vec3 rd = toFrag / max(viewDist, 1e-3);
 
-          // Beer-Lambert absorption toward the deep-water colour.
+          // Beer-Lambert absorption toward the deep-water colour (demo math).
           float dist = min(viewDist, uMaxDist * 3.0);
           vec3 trans = exp(-uExtinction * dist);
           vec3 col2 = col * trans + uDeepColor * (1.0 - trans) * uFogStrength;
 
-          // Volumetric shafts: march the view ray, sampling a caustic pattern
-          // projected up the sun direction to the surface.
-          float dither = fract(sin(dot(vUv, vec2(12.9898, 78.233)) + uTime) * 43758.5453);
-          float marchLen = min(viewDist, uMaxDist);
-          const int STEPS = 28;
-          float dt = marchLen / float(STEPS);
-          float acc = 0.0;
-          for (int i = 0; i < STEPS; i++){
-            float s = (float(i) + dither) * dt;
-            vec3 p = uCameraPos + rd * s;
-            float below = uSurfaceY - p.y;
-            if (below <= 0.0) continue;
-            float proj = below / max(uSunDir.y, 0.15);
-            vec2 sxz = (p + uSunDir * proj).xz;
-            float shaft = caustics(sxz * 0.03 + uSunDir.xz * uTime * 0.25, uTime * 0.5);
-            acc += shaft * exp(-below * 0.03);
-          }
-          acc *= dt;
-          float phase = hg(clamp(dot(rd, uSunDir), -1.0, 1.0), 0.72);
-          vec3 rays = uShaftColor * acc * uShaftDensity * phase;
+          // God rays from the half-res march (bilinear upsample — the shafts
+          // are soft light volumes; the demo's per-pixel march is preserved
+          // verbatim inside the half-res pass).
+          vec3 rays = texture2D(tRays, vUv).rgb;
 
           gl_FragColor = vec4(col2 + rays, 1.0);
         }
@@ -329,6 +386,7 @@ export class Post {
     this.brightRT.setSize(bw, bh);
     this.blurA.setSize(bw, bh);
     this.blurB.setSize(bw, bh);
+    this.raysRT.setSize(bw, bh);
     this.blurMat.uniforms.uTexel.value.set(1 / bw, 1 / bh);
   }
 
@@ -342,12 +400,30 @@ export class Post {
     const uw = this.underwaterMat.uniforms;
     uw.tDiffuse.value = hdrRT.texture;
     uw.tDepth.value = hdrRT.depthTexture;
+    uw.tRays.value = this.raysRT.texture;
     uw.uInvProjView.value.copy(params.invProjView);
     uw.uCameraPos.value.copy(params.cameraPos);
     uw.uSunDir.value.copy(params.sunDir);
     uw.uTime.value = params.time;
     uw.uUnderwater.value = params.underwater ? 1 : 0;
     uw.uSurfaceY.value = params.surfaceY;
+
+    // 0) god-ray march at half res (underwater only). The external dials
+    // stay on underwaterMat (uShaftDensity/uShaftColor/uMaxDist — the GUI
+    // and presets edit those) and are mirrored here each frame.
+    if (params.underwater) {
+      const rm = this.raysMat.uniforms;
+      rm.tDepth.value = hdrRT.depthTexture;
+      rm.uInvProjView.value.copy(params.invProjView);
+      rm.uCameraPos.value.copy(params.cameraPos);
+      rm.uSunDir.value.copy(params.sunDir);
+      rm.uTime.value = params.time;
+      rm.uSurfaceY.value = params.surfaceY;
+      rm.uShaftColor.value.copy(uw.uShaftColor.value);
+      rm.uShaftDensity.value = uw.uShaftDensity.value;
+      rm.uMaxDist.value = uw.uMaxDist.value;
+      this._draw(this.raysMat, this.raysRT);
+    }
 
     // 1) underwater volumetrics → sceneRT
     this._draw(this.underwaterMat, this.sceneRT);

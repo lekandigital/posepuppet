@@ -13,11 +13,11 @@
  *  - `region-preview` (Checkpoint 04A): graybox terrain preview of the baked
  *    authored region — an engineering view (no water, no pose runtime, no
  *    camera access), explicitly not the game look.
- *  - `region` (Checkpoint 04B): THE GAME VIEW — the approved dolphin swims
- *    the baked Twin Bay region under the jeantimex water (app-owned
- *    container-swap copies; 512² player-following sim window). Same body
- *    input/pose-runtime boot as the pool; append &debug=1 for the cp04B
- *    instrument overlay.
+ *  - `region` (Checkpoint 05C): THE GAME VIEW — the approved dolphin swims
+ *    the baked Twin Bay region under the ported WaterThreeJS procedural
+ *    ocean (Gerstner surface, analytic-atmosphere sky, time-of-day cycle,
+ *    linear-HDR post). Same body input/pose-runtime boot as the pool;
+ *    append &debug=1 for the instrument overlay + ocean GUI.
  */
 
 const params = new URLSearchParams(location.search);

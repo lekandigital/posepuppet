@@ -339,18 +339,18 @@ test.describe('checkpoint 05 — terrain across the waterline', () => {
     await testHook(page, 'setIntent({ brake: true })');
     await page.addStyleTag({ content: '#region-overlay { display: none !important; }' });
     await page.waitForTimeout(800);
-    // cp05B instrument condition (gates unchanged): the mask/gap deltas
+    // cp05C instrument condition (gates unchanged): the mask/gap deltas
     // compare paired captures taken ~0.3 s apart, which requires the water
-    // to look identical in both frames. Pre-cp05B the damped surface was
-    // static at capture time; the cp05B ambient motion never damps, so the
-    // ambient CLOCK is frozen for the paired captures — ambient geometry
-    // and normals stay PRESENT (the shoreline masking under ambient
-    // displacement is exactly what the gate then verifies), they just stop
-    // advancing between the two frames. Measured pre-fix: 1756 legal
-    // crest-adjacency water pixels flagged purely by inter-capture ambient
-    // motion (forensic heights +46…+49 m — cliff crests, not shoreline
-    // flats; recorded in the cp05B report).
-    await testHook(page, 'setAmbient({ frozen: true, timeS: 137.25 })');
+    // to look identical in both frames. The OCEAN CLOCK is frozen for the
+    // paired captures — Gerstner geometry, foam, and detail normals stay
+    // PRESENT (shoreline masking under wave displacement is exactly what
+    // the gate verifies), they just stop advancing between the two frames
+    // (the cp05B setAmbient-freeze mechanism's heir). Post/clouds are
+    // disabled so the captures are the raw deterministic linear render
+    // (the volumetric clouds run their own drift clock, and grain/bloom
+    // would smear the pixel-exact comparisons).
+    await testHook(page, 'setOcean({ frozen: true, timeS: 137.25 })');
+    await testHook(page, 'setPostEnabled(false)');
 
     const perBeach: Record<string, unknown> = {};
     let totalLandSamples = 0;
@@ -466,6 +466,13 @@ test.describe('checkpoint 05 — terrain across the waterline', () => {
             };
             const wellPosed = (px: number, py: number, pz: number) =>
               losClear(px, py, pz) && facing(px, py, pz) && crestFree(px, py, pz);
+            // cp05C land-sample law: the WaterThreeJS ocean has no shoreline
+            // discard — Gerstner crests legitimately WASH over beach sand
+            // below the physical wave reach (the demo's swash/shore-foam
+            // behavior). The mask gate therefore samples land ABOVE the
+            // maximum crest height (2 m > amplitude sum + detail): water
+            // there is a genuine masking violation; wash below it is the
+            // ocean working as designed (ocean addendum §4.8 re-spec).
             const land: [number, number, number][] = [];
             const gap: [number, number, number][] = [];
             const beachAbove: [number, number, number][] = [];
@@ -474,7 +481,7 @@ test.describe('checkpoint 05 — terrain across the waterline', () => {
               for (let z = b.z0; z <= b.z1; z += 1.5) {
                 const th = w.terrainHeight(x, z);
                 const sd = w.shoreDistance(x, z);
-                if (sd <= -1.5 && sd >= -25 && th >= 0.2 && land.length < 2000) {
+                if (sd <= -1.5 && sd >= -45 && th >= 2.0 && land.length < 2000) {
                   if (wellPosed(x, th + 0.05, z)) land.push([x, th + 0.05, z]);
                 } else if (sd > 0.3 && sd <= 0.97 && gap.length < 600) {
                   if (losClear(x, 0, z)) gap.push([x, 0, z]);
@@ -515,17 +522,26 @@ test.describe('checkpoint 05 — terrain across the waterline', () => {
       expect(landPx.length, `${beach.name}: land samples in frame`).toBeGreaterThanOrEqual(170);
       expect(gapPx.length, `${beach.name}: shoreline-adjacent samples`).toBeGreaterThanOrEqual(40);
 
+      // cp05C capture discipline: an occluded/idle Chrome window serves a
+      // STALE compositor frame to the first screenshot after a state change
+      // (the screenshot itself wakes the presentation path), so every
+      // measured capture is taken twice and the first is discarded.
+      const shot2 = async (path: string) => {
+        await page.locator('#app canvas').screenshot({ path });
+        await page.waitForTimeout(250);
+        await page.locator('#app canvas').screenshot({ path });
+      };
       const onPath = join(MEDIA_DIR, `beach-${beach.name}-above-on.png`);
       const offPath = join(MEDIA_DIR, `beach-${beach.name}-above-off.png`);
       const bgPath = join(MEDIA_DIR, `beach-${beach.name}-above-bg.png`);
-      await page.locator('#app canvas').screenshot({ path: onPath });
-      await testHook(page, 'setSurfaceVisible(false)');
+      await shot2(onPath);
+      await testHook(page, 'setStageEnabled({ oceanMesh: false })');
       await page.waitForTimeout(300);
-      await page.locator('#app canvas').screenshot({ path: offPath });
-      await testHook(page, 'setSurfaceVisible(true)');
+      await shot2(offPath);
+      await testHook(page, 'setStageEnabled({ oceanMesh: true })');
       await testHook(page, `setFlatBackground(${SCAN_BG})`);
       await page.waitForTimeout(300);
-      await page.locator('#app canvas').screenshot({ path: bgPath });
+      await shot2(bgPath);
       await testHook(page, 'setFlatBackground(null)');
 
       const on = decodePng(onPath);
@@ -575,10 +591,10 @@ test.describe('checkpoint 05 — terrain across the waterline', () => {
       await page.waitForTimeout(1200);
       const belowPath = join(MEDIA_DIR, `beach-${beach.name}-below.png`);
       const belowBgPath = join(MEDIA_DIR, `beach-${beach.name}-below-bg.png`);
-      await page.locator('#app canvas').screenshot({ path: belowPath });
+      await shot2(belowPath);
       await testHook(page, `setFlatBackground(${SCAN_BG})`);
       await page.waitForTimeout(300);
-      await page.locator('#app canvas').screenshot({ path: belowBgPath });
+      await shot2(belowBgPath);
       await testHook(page, 'setFlatBackground(null)');
 
       const beachPxBelow = (await proj(belowSets.beachAbove)).filter((p) => inFrame(p));
@@ -619,6 +635,10 @@ test.describe('checkpoint 05 — terrain across the waterline', () => {
     await testHook(page, `teleport(${SPAWN.x}, ${SPAWN.z}, -3)`);
     await testHook(page, 'setIntent({ brake: true })');
     await page.addStyleTag({ content: '#region-overlay { display: none !important; }' });
+    // cp05C: deterministic raw-render captures for the crack scans (frozen
+    // ocean clock; post/clouds off so scan-background pixels are exact)
+    await testHook(page, 'setOcean({ frozen: true, timeS: 137.25 })');
+    await testHook(page, 'setPostEnabled(false)');
 
     // 1.5 km north→south run up the bay at +35 m, looking west at the
     // crescent ridge/summit silhouette (protected ridge + coastline tiles
@@ -1006,7 +1026,8 @@ test.describe('checkpoint 05 — terrain across the waterline', () => {
     await testHook(page, 'setStageEnabled({ terrain: false })');
     const gpuOff = await settle();
     await testHook(page, 'setStageEnabled({ terrain: true })');
-    const terrainStageMs = Math.max(0, (gpuOn?.render ?? 0) - (gpuOff?.render ?? 0));
+    // cp05C stage names: the scene draw is the 'main' pass
+    const terrainStageMs = Math.max(0, (gpuOn?.main ?? 0) - (gpuOff?.main ?? 0));
     const method =
       'RECORDED ONLY (not gated): GPU timer spans are unsound on this stack — ' +
       'toggle deltas cross DVFS clock states and all-stage spans measure ' +
