@@ -52,8 +52,10 @@ export const ECCO_GRADE = {
     density: 0.95,
   },
   post: {
-    /** Ecco is vividly saturated */
-    saturation: 1.12,
+    /** Ecco is vividly saturated — but the approved Fantasy terrain palette
+     *  is already highly chromatic in the linear pipeline, so only a hair
+     *  above the demo's 1.06 */
+    saturation: 1.08,
     /** modern lens tells off/near-off for period faithfulness */
     ca: 0.0,
     grain: 0.03,
