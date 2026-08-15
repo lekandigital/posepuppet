@@ -30,6 +30,8 @@ export interface OceanDebugGuiCtx {
   postExposure: { base: number };
   /** restore the boot-time Ecco grade after preset/slider experiments */
   applyEccoGrade: () => void;
+  /** cp08 zone-atmosphere driver (enabled flag + cave-darkness input) */
+  zoneAtmo: { enabled: boolean; caveDarkness: number; setEnabled(v: boolean): void };
 }
 
 export function mountOceanDebugGui(ctx: OceanDebugGuiCtx): GUI {
@@ -126,8 +128,18 @@ export function mountOceanDebugGui(ctx: OceanDebugGuiCtx): GUI {
   fClouds.add(ctx.cloudShadowP, 'strength', 0.0, 1.0, 0.02).name('sea shadows');
 
   const fUnder = gui.addFolder('Underwater').close();
+  // NOTE: with the zone atmosphere enabled these two dials are zone-driven
+  // every frame; disable the zone driver below to steer them by hand
   fUnder.add(post.underwaterMat.uniforms.uShaftDensity!, 'value', 0.0, 0.2, 0.005).name('god-ray density');
   fUnder.add(post.underwaterMat.uniforms.uFogStrength!, 'value', 0.0, 2.0, 0.05).name('fog strength');
+  fUnder
+    .add({ on: ctx.zoneAtmo.enabled }, 'on')
+    .name('zone atmosphere (cp08)')
+    .onChange((v: boolean) => {
+      ctx.zoneAtmo.setEnabled(v);
+      if (!v) ctx.applyEccoGrade(); // dials return to the Ecco-grade baseline
+    });
+  fUnder.add(ctx.zoneAtmo, 'caveDarkness', 0, 1, 0.01).name('cave darkness (cp09 demo)');
 
   const fPost = gui.addFolder('Post').close();
   fPost.add(ctx.postExposure, 'base', 0.3, 2.0, 0.02).name('exposure').onChange(applySun);

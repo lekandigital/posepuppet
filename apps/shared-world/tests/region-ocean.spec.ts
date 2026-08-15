@@ -663,6 +663,97 @@ test.describe('checkpoint 05C — ocean replacement (WaterThreeJS port)', () => 
     results.floatingBody = check;
   });
 
+  test('11. zone atmosphere (cp08): smooth per-zone dials — bright shallows, greener midwater, dark deep, true-dark cave capability', async ({ page }) => {
+    test.setTimeout(240_000);
+    await bootRegion(page);
+    await testHook(page, 'teleport(600, 600, -3)');
+    await testHook(page, 'setIntent({ brake: true })');
+    await testHook(page, 'setTimeOfDay({ phase: 0.41, frozen: true })');
+    await testHook(page, 'setOcean({ frozen: true, timeS: 137.25 })');
+
+    // find a genuine midwater column (20–28 m) from the baked data
+    const midPt = (await page.evaluate(() => {
+      const w = (window as any).__SHARED_WORLD.region.world;
+      for (let x = -900; x <= 900; x += 20) {
+        for (let z = -900; z <= 900; z += 20) {
+          const d = w.depthAt(x, z);
+          if (d > 20 && d < 28) return [x, z, d];
+        }
+      }
+      return null;
+    })) as [number, number, number] | null;
+    expect(midPt).not.toBeNull();
+
+    const sample = async (x: number, z: number, y: number) => {
+      await testHook(
+        page,
+        `shotMode({ pos: [${x}, ${y}, ${z}], look: [${x + 50}, ${y}, ${z}], fov: 60, size: [960, 600] })`,
+      );
+      await page.waitForTimeout(350); // camera applied by the frame loop
+      await testHook(page, 'setZoneAtmosphere({ settle: true })');
+      return (await oceanHook(page, 'zoneAtmosphere()')) as {
+        weights: Record<string, number>;
+        dials: {
+          extinction: [number, number, number];
+          fogColor: [number, number, number];
+          fogStrength: number;
+          shaftDensity: number;
+          exposureMul: number;
+          causticMul: number;
+        };
+        columnDepthM: number;
+      };
+    };
+    const luma = (c: [number, number, number]) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+
+    const shallow = await sample(-180, -380, -4);   // spawn bay, ~7.5 m column
+    const mid = await sample(midPt![0], midPt![1], -8);
+    const deep = await sample(450, -30, -15);       // trench, ~80 m column
+
+    // zone dominance
+    expect(shallow.weights.shallow).toBeGreaterThan(0.6);
+    expect(mid.weights.mid).toBeGreaterThan(0.5);
+    expect(deep.weights.deep).toBeGreaterThan(0.9);
+    // visibility falls with zone depth (extinction rises, every channel)
+    for (let c = 0; c < 3; c++) {
+      expect(shallow.dials.extinction[c]!).toBeLessThan(mid.dials.extinction[c]!);
+      expect(mid.dials.extinction[c]!).toBeLessThan(deep.dials.extinction[c]!);
+    }
+    // red always dies fastest; green always travels furthest (r > b > g)
+    for (const s of [shallow, mid, deep]) {
+      expect(s.dials.extinction[0]).toBeGreaterThan(s.dials.extinction[2]);
+      expect(s.dials.extinction[2]).toBeGreaterThan(s.dials.extinction[1]);
+    }
+    // fog identity: bright shallows > midwater > deep; mid is the greenest
+    expect(luma(shallow.dials.fogColor)).toBeGreaterThan(luma(mid.dials.fogColor) * 1.4);
+    expect(luma(mid.dials.fogColor)).toBeGreaterThan(luma(deep.dials.fogColor) * 1.4);
+    const greenness = (c: [number, number, number]) => c[1] / (c[0] + c[1] + c[2]);
+    expect(greenness(mid.dials.fogColor)).toBeGreaterThanOrEqual(greenness(shallow.dials.fogColor) - 0.01);
+    // exposure/caustics dim with depth; shafts fade out
+    expect(shallow.dials.exposureMul).toBeGreaterThan(mid.dials.exposureMul);
+    expect(mid.dials.exposureMul).toBeGreaterThan(deep.dials.exposureMul);
+    expect(shallow.dials.shaftDensity).toBeGreaterThan(deep.dials.shaftDensity + 0.03);
+    expect(shallow.dials.causticMul).toBeGreaterThan(deep.dials.causticMul + 0.5);
+
+    // true-darkness capability (cp09 groundwork): cave weight overrides
+    // WITHOUT touching the open-water table
+    await testHook(page, 'setZoneAtmosphere({ caveDarkness: 1, settle: true })');
+    const dark = (await oceanHook(page, 'zoneAtmosphere()')) as typeof shallow & {
+      dials: { exposureMul: number; fogColor: [number, number, number] };
+    };
+    expect(dark.dials.exposureMul).toBeLessThanOrEqual(0.32);
+    expect(luma(dark.dials.fogColor)).toBeLessThan(luma(deep.dials.fogColor) * 0.25);
+    await testHook(page, 'setZoneAtmosphere({ caveDarkness: 0, settle: true })');
+
+    await testHook(page, 'shotMode(null)');
+    results.zoneAtmosphere = {
+      table: await oceanHook(page, 'zoneTable'),
+      bands: await oceanHook(page, 'zoneBands'),
+      sampled: { shallow, mid, deep, dark },
+      midColumn: midPt,
+    };
+  });
+
   test('10. performance: sustained median fps ≥ 58, simHz > 100 on a scripted burst swim; stage medians recorded', async ({ page, browser }) => {
     test.setTimeout(300_000);
     await bootRegion(page);

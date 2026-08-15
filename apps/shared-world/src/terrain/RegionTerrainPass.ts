@@ -208,6 +208,11 @@ export class RegionTerrainPass {
     this.material.uniforms.uSunDir!.value.copy(sunDir);
   }
 
+  /** the caustic tint uniform (cp08 zone atmosphere scales it in dark water) */
+  get causticColor(): THREE.Color {
+    return this.material.uniforms.uCausticColor!.value as THREE.Color;
+  }
+
   setVisible(v: boolean) {
     this.group.visible = v;
   }

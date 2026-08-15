@@ -30,6 +30,7 @@ import { Clouds } from '../ocean/Clouds';
 import { FloatingBodies } from '../ocean/FloatingBodies';
 import { applyPreset, PRESETS, type SunParams } from '../ocean/presets';
 import { ECCO_GRADE, applyEccoGrade } from '../ocean/eccoGrade';
+import { ZoneAtmosphere, ZONE_TABLE, ZONE_BANDS } from '../ocean/zoneAtmosphere';
 import { createTimeOfDay, TOD, sunAnglesAt } from '../ocean/timeOfDay';
 import { buildRegionContext } from '../terrain/regionContext';
 import {
@@ -178,6 +179,9 @@ export async function startRegionGame(
   ocean.uniforms.uDepthTex.value = refractionRT.depthTexture;
 
   const post = new Post(webglRenderer, innerWidth, innerHeight, sunDir, OCEAN_CONFIG.deepColor);
+  // cp08 zone atmosphere: per-zone drive of the existing underwater dials
+  // (biome.png + depth ramp; Ecco grade = the midwater baseline)
+  const zoneAtmo = new ZoneAtmosphere(data, post, terrain.causticColor);
   const clouds = new Clouds(webglRenderer, innerWidth, innerHeight, { scale: 0.5 });
   const cloudShadowP = { strength: 0.5 };
   const cu = clouds.uniforms;
@@ -208,7 +212,9 @@ export async function startRegionGame(
     const night = THREE.MathUtils.smoothstep(sunParams.elevation, -8, 8);
     sunLight.intensity = (0.6 + 3.0 * Math.max(sunDir.y, 0.0)) * Math.max(night, 0.2);
     skyLight.intensity = 1.1 * (0.18 + 0.82 * night);
-    post.compositeMat.uniforms.uExposure.value = postExposure.base * (0.15 + 0.85 * night);
+    // exposure = base × night dimmer × zone-atmosphere underwater arm
+    post.compositeMat.uniforms.uExposure.value =
+      postExposure.base * (0.15 + 0.85 * night) * zoneAtmo.zoneExposure.value;
   }
 
   const timeOfDay = createTimeOfDay(sunParams, applySun);
@@ -409,6 +415,9 @@ export async function startRegionGame(
     ocean: {
       config: OCEAN_CONFIG,
       grade: ECCO_GRADE,
+      zoneTable: ZONE_TABLE,
+      zoneBands: ZONE_BANDS,
+      zoneAtmosphere: () => zoneAtmo.state(),
       TOD,
       heightAt: (x: number, z: number, t?: number) =>
         ocean.heightAt(x, z, t ?? oceanTimeS),
@@ -529,6 +538,29 @@ export async function startRegionGame(
       applyEccoGrade() {
         applyEccoGrade({ ocean, post, clouds });
         applySun();
+      },
+      /** cp08 zone-atmosphere control: enable/disable, force cave darkness
+       *  (cp09 groundwork), snap the temporal smoothing for captures */
+      setZoneAtmosphere(patch: { enabled?: boolean; caveDarkness?: number; settle?: boolean }) {
+        if (patch.enabled !== undefined) {
+          zoneAtmo.setEnabled(patch.enabled);
+          if (!patch.enabled) {
+            applyEccoGrade({ ocean, post, clouds });
+            applySun();
+          }
+        }
+        if (patch.caveDarkness !== undefined) zoneAtmo.caveDarkness = patch.caveDarkness;
+        if (patch.settle) {
+          const camP = cam.camera.position;
+          const sh = ocean.heightAt(camP.x, camP.z, oceanTimeS);
+          camFwd.set(0, 0, -1).applyQuaternion(cam.camera.quaternion);
+          zoneAtmo.update(
+            0, camP.x, camP.z, camP.y, sh,
+            Math.asin(THREE.MathUtils.clamp(camFwd.y, -1, 1)),
+            true,
+          );
+          applySun();
+        }
       },
       presets: Object.keys(PRESETS),
       /** cp05A: render raw classification albedo on the terrain (no
@@ -723,6 +755,7 @@ export async function startRegionGame(
           applyEccoGrade({ ocean, post, clouds });
           applySun();
         },
+        zoneAtmo,
         applyPreset: (name: string) => {
           const ok = applyPreset(name, { ocean, post, clouds, sunParams, applySun });
           const P = PRESETS[name];
@@ -749,6 +782,7 @@ export async function startRegionGame(
   let prevPhase: 'swim' | 'air' = 'swim';
   let splashImpulse = 0;
   let prevPitch = sim.state.pitch;
+  const camFwd = new THREE.Vector3();
 
   if (loading) loading.innerHTML = '';
 
@@ -853,6 +887,15 @@ export async function startRegionGame(
     const camP = cam.camera.position;
     const surfaceH = ocean.heightAt(camP.x, camP.z, oceanTimeS);
     const underwater = camP.y < surfaceH - 0.15;
+
+    // --- cp08 zone atmosphere (frozen with the ocean clock; the viewer
+    // column tracks the dolphin in play) ---
+    camFwd.set(0, 0, -1).applyQuaternion(cam.camera.quaternion);
+    zoneAtmo.update(
+      oceanFrozen ? 0 : frameDt,
+      camP.x, camP.z, camP.y, surfaceH,
+      Math.asin(THREE.MathUtils.clamp(camFwd.y, -1, 1)),
+    );
 
     // --- per-frame updates (demo animate() transplant) ---
     ocean.update(oceanTimeS, cam.camera);

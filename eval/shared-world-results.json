@@ -1,5 +1,5 @@
 {
-  "checkpoint": "05A-terrain-relief-and-substrate-color",
+  "checkpoint": "05C-ocean-replacement",
   "timestamp": "2026-07-18T05:37:35.848Z",
   "url": "/shared-world/?view=stock",
   "viewport": {
@@ -33,7 +33,7 @@
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
   "paintedPixels": 508275,
-  "generatedAt": "2026-08-14T17:09:58.827Z",
+  "generatedAt": "2026-08-15T13:27:16.396Z",
   "pool": {
     "modelLengthM": 2.8968250546579615,
     "bootConsoleErrors": 0,
@@ -2303,25 +2303,25 @@
       ],
       "colors": [
         [
-          193,
-          202,
-          162
+          191,
+          200,
+          159
         ],
         [
-          121,
-          192,
-          145
+          120,
+          191,
+          142
         ],
         [
           30,
-          140,
-          106
+          139,
+          102
         ]
       ],
       "rbRatios": [
-        1.1901840490797546,
-        0.8356164383561644,
-        0.2897196261682243
+        1.2,
+        0.8461538461538461,
+        0.30097087378640774
       ]
     },
     "snell": {
@@ -2353,51 +2353,51 @@
       ]
     },
     "pipelineSmoke": {
-      "cloudDiff": 0.499640625,
+      "cloudDiff": 0.499515625,
       "postDiff": 0.996984375
     },
     "floatingBody": {
-      "y": -0.8569180216996366,
-      "surf": -0.5780265283093845,
-      "r": 1.1898380737784127,
-      "wet": 0.6192637530688284,
-      "delta": 0.2788914933902521
+      "y": -0.7398722638650637,
+      "surf": -0.6024874924916905,
+      "r": 1.5814576220857486,
+      "wet": 0.5450653315827316,
+      "delta": 0.13738477137337313
     },
     "perf": {
       "script": "burst east across the bay, 12 s",
       "fps": {
         "buckets": [
-          64,
-          65,
-          65,
-          66,
-          66,
-          68,
-          66,
-          66,
-          66,
-          68,
-          65,
-          66
+          120,
+          120,
+          120,
+          120,
+          121,
+          120,
+          120,
+          120,
+          120,
+          120,
+          120,
+          119
         ],
-        "median": 66,
-        "min": 64
+        "median": 120,
+        "min": 119
       },
-      "simHz": 120.82796870357524,
+      "simHz": 119.9520191923229,
       "gpuStageMs": {
-        "refraction": 47.435124,
-        "main": 23.629,
-        "clouds": 6.552874,
-        "post": 13.149
+        "refraction": 70.287666,
+        "main": 13.303374,
+        "clouds": 4.871083,
+        "post": 6.690083
       },
       "cpuStageMs": {
         "refraction": 0,
-        "main": 0.1507246390632961,
-        "clouds": 0.021739131298618042,
-        "post": 0.02173913000286489,
-        "frame": 0.2884057963239974
+        "main": 0.21196581257714164,
+        "clouds": 0.01452991391858484,
+        "post": 0.029914529914529916,
+        "frame": 0.3752136737362951
       },
-      "usedJSHeapBytes": 107778774,
+      "usedJSHeapBytes": 117717053,
       "viewport": {
         "width": 1728,
         "height": 1080
@@ -2408,7 +2408,7 @@
     },
     "frozenDetector": {
       "frozenDiff": 0,
-      "livingDiff": 0.711796875
+      "livingDiff": 0.7029375
     },
     "timeOfDay": {
       "sky": {
@@ -2434,6 +2434,219 @@
           "warmth": 0.5530940369700894
         }
       }
+    },
+    "zoneAtmosphere": {
+      "table": {
+        "shallow": {
+          "extinction": [
+            0.058,
+            0.022,
+            0.03
+          ],
+          "fogColor": [
+            0.032,
+            0.128,
+            0.112
+          ],
+          "fogStrength": 1,
+          "shaftDensity": 0.06,
+          "exposureMul": 1,
+          "causticMul": 1
+        },
+        "mid": {
+          "extinction": [
+            0.072,
+            0.03,
+            0.04
+          ],
+          "fogColor": [
+            0.009,
+            0.08,
+            0.068
+          ],
+          "fogStrength": 1.15,
+          "shaftDensity": 0.045,
+          "exposureMul": 0.96,
+          "causticMul": 0.85
+        },
+        "deep": {
+          "extinction": [
+            0.108,
+            0.054,
+            0.066
+          ],
+          "fogColor": [
+            0.0035,
+            0.026,
+            0.028
+          ],
+          "fogStrength": 1.25,
+          "shaftDensity": 0.012,
+          "exposureMul": 0.78,
+          "causticMul": 0.25
+        },
+        "dark": {
+          "extinction": [
+            0.17,
+            0.105,
+            0.115
+          ],
+          "fogColor": [
+            0.0006,
+            0.004,
+            0.0048
+          ],
+          "fogStrength": 1.3,
+          "shaftDensity": 0,
+          "exposureMul": 0.3,
+          "causticMul": 0
+        }
+      },
+      "bands": {
+        "SHALLOW_LO": 8,
+        "SHALLOW_HI": 16,
+        "DEEP_LO": 30,
+        "DEEP_HI": 48
+      },
+      "sampled": {
+        "shallow": {
+          "enabled": true,
+          "caveDarkness": 0,
+          "weights": {
+            "shallow": 1,
+            "mid": 0,
+            "deep": 0,
+            "dark": 0
+          },
+          "biome": {
+            "bright": 1,
+            "kelp": 0,
+            "plain": 0
+          },
+          "dials": {
+            "extinction": [
+              0.058,
+              0.022,
+              0.03
+            ],
+            "fogColor": [
+              0.032,
+              0.128,
+              0.112
+            ],
+            "fogStrength": 1,
+            "shaftDensity": 0.06,
+            "exposureMul": 1,
+            "causticMul": 1
+          },
+          "exposure": 1,
+          "columnDepthM": 7.580688789367676
+        },
+        "mid": {
+          "enabled": true,
+          "caveDarkness": 0,
+          "weights": {
+            "shallow": 0,
+            "mid": 1,
+            "deep": 0,
+            "dark": 0
+          },
+          "biome": {
+            "bright": 0,
+            "kelp": 0,
+            "plain": 0
+          },
+          "dials": {
+            "extinction": [
+              0.072,
+              0.03,
+              0.04
+            ],
+            "fogColor": [
+              0.009000000000000001,
+              0.08,
+              0.068
+            ],
+            "fogStrength": 1.15,
+            "shaftDensity": 0.045,
+            "exposureMul": 0.96,
+            "causticMul": 0.85
+          },
+          "exposure": 0.96,
+          "columnDepthM": 24.99860908508301
+        },
+        "deep": {
+          "enabled": true,
+          "caveDarkness": 0,
+          "weights": {
+            "shallow": 0,
+            "mid": 0,
+            "deep": 1,
+            "dark": 0
+          },
+          "biome": {
+            "bright": 0,
+            "kelp": 0,
+            "plain": 0
+          },
+          "dials": {
+            "extinction": [
+              0.108,
+              0.054,
+              0.066
+            ],
+            "fogColor": [
+              0.0034999999999999996,
+              0.025999999999999995,
+              0.027999999999999997
+            ],
+            "fogStrength": 1.25,
+            "shaftDensity": 0.011999999999999997,
+            "exposureMul": 0.78,
+            "causticMul": 0.25
+          },
+          "exposure": 0.78,
+          "columnDepthM": 78.40115277099608
+        },
+        "dark": {
+          "enabled": true,
+          "caveDarkness": 1,
+          "weights": {
+            "shallow": 0,
+            "mid": 0,
+            "deep": 0,
+            "dark": 1
+          },
+          "biome": {
+            "bright": 0,
+            "kelp": 0,
+            "plain": 0
+          },
+          "dials": {
+            "extinction": [
+              0.17,
+              0.105,
+              0.115
+            ],
+            "fogColor": [
+              0.0005999999999999998,
+              0.004,
+              0.004799999999999999
+            ],
+            "fogStrength": 1.3,
+            "shaftDensity": 0,
+            "exposureMul": 0.3,
+            "causticMul": 0
+          },
+          "exposure": 0.30000000000000004,
+          "columnDepthM": 78.40115277099608
+        }
+      },
+      "midColumn": [
+        -900,
+        -280,
+        24.99860908508301
+      ]
     }
   }
 }
