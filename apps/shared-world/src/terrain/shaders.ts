@@ -469,11 +469,11 @@ export const SUBSTRATE = /* glsl */ `
     duneM = vnoiseQ(xz * 0.06 + Z_SEED_OFFSET, 0.0);
   }
 
-  /** Classification albedo (pre-detail), LINEAR — the probe/debug surface
-   *  and the base every path shares. */
-  vec3 substrateAlbedo(vec3 point, vec3 normal) {
-    vec2 xz = point.xz;
-    float h = terrainHeight(xz);
+  /** Classification albedo at an EXPLICIT classification height h (cp09:
+   *  cave/arch modules classify by their own surface elevation so the rock
+   *  families match the adjacent terrain at every seam — Track B Q19
+   *  "shared substrate rock classification"). Same math, same constants. */
+  vec3 substrateAlbedoAtH(vec3 point, vec3 normal, float h) {
     float hZ = h * 2.0 + Z_SEA;             // adaptation A2
     float hRel = hZ - Z_SEA;                // = 2·h
     float h01 = hZ / Z_HEIGHT_SCALE;
@@ -491,11 +491,15 @@ export const SUBSTRATE = /* glsl */ `
     return tc.albedo;
   }
 
-  /** Full substrate color: classification + the ZyFou close-range detail
-   *  layer, LINEAR. */
-  vec3 substrateColor(vec3 point, vec3 normal) {
-    vec2 xz = point.xz;
-    float h = terrainHeight(xz);
+  /** Classification albedo (pre-detail), LINEAR — the probe/debug surface
+   *  and the base every path shares. */
+  vec3 substrateAlbedo(vec3 point, vec3 normal) {
+    return substrateAlbedoAtH(point, normal, terrainHeight(point.xz));
+  }
+
+  /** Full substrate color at an EXPLICIT classification height (cp09 cave
+   *  path — see substrateAlbedoAtH). */
+  vec3 substrateColorAtH(vec3 point, vec3 normal, float h) {
     float hZ = h * 2.0 + Z_SEA;
     float hRel = hZ - Z_SEA;
     float h01 = hZ / Z_HEIGHT_SCALE;
@@ -522,6 +526,12 @@ export const SUBSTRATE = /* glsl */ `
     return td.albedo;
   }
 
+  /** Full substrate color: classification + the ZyFou close-range detail
+   *  layer, LINEAR. */
+  vec3 substrateColor(vec3 point, vec3 normal) {
+    return substrateColorAtH(point, normal, terrainHeight(point.xz));
+  }
+
   /** Low-intensity detail normal (unchanged from CP05A). */
   vec3 substrateDetailNormal(vec3 normal, vec3 point) {
     float d = length(cameraPosition - point);
@@ -539,6 +549,51 @@ export const SUBSTRATE = /* glsl */ `
     float shoreMask = zShoreMask(hRel);
     float matStrength = strength * (0.55 + rockMask * 1.05 + shoreMask * 0.25);
     return normalize(normal + vec3(-dx * matStrength * 5.5, 0.0, -dz * matStrength * 5.5));
+  }
+`;
+
+/* ------------------------------------------------------------------------
+ * cp09 cave-bore heightfield omission (addendum §9.1 "locally lower or
+ * omit"): terrain fragments inside a cave bore volume are discarded — the
+ * module trimesh is authoritative there. A single-valued heightfield must
+ * sweep each bore section once near every aperture (measured, recorded by
+ * the bake's cp09-throat checks); the discard removes exactly those sheet
+ * fragments. The bore volumes derive from the committed caves.json station
+ * data (uniforms built by RegionTerrainPass); everything is enclosed by the
+ * watertight module shells, so a discarded fragment always reveals cave
+ * rock, never background.
+ * ---------------------------------------------------------------------- */
+export const MAX_BORE_SEGMENTS = 24;
+
+export const CAVE_BORE = /* glsl */ `
+  uniform int  uBoreCount;
+  uniform vec4 uBoreA[${MAX_BORE_SEGMENTS}]; // x0, z0, x1, z1
+  uniform vec4 uBoreB[${MAX_BORE_SEGMENTS}]; // floor0, floor1, halfW0, halfW1
+  uniform vec2 uBoreC[${MAX_BORE_SEGMENTS}]; // height0, height1
+  uniform vec4 uBoreBox[2];                  // per-cave inflated XZ AABBs
+
+  bool insideCaveBore(vec3 p) {
+    if (uBoreCount == 0) return false;
+    bool near = false;
+    for (int b = 0; b < 2; b++) {
+      if (p.x > uBoreBox[b].x && p.z > uBoreBox[b].y &&
+          p.x < uBoreBox[b].z && p.z < uBoreBox[b].w) near = true;
+    }
+    if (!near) return false;
+    for (int i = 0; i < ${MAX_BORE_SEGMENTS}; i++) {
+      if (i >= uBoreCount) break;
+      vec2 a = uBoreA[i].xy;
+      vec2 e = uBoreA[i].zw - a;
+      float len2 = max(dot(e, e), 1e-6);
+      float t = clamp(dot(p.xz - a, e) / len2, 0.0, 1.0);
+      float lat = length(p.xz - (a + e * t));
+      float halfW = mix(uBoreB[i].z, uBoreB[i].w, t);
+      if (lat > halfW + 0.3) continue;
+      float fl = mix(uBoreB[i].x, uBoreB[i].y, t);
+      float ht = mix(uBoreC[i].x, uBoreC[i].y, t);
+      if (p.y > fl - 0.5 && p.y < fl + ht + 0.5) return true;
+    }
+    return false;
   }
 `;
 
@@ -580,8 +635,13 @@ export const TERRAIN_FRAG = /* glsl */ `
   ${OCEAN_HEIGHT}
   ${CAUSTICS}
   ${SUBSTRATE}
+  ${CAVE_BORE}
 
   void main() {
+    // cp09: heightfield locally omitted inside cave bore volumes (the
+    // module trimesh is authoritative there — addendum §9.1)
+    if (insideCaveBore(vPosition)) discard;
+
     vec3 nGeo = seabedNormal(vPosition.xz);
 
     if (uAlbedoDebug > 0.5) {
@@ -628,6 +688,100 @@ export const TERRAIN_FRAG = /* glsl */ `
       float sheen = smoothstep(1.4, 0.0, y) * (1.0 - wetness * 0.4);
       vec3 H = normalize(sunDir + normalize(cameraPosition - vPosition));
       color += vec3(0.9) * pow(max(dot(nLit, H), 0.0), 40.0) * sheen * 0.3;
+    }
+
+    gl_FragColor = vec4(color, 1.0);
+  }
+`;
+
+/* ------------------------------------------------------------------------
+ * Cave/arch module shaders — Checkpoint 09. Baked world-space geometry
+ * (positions/normals/AO from the committed GLBs) colored by the SAME
+ * substrate classification the terrain uses (Track B Q19 seam rule), with
+ * two cave-specific laws:
+ *  - the classification height is the fragment's OWN elevation (a cave wall
+ *    at the lip classifies identically to the terrain beside it; ceilings
+ *    read as full slope → rock family);
+ *  - the baked ambient occlusion (COLOR_0.r, cosine-weighted BVH bake)
+ *    darkens enclosed interiors — apertures stay the brightest surfaces.
+ * Lighting and caustics are the terrain fragment's own laws verbatim; the
+ * caustic tint uniform is the SAME THREE.Color instance the zone atmosphere
+ * scales, so dark zones kill the dance on cave and terrain together.
+ * ---------------------------------------------------------------------- */
+export const CAVE_VERT = /* glsl */ `
+  varying vec3 vPosition;
+  varying vec3 vNormal;
+  varying float vAo;
+
+  attribute vec4 color; // COLOR_0: R = baked AO (1 = open sky)
+
+  void main() {
+    vPosition = position; // baked in world space; mesh at identity
+    vNormal = normal;
+    vAo = color.r;
+    gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.0);
+  }
+`;
+
+export const CAVE_FRAG = /* glsl */ `
+  precision highp float;
+
+  uniform float uTime;
+  uniform vec3  uSunDir;
+  uniform vec3  uCausticColor;
+  uniform float uWireDebug; // 1 = flat debug tint (the ?debug wireframe pass)
+
+  varying vec3 vPosition;
+  varying vec3 vNormal;
+  varying float vAo;
+
+  ${NOISE}
+  ${HEIGHTFIELD}
+  ${OCEAN_HEIGHT}
+  ${CAUSTICS}
+  ${SUBSTRATE}
+
+  void main() {
+    if (uWireDebug > 0.5) {
+      gl_FragColor = vec4(0.95, 0.35, 0.85, 1.0);
+      return;
+    }
+    // double-sided: flip the interpolated normal on back faces so interior
+    // walls light correctly from inside the bore
+    vec3 nGeo = normalize(vNormal) * (gl_FrontFacing ? 1.0 : -1.0);
+
+    // the fragment's own elevation drives the classification (seam law)
+    vec3 albedo = substrateColorAtH(vPosition, nGeo, vPosition.y);
+    vec3 nLit = substrateDetailNormal(nGeo, vPosition);
+    vec3 sunDir = normalize(uSunDir);
+    vec2 xz = vPosition.xz;
+    float y = vPosition.y;
+    float ndl = clamp(dot(nLit, sunDir), 0.0, 1.0);
+
+    // baked AO: enclosed interiors darken; apertures stay bright
+    float ao = mix(0.22, 1.0, vAo);
+
+    float submerged = oceanHeight(xz) - y;
+
+    vec3 color;
+    if (submerged > 0.0) {
+      float diffuse = 0.45 + 0.55 * ndl;
+      color = albedo * diffuse * ao;
+
+      vec2 flow = sunDir.xz * uTime * 0.4;
+      float c1 = caustics(xz * 0.05 + flow, uTime * 0.6);
+      float c2 = caustics(xz * 0.085 - flow * 0.7 + 15.0, uTime * 0.8);
+      float caus = min(c1, c2) + 0.35 * c1 * c2;
+      float edge = smoothstep(0.0, 0.5, submerged);
+      // caustics require open sky above — the baked AO gates them so no
+      // caustic dance appears under a ceiling (aperture-bound light only)
+      color += uCausticColor * caus * exp(-submerged * 0.06)
+             * (0.4 + 0.8 * ndl) * edge * smoothstep(0.35, 0.85, vAo);
+    } else {
+      float wetness = smoothstep(1.6, -0.2, y);
+      vec3 alb = albedo * mix(1.0, 0.62, wetness * 0.75);
+      vec3 sky = vec3(0.35, 0.5, 0.7);
+      color = alb * (0.35 * sky + 1.05 * ndl) * ao;
     }
 
     gl_FragColor = vec4(color, 1.0);

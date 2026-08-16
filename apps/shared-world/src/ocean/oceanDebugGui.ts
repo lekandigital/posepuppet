@@ -30,8 +30,16 @@ export interface OceanDebugGuiCtx {
   postExposure: { base: number };
   /** restore the boot-time Ecco grade after preset/slider experiments */
   applyEccoGrade: () => void;
-  /** cp08 zone-atmosphere driver (enabled flag + cave-darkness input) */
-  zoneAtmo: { enabled: boolean; caveDarkness: number; setEnabled(v: boolean): void };
+  /** cp08 zone-atmosphere driver (enabled flag + cave-darkness input;
+   *  cp09: the override pin — null = the spatial CaveField drive rules) */
+  zoneAtmo: {
+    enabled: boolean;
+    caveDarkness: number;
+    caveDarknessOverride: number | null;
+    setEnabled(v: boolean): void;
+  };
+  /** cp09: flat-tint + wireframe on the cave meshes (seam inspection) */
+  setCaveWireframe?: (v: boolean) => void;
 }
 
 export function mountOceanDebugGui(ctx: OceanDebugGuiCtx): GUI {
@@ -139,7 +147,31 @@ export function mountOceanDebugGui(ctx: OceanDebugGuiCtx): GUI {
       ctx.zoneAtmo.setEnabled(v);
       if (!v) ctx.applyEccoGrade(); // dials return to the Ecco-grade baseline
     });
-  fUnder.add(ctx.zoneAtmo, 'caveDarkness', 0, 1, 0.01).name('cave darkness (cp09 demo)');
+  // cp09: cave darkness is driven spatially by the CaveField; the slider
+  // PINS an override for inspection, the button releases it
+  const darkProxy = { pin: 0 };
+  fUnder
+    .add(darkProxy, 'pin', 0, 1, 0.01)
+    .name('cave darkness (pin)')
+    .onChange((v: number) => {
+      ctx.zoneAtmo.caveDarknessOverride = v;
+    });
+  fUnder
+    .add(
+      {
+        release: () => {
+          ctx.zoneAtmo.caveDarknessOverride = null;
+        },
+      },
+      'release',
+    )
+    .name('release pin (spatial drive)');
+  if (ctx.setCaveWireframe) {
+    fUnder
+      .add({ wire: false }, 'wire')
+      .name('cave wireframe (cp09 seams)')
+      .onChange((v: boolean) => ctx.setCaveWireframe!(v));
+  }
 
   const fPost = gui.addFolder('Post').close();
   fPost.add(ctx.postExposure, 'base', 0.3, 2.0, 0.02).name('exposure').onChange(applySun);

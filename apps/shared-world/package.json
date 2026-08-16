@@ -13,6 +13,7 @@
     "review": "node review.mjs"
   },
   "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.20.0",
     "lil-gui": "^0.21.0",
     "three": "^0.184.0",
     "three-mesh-bvh": "^0.9.12"

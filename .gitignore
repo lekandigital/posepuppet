@@ -117,6 +117,16 @@ FABLE_REMOTE_HANDOFF.local.md
 !apps/shared-world/public/world/
 !apps/shared-world/public/world/**
 
+# CP09: Kenney Modular Cave Kit 1.0 (CC0, user-approved 2026-08-16) —
+# authoring-time GLB geometry only. Kit textures are unused (runtime
+# materials share the region substrate rock classification). The ZIP is
+# not committed.
+!apps/shared-world/authoring/assets/
+!apps/shared-world/authoring/assets/kenney-modular-cave-kit/
+!apps/shared-world/authoring/assets/kenney-modular-cave-kit/**
+apps/shared-world/authoring/assets/kenney-modular-cave-kit/**/Textures/
+apps/shared-world/authoring/assets/kenney-modular-cave-kit/**/*.png
+
 # Stage-3 planning references (post-CP05 addendum): the pinned ZyFou
 # ProceduralTerrains snapshot and the 13 Ecco waterline frames are intentional
 # committed documentation inputs. Their existing binary files were force-added

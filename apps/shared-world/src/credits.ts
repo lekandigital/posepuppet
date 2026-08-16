@@ -32,9 +32,21 @@ export function mountCredits(root: HTMLElement): void {
     </p>
     <h2 style="font-size:1rem;margin:1.2rem 0 .4rem">Water</h2>
     <p>
-      Water rendering by
+      Region ocean: a TypeScript port of
+      <a style="color:#8fd4ff" href="https://github.com/mohamedachrefelouafi/WaterThreeJS" target="_blank" rel="noopener noreferrer">WaterThreeJS</a>
+      by mohamedachrefelouafi (MIT; license text ships beside the ported code).
+      Pool and stock views: water rendering by
       <a style="color:#8fd4ff" href="https://github.com/jeantimex/threejs-water" target="_blank" rel="noopener noreferrer">jeantimex/threejs-water</a>
       (MIT) — a Three.js port of Evan Wallace&rsquo;s WebGL water. Pool tile texture from zooboing on Flickr.
+    </p>
+    <h2 style="font-size:1rem;margin:1.2rem 0 .4rem">Caves</h2>
+    <p>
+      Cave and arch dressing geometry from the
+      <a style="color:#8fd4ff" href="https://kenney.nl/assets/modular-cave-kit" target="_blank" rel="noopener noreferrer">Modular Cave Kit</a>
+      by <a style="color:#8fd4ff" href="https://www.kenney.nl" target="_blank" rel="noopener noreferrer">Kenney</a>
+      (<a style="color:#8fd4ff" href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener noreferrer">CC0</a>),
+      kitbashed onto BodyArcade&rsquo;s hand-authored cave shells at bake time.
+      Crediting is voluntary under CC0 — given with thanks.
     </p>
     <p style="margin-top:2rem">
       <a style="color:#8fd4ff" href="?view=pool">&larr; back to the pool</a> ·

@@ -20,8 +20,9 @@
 
 import * as THREE from 'three';
 import type { WorldData } from '../world/WorldData';
+import { CaveField } from '../world/CaveField';
 import { regionUniforms, type RegionContext } from './regionContext';
-import { TERRAIN_VERT, TERRAIN_FRAG } from './shaders';
+import { TERRAIN_VERT, TERRAIN_FRAG, MAX_BORE_SEGMENTS } from './shaders';
 
 export const TILES = 16;
 /** heightmap cells per tile side (2048 / 16) */
@@ -83,6 +84,26 @@ export class RegionTerrainPass {
     sunDir: THREE.Vector3,
   ) {
     const t0 = performance.now();
+    // cp09: cave-bore omission uniforms (addendum §9.1 — terrain fragments
+    // inside a bore volume are discarded; the trimesh is authoritative).
+    // Derived from the committed caves.json runtime stations.
+    const bore = new CaveField(data.caves).boreSegments();
+    if (bore.segments.length > MAX_BORE_SEGMENTS) {
+      throw new Error(`cave bore segments ${bore.segments.length} > ${MAX_BORE_SEGMENTS}`);
+    }
+    const boreA = Array.from({ length: MAX_BORE_SEGMENTS }, () => new THREE.Vector4());
+    const boreB = Array.from({ length: MAX_BORE_SEGMENTS }, () => new THREE.Vector4());
+    const boreC = Array.from({ length: MAX_BORE_SEGMENTS }, () => new THREE.Vector2());
+    bore.segments.forEach((s, i) => {
+      boreA[i]!.set(s.x0, s.z0, s.x1, s.z1);
+      boreB[i]!.set(s.floor0, s.floor1, s.halfW0, s.halfW1);
+      boreC[i]!.set(s.height0, s.height1);
+    });
+    const boreBox = [new THREE.Vector4(1e9, 1e9, -1e9, -1e9), new THREE.Vector4(1e9, 1e9, -1e9, -1e9)];
+    bore.boxes.slice(0, 2).forEach((b, i) => {
+      boreBox[i]!.set(b.minX, b.minZ, b.maxX, b.maxZ);
+    });
+
     this.material = new THREE.ShaderMaterial({
       vertexShader: TERRAIN_VERT,
       fragmentShader: TERRAIN_FRAG,
@@ -90,6 +111,11 @@ export class RegionTerrainPass {
       uniforms: {
         uSunDir: { value: sunDir.clone() },
         uCausticColor: { value: new THREE.Color(1.0, 0.98, 0.85) },
+        uBoreCount: { value: bore.segments.length },
+        uBoreA: { value: boreA },
+        uBoreB: { value: boreB },
+        uBoreC: { value: boreC },
+        uBoreBox: { value: boreBox },
         // shared, by reference — auto-synced with the ocean's wave settings
         uTime: oceanUniforms.uTime!,
         uWindDir: oceanUniforms.uWindDir!,

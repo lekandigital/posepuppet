@@ -41,6 +41,8 @@ import {
   LOD_DISTANCES_M,
   SKIRT_DROP_M,
 } from '../terrain/RegionTerrainPass';
+import { CavesPass } from '../terrain/CavesPass';
+import { RegionCollision } from './rapierCollision';
 import { WorldData } from '../world/WorldData';
 import { RegionSampler } from '../world/RegionSampler';
 import { SwimSim, SIM, NEUTRAL_INTENT, type AssistMode, type SwimIntent } from './sim';
@@ -145,6 +147,14 @@ export async function startRegionGame(
   const terrain = new RegionTerrainPass(data, ctx, ocean.uniforms, sunDir);
   scene.add(terrain.group);
 
+  // --- cp09 cave/arch modules: committed GLBs rendered with the shared
+  // substrate-rock material; the same geometry feeds the camera BVHs and
+  // the Rapier trimesh colliders (one artifact, three consumers) ---
+  const caves = await CavesPass.load(
+    import.meta.env.BASE_URL, data, ctx, ocean.uniforms, sunDir, terrain.causticColor,
+  );
+  scene.add(caves.group);
+
   // Marine snow restrained vs the demo's 5000 (Ecco frames show sparse
   // motes; Track D keeps particles subordinate to the fog) — count is a
   // construction option, the field/shader untouched.
@@ -205,6 +215,7 @@ export async function startRegionGame(
     ocean.setSun(sunDir);
     floor.setSun(sunDir);
     terrain.setSun(sunDir);
+    caves.setSun(sunDir);
     post.underwaterMat.uniforms.uSunDir.value.copy(sunDir);
     clouds.setSun(sunDir);
     sunLight.position.copy(sunDir).multiplyScalar(300);
@@ -227,8 +238,11 @@ export async function startRegionGame(
     `${dolphin.measuredLengthM.toFixed(3)} m (expected 2.89 ± 2 %; BL policy: measure, never rescale)`,
   );
 
-  // --- sim + controls + camera: the approved systems on RegionSampler ---
+  // --- sim + controls + camera: the approved systems on RegionSampler
+  // (cp09: the sampler now carries the CaveField — the analytic cave
+  // containment inside the deterministic 120 Hz step) ---
   const sampler = new RegionSampler(data);
+  const caveField = sampler.caveField;
   const sim = new SwimSim(sampler);
   sim.state.x = spawn.x;
   sim.state.z = spawn.z;
@@ -236,9 +250,117 @@ export async function startRegionGame(
   sim.state.wvx = Math.sin(spawn.yaw) * sim.state.speed;
   sim.state.wvz = Math.cos(spawn.yaw) * sim.state.speed;
   const controls = createSwimControls();
-  const bvh = new TerrainBvh(data);
+  // cp09: the terrain BVH skips triangles inside cave bore volumes (the
+  // local heightfield omission — matches the shader discard)
+  const bvh = new TerrainBvh(data, caveField);
   for (let k = 0; k < 9; k++) bvh.prefetch(spawn.x, spawn.z);
-  const camCollision = new RegionCameraCollision(data, bvh, RIG.COLLISION_RADIUS);
+  const camCollision = new RegionCameraCollision(
+    data, bvh, RIG.COLLISION_RADIUS, 5, null, caveField,
+  );
+  camCollision.setCaves(caves); // cp09: cave BVHs join every camera query
+
+  // --- cp09 Rapier volumetric collision (heightfield + module trimeshes;
+  // character-controller correction inside the fixed loop; heightfield
+  // locally omitted inside bore volumes) ---
+  const rapier = await RegionCollision.create(data, caves.moduleGeometry, caveField);
+
+  // --- cp09 scripted cave traversal (spec §8.2 + manual-review support):
+  // a waypoint autopilot steers the LIVE sim along a cave's baked station
+  // centerline — the traversal exercises the real sim/collision/camera
+  // stack; the spec polls progress, contact, and camera state. ---
+  interface CaveSwim {
+    caveId: string;
+    waypoints: { x: number; y: number; z: number }[];
+    i: number;
+    done: boolean;
+    tS: number;
+    kickAcc: number;
+    maxWedgeT: number;
+    minSpeed: number;
+    maxLosBlockedS: number;
+  }
+  let caveSwim: CaveSwim | null = null;
+
+  function buildCaveWaypoints(
+    caveId: string,
+    opts: { reverse?: boolean; thereAndBack?: boolean },
+  ): { x: number; y: number; z: number }[] {
+    const mod = data.caves.modules.find((m) => m.id === caveId);
+    const st = mod?.runtime?.stations ?? [];
+    if (st.length < 2) return [];
+    let pts = st.map((p) => ({ x: p.x, y: p.floorY + p.height * 0.55, z: p.z }));
+    if (opts.reverse) pts = pts.reverse();
+    const ext = (
+      a: { x: number; y: number; z: number },
+      b: { x: number; y: number; z: number },
+      d: number,
+    ) => {
+      const dx = a.x - b.x;
+      const dz = a.z - b.z;
+      const l = Math.hypot(dx, dz) || 1;
+      return { x: a.x + (dx / l) * d, y: a.y, z: a.z + (dz / l) * d };
+    };
+    const out: { x: number; y: number; z: number }[] = [...pts];
+    if (opts.thereAndBack) {
+      const inbound = mod?.runtime?.endCap ? pts.slice(0, -1) : pts;
+      const back = [...inbound].reverse().slice(1);
+      out.length = 0;
+      out.push(...inbound, ...back, ext(pts[0]!, pts[1]!, 12));
+    } else if (mod?.runtime?.endCap) {
+      // optional dead-end: swim in to the chamber (the cap ram is test 7)
+      return pts.slice(0, -1);
+    } else {
+      out.push(ext(pts[pts.length - 1]!, pts[pts.length - 2]!, 12));
+    }
+    return out;
+  }
+
+  /** frame-rate steering toward the current waypoint (drives SwimIntent) */
+  function steerCaveSwim(dtS: number): SwimIntent | null {
+    if (!caveSwim || caveSwim.done) return null;
+    const s = sim.state;
+    caveSwim.tS += dtS;
+    const pts = caveSwim.waypoints;
+    // consume every waypoint already within the arrival disk so a curved
+    // centerline cannot stall on a station the dolphin has already passed
+    while (caveSwim.i < pts.length) {
+      const w = pts[caveSwim.i]!;
+      const dPlan = Math.hypot(w.x - s.x, w.z - s.z);
+      if (dPlan >= 8) break;
+      caveSwim.i++;
+    }
+    if (caveSwim.i >= pts.length) {
+      caveSwim.done = true;
+      return { ...NEUTRAL_INTENT };
+    }
+    const wp = pts[caveSwim.i]!;
+    const dx = wp.x - s.x;
+    const dz = wp.z - s.z;
+    const dPlan = Math.hypot(dx, dz);
+    const desiredYaw = Math.atan2(dx, dz);
+    let yawErr = (desiredYaw - s.yaw) % (2 * Math.PI);
+    if (yawErr > Math.PI) yawErr -= 2 * Math.PI;
+    if (yawErr < -Math.PI) yawErr += 2 * Math.PI;
+    const roll = Math.max(-1, Math.min(1, yawErr * 1.4));
+    const dy = wp.y - s.y;
+    const desiredPitch = -Math.atan2(dy, Math.max(dPlan, 3));
+    const pitch = Math.max(-1, Math.min(1, (desiredPitch - s.pitch) * 3));
+    caveSwim.kickAcc += dtS;
+    let kicks = 0;
+    if (s.speed < 5.5 && caveSwim.kickAcc > 0.32) {
+      kicks = 1;
+      caveSwim.kickAcc = 0;
+    }
+    return {
+      ...NEUTRAL_INTENT,
+      pitch,
+      roll,
+      kicks,
+      kickAmp: 1,
+      kickRate: kicks > 0 ? 2.2 : 0,
+      burst: dPlan > 10 && Math.abs(yawErr) < 0.6,
+    };
+  }
 
   // --- deterministic ocean clock (test-controllable; never wall clock) ---
   let oceanTimeS = 0;
@@ -246,8 +368,12 @@ export async function startRegionGame(
 
   const cam = new CameraRig(innerWidth / innerHeight, camCollision, REGION_FAR, {
     terrainCompression: true,
-    // cp05C: the visual waterline is the Gerstner surface (CPU mirror)
     waterlineAt: (x, z) => ocean.heightAt(x, z, oceanTimeS),
+    interiorFollowScale: (x, y, z) => {
+      const hit = caveField.queryColumn(x, z);
+      if (!hit || hit.q.w < 0.4) return 1;
+      return hit.q.halfW < 4.2 ? 0.38 : 0.62;
+    },
   });
   ocean.uniforms.uNear.value = cam.camera.near;
   ocean.uniforms.uFar.value = cam.camera.far;
@@ -309,6 +435,7 @@ export async function startRegionGame(
     particles: true,
     oceanMesh: true,
     terrain: true,
+    caves: true,
   };
 
   // cp02 coverage probe (unchanged from the pool shell)
@@ -477,6 +604,26 @@ export async function startRegionGame(
         bvhStats: () => ({ ...bvh.stats }),
         cameraClearanceM: () => camCollision.lastClearanceM,
       },
+      // --- cp09 caves + collision instrumentation ---
+      caves: {
+        data: data.caves,
+        stats: () => ({
+          ...caves.stats,
+          modules: caves.stats.modules.map((m) => ({ ...m })),
+        }),
+      },
+      collision: {
+        stats: () => ({
+          ...rapier.stats,
+          trimeshes: rapier.stats.trimeshes.map((t) => ({ ...t })),
+        }),
+        /** Rapier heightfield vs analytic terrain agreement probe */
+        heightProbe: (pts: [number, number][]) =>
+          rapier.heightProbe(pts).map((p) => ({
+            ...p,
+            analytic: data.terrainHeight(p.x, p.z),
+          })),
+      },
     },
     test: {
       /** fixed-camera fidelity-shot mode; null restores */
@@ -504,6 +651,7 @@ export async function startRegionGame(
       setStageEnabled(patch: Partial<typeof stageEnabled>) {
         Object.assign(stageEnabled, patch);
         terrain.setVisible(stageEnabled.terrain);
+        caves.setVisible(stageEnabled.caves);
       },
       /** post on/off — off renders the main pass straight to the canvas
        *  (raw linear values; the flat-background/seam scans use this) */
@@ -539,9 +687,14 @@ export async function startRegionGame(
         applyEccoGrade({ ocean, post, clouds });
         applySun();
       },
-      /** cp08 zone-atmosphere control: enable/disable, force cave darkness
-       *  (cp09 groundwork), snap the temporal smoothing for captures */
-      setZoneAtmosphere(patch: { enabled?: boolean; caveDarkness?: number; settle?: boolean }) {
+      /** cp08 zone-atmosphere control: enable/disable, pin cave darkness
+       *  (cp09: a number pins the override; null releases it back to the
+       *  spatial CaveField drive), snap the temporal smoothing for captures */
+      setZoneAtmosphere(patch: {
+        enabled?: boolean;
+        caveDarkness?: number | null;
+        settle?: boolean;
+      }) {
         if (patch.enabled !== undefined) {
           zoneAtmo.setEnabled(patch.enabled);
           if (!patch.enabled) {
@@ -549,11 +702,15 @@ export async function startRegionGame(
             applySun();
           }
         }
-        if (patch.caveDarkness !== undefined) zoneAtmo.caveDarkness = patch.caveDarkness;
+        if (patch.caveDarkness !== undefined) {
+          zoneAtmo.caveDarknessOverride = patch.caveDarkness;
+        }
         if (patch.settle) {
           const camP = cam.camera.position;
           const sh = ocean.heightAt(camP.x, camP.z, oceanTimeS);
           camFwd.set(0, 0, -1).applyQuaternion(cam.camera.quaternion);
+          // cp09: refresh the spatial darkness drive at the settle column
+          zoneAtmo.caveDarkness = caveField.darknessAt(camP.x, camP.y, camP.z);
           zoneAtmo.update(
             0, camP.x, camP.z, camP.y, sh,
             Math.asin(THREE.MathUtils.clamp(camFwd.y, -1, 1)),
@@ -564,24 +721,197 @@ export async function startRegionGame(
       },
       presets: Object.keys(PRESETS),
       /** cp05A: render raw classification albedo on the terrain (no
-       *  lighting) — the probe surface the CPU twin compares against */
+       *  lighting) — the probe surface the CPU twin compares against.
+       *  cp09: cave meshes hide during the probe so they can never occlude
+       *  a terrain probe pixel (recorded in the cp09 report). */
       setAlbedoDebug(v: boolean) {
         terrain.setAlbedoDebug(v);
+        caves.setVisible(!v && stageEnabled.caves);
       },
       /** cp05A: the classification CPU twin at world points */
       substrateProbe(pts: [number, number][]) {
         return pts.map(([x, z]) => substrateSampleCpu(data, x, z));
       },
       /** structural audit: the terrain fragment carries the ONE substrate
-       *  entry point and no legacy tint law */
+       *  entry point and no legacy tint law (cp09: the cave fragment is
+       *  audited on the same terms — shared classification, Q19) */
       substrateShaderAudit() {
         const marker = 'substrateAlbedo(';
         const legacyTint = 'waterPathTint(';
         const terrainSrc = terrain.fragmentSource();
+        const caveSrc = caves.fragmentSource();
         return {
           terrainHasSubstrate: terrainSrc.includes(marker),
-          anyLegacyTintLaw: terrainSrc.includes(legacyTint),
+          anyLegacyTintLaw: terrainSrc.includes(legacyTint) || caveSrc.includes(legacyTint),
+          caveHasSubstrate: caveSrc.includes('substrateColorAtH('),
         };
+      },
+
+      // ------------------------------------------------------------------
+      // cp09 cave hooks
+      // ------------------------------------------------------------------
+
+      /** CaveField probe at world points: per-channel projection, blended
+       *  sampler answers, darkness (the deterministic containment surface) */
+      caveProbe(pts: [number, number, number][]) {
+        return pts.map(([x, y, z]) => ({
+          x, y, z,
+          darkness: caveField.darknessAt(x, y, z),
+          channels: caveField.probe(x, y, z).map((c) => ({
+            id: c.id,
+            q: c.q
+              ? {
+                  s: c.q.s, lat: c.q.lat, w: c.q.w,
+                  floorY: c.q.floorY, halfW: c.q.halfW, height: c.q.height,
+                  overshoot: c.q.overshoot, mouthDist: c.q.mouthDist,
+                }
+              : null,
+          })),
+          eff: {
+            terrainHeight: sampler.terrainHeight(x, z),
+            shoreDistance: sampler.shoreDistance(x, z),
+            inWater: sampler.inWater(x, z),
+            ceiling: sampler.ceilingAt(x, z),
+          },
+        }));
+      },
+      /** live sim contact/anti-wedge internals (traversal assertions) */
+      contactState() {
+        return sim.contactState();
+      },
+      /**
+       * Measured clearance at each baked station of a cave (BVH ray fans
+       * from the interior centerline — the CP09 clearance evidence): width
+       * at mid-height, floor→ceiling height at center.
+       */
+      caveClearance(caveId: string) {
+        const mod = data.caves.modules.find((m) => m.id === caveId);
+        const st = mod?.runtime?.stations ?? [];
+        if (st.length < 2) return null;
+        const rows: {
+          s: number; widthM: number | null; heightM: number | null;
+        }[] = [];
+        const o = new THREE.Vector3();
+        const d = new THREE.Vector3();
+        const MAXD = 40;
+        for (let i = 0; i < st.length; i++) {
+          const p = st[i]!;
+          const nb = st[Math.min(i + 1, st.length - 1)]!;
+          const pb = st[Math.max(i - 1, 0)]!;
+          let ax = nb.x - pb.x;
+          let az = nb.z - pb.z;
+          const al = Math.hypot(ax, az) || 1;
+          ax /= al;
+          az /= al;
+          // lateral = axis-left perpendicular
+          const lx = -az;
+          const lz = ax;
+          const midY = p.floorY + p.height * 0.5;
+          o.set(p.x, midY, p.z);
+          d.set(lx, 0, lz);
+          const wPos = caves.rayDistance(o, d, MAXD);
+          d.set(-lx, 0, -lz);
+          const wNeg = caves.rayDistance(o, d, MAXD);
+          d.set(0, 1, 0);
+          const hUp = caves.rayDistance(o, d, MAXD);
+          d.set(0, -1, 0);
+          const hDown = caves.rayDistance(o, d, MAXD);
+          rows.push({
+            s: p.s,
+            widthM: wPos !== null && wNeg !== null ? wPos + wNeg : null,
+            heightM: hUp !== null && hDown !== null ? hUp + hDown : null,
+          });
+        }
+        return rows;
+      },
+      /** arch clearance: opening width at the crown column + clear height */
+      archClearance() {
+        const mod = data.caves.modules.find((m) => m.id === 'arch-islet-gap');
+        const op = mod?.runtime?.opening;
+        if (!op) return null;
+        const o = new THREE.Vector3();
+        const d = new THREE.Vector3();
+        // swim-through direction = yaw; width measured perpendicular to it
+        const px = Math.cos(op.yaw);
+        const pz = -Math.sin(op.yaw);
+        // the loft places ringW vertically at the crown, so crownY is the
+        // beam CENTER, not the soffit. Sample in the opening void, well
+        // below the beam and above the footings.
+        const floorH = data.terrainHeight(op.x, op.z);
+        const midY = (floorH + (op.crownY - 2.2)) * 0.5;
+        o.set(op.x, midY, op.z);
+        d.set(px, 0, pz);
+        const wPos = caves.rayDistance(o, d, 30);
+        d.set(-px, 0, -pz);
+        const wNeg = caves.rayDistance(o, d, 30);
+        d.set(0, 1, 0);
+        const up = caves.rayDistance(o, d, 30);
+        return {
+          openingW: wPos !== null && wNeg !== null ? wPos + wNeg : null,
+          crownClearance: up,
+          clearHeightM: up !== null ? midY + up - floorH : null,
+          floorH,
+          crownY: op.crownY,
+        };
+      },
+      /** cp09 scripted traversal control (drives the LIVE sim) */
+      startCaveSwim(caveId: string, opts: { reverse?: boolean; thereAndBack?: boolean } = {}) {
+        const waypoints = buildCaveWaypoints(caveId, opts);
+        if (waypoints.length === 0) return false;
+        const first = waypoints[0]!;
+        sim.state.x = first.x;
+        sim.state.z = first.z;
+        sim.state.y = first.y;
+        const second = waypoints[1]!;
+        const yaw = Math.atan2(second.x - first.x, second.z - first.z);
+        sim.state.yaw = yaw;
+        sim.state.speed = 3;
+        sim.state.wvx = Math.sin(yaw) * 3;
+        sim.state.wvz = Math.cos(yaw) * 3;
+        sim.state.pitch = 0;
+        caveSwim = {
+          caveId, waypoints, i: 1, done: false, tS: 0, kickAcc: 0,
+          maxWedgeT: 0, minSpeed: Infinity, maxLosBlockedS: 0,
+        };
+        cam.snap(); // eye starts at the approach, not a 400 m LOS-blocked chase
+        return true;
+      },
+      snapCamera() {
+        cam.snap();
+      },
+      placeAndFace(x: number, z: number, y: number, yaw: number, speed = 4) {
+        sim.state.x = x;
+        sim.state.z = z;
+        sim.state.y = y;
+        sim.state.yaw = yaw;
+        sim.state.pitch = 0;
+        sim.state.roll = 0;
+        sim.state.speed = speed;
+        sim.state.wvx = Math.sin(yaw) * speed;
+        sim.state.wvz = Math.cos(yaw) * speed;
+        sim.state.wvy = 0;
+        cam.snap();
+      },
+      stopCaveSwim() {
+        caveSwim = null;
+      },
+      caveSwimState() {
+        return caveSwim
+          ? {
+              caveId: caveSwim.caveId,
+              i: caveSwim.i,
+              total: caveSwim.waypoints.length,
+              done: caveSwim.done,
+              tS: caveSwim.tS,
+              maxWedgeT: caveSwim.maxWedgeT,
+              minSpeed: caveSwim.minSpeed === Infinity ? null : caveSwim.minSpeed,
+              maxLosBlockedS: caveSwim.maxLosBlockedS,
+            }
+          : null;
+      },
+      /** ?debug seam inspection: flat tint + wireframe on the cave meshes */
+      setCaveWireframe(v: boolean) {
+        caves.setWireDebug(v);
       },
       /** project world points through the live camera → pixel coords */
       projectPoints(pts: [number, number, number][]) {
@@ -756,6 +1086,7 @@ export async function startRegionGame(
           applySun();
         },
         zoneAtmo,
+        setCaveWireframe: (v: boolean) => caves.setWireDebug(v),
         applyPreset: (name: string) => {
           const ok = applyPreset(name, { ocean, post, clouds, sunParams, applySun });
           const P = PRESETS[name];
@@ -826,19 +1157,28 @@ export async function startRegionGame(
     acc += dtMs / 1000;
 
     const live = controls.intent(dtMs);
-    const intent: SwimIntent = testIntent ? { ...live, ...testIntent } : live;
+    // cp09: an active scripted cave traversal owns the intent wholesale
+    const steer = steerCaveSwim(dtMs / 1000);
+    const intent: SwimIntent = steer ?? (testIntent ? { ...live, ...testIntent } : live);
 
     if (shot) {
       acc = 0; // sim frozen during fidelity shots (water keeps running)
     }
     let kicksLeft = intent.kicks;
     while (acc >= SIM.DT) {
+      // cp09: Rapier character-controller correction rides INSIDE the fixed
+      // loop — desired movement = the step the deterministic sim just took
+      const px = sim.state.x;
+      const py = sim.state.y;
+      const pz = sim.state.z;
       sim.step({ ...intent, kicks: kicksLeft }, SIM.DT);
+      rapier.correct(px, py, pz, sim.state);
       kicksLeft = 0;
       acc -= SIM.DT;
       steps++;
       if (sim.state.splashed) splashes++;
     }
+    rapier.step(); // once per frame (bookkeeping + honest cost measurement)
 
     const s = sim.state;
     const frameDt = dtMs / 1000;
@@ -880,6 +1220,12 @@ export async function startRegionGame(
       cam.update(s, frameDt);
       rigUs += (performance.now() - rigT0) * 1000;
       rigN++;
+      if (caveSwim && caveSwim.tS > 3 && !caveSwim.done) {
+        const cs = sim.contactState();
+        caveSwim.maxWedgeT = Math.max(caveSwim.maxWedgeT, cs.wedgeT);
+        caveSwim.minSpeed = Math.min(caveSwim.minSpeed, s.speed);
+        caveSwim.maxLosBlockedS = Math.max(caveSwim.maxLosBlockedS, cam.evalState().losBlockedS);
+      }
     }
     cam.camera.updateMatrixWorld();
 
@@ -889,7 +1235,11 @@ export async function startRegionGame(
     const underwater = camP.y < surfaceH - 0.15;
 
     // --- cp08 zone atmosphere (frozen with the ocean clock; the viewer
-    // column tracks the dolphin in play) ---
+    // column tracks the dolphin in play). cp09: the cave darkness input is
+    // driven spatially by the CaveField at the viewer — genuine darkness
+    // inside cave interiors, exactly 0 in open water, mouth-blended
+    // between (unless a test/GUI override pins it). ---
+    zoneAtmo.caveDarkness = caveField.darknessAt(camP.x, camP.y, camP.z);
     camFwd.set(0, 0, -1).applyQuaternion(cam.camera.quaternion);
     zoneAtmo.update(
       oceanFrozen ? 0 : frameDt,
@@ -1053,6 +1403,11 @@ export async function startRegionGame(
         `(SHORE_BAND ${SIM.SHORE_BAND} / SHORE_PUSH ${SIM.SHORE_PUSH})\n` +
         `ocean t ${oceanTimeS.toFixed(1)} s${oceanFrozen ? ' (frozen)' : ''} · ` +
         `tod phase ${tod.phase.toFixed(3)} el ${tod.elevationDeg.toFixed(1)}° az ${tod.azimuthDeg.toFixed(0)}° ×${tod.speedMul}\n` +
+        `cave dark ${zoneAtmo.caveDarkness.toFixed(2)}` +
+        `${zoneAtmo.caveDarknessOverride !== null ? ` (pinned ${zoneAtmo.caveDarknessOverride.toFixed(2)})` : ''} · ` +
+        `rapier cc ${rapier.stats.ccUsAvg.toFixed(0)} µs · step ${rapier.stats.stepMsAvg.toFixed(2)} ms · ` +
+        `corr ${rapier.stats.corrections}` +
+        `${caveSwim ? ` · caveswim ${caveSwim.i}/${caveSwim.waypoints.length}${caveSwim.done ? ' DONE' : ''}` : ''}\n` +
         `camera ${underwater ? 'BELOW' : 'ABOVE'} · surface ${surfaceH.toFixed(2)} m · ` +
         `foam bodies ${ou.uBodyCount.value}\n` +
         `fps ${fps.toFixed(0)} · simHz ${simHz.toFixed(0)}\n` +

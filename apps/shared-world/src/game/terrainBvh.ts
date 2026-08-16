@@ -1,7 +1,7 @@
 // TerrainBvh — Checkpoint 05 camera-query acceleration (Master §5.3:
-// three-mesh-bvh carries all non-physics spatial queries; Rapier does not
-// arrive until cp09). PRESENTATION-SIDE ONLY: the 120 Hz sim's terrain
-// contact stays analytic (heightfield + shore SDF) so replays remain
+// three-mesh-bvh carries all non-physics spatial queries; Rapier owns
+// volumetric collision from cp09). PRESENTATION-SIDE ONLY: the 120 Hz sim's
+// terrain contact stays analytic (heightfield + shore SDF) so replays remain
 // platform-stable (cp05 §6 determinism law); only the camera consumes this.
 //
 // Per-tile lazy BVHs over the LOD-0 terrain grid (the same 16×16 / 128-cell
@@ -10,10 +10,16 @@
 // build on first demand (~tens of ms each, measured and reported) with a
 // small LRU so memory stays bounded; a per-frame prefetch budget of one
 // build keeps hitches out of the steady state.
+//
+// cp09: triangles whose vertices all sit inside a cave bore volume are
+// SKIPPED at tile build (the heightfield locally omitted, addendum §9.1) so
+// camera queries agree with the rendered terrain (whose fragments discard
+// inside the bores) and never collide the camera with an invisible sliver.
 
 import * as THREE from 'three';
 import { MeshBVH } from 'three-mesh-bvh';
 import type { WorldData } from '../world/WorldData';
+import type { CaveField } from '../world/CaveField';
 import { TILES, CELLS_PER_TILE } from '../terrain/RegionTerrainPass';
 
 /** LRU capacity [DERIVED memory bound, reported]: must exceed the working
@@ -64,10 +70,18 @@ export class TerrainBvh {
   private readonly tmpRay = new THREE.Ray();
   private readonly tmpDir = new THREE.Vector3();
 
-  constructor(private readonly data: WorldData) {
+  /** cp09: inflated per-cave XZ boxes (tile pretest for the bore skip) */
+  private readonly boreBoxes: { minX: number; minZ: number; maxX: number; maxZ: number }[];
+
+  constructor(
+    private readonly data: WorldData,
+    /** cp09: bore-volume test for the local heightfield omission */
+    private readonly caveField: CaveField | null = null,
+  ) {
     this.n = data.header.artifacts['height.r16']!.resolution!;
     this.half = data.header.sizeMeters[0] / 2;
     this.cellM = data.header.sizeMeters[0] / (this.n - 1);
+    this.boreBoxes = caveField ? caveField.boreSegments().boxes : [];
   }
 
   private tileByKey(key: number): TileEntry {
@@ -101,6 +115,20 @@ export class TerrainBvh {
       }
     }
     const indices = new Uint32Array(CELLS_PER_TILE * CELLS_PER_TILE * 6);
+    // cp09 bore omission: skip triangles fully inside a cave bore volume
+    // (matches the shader discard — the trimesh is authoritative there).
+    // Cheap pretest: only tiles overlapping a cave box pay the projection.
+    const tx0 = -this.half + g0 * this.cellM;
+    const tz0 = -this.half + r0 * this.cellM;
+    const tx1 = tx0 + CELLS_PER_TILE * this.cellM;
+    const tz1 = tz0 + CELLS_PER_TILE * this.cellM;
+    const nearBore = this.boreBoxes.some(
+      (b) => tx1 >= b.minX && tx0 <= b.maxX && tz1 >= b.minZ && tz0 <= b.maxZ,
+    );
+    const inBore = (v: number): boolean =>
+      nearBore &&
+      this.caveField !== null &&
+      this.caveField.insideBore(positions[v * 3]!, positions[v * 3 + 1]!, positions[v * 3 + 2]!);
     let p = 0;
     for (let r = 0; r < CELLS_PER_TILE; r++) {
       for (let c = 0; c < CELLS_PER_TILE; c++) {
@@ -108,13 +136,17 @@ export class TerrainBvh {
         const b = a + 1;
         const d = a + verts;
         const e = d + 1;
-        indices[p++] = a; indices[p++] = d; indices[p++] = b;
-        indices[p++] = b; indices[p++] = d; indices[p++] = e;
+        if (!(inBore(a) && inBore(d) && inBore(b))) {
+          indices[p++] = a; indices[p++] = d; indices[p++] = b;
+        }
+        if (!(inBore(b) && inBore(d) && inBore(e))) {
+          indices[p++] = b; indices[p++] = d; indices[p++] = e;
+        }
       }
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+    geometry.setIndex(new THREE.BufferAttribute(indices.subarray(0, p), 1));
     const bvh = new MeshBVH(geometry);
     const ms = performance.now() - t0;
     this.stats.tilesBuilt++;

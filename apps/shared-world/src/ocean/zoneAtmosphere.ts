@@ -109,6 +109,8 @@ const mixN = (a: number, b: number, t: number) => a + (b - a) * t;
 export interface ZoneAtmosphereState {
   enabled: boolean;
   caveDarkness: number;
+  /** cp09: the test/GUI pin (null = the spatial CaveField drive rules) */
+  caveDarknessOverride: number | null;
   weights: { shallow: number; mid: number; deep: number; dark: number };
   biome: { bright: number; kelp: number; plain: number };
   /** current smoothed dials (pre view-tint — the table-comparable state) */
@@ -120,8 +122,12 @@ export interface ZoneAtmosphereState {
 
 export class ZoneAtmosphere {
   enabled = true;
-  /** cp09 groundwork: cave interiors drive this toward 1 (test-forcible) */
+  /** cp09: driven every frame by the CaveField at the viewer column
+   *  (0 in open water; → 1 inside cave interiors) */
   caveDarkness = 0;
+  /** cp09: test/GUI pin — when non-null it replaces the spatial drive
+   *  (the cp08 "test-forcible" input, formalized) */
+  caveDarknessOverride: number | null = null;
   /** consumed by applySun: uExposure = base × night × zoneExposure.value */
   readonly zoneExposure = { value: 1 };
 
@@ -196,8 +202,10 @@ export class ZoneAtmosphere {
     // authored bright-shallow band (biome.R) pulls toward the shallow set
     wShallow = Math.min(1, wShallow + biome.bright * 0.6 * (1 - wDeep));
     let wMid = Math.max(0, 1 - wShallow - wDeep);
-    // cave darkness overrides proportionally (cp09 interiors → 1)
-    const wDark = Math.min(Math.max(this.caveDarkness, 0), 1);
+    // cave darkness overrides proportionally (cp09 interiors → 1); a
+    // non-null test/GUI pin replaces the spatial drive
+    const darkIn = this.caveDarknessOverride ?? this.caveDarkness;
+    const wDark = Math.min(Math.max(darkIn, 0), 1);
     const open = 1 - wDark;
     wShallow *= open;
     wMid *= open;
@@ -296,6 +304,7 @@ export class ZoneAtmosphere {
     return {
       enabled: this.enabled,
       caveDarkness: this.caveDarkness,
+      caveDarknessOverride: this.caveDarknessOverride,
       weights,
       biome,
       dials: {

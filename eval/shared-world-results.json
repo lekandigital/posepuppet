@@ -1,5 +1,5 @@
 {
-  "checkpoint": "05C-ocean-replacement",
+  "checkpoint": "09-caves-and-overhangs",
   "timestamp": "2026-07-18T05:37:35.848Z",
   "url": "/shared-world/?view=stock",
   "viewport": {
@@ -33,7 +33,7 @@
   "simHzNote": "not applicable — no sim exists at checkpoint 00 (stock demo only)",
   "consoleErrors": 0,
   "paintedPixels": 508275,
-  "generatedAt": "2026-08-15T13:27:16.396Z",
+  "generatedAt": "2026-08-16T14:22:27.867Z",
   "pool": {
     "modelLengthM": 2.8968250546579615,
     "bootConsoleErrors": 0,
@@ -2303,41 +2303,41 @@
       ],
       "colors": [
         [
-          191,
-          200,
-          159
+          192,
+          201,
+          160
         ],
         [
-          120,
-          191,
-          142
+          122,
+          192,
+          143
         ],
         [
-          30,
-          139,
-          102
+          0,
+          136,
+          97
         ]
       ],
       "rbRatios": [
-        1.2,
-        0.8461538461538461,
-        0.30097087378640774
+        1.1987577639751552,
+        0.8541666666666666,
+        0.01020408163265306
       ]
     },
     "snell": {
       "capture": "media/shared-world-cp05c/snell-window.png",
-      "coneDeg": 98.39391159416475,
+      "coneDeg": 92.72871204262292,
       "halfAngles": [
-        32.40462143521548,
-        46.611278638976835,
-        49.196955797082374,
-        49.326028874208326
+        44.031337887183064,
+        45.94954645706687,
+        46.36435602131146,
+        48.87949512126814
       ],
       "radiiPx": [
-        400,
-        240,
-        440,
-        438
+        494,
+        462,
+        282,
+        308
       ],
       "note": "critical angle 48.6° → 97.2° cone; tolerance ±8° (wavy surface + profile smoothing); axes measured with per-axis CSS-stretch scales"
     },
@@ -2353,85 +2353,85 @@
       ]
     },
     "pipelineSmoke": {
-      "cloudDiff": 0.499515625,
-      "postDiff": 0.996984375
+      "cloudDiff": 0.49818774366471735,
+      "postDiff": 1
     },
     "floatingBody": {
-      "y": -0.7398722638650637,
-      "surf": -0.6024874924916905,
-      "r": 1.5814576220857486,
-      "wet": 0.5450653315827316,
-      "delta": 0.13738477137337313
+      "y": -1.048755950166251,
+      "surf": -0.6016683537240879,
+      "r": 1.770240026862967,
+      "wet": 0.62769420830214,
+      "delta": 0.447087596442163
     },
     "perf": {
       "script": "burst east across the bay, 12 s",
       "fps": {
         "buckets": [
-          120,
-          120,
-          120,
-          120,
-          121,
-          120,
-          120,
-          120,
-          120,
-          120,
-          120,
-          119
+          60,
+          61,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          61,
+          60
         ],
-        "median": 120,
-        "min": 119
+        "median": 60,
+        "min": 60
       },
-      "simHz": 119.9520191923229,
+      "simHz": 120.00786936848314,
       "gpuStageMs": {
-        "refraction": 70.287666,
-        "main": 13.303374,
-        "clouds": 4.871083,
-        "post": 6.690083
+        "refraction": 39.087291,
+        "main": 4.478333,
+        "clouds": 3.205083,
+        "post": 4.227874
       },
       "cpuStageMs": {
         "refraction": 0,
-        "main": 0.21196581257714164,
-        "clouds": 0.01452991391858484,
-        "post": 0.029914529914529916,
-        "frame": 0.3752136737362951
+        "main": 0.4196721315383911,
+        "clouds": 0.05245902401502015,
+        "post": 0.07049180151986294,
+        "frame": 0.9327868897406781
       },
-      "usedJSHeapBytes": 117717053,
+      "usedJSHeapBytes": 140077816,
       "viewport": {
-        "width": 1728,
-        "height": 1080
+        "width": 1365,
+        "height": 768
       },
       "devicePixelRatio": 1,
-      "acceptanceTier": true,
+      "acceptanceTier": false,
       "chromeVersion": "151.0.7922.138"
     },
     "frozenDetector": {
       "frozenDiff": 0,
-      "livingDiff": 0.7029375
+      "livingDiff": 0.7010233918128655
     },
     "timeOfDay": {
       "sky": {
         "noon": {
-          "r": 182.6367396966447,
-          "g": 205.27409223226599,
-          "b": 224.09120357197574,
-          "luma": 201.81998652191996,
-          "warmth": 0.8158325904456082
+          "r": 182.61830790568655,
+          "g": 205.26572068707992,
+          "b": 224.08498879761015,
+          "luma": 201.80963188733597,
+          "warmth": 0.8157732280884834
         },
         "sunset": {
-          "r": 194.08015058329138,
-          "g": 198.07901245376348,
-          "b": 210.32800017509686,
-          "luma": 198.11323133358135,
-          "warmth": 0.9231154907142298
+          "r": 194.02552011095702,
+          "g": 198.04766883601835,
+          "b": 210.30664675130694,
+          "luma": 198.07765822255413,
+          "warmth": 0.9229502389505444
         },
         "night": {
-          "r": 52.22206658057738,
-          "g": 67.1873974041892,
-          "b": 95.22607192103132,
-          "luma": 66.03016037120533,
-          "warmth": 0.5530940369700894
+          "r": 52.17949429211565,
+          "g": 67.16532593619972,
+          "b": 95.21677157793663,
+          "luma": 66.00465250400084,
+          "warmth": 0.5527050369699806
         }
       }
     },
@@ -2512,6 +2512,7 @@
         "shallow": {
           "enabled": true,
           "caveDarkness": 0,
+          "caveDarknessOverride": null,
           "weights": {
             "shallow": 1,
             "mid": 0,
@@ -2545,6 +2546,7 @@
         "mid": {
           "enabled": true,
           "caveDarkness": 0,
+          "caveDarknessOverride": null,
           "weights": {
             "shallow": 0,
             "mid": 1,
@@ -2578,6 +2580,7 @@
         "deep": {
           "enabled": true,
           "caveDarkness": 0,
+          "caveDarknessOverride": null,
           "weights": {
             "shallow": 0,
             "mid": 0,
@@ -2606,11 +2609,12 @@
             "causticMul": 0.25
           },
           "exposure": 0.78,
-          "columnDepthM": 78.40115277099608
+          "columnDepthM": 79.9382373046875
         },
         "dark": {
           "enabled": true,
-          "caveDarkness": 1,
+          "caveDarkness": 0,
+          "caveDarknessOverride": 1,
           "weights": {
             "shallow": 0,
             "mid": 0,
@@ -2639,7 +2643,7 @@
             "causticMul": 0
           },
           "exposure": 0.30000000000000004,
-          "columnDepthM": 78.40115277099608
+          "columnDepthM": 79.9382373046875
         }
       },
       "midColumn": [
@@ -2647,6 +2651,617 @@
         -280,
         24.99860908508301
       ]
+    }
+  },
+  "region09": {
+    "artifacts": {
+      "geomHashes": {
+        "cave-headland": "9965a4a27361666ce4e80d9720431e49a26fe45a4174a21b6d770506d41c9eb0",
+        "cave-trench-wall": "052f2dc1f3fa8178fb43c200e0c71a4b0a976338981f7c84ec121809ec0edd8b",
+        "arch-islet-gap": "ee26602983fab68a99869bdcf7261764b1622be054b8fff61def9a1724f95aa7"
+      },
+      "stamps": 4,
+      "clearance": {
+        "headlandMouthW": 13,
+        "headlandMouthH": 8.5,
+        "headlandMinW": 9,
+        "headlandMinH": 6.6,
+        "trenchMouthW": 8,
+        "trenchMouthH": 5.5,
+        "trenchMinW": 6.4,
+        "trenchMinH": 4.6,
+        "archOpeningW": 5,
+        "archClearH": 6.5,
+        "dressingIntrusionMax": 1.2
+      }
+    },
+    "bakeSeamChecks": {
+      "cp09-stamp-audit": {
+        "name": "cp09-stamp-audit",
+        "pass": true,
+        "changedTexels": 2312,
+        "maxLowerM": 19.095688,
+        "raises": 0,
+        "outsideBounds": 0,
+        "note": "lower-only, land/water bit asserted unchanged per texel during compose"
+      },
+      "cp09-stamp-support-contained": {
+        "name": "cp09-stamp-support-contained",
+        "pass": true,
+        "ringSamples": 200,
+        "samplesOutsideWithDelta": 0,
+        "note": "stampDelta ≡ 0 just outside the UNION of declared stamp footprints (stamp-frame ring; overlap-aware)"
+      },
+      "cp09-mouth-sills": {
+        "name": "cp09-mouth-sills",
+        "pass": true,
+        "south": -34.9573,
+        "southTarget": -35,
+        "north": -47.187683,
+        "northTarget": -47.3,
+        "trench": -79.938236,
+        "trenchTarget": -80,
+        "note": "sill = floor − stamp margin (±0.35 m quantization/bilinear tolerance)"
+      },
+      "cp09-throat-cave-headland": {
+        "name": "cp09-throat-cave-headland",
+        "pass": true,
+        "samples": 1267,
+        "voidOutsideBand": 0,
+        "voidInBand": 24,
+        "maxVoidIntrusionM": 2.043446,
+        "apertureBands": [
+          [
+            13,
+            20
+          ],
+          [
+            149,
+            155
+          ]
+        ],
+        "exposedOutsideHood": 0,
+        "note": "void crossings only inside the recorded aperture bands (heightfield locally omitted in the bore there); shell exposure only at hood stations"
+      },
+      "cp09-throat-cave-trench-wall": {
+        "name": "cp09-throat-cave-trench-wall",
+        "pass": true,
+        "samples": 231,
+        "voidOutsideBand": 0,
+        "voidInBand": 7,
+        "maxVoidIntrusionM": 1.78666,
+        "apertureBands": [
+          [
+            16,
+            22
+          ]
+        ],
+        "exposedOutsideHood": 0,
+        "note": "void crossings only inside the recorded aperture bands (heightfield locally omitted in the bore there); shell exposure only at hood stations"
+      },
+      "cp09-arch-no-stamp": {
+        "name": "cp09-arch-no-stamp",
+        "pass": true,
+        "boundsNearArch": 0,
+        "archSill": -28.462937
+      }
+    },
+    "boot": {
+      "caves": {
+        "modules": [
+          {
+            "id": "cave-headland",
+            "vertices": 17546,
+            "triangles": 15988,
+            "bvhBuildMs": 5.099999964237213
+          },
+          {
+            "id": "cave-trench-wall",
+            "vertices": 4229,
+            "triangles": 3828,
+            "bvhBuildMs": 0.40000003576278687
+          },
+          {
+            "id": "arch-islet-gap",
+            "vertices": 2018,
+            "triangles": 1552,
+            "bvhBuildMs": 0
+          }
+        ],
+        "loadMs": 16.19999998807907,
+        "queries": 45,
+        "queryUsTotal": 199.99998807907104
+      },
+      "collision": {
+        "initMs": 17.700000047683716,
+        "buildMs": 37.60000002384186,
+        "physGridN": 513,
+        "maxDownsampleDropM": 18.278,
+        "trimeshes": [
+          {
+            "id": "cave-headland",
+            "vertices": 4454,
+            "triangles": 8952
+          },
+          {
+            "id": "cave-trench-wall",
+            "vertices": 1025,
+            "triangles": 2068
+          },
+          {
+            "id": "arch-islet-gap",
+            "vertices": 258,
+            "triangles": 512
+          }
+        ],
+        "stepMsAvg": 0.07499998807907104,
+        "stepCount": 4,
+        "ccUsAvg": 235.29411414090325,
+        "ccCount": 17,
+        "corrections": 0,
+        "lastCorrectionM": 0
+      },
+      "audit": {
+        "terrainHasSubstrate": true,
+        "anyLegacyTintLaw": false,
+        "caveHasSubstrate": true
+      }
+    },
+    "census": {
+      "placement": {
+        "spawn": 1,
+        "breach": 3,
+        "arch": 1,
+        "cave-mouth": 3,
+        "ruin": 2,
+        "wreck": 1,
+        "corridor-mass": 3,
+        "spire": 2,
+        "silhouette": 1,
+        "current": 1,
+        "discovery": 7,
+        "route": 13
+      },
+      "caveModulesWithGeometry": 3,
+      "note": "this branch has no cp07 rectangular placeholders (parked side branch); the cp09 delta is the three cave/arch site records gaining committed geometry — every other placement category is untouched"
+    },
+    "perfCaveInterior": {
+      "fps": {
+        "buckets": [
+          61,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60
+        ],
+        "median": 60,
+        "min": 60
+      },
+      "simHz": 120.00786936848314,
+      "rapier": {
+        "initMs": 18.80000001192093,
+        "buildMs": 30.80000001192093,
+        "physGridN": 513,
+        "maxDownsampleDropM": 18.278,
+        "trimeshes": [
+          {
+            "id": "cave-headland",
+            "vertices": 4454,
+            "triangles": 8952
+          },
+          {
+            "id": "cave-trench-wall",
+            "vertices": 1025,
+            "triangles": 2068
+          },
+          {
+            "id": "arch-islet-gap",
+            "vertices": 258,
+            "triangles": 512
+          }
+        ],
+        "stepMsAvg": 0.029064748870383062,
+        "stepCount": 695,
+        "ccUsAvg": 47.751606063788316,
+        "ccCount": 1401,
+        "corrections": 0,
+        "lastCorrectionM": 0
+      },
+      "caves": {
+        "modules": [
+          {
+            "id": "cave-headland",
+            "vertices": 17546,
+            "triangles": 15988,
+            "bvhBuildMs": 5.699999988079071
+          },
+          {
+            "id": "cave-trench-wall",
+            "vertices": 4229,
+            "triangles": 3828,
+            "bvhBuildMs": 0.40000003576278687
+          },
+          {
+            "id": "arch-islet-gap",
+            "vertices": 2018,
+            "triangles": 1552,
+            "bvhBuildMs": 0.09999996423721313
+          }
+        ],
+        "loadMs": 17,
+        "queries": 12307,
+        "queryUsTotal": 77199.99998807907
+      },
+      "cpuStageMs": {
+        "refraction": 0.0016393436760198876,
+        "main": 0.43770491979161247,
+        "clouds": 0.04754098223858192,
+        "post": 0.06557377244605393,
+        "frame": 1.0213114736510105
+      },
+      "gpuStageMs": {
+        "refraction": 33.368208,
+        "main": 4.240708,
+        "clouds": 3.023708,
+        "post": 4.081916
+      },
+      "viewport": {
+        "width": 1365,
+        "height": 768
+      },
+      "devicePixelRatio": 1,
+      "acceptanceTier": false,
+      "chromeVersion": "151.0.7922.138"
+    },
+    "seamScan": {
+      "headland-south": 0,
+      "headland-north": 0,
+      "trench-west": 0,
+      "arch-footings": 0
+    },
+    "clearance": {
+      "contract": {
+        "headlandMouthW": 13,
+        "headlandMouthH": 8.5,
+        "headlandMinW": 9,
+        "headlandMinH": 6.6,
+        "trenchMouthW": 8,
+        "trenchMouthH": 5.5,
+        "trenchMinW": 6.4,
+        "trenchMinH": 4.6,
+        "archOpeningW": 5,
+        "archClearH": 6.5,
+        "dressingIntrusionMax": 1.2
+      },
+      "measured": {
+        "headland": {
+          "minW": 9.021910778818688,
+          "minH": 6.760069362812125,
+          "rows": [
+            {
+              "s": 0,
+              "widthM": 12.947469921667341,
+              "heightM": 8.585798267288592
+            },
+            {
+              "s": 6,
+              "widthM": 11.77780293256249,
+              "heightM": 8.100119616483521
+            },
+            {
+              "s": 12,
+              "widthM": 10.916767594369919,
+              "heightM": 7.4451676110721365
+            },
+            {
+              "s": 20,
+              "widthM": 10.594614098136944,
+              "heightM": 7.226403620582669
+            },
+            {
+              "s": 30,
+              "widthM": 10.899765592554619,
+              "heightM": 7.340544281262826
+            },
+            {
+              "s": 45,
+              "widthM": 11.203113056289068,
+              "heightM": 7.617794429193069
+            },
+            {
+              "s": 60,
+              "widthM": 9.021910778818688,
+              "heightM": 6.86131466782583
+            },
+            {
+              "s": 75,
+              "widthM": 10.334198706670097,
+              "heightM": 7.404758230757103
+            },
+            {
+              "s": 90,
+              "widthM": 11.009408158492064,
+              "heightM": 7.658591554733064
+            },
+            {
+              "s": 100,
+              "widthM": 9.678340281808685,
+              "heightM": 6.760069362812125
+            },
+            {
+              "s": 110,
+              "widthM": 10.807527296756302,
+              "heightM": 7.362087306620914
+            },
+            {
+              "s": 125,
+              "widthM": 11.1493865299919,
+              "heightM": 7.568293670675487
+            },
+            {
+              "s": 140,
+              "widthM": 10.918209919080377,
+              "heightM": 7.4597328675803425
+            },
+            {
+              "s": 152,
+              "widthM": 10.103147138359972,
+              "heightM": 7.083094995445009
+            },
+            {
+              "s": 163,
+              "widthM": 11.064675960649783,
+              "heightM": 7.604287695034216
+            },
+            {
+              "s": 172,
+              "widthM": 11.43901446851218,
+              "heightM": 7.983697853041086
+            },
+            {
+              "s": 180.278,
+              "widthM": 13.033529507880855,
+              "heightM": 8.45370918254907
+            }
+          ]
+        },
+        "trench": {
+          "minW": 5.883532701378323,
+          "minH": 4.4657273575405725,
+          "rows": [
+            {
+              "s": 0,
+              "widthM": 8.16299104011496,
+              "heightM": 5.608694101985236
+            },
+            {
+              "s": 8,
+              "widthM": 6.421948251175247,
+              "heightM": 4.981804484889807
+            },
+            {
+              "s": 14,
+              "widthM": 5.883532701378323,
+              "heightM": 4.4657273575405725
+            },
+            {
+              "s": 20,
+              "widthM": 6.829536045912828,
+              "heightM": 4.612411952615886
+            },
+            {
+              "s": 26,
+              "widthM": 9.482236298196987,
+              "heightM": 5.13320351680602
+            },
+            {
+              "s": 32,
+              "widthM": 6.885600398964961,
+              "heightM": 5.4393839479994455
+            }
+          ]
+        },
+        "arch": {
+          "openingW": 4.692226990321342,
+          "crownClearance": 2.8003004160495486,
+          "clearHeightM": 5.281769292697479,
+          "floorH": -28.46293775329586,
+          "crownY": -21.3
+        }
+      }
+    },
+    "collision": {
+      "rapier": {
+        "initMs": 19,
+        "buildMs": 36.40000003576279,
+        "physGridN": 513,
+        "maxDownsampleDropM": 18.278,
+        "trimeshes": [
+          {
+            "id": "cave-headland",
+            "vertices": 4454,
+            "triangles": 8952
+          },
+          {
+            "id": "cave-trench-wall",
+            "vertices": 1025,
+            "triangles": 2068
+          },
+          {
+            "id": "arch-islet-gap",
+            "vertices": 258,
+            "triangles": 512
+          }
+        ],
+        "stepMsAvg": 0.03175303172381737,
+        "stepCount": 907,
+        "ccUsAvg": 329.21471669738077,
+        "ccCount": 1821,
+        "corrections": 1259,
+        "lastCorrectionM": 0.07982454296941616
+      },
+      "heightfieldAgreement": {
+        "probes": 200,
+        "maxAnalyticMinusColliderM": 7.203483581542969,
+        "maxTriangulationErrM": 0.0000457763671875
+      },
+      "wallRam": {
+        "lat": 0.5421650574975987,
+        "halfW": 5.549824918510782
+      },
+      "ceilingRam": {
+        "y": -35.592593472218105,
+        "roofY": -32.199999999999996
+      },
+      "endCapRam": {
+        "s": 31.88492098842265
+      }
+    },
+    "darkness": {
+      "deepInterior": {
+        "enabled": true,
+        "caveDarkness": 1,
+        "caveDarknessOverride": null,
+        "weights": {
+          "shallow": 0,
+          "mid": 0,
+          "deep": 0,
+          "dark": 1
+        },
+        "biome": {
+          "bright": 0,
+          "kelp": 0,
+          "plain": 0
+        },
+        "dials": {
+          "extinction": [
+            0.17,
+            0.105,
+            0.115
+          ],
+          "fogColor": [
+            0.0005999999999999998,
+            0.0040000000000000036,
+            0.004799999999999999
+          ],
+          "fogStrength": 1.3,
+          "shaftDensity": 0,
+          "exposureMul": 0.30000000000000004,
+          "causticMul": 0
+        },
+        "exposure": 0.30000000000000004,
+        "columnDepthM": 0
+      },
+      "mouthBlend": [
+        {
+          "x": -418.4,
+          "y": -33,
+          "z": 24,
+          "darkness": 0.1782427595088023,
+          "channels": [
+            {
+              "id": "cave-headland",
+              "q": {
+                "s": 5.91967763253369,
+                "lat": 0.05852218400358935,
+                "w": 1,
+                "floorY": -34.78929035100449,
+                "halfW": 6.006693530622193,
+                "height": 8.006693530622192,
+                "overshoot": 0,
+                "mouthDist": 5.91967763253369
+              }
+            },
+            {
+              "id": "cave-trench-wall",
+              "q": null
+            }
+          ],
+          "eff": {
+            "terrainHeight": -34.78929035100449,
+            "shoreDistance": 54.46414444089942,
+            "inWater": true,
+            "ceiling": -26.782596820382295
+          }
+        },
+        {
+          "x": -417.1,
+          "y": -34,
+          "z": 17.8,
+          "darkness": 0.5688480148944829,
+          "channels": [
+            {
+              "id": "cave-headland",
+              "q": {
+                "s": 12.012631422144674,
+                "lat": 0.03183917805268526,
+                "w": 1,
+                "floorY": -35.90205260609851,
+                "halfW": 5.599684214446383,
+                "height": 7.5995263216695745,
+                "overshoot": 0,
+                "mouthDist": 12.012631422144674
+              }
+            },
+            {
+              "id": "cave-trench-wall",
+              "q": null
+            }
+          ],
+          "eff": {
+            "terrainHeight": -35.90205260609851,
+            "shoreDistance": 54.68727615239803,
+            "inWater": true,
+            "ceiling": -28.302526284428932
+          }
+        }
+      ],
+      "openWater": {
+        "caveDarkness": 0,
+        "weightsDark": 0
+      },
+      "probeDeterminism": "PASS (same page ×2 + reload)"
+    },
+    "traversals": {
+      "headlandSN": {
+        "caveId": "cave-headland",
+        "completed": true,
+        "tS": 26.13469999999982,
+        "maxWedgeT": 0,
+        "minSpeed": 4.993221637160577,
+        "emergencyDelta": 0,
+        "maxLosBlockedS": 0.1165,
+        "compressedCount": 3,
+        "releasedAfterExit": true
+      },
+      "headlandNS": {
+        "caveId": "cave-headland",
+        "completed": true,
+        "tS": 26.04999999999983,
+        "maxWedgeT": 0,
+        "minSpeed": 4.9932312880757594,
+        "emergencyDelta": 0,
+        "maxLosBlockedS": 0.11680000000000292,
+        "compressedCount": 4,
+        "releasedAfterExit": true
+      },
+      "trench": {
+        "caveId": "cave-trench-wall",
+        "completed": true,
+        "tS": 3.1999999999999984,
+        "maxWedgeT": 0,
+        "minSpeed": 5,
+        "emergencyDelta": 2,
+        "maxLosBlockedS": 0,
+        "compressedCount": 5,
+        "releasedAfterExit": true
+      },
+      "archPassProjM": 11.53150380923038
     }
   }
 }

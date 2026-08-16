@@ -81,6 +81,7 @@ export const SIM = {
   TRIM_SPEED: 3.5,          // m/s vertical from crouch/stretch
   SURFACE_Y: -0.4,          // resting ceiling below the surface plane
   SEABED_CLEAR: 1.2,
+  CEIL_CLEAR: 0.6,          // cp09: clearance held below a cave ceiling [DERIVED, flagged]
   ASSIST_DEPTH_FRAC: 0.75,  // Full Assist keeps y above −frac·localDepth
   // containment current (band clamped by sampler.containmentBand — the
   // 55 m value is region-scale, review item at cp04B)
@@ -151,6 +152,9 @@ export class SwimSim {
   private readonly band: number;
   /** cp05: analytic terrain height — null in the pool (no contact model) */
   private readonly th: ((x: number, z: number) => number) | null;
+  /** cp09: analytic water ceiling — null everywhere but the cave-aware
+   *  region sampler (pool + digests unchanged by construction) */
+  private readonly ceilAt: ((x: number, z: number) => number) | null;
 
   // cp05 contact/anti-wedge state (deterministic; reset with the sim)
   private inContact = false;
@@ -160,6 +164,7 @@ export class SwimSim {
   constructor(readonly sampler: WorldSampler) {
     this.band = Math.min(SIM.SHORE_BAND, sampler.containmentBand ?? SIM.SHORE_BAND);
     this.th = sampler.terrainHeight ? sampler.terrainHeight.bind(sampler) : null;
+    this.ceilAt = sampler.ceilingAt ? sampler.ceilingAt.bind(sampler) : null;
     this.state = this.spawnState();
   }
 
@@ -510,12 +515,26 @@ export class SwimSim {
     let nx2 = s.x + vx * dt;
     let nz2 = s.z + vz * dt;
     let ny2 = nextY;
-    const ceiling = SIM.SURFACE_Y;
+    // cp09: inside a cave the ceiling is the interior roof (CEIL_CLEAR held
+    // below it, the seabed-clearance law mirrored upward); open water keeps
+    // the cp01 surface ceiling exactly (ceilingAt is +Infinity there)
+    let ceiling: number = SIM.SURFACE_Y;
+    let caveCeiling = false;
+    if (this.ceilAt) {
+      const c = this.ceilAt(nx2, nz2) - SIM.CEIL_CLEAR;
+      if (c < ceiling) {
+        ceiling = c;
+        caveCeiling = true;
+      }
+    }
     if (ny2 > ceiling) ny2 = s.y + (ceiling - s.y) * Math.min(1, dt * 8); // soft surface spring
     const floor = -this.depthAt(nx2, nz2) + SIM.SEABED_CLEAR;
     if (ny2 < floor) ny2 = s.y + (floor - s.y) * Math.min(1, dt * 8);
     if (this.assist === 'full') {
-      const assistFloor = -this.depthAt(nx2, nz2) * SIM.ASSIST_DEPTH_FRAC;
+      let assistFloor = -this.depthAt(nx2, nz2) * SIM.ASSIST_DEPTH_FRAC;
+      // cp09: under a cave ceiling the assist depth rule must never press
+      // the dolphin into the roof — cap it below the ceiling clamp
+      if (caveCeiling && assistFloor > ceiling - 0.8) assistFloor = ceiling - 0.8;
       if (ny2 < assistFloor) ny2 = s.y + (assistFloor - s.y) * Math.min(1, dt * 6);
     }
 

@@ -207,9 +207,11 @@ export class CameraRig {
   private azimuthErrorRad = 0;
   private rollRad = 0;
   private initialized = false;
+  private snapGraceS = 0;
 
   // --- cp05C visual waterline (null = constant y 0, the pool behavior) ---
   private readonly waterlineAt: ((x: number, z: number) => number) | null = null;
+  private readonly interiorFollowScale: ((x: number, y: number, z: number) => number) | null = null;
   /** waterline sampled once per update at the dolphin column */
   private wl = 0;
 
@@ -244,17 +246,38 @@ export class CameraRig {
     // the render surface is wavy, so the anti-shimmer band and the swim/air
     // clamps become surface-relative. Absent (pool view), the waterline is
     // the constant y = 0 and behavior is bit-identical to the approved cp02.
-    opts: { terrainCompression?: boolean; waterlineAt?: (x: number, z: number) => number } = {},
+    opts: {
+      terrainCompression?: boolean;
+      waterlineAt?: (x: number, z: number) => number;
+      /** cp09: < 1 shortens the chase inside a cave bore so the eye stays in the void */
+      interiorFollowScale?: (x: number, y: number, z: number) => number;
+    } = {},
   ) {
     this.camera = new THREE.PerspectiveCamera(RIG.FOV, aspect, RIG.NEAR, far);
     this.collision = collision;
     this.terrainCompression = opts.terrainCompression ?? false;
     this.waterlineAt = opts.waterlineAt ?? null;
+    this.interiorFollowScale = opts.interiorFollowScale ?? null;
   }
 
   /** R key: ease the camera directly behind facing over RECENTER_S. */
   recenter(): void {
     this.recenterT = RIG.RECENTER_S;
+  }
+
+  /**
+   * Next update copies the resolved chase point onto the eye (teleport /
+   * scripted-swim catch-up). The continuity cap still applies after that
+   * frame; this does not punch through walls on the live chase.
+   */
+    snap(): void {
+    this.initialized = false;
+    this.emergency = false;
+    this.emergencyCount = 0;
+    this.losBlockedS = 0;
+    this.snapGraceS = 1.2;
+    this.camVel.set(0, 0, 0);
+    this.aimVel.set(0, 0, 0);
   }
 
   update(s: SimState, dt: number): void {
@@ -297,6 +320,9 @@ export class CameraRig {
     let distTarget = speedDist;
     if (air) distTarget = speedDist + RIG.BREACH_PULLBACK;
     else if (speed < RIG.HOVER_SPEED) distTarget = RIG.HOVER_DIST;
+    if (this.interiorFollowScale) {
+      distTarget *= this.interiorFollowScale(d.x, d.y, d.z);
+    }
 
     // state parameter cross-fade (t90 0.3 s, inside the 0.2–0.5 band)
     const kx = 1 - Math.exp((-dt * LN10) / RIG.STATE_XFADE_T90);
@@ -395,6 +421,11 @@ export class CameraRig {
     }
 
     // --- emergency detection: distance error > 3× target, or LOS > 0.3 s ---
+    if (this.snapGraceS > 0) {
+      this.snapGraceS = Math.max(0, this.snapGraceS - dt);
+      this.emergency = false;
+      this.losBlockedS = 0;
+    }
     const followDist = this.camPos.distanceTo(d);
     const targetDist = Math.hypot(this.dist, RIG.HEIGHT);
     if (

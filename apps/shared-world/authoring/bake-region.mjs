@@ -72,6 +72,18 @@ import {
   loopWaypoints,
   isletSpecs,
 } from './region-relief.mjs';
+import {
+  stampDelta,
+  stampBounds,
+  stampRecord,
+  runtimeCaveRecord,
+  clearanceRecord,
+  axisFrame as caveAxisFrame,
+  stationAt as caveStationAt,
+  HEADLAND as CAVE_HEADLAND,
+  TRENCH as CAVE_TRENCH,
+  ARCH as CAVE_ARCH,
+} from './caves/cave-plan.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(HERE, '..', 'public', 'world');
@@ -373,7 +385,48 @@ function composeHeights() {
   if (maskFlips > 0) {
     throw new Error(`CP05A relief moved the coastline: ${maskFlips} texels changed the quantized land/water bit`);
   }
-  return { h16, base, h05, sdfM, reliefRange: { min: deltaMin, max: deltaMax } };
+
+  // --- pass 4: CP09 cave/arch seam stamps (cave-plan.mjs; addendum §9.1) ---
+  // Lower-only, strictly inside the declared stamp footprints: mouth
+  // "throats" keep the terrain sheet out of the module interiors, seat
+  // aprons bed the hoods. The land/water bit of every texel is asserted
+  // unchanged (stamps act on deep-water texels only).
+  const stampAudit = { changedTexels: 0, maxLowerM: 0, raises: 0, outsideBounds: 0 };
+  const bounds = stampBounds();
+  const seen = new Uint8Array(N * N);
+  for (const b of bounds) {
+    const i0 = Math.max(0, Math.floor((b.minX + 1000) / TEXEL) - 1);
+    const i1 = Math.min(N - 1, Math.ceil((b.maxX + 1000) / TEXEL) + 1);
+    const j0 = Math.max(0, Math.floor((b.minZ + 1000) / TEXEL) - 1);
+    const j1 = Math.min(N - 1, Math.ceil((b.maxZ + 1000) / TEXEL) + 1);
+    for (let j = j0; j <= j1; j++) {
+      for (let i = i0; i <= i1; i++) {
+        const k = j * N + i;
+        if (seen[k]) continue;
+        seen[k] = 1;
+        const h3 = qDecode(h16[k]);
+        const d = stampDelta(texX(i), texZ(j), h3);
+        if (d >= 0) {
+          if (d > 0) stampAudit.raises++;
+          continue;
+        }
+        const q = qEncode(clamp(h3 + d, H_MIN, H_MAX));
+        if (q === h16[k]) continue;
+        if ((qDecode(q) >= 0 ? 1 : 0) !== mask05[k]) {
+          throw new Error(`CP09 stamp changed the land/water bit at texel ${k}`);
+        }
+        h16[k] = q;
+        stampAudit.changedTexels++;
+        if (-d > stampAudit.maxLowerM) stampAudit.maxLowerM = -d;
+      }
+    }
+  }
+  if (stampAudit.raises > 0) {
+    throw new Error(`CP09 stamps attempted to raise terrain (${stampAudit.raises} texels)`);
+  }
+  stampAudit.maxLowerM = Math.round(stampAudit.maxLowerM * 1e6) / 1e6;
+
+  return { h16, base, h05, sdfM, reliefRange: { min: deltaMin, max: deltaMax }, stampAudit };
 }
 
 // ---------------------------------------------------------------------------
@@ -617,35 +670,41 @@ function buildPlacement() {
   };
 }
 
-function buildCaves(sampleH) {
+function buildCaves(sampleH, caveArtifacts) {
   const lip = (x, z) => r6(sampleH(x, z));
+  const rt = runtimeCaveRecord();
+  const geom = (id) => caveArtifacts?.[`${id}.glb`] ?? null;
   return {
     magic: 'bodyarcade-region-caves/1',
-    note: 'Sites + transforms fixed at cp04A; module IDs assigned at cp09 (Kenney kit + Blender). Seam rule per Master §5.2.',
+    note: 'Sites + transforms fixed at cp04A (X/Z immutable). CP09: module geometry baked from the hand-authored plan (authoring/caves/cave-plan.mjs, Kenney Modular Cave Kit kitbash realized through scripted Blender); lipY = the stamped mouth sill; seam stamps per addendum §9.1 recorded below. Omission law (addendum §9.1 "locally lower or omit"): inside each bore volume (runtime stations, lat ≤ halfW+0.3, floor−0.5 ≤ y ≤ ceiling+0.5) the heightfield is locally OMITTED by every consumer — terrain fragments discarded, camera-BVH triangles skipped, Rapier heightfield excluded — because a single-valued sheet must sweep each bore section once near every aperture; the trimesh is authoritative there.',
     modules: [
       {
         id: 'cave-headland',
         family: 'D',
         role: 'primary bay-to-bay loop shortcut (approved: the main route)',
-        moduleId: null,
+        moduleId: 'caves/cave-headland.glb',
+        geometry: geom('cave-headland'),
         transform: { x: -425, z: -60, yaw: r6(yawTo(-430, -150, -420, 30)), scale: 1 },
         mouths: [
           { name: 'south', x: -420, z: 30, yaw: r6(yawTo(-420, 30, -430, -150)), lipY: lip(-420, 30) },
           { name: 'north', x: -430, z: -150, yaw: r6(yawTo(-430, -150, -420, 30)), lipY: lip(-430, -150) },
         ],
         passage: [[-430, -150], [-420, 30]],
+        runtime: rt['cave-headland'],
         seam: {
-          policy: 'heightmap locally lowered to meet each module lip at cp09; shared triplanar rock across the seam; trimesh authoritative where the module undercuts',
+          policy: 'heightmap locally lowered to meet each module lip at cp09; shared substrate rock classification across the seam; trimesh authoritative where the module undercuts',
         },
       },
       {
         id: 'cave-trench-wall',
         family: 'D',
         role: 'smaller optional trench-wall discovery — NOT another major route (approved)',
-        moduleId: null,
+        moduleId: 'caves/cave-trench-wall.glb',
+        geometry: geom('cave-trench-wall'),
         transform: { x: 450, z: -30, yaw: r6(yawTo(450, -30, 520, -35)), scale: 0.6 },
         mouths: [{ name: 'west', x: 450, z: -30, yaw: r6(yawTo(450, -30, 520, -35)), lipY: lip(450, -30) }],
         passage: [[450, -30]],
+        runtime: rt['cave-trench-wall'],
         seam: {
           policy: 'single-mouth pocket in the trench W wall; heightmap lip lowered at cp09; trimesh authoritative inside',
         },
@@ -654,13 +713,17 @@ function buildCaves(sampleH) {
         id: 'arch-islet-gap',
         family: 'arch',
         role: 'the approved arch in the islet gap (opening 5 m)',
-        moduleId: null,
+        moduleId: 'caves/arch-islet-gap.glb',
+        geometry: geom('arch-islet-gap'),
         openingMeters: 5,
         transform: { x: -40, z: -70, yaw: r6(yawTo(-40, -70, 10, -90)), scale: 1 },
         mouths: [],
-        seam: { policy: 'free-standing arch; footings meet terrain; trimesh at cp09' },
+        runtime: rt['arch-islet-gap'],
+        seam: { policy: 'free-standing arch; footings embedded below terrain (no stamp); trimesh at cp09' },
       },
     ],
+    clearance: clearanceRecord(),
+    stamps: stampRecord(),
   };
 }
 
@@ -807,7 +870,7 @@ function buildWorldJson(h16, byteSizes) {
 // ---------------------------------------------------------------------------
 
 function bake() {
-  const { h16, base, h05, sdfM, reliefRange } = composeHeights();
+  const { h16, base, h05, sdfM, reliefRange, stampAudit } = composeHeights();
   const mask = shoreMask(h16);
   const sdf16 = signedShoreDistance(sdfM);
 
@@ -818,9 +881,21 @@ function bake() {
   const shorePng = encodePNG(N, N, maskPx, 0);
   const biomePng = encodePNG(NB, NB, biomePixels(), 6);
 
+  // CP09 cave-module artifacts: committed GLBs baked by bake-caves.mjs.
+  // This bake only READS them (size + SHA-256 recorded into caves.json) —
+  // regenerating them requires Blender and is a separate deterministic step.
+  const caveArtifacts = {};
+  for (const name of ['cave-headland.glb', 'cave-trench-wall.glb', 'arch-islet-gap.glb']) {
+    const p = join(OUT_DIR, 'caves', name);
+    if (existsSync(p)) {
+      const buf = readFileSync(p);
+      caveArtifacts[name] = { bytes: buf.length, sha256: sha256(buf) };
+    }
+  }
+
   const placement = Buffer.from(JSON.stringify(buildPlacement(), null, 2) + '\n');
   const caves = Buffer.from(
-    JSON.stringify(buildCaves((x, z) => bilinearH(h16, x, z)), null, 2) + '\n',
+    JSON.stringify(buildCaves((x, z) => bilinearH(h16, x, z), caveArtifacts), null, 2) + '\n',
   );
 
   const byteSizes = {
@@ -843,7 +918,7 @@ function bake() {
       'caves.json': caves,
       'world.json': world,
     },
-    h16, base, h05, sdfM, mask, sdf16, reliefRange,
+    h16, base, h05, sdfM, mask, sdf16, reliefRange, stampAudit,
   };
 }
 
@@ -872,9 +947,182 @@ function landCentroid(h16, cx, cz, r) {
   return n ? { x: sx / n, z: sz / n, landTexels: n } : null;
 }
 
-function runChecks({ h16, base, h05, mask, sdf16, reliefRange }) {
+function runChecks({ h16, base, h05, mask, sdf16, reliefRange, stampAudit }) {
   const checks = [];
   const push = (name, pass, detail) => checks.push({ name, pass, ...detail });
+
+  // --- CP09 seam stamps (addendum §9.1): audit + throat/hood guarantees ---
+  // maxLower bound 25 m [DERIVED]: the N throat legitimately carves ~19 m
+  // through the rising headland face at the notch back wall; the bound only
+  // guards against a runaway stamp.
+  push('cp09-stamp-audit', stampAudit.changedTexels > 0 && stampAudit.raises === 0 && stampAudit.maxLowerM < 25, {
+    ...stampAudit,
+    note: 'lower-only, land/water bit asserted unchanged per texel during compose',
+  });
+
+  // support containment, in the stamp's OWN frame (an AABB ring cuts
+  // through diagonal footprints): stampDelta must be identically zero just
+  // outside the declared lat/s extents of every stamp
+  {
+    // a world point is inside a stamp's declared footprint when its
+    // stamp-frame coordinates fall within [s0, s1] × (−latOut, latOut)
+    const stamps = stampRecord();
+    const frames = new Map([
+      ['cave-headland', caveAxisFrame(CAVE_HEADLAND)],
+      ['cave-trench-wall', caveAxisFrame(CAVE_TRENCH)],
+    ]);
+    const mods = new Map([
+      ['cave-headland', CAVE_HEADLAND],
+      ['cave-trench-wall', CAVE_TRENCH],
+    ]);
+    const insideAnyStamp = (x, z) => {
+      for (const sp of stamps) {
+        const f = frames.get(sp.module);
+        const m = mods.get(sp.module);
+        const rx = x - f.ax;
+        const rz = z - f.az;
+        const s = rx * f.ux + rz * f.uz;
+        if (s < sp.s0 - 0.05 || s > sp.s1 + 0.05) continue;
+        const v = caveStationAt(m, s);
+        const latHere = rx * f.px + rz * f.pz - v.lat;
+        if (Math.abs(latHere) < sp.latOut + 0.05) return true;
+      }
+      return false;
+    };
+    let outside = 0;
+    let ringSamples = 0;
+    for (const sp of stamps) {
+      const m = mods.get(sp.module);
+      const f = frames.get(sp.module);
+      const at = (s, lat) => {
+        const v = caveStationAt(m, s);
+        const x = f.ax + f.ux * s + f.px * (v.lat + lat);
+        const z = f.az + f.uz * s + f.pz * (v.lat + lat);
+        // overlapping stamps are legitimate (n-throat ∩ n-hoodseat):
+        // ring points falling inside ANOTHER stamp's footprint are skipped
+        if (insideAnyStamp(x, z)) return null;
+        return stampDelta(x, z, bilinearH(h16, x, z));
+      };
+      // just outside the lateral fade band, along the whole span
+      for (let s = sp.s0; s <= sp.s1; s += 1.5) {
+        for (const lat of [-(sp.latOut + 1.0), sp.latOut + 1.0]) {
+          const d = at(s, lat);
+          if (d === null) continue;
+          ringSamples++;
+          if (d !== 0) outside++;
+        }
+      }
+      // just past both span ends, across the footprint width
+      for (const s of [sp.s0 - 1.0, sp.s1 + 1.0]) {
+        for (let lat = -sp.latOut; lat <= sp.latOut; lat += 2.5) {
+          const d = at(s, lat);
+          if (d === null) continue;
+          ringSamples++;
+          if (d !== 0) outside++;
+        }
+      }
+    }
+    push('cp09-stamp-support-contained', outside === 0 && ringSamples > 100, {
+      ringSamples,
+      samplesOutsideWithDelta: outside,
+      note: 'stampDelta ≡ 0 just outside the UNION of declared stamp footprints (stamp-frame ring; overlap-aware)',
+    });
+  }
+
+  // mouth sills seated at the STAMP targets: lip = module floor − stamp
+  // margin (the shell skirt covers the sill), clamped at the −80 world floor
+  const sill = (x, z) => bilinearH(h16, x, z);
+  const sillTargets = {
+    south: -35.0,          // floor −34 − margin 1
+    north: -47.3,          // floor −46.3 − margin 1
+    trench: -80.0,         // floor −79.2 − margin 0.8, clamped at −80
+  };
+  push('cp09-mouth-sills',
+    Math.abs(sill(-420, 30) - sillTargets.south) < 0.35 &&
+    Math.abs(sill(-430, -150) - sillTargets.north) < 0.35 &&
+    Math.abs(sill(450, -30) - sillTargets.trench) < 0.35, {
+    south: r6(sill(-420, 30)), southTarget: sillTargets.south,
+    north: r6(sill(-430, -150)), northTarget: sillTargets.north,
+    trench: r6(sill(450, -30)), trenchTarget: sillTargets.trench,
+    note: 'sill = floor − stamp margin (±0.35 m quantization/bilinear tolerance)',
+  });
+
+  // Throat guarantee, dome-aware (the WIP rectangle band misclassified the
+  // shell): the interior void at lateral fraction u spans
+  //   yBot = floor + 0.35  …  yTop = floor + h·(1−UP) + h·UP·√(1−u²) − 0.55
+  // (inner noise margin 0.55). A single-valued heightfield MUST sweep each
+  // bore section once near every aperture; those crossings are confined to
+  // the measured APERTURE BANDS below, where the runtime locally OMITS the
+  // heightfield inside the bore volume (render discard + camera-BVH skip +
+  // Rapier exclusion — addendum §9.1 "locally lower or omit"). Outside the
+  // bands the void must be perfectly clean. Shell exposure (terrain below
+  // the outer roof) is allowed only at hood stations.
+  {
+    const UP = 0.62; // SHELL.DOME_UP_FRAC
+    const APERTURE_BANDS = {
+      'cave-headland': [[13, 20], [149, 155]],
+      'cave-trench-wall': [[16, 22]],
+    };
+    for (const m of [CAVE_HEADLAND, CAVE_TRENCH]) {
+      const f = caveAxisFrame(m);
+      const bands = APERTURE_BANDS[m.id];
+      let samples = 0;
+      let voidInBand = 0;
+      let voidOutsideBand = 0;
+      let exposedOutsideHood = 0;
+      let maxVoidIntrusionM = 0;
+      const sEnd = m.stations[m.stations.length - 1].s;
+      for (let s = 0; s <= sEnd; s += 1) {
+        const v = caveStationAt(m, s);
+        const ceil = v.floorY + v.height;
+        const inBand = bands.some(([a, b]) => s >= a && s <= b);
+        for (const u of [-0.85, -0.6, -0.35, 0, 0.35, 0.6, 0.85]) {
+          const lat = v.lat + u * v.halfW;
+          const x = f.ax + f.ux * s + f.px * lat;
+          const z = f.az + f.uz * s + f.pz * lat;
+          const h = bilinearH(h16, x, z);
+          const au = Math.abs(u);
+          const yTop = v.floorY + v.height * (1 - UP) + v.height * UP * Math.sqrt(1 - au * au) - 0.55;
+          const yBot = v.floorY + 0.35;
+          samples++;
+          if (h > yBot && h < yTop) {
+            if (inBand) {
+              voidInBand++;
+              const intrusion = Math.min(h - yBot, yTop - h);
+              if (intrusion > maxVoidIntrusionM) maxVoidIntrusionM = intrusion;
+            } else {
+              voidOutsideBand++;
+            }
+          }
+          // shell exposure allowed at hood stations AND inside the aperture
+          // bands (the sweep zone IS the exposure; omitted in the bore)
+          if (u === 0 && h < ceil + 2.2 && !v.hood && !inBand) exposedOutsideHood++;
+        }
+      }
+      push(`cp09-throat-${m.id}`, voidOutsideBand === 0 && exposedOutsideHood === 0 && voidInBand < 60, {
+        samples,
+        voidOutsideBand,
+        voidInBand,
+        maxVoidIntrusionM: r6(maxVoidIntrusionM),
+        apertureBands: bands,
+        exposedOutsideHood,
+        note: 'void crossings only inside the recorded aperture bands (heightfield locally omitted in the bore there); shell exposure only at hood stations',
+      });
+    }
+  }
+
+  // arch site untouched by stamps (footings embed instead)
+  {
+    let overlap = 0;
+    for (const b of stampBounds()) {
+      if (CAVE_ARCH.center.x > b.minX - 20 && CAVE_ARCH.center.x < b.maxX + 20 &&
+          CAVE_ARCH.center.z > b.minZ - 20 && CAVE_ARCH.center.z < b.maxZ + 20) overlap++;
+    }
+    push('cp09-arch-no-stamp', overlap === 0, {
+      boundsNearArch: overlap,
+      archSill: r6(bilinearH(h16, CAVE_ARCH.center.x, CAVE_ARCH.center.z)),
+    });
+  }
 
   // --- cp05A §8.3: coastline preservation — the artifact mask must equal the
   // CP05 (pre-relief) quantized mask texel for texel (⇒ shore.png bytes) ---

@@ -47,6 +47,15 @@ export interface PlacementData {
   instances: PlacementInstance[];
 }
 
+export interface CaveRuntimeStation {
+  s: number;
+  x: number;
+  z: number;
+  floorY: number;
+  halfW: number;
+  height: number;
+}
+
 export interface CavesData {
   magic: string;
   modules: {
@@ -54,8 +63,33 @@ export interface CavesData {
     family: string;
     role: string;
     moduleId: string | null;
+    /** cp09: committed GLB record (bytes + SHA-256) written by the bake */
+    geometry?: { bytes: number; sha256: string } | null;
     transform: { x: number; z: number; yaw: number; scale: number };
     mouths: { name: string; x: number; z: number; yaw: number; lipY: number }[];
+    /** cp09: baked containment/darkness record (the CaveField source) */
+    runtime?: {
+      stations: CaveRuntimeStation[];
+      darkFullM: number;
+      endCap: boolean;
+      opening?: { x: number; z: number; yaw: number; halfW: number; crownY: number };
+    };
+  }[];
+  /** cp09: proposed clearance contract (flagged for user ruling) */
+  clearance?: Record<string, number>;
+  /** cp09: seam-local terrain stamps (addendum §9.1 record) */
+  stamps?: {
+    id: string;
+    module: string;
+    s0: number;
+    s1: number;
+    latIn: number;
+    latOut: number;
+    margin?: number;
+    seatMax?: number;
+    apronSlope?: number;
+    fade0: number;
+    fade1: number;
   }[];
 }
 

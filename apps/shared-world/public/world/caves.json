@@ -1,12 +1,16 @@
 {
   "magic": "bodyarcade-region-caves/1",
-  "note": "Sites + transforms fixed at cp04A; module IDs assigned at cp09 (Kenney kit + Blender). Seam rule per Master §5.2.",
+  "note": "Sites + transforms fixed at cp04A (X/Z immutable). CP09: module geometry baked from the hand-authored plan (authoring/caves/cave-plan.mjs, Kenney Modular Cave Kit kitbash realized through scripted Blender); lipY = the stamped mouth sill; seam stamps per addendum §9.1 recorded below. Omission law (addendum §9.1 \"locally lower or omit\"): inside each bore volume (runtime stations, lat ≤ halfW+0.3, floor−0.5 ≤ y ≤ ceiling+0.5) the heightfield is locally OMITTED by every consumer — terrain fragments discarded, camera-BVH triangles skipped, Rapier heightfield excluded — because a single-valued sheet must sweep each bore section once near every aperture; the trimesh is authoritative there.",
   "modules": [
     {
       "id": "cave-headland",
       "family": "D",
       "role": "primary bay-to-bay loop shortcut (approved: the main route)",
-      "moduleId": null,
+      "moduleId": "caves/cave-headland.glb",
+      "geometry": {
+        "bytes": 684948,
+        "sha256": "9965a4a27361666ce4e80d9720431e49a26fe45a4174a21b6d770506d41c9eb0"
+      },
       "transform": {
         "x": -425,
         "z": -60,
@@ -19,14 +23,14 @@
           "x": -420,
           "z": 30,
           "yaw": -3.086094,
-          "lipY": -32.63591
+          "lipY": -34.9573
         },
         {
           "name": "north",
           "x": -430,
           "z": -150,
           "yaw": 0.055499,
-          "lipY": -45.126001
+          "lipY": -47.187683
         }
       ],
       "passage": [
@@ -39,15 +43,161 @@
           30
         ]
       ],
+      "runtime": {
+        "stations": [
+          {
+            "s": 0,
+            "x": -420,
+            "z": 30,
+            "floorY": -34,
+            "halfW": 6.5,
+            "height": 8.5
+          },
+          {
+            "s": 6,
+            "x": -418.435745,
+            "z": 23.903845,
+            "floorY": -34.8,
+            "halfW": 6,
+            "height": 8
+          },
+          {
+            "s": 12,
+            "x": -417.071183,
+            "z": 17.818784,
+            "floorY": -35.9,
+            "halfW": 5.6,
+            "height": 7.6
+          },
+          {
+            "s": 20,
+            "x": -415.518022,
+            "z": 9.720161,
+            "floorY": -37.2,
+            "halfW": 5.4,
+            "height": 7.3
+          },
+          {
+            "s": 30,
+            "x": -414.075802,
+            "z": -0.375383,
+            "floorY": -38.1,
+            "halfW": 5.5,
+            "height": 7.4
+          },
+          {
+            "s": 45,
+            "x": -413.510008,
+            "z": -15.429946,
+            "floorY": -38.7,
+            "halfW": 5.6,
+            "height": 7.5
+          },
+          {
+            "s": 60,
+            "x": -415.340518,
+            "z": -30.351381,
+            "floorY": -39.1,
+            "halfW": 4.5,
+            "height": 6.8
+          },
+          {
+            "s": 75,
+            "x": -418.768566,
+            "z": -45.184065,
+            "floorY": -39.5,
+            "halfW": 5.2,
+            "height": 7.4
+          },
+          {
+            "s": 90,
+            "x": -423.394765,
+            "z": -59.950184,
+            "floorY": -39.9,
+            "halfW": 5.8,
+            "height": 7.7
+          },
+          {
+            "s": 100,
+            "x": -426.545462,
+            "z": -69.790565,
+            "floorY": -40.1,
+            "halfW": 4.8,
+            "height": 6.6
+          },
+          {
+            "s": 110,
+            "x": -430.494928,
+            "z": -79.586571,
+            "floorY": -40.7,
+            "halfW": 5.5,
+            "height": 7.4
+          },
+          {
+            "s": 125,
+            "x": -434.422205,
+            "z": -94.391519,
+            "floorY": -41.2,
+            "halfW": 5.7,
+            "height": 7.6
+          },
+          {
+            "s": 140,
+            "x": -436.6521,
+            "z": -109.290766,
+            "floorY": -42.2,
+            "halfW": 5.5,
+            "height": 7.4
+          },
+          {
+            "s": 152,
+            "x": -436.119588,
+            "z": -121.338855,
+            "floorY": -43.2,
+            "halfW": 5.3,
+            "height": 7.2
+          },
+          {
+            "s": 163,
+            "x": -434.333453,
+            "z": -132.455046,
+            "floorY": -44.1,
+            "halfW": 5.6,
+            "height": 7.6
+          },
+          {
+            "s": 172,
+            "x": -432.436378,
+            "z": -141.574318,
+            "floorY": -45.2,
+            "halfW": 6,
+            "height": 8
+          },
+          {
+            "s": 180.278,
+            "x": -430.000024,
+            "z": -150.000436,
+            "floorY": -46.3,
+            "halfW": 6.5,
+            "height": 8.5
+          }
+        ],
+        "darkFullM": 22,
+        "endCap": false
+      },
       "seam": {
-        "policy": "heightmap locally lowered to meet each module lip at cp09; shared triplanar rock across the seam; trimesh authoritative where the module undercuts"
+        "policy": "heightmap locally lowered to meet each module lip at cp09; shared substrate rock classification across the seam; trimesh authoritative where the module undercuts"
       }
     },
     {
       "id": "cave-trench-wall",
       "family": "D",
       "role": "smaller optional trench-wall discovery — NOT another major route (approved)",
-      "moduleId": null,
+      "moduleId": "caves/cave-trench-wall.glb",
+      "geometry": {
+        "bytes": 166148,
+        "sha256": "052f2dc1f3fa8178fb43c200e0c71a4b0a976338981f7c84ec121809ec0edd8b"
+      },
       "transform": {
         "x": 450,
         "z": -30,
@@ -60,7 +210,7 @@
           "x": 450,
           "z": -30,
           "yaw": 1.642104,
-          "lipY": -78.401152
+          "lipY": -79.938236
         }
       ],
       "passage": [
@@ -69,6 +219,60 @@
           -30
         ]
       ],
+      "runtime": {
+        "stations": [
+          {
+            "s": 0,
+            "x": 450,
+            "z": -30,
+            "floorY": -79.2,
+            "halfW": 4,
+            "height": 5.5
+          },
+          {
+            "s": 8,
+            "x": 442.091578,
+            "z": -28.432563,
+            "floorY": -78.9,
+            "halfW": 3.4,
+            "height": 4.8
+          },
+          {
+            "s": 14,
+            "x": 436.206572,
+            "z": -26.608638,
+            "floorY": -78.6,
+            "halfW": 3.2,
+            "height": 4.6
+          },
+          {
+            "s": 20,
+            "x": 430.350065,
+            "z": -24.385728,
+            "floorY": -78.2,
+            "halfW": 3.4,
+            "height": 4.7
+          },
+          {
+            "s": 26,
+            "x": 424.536306,
+            "z": -21.564344,
+            "floorY": -77.9,
+            "halfW": 5,
+            "height": 5.2
+          },
+          {
+            "s": 32,
+            "x": 418.686924,
+            "z": -19.241689,
+            "floorY": -77.6,
+            "halfW": 5.5,
+            "height": 5.4
+          }
+        ],
+        "darkFullM": 14,
+        "endCap": true
+      },
       "seam": {
         "policy": "single-mouth pocket in the trench W wall; heightmap lip lowered at cp09; trimesh authoritative inside"
       }
@@ -77,7 +281,11 @@
       "id": "arch-islet-gap",
       "family": "arch",
       "role": "the approved arch in the islet gap (opening 5 m)",
-      "moduleId": null,
+      "moduleId": "caves/arch-islet-gap.glb",
+      "geometry": {
+        "bytes": 76924,
+        "sha256": "ee26602983fab68a99869bdcf7261764b1622be054b8fff61def9a1724f95aa7"
+      },
       "openingMeters": 5,
       "transform": {
         "x": -40,
@@ -86,9 +294,83 @@
         "scale": 1
       },
       "mouths": [],
+      "runtime": {
+        "stations": [],
+        "darkFullM": 0,
+        "endCap": false,
+        "opening": {
+          "x": -40,
+          "z": -70,
+          "yaw": 1.951303,
+          "halfW": 2.5,
+          "crownY": -21.3
+        }
+      },
       "seam": {
-        "policy": "free-standing arch; footings meet terrain; trimesh at cp09"
+        "policy": "free-standing arch; footings embedded below terrain (no stamp); trimesh at cp09"
       }
+    }
+  ],
+  "clearance": {
+    "headlandMouthW": 13,
+    "headlandMouthH": 8.5,
+    "headlandMinW": 9,
+    "headlandMinH": 6.6,
+    "trenchMouthW": 8,
+    "trenchMouthH": 5.5,
+    "trenchMinW": 6.4,
+    "trenchMinH": 4.6,
+    "archOpeningW": 5,
+    "archClearH": 6.5,
+    "dressingIntrusionMax": 1.2
+  },
+  "stamps": [
+    {
+      "id": "stamp-headland-s-throat",
+      "module": "cave-headland",
+      "s0": -8,
+      "s1": 20,
+      "latIn": 8.5,
+      "latOut": 14,
+      "margin": 1,
+      "apronSlope": 0.35,
+      "fade0": 6,
+      "fade1": 5
+    },
+    {
+      "id": "stamp-headland-n-throat",
+      "module": "cave-headland",
+      "s0": 149,
+      "s1": 188,
+      "latIn": 8.5,
+      "latOut": 14,
+      "margin": 1,
+      "apronSlope": 0.35,
+      "fade0": 5,
+      "fade1": 6
+    },
+    {
+      "id": "stamp-headland-n-hoodseat",
+      "module": "cave-headland",
+      "s0": 150,
+      "s1": 181,
+      "latIn": 9,
+      "latOut": 15,
+      "seatMax": 0.9,
+      "fade0": 6,
+      "fade1": 4
+    },
+    {
+      "id": "stamp-trench-throat",
+      "module": "cave-trench-wall",
+      "s0": -6,
+      "s1": 21,
+      "latIn": 6.5,
+      "latOut": 11,
+      "margin": 0.8,
+      "apronSlope": 0.35,
+      "fade0": 5,
+      "fade1": 4
     }
   ]
 }

@@ -26,6 +26,15 @@ export interface WorldSampler {
    * unchanged by construction.
    */
   terrainHeight?(x: number, z: number): number;
+  /**
+   * cp09: analytic water ceiling (metres, y-up; Infinity = open water).
+   * Inside cave interiors the CaveField returns the interior ceiling and
+   * the sim's vertical clamp holds the dolphin below it (soft spring, the
+   * seabed-clearance law mirrored upward). Absent everywhere else — the
+   * pool and open-region behavior (and their replay digests where no cave
+   * is entered) are unchanged by construction.
+   */
+  ceilingAt?(x: number, z: number): number;
 }
 
 /**

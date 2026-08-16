@@ -1,10 +1,26 @@
 # BodyArcade Shared-World — Asset Credits
 
-_Last updated: 2026-08-08 (Checkpoint 05C docs pass). This file is mirrored
+_Last updated: 2026-08-16 (Checkpoint 09 caves pass). This file is mirrored
 by the in-app credits panel (`/shared-world/?view=credits`)._
 
 ## 3D Models
 
+- **Modular Cave Kit 1.0** — by Kenney (www.kenney.nl) — **CC0**
+  (http://creativecommons.org/publicdomain/zero/1.0/).
+  Source: https://kenney.nl/assets/modular-cave-kit
+  Live license check 2026-08-15 (CP09 asset gate, master §12 item 2): the
+  source page states "Download this package (40 assets) for free, CC0
+  licensed!" and links Creative Commons CC0; the bundled `License.txt`
+  confirms CC0 with voluntary crediting; Kenney's release note states
+  "Completely free for everyone, no attribution/donation/etc. required."
+  User approval recorded 2026-08-16 (Kenney geometry as dressing on the
+  hand-authored BodyArcade cave shells; the authored shells remain the
+  true navigable geometry). Kit models live at
+  `apps/shared-world/authoring/assets/kenney-modular-cave-kit/` (authoring
+  input only — geometry kitbashed into the baked cave modules under
+  `apps/shared-world/public/world/caves/`; the kit's palette textures are
+  not used; runtime materials come from the region substrate rock
+  classification). Credit is voluntary under CC0 — given with thanks.
 - **Dolphin** — "Realistic Dolphin | Rigged with 25+ Animations" by GAMICO
   (https://sketchfab.com/gamico) — **CC-BY 4.0**
   (https://creativecommons.org/licenses/by/4.0/).
