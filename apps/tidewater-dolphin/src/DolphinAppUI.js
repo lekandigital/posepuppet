@@ -2,14 +2,24 @@
 // unmodified) to the dolphin app. Derived from Tidewater's src/ui/AppUI.js: every ocean /
 // shore / sky / effects / performance control is identical (same objects, same ranges, same
 // defaults — the panel edits the SAME Tidewater uniforms the pristine app exposes). Differences
-// (CP10): the Camera tab has no boat-camera select (there is no boat mode); the per-frame HUD
-// shows the dolphin's state (swimming / surface / diving / airborne, tracking source) instead
-// of the walker's; the boat gauges stay hidden.
+// (CP10): a PLAY tab in front — play mode (Dolphin / Walking / Boat), the optional fishing
+// activity, the dolphin's assist and body-input status, and the scenery-additions toggles
+// (Original Tidewater / Enhanced); the Camera tab's boat-camera select shows in boat mode; the
+// per-frame HUD shows the dolphin's state (swimming / surface / diving / airborne, tracking
+// source) in dolphin mode and Tidewater's own walker / boat HUD (mode, prompts, boat gauges,
+// depth) in the other modes.
 
 import * as THREE from '../vendor/tidewater/src/engine/index.js';
 import { UI } from '../vendor/tidewater/src/ui/UI.js';
 import { G } from '../vendor/tidewater/src/core/Globals.js';
 import { GroundBounce } from '../vendor/tidewater/src/materials/GroundBounce.js';
+import { ADDITION_CATEGORIES } from './additions/SceneryAdditions.js';
+
+const MODE_CONTROLS = {
+	dolphin: 'Shift kick · W/S pitch · A/D bank · Q/E depth · Space burst · X brake · R recenter · 1/2/3 assist · body input via PosePuppet',
+	walk: 'WASD move · mouse look (click the view) · Shift sprint · Space jump / swim up · C dive · E board the boat, climb ladders, talk',
+	boat: 'W/S throttle · A/D steer · Shift boost · V helm / chase camera · E leave the helm, step ashore · mouse look',
+};
 
 const SEA = {
 	Calm: { wind: 3.5, fetch: 40, chop: 0.75, swell: 0.28, surf: 0.18, period: 11, whitecaps: 0.2 },
@@ -56,6 +66,72 @@ export class DolphinAppUI {
 			grain: app.post.params.grain.value,
 			renderScale: app.settings.renderScale,
 			shadows: true,
+			// CP10 continuation: play tab state
+			mode: app.displayedMode,
+			fishing: app.fishing,
+			assist: app.dolphin ? app.dolphin.sim.assist : 'full',
+			swellRide: app.dolphin ? app.dolphin.opts.swellRide : true,
+			camMode: app.player ? app.player.camMode : 'third',
+			environment: app.additions && app.additions.anyOn ? 'enhanced' : 'original',
+		};
+
+		// ---------------------------------------------------------------- Play (CP10 continuation)
+		const play = ui.addTab( 'play', 'Play', 'play' );
+		const who = play.addFolder( 'Player', { icon: 'swim' } );
+		this.modeCtl = who.addSelect( {
+			label: 'Mode', object: s, key: 'mode', segmented: true,
+			tooltip: 'Who you are in the same running island: the BodyArcade dolphin (default), Tidewater\'s walker, or Tidewater\'s boat at the helm. Switching never reloads the world.',
+			options: [ { label: 'Dolphin', value: 'dolphin' }, { label: 'Walking', value: 'walk' }, { label: 'Boat', value: 'boat' } ],
+			onChange: ( v ) => { if ( ! app.setPlayerMode( v ) ) s.mode = app.displayedMode; },
+		} );
+		who.addButton( { label: 'Return to the dolphin', icon: 'swim', onClick: () => app.setPlayerMode( 'dolphin' ) } );
+		who.addInfo( { label: 'Controls', get: () => MODE_CONTROLS[ app.displayedMode ] } );
+		const fish = play.addFolder( 'Fishing', { icon: 'anchor' } );
+		fish.addToggle( {
+			label: 'Fishing gameplay', object: s, key: 'fishing',
+			tooltip: 'Tidewater\'s fishing: the rod (R), casting, bites and the fight, the cooler and log (I), Joe\'s fish stand and Marta\'s chandlery. Needs Walking or Boat — never in Dolphin mode.',
+			onChange: ( v ) => app.setFishing( v ),
+		} );
+		fish.addInfo( { label: 'Where', get: () => ! app.fishing ? 'Off (default)' : app.playerMode === 'dolphin' ? 'On — switch to Walking or Boat to fish' : 'On — R takes out the rod, I opens the cooler' } );
+		const dol = play.addFolder( 'Dolphin', { icon: 'swim', open: false } );
+		dol.addSelect( { label: 'Assist', object: s, key: 'assist', segmented: true, tooltip: 'Full: auto-level and drift help. Standard. Expert: you hold every angle.', options: [ { label: 'Full', value: 'full' }, { label: 'Standard', value: 'standard' }, { label: 'Expert', value: 'expert' } ], onChange: ( v ) => { if ( app.dolphin ) app.dolphin.sim.assist = v; } } );
+		dol.addToggle( { label: 'Ride the swell', object: s, key: 'swellRide', tooltip: 'Presentation only: near the surface the rendered dolphin lifts with the measured wave height so it sits in Tidewater\'s actual swell. The deterministic sim is untouched.', onChange: ( v ) => { if ( app.dolphin ) app.dolphin.opts.swellRide = v; } } );
+		dol.addInfo( { label: 'Body input', get: () => {
+
+			if ( ! app.dolphin ) return '—';
+			const t = app.dolphin.state().tracking;
+			return t === 'live' ? 'Live (PosePuppet)' : t === 'keyboard' ? 'Keyboard' : t === 'none' ? 'Listening — none received (keyboard works)' : `Lost (${ t }) — gliding`;
+
+		} } );
+		dol.addButton( { label: 'Recenter chase camera (R)', icon: 'camera', onClick: () => app.dolphin && app.dolphin.rig.recenter() } );
+		if ( app.additions ) {
+
+			const add = play.addFolder( 'Scenery additions', { icon: 'layers' } );
+			add.addSelect( {
+				label: 'Environment', object: s, key: 'environment', segmented: true,
+				tooltip: 'Original: exactly the pristine Tidewater scene. Enhanced: the optional additions below (all made of assets already in Tidewater, Poly Haven CC0). Compare freely; nothing of the original is changed either way.',
+				options: [ { label: 'Original Tidewater', value: 'original' }, { label: 'Enhanced', value: 'enhanced' } ],
+				onChange: ( v ) => { app.additions.setAll( v === 'enhanced' ); for ( const c of ADDITION_CATEGORIES ) s[ 'add_' + c.id ] = v === 'enhanced'; ui.refresh(); },
+			} );
+			for ( const c of ADDITION_CATEGORIES ) {
+
+				s[ 'add_' + c.id ] = !! app.additions.enabled[ c.id ];
+				add.addToggle( { label: c.label, object: s, key: 'add_' + c.id, tooltip: c.tooltip, onChange: ( v ) => { app.additions.setCategory( c.id, v ); s.environment = app.additions.anyOn ? 'enhanced' : 'original'; ui.refresh(); } } );
+
+			}
+
+			add.addInfo( { label: 'Instances', get: () => { const st = app.additions.stats().categories; return ADDITION_CATEGORIES.map( ( c ) => `${ c.label.split( ' ' )[ 1 ] || c.label } ${ st[ c.id ] ? st[ c.id ].instances : 0 }` ).join( ' · ' ); } } );
+
+		}
+
+		app.onPlayerMode = ( mode ) => {
+
+			s.mode = app.displayedMode;
+			s.camMode = app.player.camMode;
+			if ( this.camModeCtl ) this.camModeCtl.setVisible( mode === 'boat' );
+			ui.refresh();
+			ui.toast( mode === 'dolphin' ? 'Dolphin · Shift to kick' : mode === 'walk' ? 'Walking · click the view to look around' : 'Boat · at the helm — W throttle, A/D steer, V camera' );
+
 		};
 
 		const spectrum = () => {
@@ -186,10 +262,12 @@ export class DolphinAppUI {
 		atmo.addSlider( { label: 'Exposure', object: s, key: 'exposure', min: - 3, max: 3, step: 0.1, unit: 'EV', onChange: ( v ) => { app.settings.exposure = 0.55 * Math.pow( 2, v ); } } );
 
 		// ---------------------------------------------------------------- Camera
-		// CP10: no boat-camera select. The field-of-view slider edits the live lens (the chase
-		// rig's 55° while following, Tidewater's 62° in the free camera).
+		// CP10: the boat-camera select (Tidewater's) shows in boat mode. The field-of-view slider
+		// edits the live lens (the chase rig's 55° while following, Tidewater's 62° for the free
+		// camera and its player).
 		const cam = ui.addTab( 'camera', 'Camera', 'camera' );
 		const view = cam.addFolder( 'View', { icon: 'camera' } );
+		this.camModeCtl = view.addSelect( { label: 'Boat camera', object: s, key: 'camMode', options: [ { label: '1st person', value: 'first' }, { label: '3rd person', value: 'third' } ], onChange: ( v ) => { app.player.camMode = v; } } ).setVisible( app.displayedMode === 'boat' );
 		view.addSlider( { label: 'Field of view', object: s, key: 'fov', min: 35, max: 100, step: 1, unit: '°', onChange: ( v ) => {
 
 			app.camera.fov = v;
@@ -256,17 +334,52 @@ export class DolphinAppUI {
 		ui.setStats( { fps: app.fps, frameMs: dt * 1000 } );
 		this.s.renderScale = app.post.scale;
 		this.s.fov = app.camera.fov;
-		ui.setBoatGauges( { visible: false } );
+		this.s.mode = app.displayedMode;
+		this.s.fishing = app.fishing;
+		if ( app.dolphin ) this.s.assist = app.dolphin.sim.assist;
+		if ( app.player && this.s.camMode !== app.player.camMode ) this.s.camMode = app.player.camMode;
 
 		if ( app.freeCam ) {
 
 			ui.setMode( 'Free camera' );
-			ui.setPrompt( 'F', 'Back to the dolphin' );
+			ui.setPrompt( 'F', app.playerMode === 'dolphin' ? 'Back to the dolphin' : 'Walk' );
+			ui.setBoatGauges( { visible: false } );
 			ui.setDepth( { visible: false } );
 			return;
 
 		}
 
+		if ( app.playerMode !== 'dolphin' ) {
+
+			// Tidewater's own walker / boat HUD (AppUI.update verbatim)
+			const p = app.player;
+			const mode = p.mode === 'boat' ? `Boat · ${ p.camMode === 'first' ? '1st' : '3rd' } person`
+				: p.mode === 'deck' ? 'On deck'
+				: p.mode === 'swim' ? ( app.camera.position.y < ( app.cameraWaterHeight ?? 0 ) - 0.3 ? 'Diving' : 'Swimming' ) : 'Walking';
+			ui.setMode( mode );
+			if ( p.prompt ) ui.setPrompt( p.prompt.key, p.prompt.text );
+			else ui.setPrompt( null );
+			const b = app.boatCtl;
+			if ( p.mode === 'boat' ) {
+
+				const f = b.forward( new THREE.Vector3() );
+				ui.setBoatGauges( {
+					visible: true,
+					throttle: b.throttle,
+					rpm: b.rpm,
+					speedKnots: b.speed * 1.94384,
+					heading: ( THREE.MathUtils.radToDeg( Math.atan2( f.x, - f.z ) ) + 360 ) % 360,
+				} );
+
+			} else ui.setBoatGauges( { visible: false } );
+
+			const depth = ( app.cameraWaterHeight ?? 0 ) - app.camera.position.y;
+			ui.setDepth( { visible: p.mode === 'swim' && depth > 0.3, meters: depth } );
+			return;
+
+		}
+
+		ui.setBoatGauges( { visible: false } );
 		const d = app.dolphin;
 		if ( ! d ) return;
 		const st = d.state();

@@ -43,8 +43,20 @@ sheet and `?credits` of `apps/tidewater-dolphin/`)._
   `LICENSE-dolphin.txt` alongside (SHA-256
   `e2cca876f8935269df8b9b658962f5db349bb9e11e6ed695a8c691bb94ef6cb4`). Runtime
   modification unchanged: the `Jump` clip's baked `Dolphin_Root` translation
-  channel is stripped at load. No other asset was added in CP10 (optional
-  downloaded assets are deferred past the visual-approval gate).
+  channel is stripped at load.
+- **Scenery additions (CP10 continuation, optional layer, Play tab → Original /
+  Enhanced)** — no new asset files. The layer re-instances four Poly Haven
+  **CC0 1.0** photoscans that Tidewater already ships and renders
+  (`vendor/tidewater/public/models/debris/`: Dead Quiver Trunk, Dead Quiver
+  Branch 01 / 02, Lambis Shell — https://polyhaven.com/a/dead_quiver_trunk,
+  …/dead_quiver_branch_01, …/dead_quiver_branch_02, …/lambis_shell; Tidewater's
+  LOD exports per `public/models/debris/CREDITS.md`) as 11 sunken driftwood
+  pieces on the bay floor and 30 shells on the shallow sand, drawn with
+  Tidewater's own ScannedDebris material and LODs; deterministic placement
+  record at `apps/tidewater-dolphin/eval/results/additions-manifest.json`.
+  The user's downloaded collection was audited and nothing from it was
+  added (see the CP10 report, "Assets": character rigs, the Kenney cave kit,
+  flight-demo props and aircraft models rejected on art direction / relevance).
 
 ## 3D Models
 

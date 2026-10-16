@@ -29,6 +29,11 @@ export const CUSTOM_VIEWS = {
 	waterlineDrops: { p: [ 5, 0.02, - 10 ], yaw: Math.PI, pitch: 0.0, time: 14.0 },
 	// the dolphin spawn area (the integrated app's first frame), seen from behind the spawn heading
 	spawnArea: { p: [ 2, - 1.4, 70 ], yaw: 0.0, pitch: 0.05, time: 16.2 },
+	// CP10 continuation — the scenery-additions sites (identical in the pristine / additions-off
+	// captures, where the sand is bare): the sunken driftwood group east of the pier head and the
+	// shell drift on the shallow sand off the beach
+	addWoodEast: { p: [ 70, - 2.4, 52 ], yaw: Math.atan2( - 10, - 12 ), pitch: - 0.15, time: 13.0 },
+	addShellsBeach: { p: [ 9, - 1.9, 16 ], yaw: Math.atan2( - 5, - 8 ), pitch: - 0.16, time: 13.0 },
 };
 
 export const ALL_VIEWS = [ ...STANDARD_VIEWS, ...Object.keys( CUSTOM_VIEWS ) ];

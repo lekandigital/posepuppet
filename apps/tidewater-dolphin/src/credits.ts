@@ -22,7 +22,7 @@ export const TIDEWATER_NOTICE =
 
 const CONTROLS_HTML = `
 	<section>
-		<h3>Swim</h3>
+		<h3>Swim — Dolphin (default)</h3>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>Shift</kbd></span><span class="tw-help-text">Kick<small>Tap for one kick, hold for a steady rhythm</small></span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>W</kbd><kbd>S</kbd></span><span class="tw-help-text">Pitch<small>W dives, S surfaces</small></span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>A</kbd><kbd>D</kbd></span><span class="tw-help-text">Bank and turn</span></div>
@@ -31,18 +31,33 @@ const CONTROLS_HTML = `
 		<div class="tw-help-row"><span class="tw-keys"><kbd>X</kbd></span><span class="tw-help-text">Brake</span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>R</kbd></span><span class="tw-help-text">Recenter the camera</span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></span><span class="tw-help-text">Assist<small>Full · standard · expert</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys">PosePuppet</span><span class="tw-help-text">Swim with your body<small>Kick rhythm, lean to pitch and bank, crouch / stretch for depth, hands forward to burst. Keyboard always wins while touched.</small></span></div>
 	</section>
 	<section>
-		<h3>Body input</h3>
-		<div class="tw-help-row"><span class="tw-keys">PosePuppet</span><span class="tw-help-text">Swim with your body<small>Kick rhythm, lean to pitch and bank, crouch / stretch for depth, hands forward to burst. Keyboard always wins while touched.</small></span></div>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>F</kbd></span><span class="tw-help-text">Free camera<small>Review camera; the dolphin waits</small></span></div>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>T</kbd></span><span class="tw-help-text">Pause time</span></div>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>L</kbd></span><span class="tw-help-text">Flashlight</span></div>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>M</kbd></span><span class="tw-help-text">Mute</span></div>
+		<h3>Walking · Boat — Play tab (H)</h3>
+		<div class="tw-help-row"><span class="tw-keys"><span class="tw-wasd"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span></span><span class="tw-help-text">Move · throttle and steer<small>Tidewater's own walker and boat</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd class="tw-kbd-ico" aria-label="Mouse">🖱</kbd></span><span class="tw-help-text">Look around<small>Click the view to capture the mouse, Esc releases it</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>Shift</kbd></span><span class="tw-help-text">Sprint, boat boost</span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>Space</kbd></span><span class="tw-help-text">Jump, swim up</span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>C</kbd></span><span class="tw-help-text">Dive</span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>E</kbd></span><span class="tw-help-text">Interact<small>Board, helm, step ashore, trade</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>V</kbd></span><span class="tw-help-text">Boat camera<small>1st / 3rd person</small></span></div>
+	</section>
+	<section>
+		<h3>Fishing — when enabled (Play tab)</h3>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>R</kbd></span><span class="tw-help-text">Fishing rod<small>Take out / put away (walking, pier, deck)</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>LMB</kbd></span><span class="tw-help-text">Cast, strike, reel<small>Hold to wind up / reel</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>RMB</kbd></span><span class="tw-help-text">Reel in an empty line</span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>I</kbd></span><span class="tw-help-text">Cooler and fish log</span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>E</kbd></span><span class="tw-help-text">Sell to Joe, buy from Marta</span></div>
 	</section>
 	<section>
 		<h3>Interface</h3>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>H</kbd></span><span class="tw-help-text">Settings panel</span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>F</kbd></span><span class="tw-help-text">Free camera<small>Review camera; the player waits</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>T</kbd></span><span class="tw-help-text">Pause time</span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>L</kbd></span><span class="tw-help-text">Flashlight</span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>M</kbd></span><span class="tw-help-text">Mute</span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>H</kbd></span><span class="tw-help-text">Settings panel<small>Play tab: mode, fishing, scenery additions</small></span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>P</kbd></span><span class="tw-help-text">Photo mode<small>Hides all interface</small></span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>F1</kbd><kbd>?</kbd></span><span class="tw-help-text">This sheet</span></div>
 	</section>`;
@@ -65,7 +80,7 @@ export function installCredits(ui: { helpEl?: HTMLElement; startEl?: HTMLElement
     const guide = help.querySelector('.tw-help-guide');
     if (guide) guide.innerHTML = CREDITS_HTML;
     const sub = help.querySelector('.tw-help-head p');
-    if (sub) sub.textContent = 'BodyArcade dolphin in the Tidewater island. Keyboard or PosePuppet body input; no mouse look.';
+    if (sub) sub.textContent = 'BodyArcade dolphin in the Tidewater island (default: keyboard or PosePuppet body input, no mouse look). Tidewater\'s walking, boat and fishing are in the Play tab of the settings panel (H).';
   }
   const start = ui.startEl;
   if (start) {

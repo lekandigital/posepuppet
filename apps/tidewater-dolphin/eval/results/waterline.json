@@ -1,0 +1,360 @@
+{
+  "url": "http://127.0.0.1:5199/?noAudio",
+  "at": "2026-10-16T13:55:21.712Z",
+  "passed": 17,
+  "total": 17,
+  "results": [
+    {
+      "name": "rig constants carry no waterline exclusion (SURFACE_BAND / SHIMMER_MIN_Y / SHIMMER_HOLD_S absent)",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "1 fully submerged: lens entirely in water (medium ≥ 0.98), eye ≈ 4.9 m below the surface",
+      "ok": true,
+      "detail": {
+        "water": 1,
+        "eyeAboveCam": -4.7
+      }
+    },
+    {
+      "name": "2 fully above: lens entirely in air (medium ≤ 0.03) with the dolphin at the surface",
+      "ok": true,
+      "detail": {
+        "water": 0,
+        "eyeAboveCam": 0.97
+      }
+    },
+    {
+      "name": "3 lens at the surface: the eye rests within 15 cm of the local waterline, no exclusion band",
+      "ok": true,
+      "detail": {
+        "eyeAboveDolphinColumn": [
+          -0.073,
+          -0.049,
+          -0.03,
+          -0.005,
+          0.036,
+          0.066,
+          0.073,
+          0.046
+        ]
+      }
+    },
+    {
+      "name": "3 split frames: air and water in the same image (0.04 < medium < 0.96) seen repeatedly, with fully-in and fully-out frames between",
+      "ok": true,
+      "detail": {
+        "splitSamples": 5,
+        "of": 23,
+        "medium": [
+          0.94,
+          0.49,
+          0,
+          0,
+          0,
+          0,
+          0.92,
+          0.84,
+          0,
+          0,
+          0,
+          0.22,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "3 the split sits the right way up (air at the top row, water at the bottom row) in the split frames",
+      "ok": true,
+      "detail": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "3 the surface passes through the lens repeatedly (eye / waterline crossings ≥ 2 in 6 s)",
+      "ok": true,
+      "detail": {
+        "crossings": 3
+      }
+    },
+    {
+      "name": "4 waves cross a stationary lens: eye still (< 3 cm), water fraction sweeps (range ≥ 0.5), surface crossings ≥ 1",
+      "ok": true,
+      "detail": {
+        "eyeMoveM": 0,
+        "minWater": 0,
+        "maxWater": 1,
+        "splitSamples": 2,
+        "crossings": 4
+      }
+    },
+    {
+      "name": "5 swimming below with the lens partly submerged: dolphin stays under (y < −0.8), split frames seen",
+      "ok": true,
+      "detail": {
+        "dolphinY": [
+          -1.15,
+          -1.15,
+          -1.15,
+          -1.15,
+          -1.15,
+          -1.15,
+          -1.15,
+          -1.15,
+          -1.15,
+          -1.15
+        ],
+        "medium": [
+          1,
+          0.18,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0.2,
+          0
+        ]
+      }
+    },
+    {
+      "name": "6 dive: lens goes fully under (medium ≥ 0.98 at the bottom of the dive)",
+      "ok": true,
+      "detail": {
+        "deepest": -4.02
+      }
+    },
+    {
+      "name": "6 dive and ascent: eye crosses the waterline (≥ 2 crossings) and moves continuously (< 5.5 m per 100 ms, the rig's speed cap)",
+      "ok": true,
+      "detail": {
+        "crossings": 3,
+        "maxStepM": 0.982,
+        "medium": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "name": "7 breach: the dolphin goes airborne, the lens is in air at the apex, then both return under",
+      "ok": true,
+      "detail": {
+        "airSamples": 17,
+        "apexY": 3.14,
+        "mediumInAir": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "7 breach: camera states Airborne and SurfaceTransition / ReEntryRecovery, lens crossings counted",
+      "ok": true,
+      "detail": {
+        "states": [
+          "FastTravel",
+          "Airborne",
+          "SurfaceTransition",
+          "ReEntryRecovery"
+        ],
+        "crossings": 2
+      }
+    },
+    {
+      "name": "7 breach: camera path continuous (< 2.75 m per 50 ms sample in y — the 55 m/s cap, never a cut)",
+      "ok": true,
+      "detail": 0.85
+    },
+    {
+      "name": "8 pier shallows at the surface: camera clearance from terrain / piles ≥ 0.5 m, no EmergencyRecenter, the surface crosses the lens",
+      "ok": true,
+      "detail": {
+        "minClear": 2.07,
+        "states": [
+          "NormalFollow",
+          "FastTravel"
+        ],
+        "medium": [
+          0,
+          0.63,
+          0,
+          0,
+          0.26,
+          1,
+          1,
+          0.55,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "crossings": 1
+      }
+    },
+    {
+      "name": "pristine Tidewater at the same lens pose and 55° lens shows the same behaviour (the surface sweeps through the lens: split frames, fully-in and fully-out)",
+      "ok": true,
+      "detail": {
+        "pose": {
+          "p": [
+            -4.0413344371862675e-16,
+            -0.044964409806269284,
+            83.3
+          ],
+          "yaw": -1.2246467991473547e-16,
+          "pitch": -0.3328159334434224,
+          "fov": 55
+        },
+        "medium": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.17,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0.25,
+          0.02,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.74,
+          1,
+          0.75,
+          0,
+          0
+        ],
+        "split": 4,
+        "min": 0,
+        "max": 1
+      }
+    },
+    {
+      "name": "no console errors during the waterline trials",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "pristine": {
+    "pose": {
+      "p": [
+        -4.0413344371862675e-16,
+        -0.044964409806269284,
+        83.3
+      ],
+      "yaw": -1.2246467991473547e-16,
+      "pitch": -0.3328159334434224,
+      "fov": 55
+    },
+    "medium": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0.17,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0.25,
+      0.02,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0.74,
+      1,
+      0.75,
+      0,
+      0
+    ],
+    "split": 4,
+    "min": 0,
+    "max": 1
+  }
+}

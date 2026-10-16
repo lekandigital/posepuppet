@@ -1,0 +1,371 @@
+{
+  "a": "Aseq",
+  "b": "Bhiddenseq",
+  "comparedAt": "2026-10-16T13:49:58.471Z",
+  "tolerances": {
+    "identical": "MAD < 0.05 and no pixel > 32",
+    "withinNoise": "MAD < 0.5 and < 0.5 % pixels > 32"
+  },
+  "rows": [
+    {
+      "view": "surf-0",
+      "mad": 0.0621,
+      "psnr": 50.31,
+      "maxDiff": 187,
+      "pctOver8": 0.101,
+      "pctOver32": 0.011,
+      "bbox": [
+        1,
+        16,
+        2559,
+        1257
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "surf-1",
+      "mad": 0.0663,
+      "psnr": 49.98,
+      "maxDiff": 189,
+      "pctOver8": 0.112,
+      "pctOver32": 0.012,
+      "bbox": [
+        2,
+        20,
+        2559,
+        1261
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "surf-2",
+      "mad": 0.0658,
+      "psnr": 50.27,
+      "maxDiff": 190,
+      "pctOver8": 0.111,
+      "pctOver32": 0.011,
+      "bbox": [
+        2,
+        11,
+        2559,
+        1197
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "surf-3",
+      "mad": 0.0692,
+      "psnr": 49.19,
+      "maxDiff": 191,
+      "pctOver8": 0.109,
+      "pctOver32": 0.015,
+      "bbox": [
+        0,
+        26,
+        2559,
+        1134
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "surf-4",
+      "mad": 0.0731,
+      "psnr": 49.15,
+      "maxDiff": 191,
+      "pctOver8": 0.124,
+      "pctOver32": 0.016,
+      "bbox": [
+        0,
+        0,
+        2549,
+        1246
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "surf-5",
+      "mad": 0.0811,
+      "psnr": 49.41,
+      "maxDiff": 192,
+      "pctOver8": 0.13,
+      "pctOver32": 0.013,
+      "bbox": [
+        0,
+        6,
+        2559,
+        1252
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "swash-0",
+      "mad": 0.0783,
+      "psnr": 50.27,
+      "maxDiff": 183,
+      "pctOver8": 0.102,
+      "pctOver32": 0.011,
+      "bbox": [
+        5,
+        27,
+        2559,
+        1263
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "swash-1",
+      "mad": 0.0808,
+      "psnr": 49.26,
+      "maxDiff": 184,
+      "pctOver8": 0.12,
+      "pctOver32": 0.016,
+      "bbox": [
+        2,
+        2,
+        2559,
+        1217
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "swash-2",
+      "mad": 0.0786,
+      "psnr": 50.09,
+      "maxDiff": 186,
+      "pctOver8": 0.107,
+      "pctOver32": 0.014,
+      "bbox": [
+        0,
+        6,
+        2559,
+        1261
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "swash-3",
+      "mad": 0.0784,
+      "psnr": 50.7,
+      "maxDiff": 183,
+      "pctOver8": 0.086,
+      "pctOver32": 0.01,
+      "bbox": [
+        0,
+        6,
+        2559,
+        1222
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "swash-4",
+      "mad": 0.079,
+      "psnr": 50.31,
+      "maxDiff": 183,
+      "pctOver8": 0.073,
+      "pctOver32": 0.012,
+      "bbox": [
+        0,
+        4,
+        2559,
+        1222
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "swash-5",
+      "mad": 0.0806,
+      "psnr": 50.32,
+      "maxDiff": 184,
+      "pctOver8": 0.078,
+      "pctOver32": 0.011,
+      "bbox": [
+        0,
+        4,
+        2558,
+        1225
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "underwater-0",
+      "mad": 0.0059,
+      "psnr": 60.49,
+      "maxDiff": 106,
+      "pctOver8": 0.005,
+      "pctOver32": 0.003,
+      "bbox": [
+        256,
+        0,
+        2352,
+        1140
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "underwater-1",
+      "mad": 0.0049,
+      "psnr": 62.64,
+      "maxDiff": 114,
+      "pctOver8": 0.004,
+      "pctOver32": 0.002,
+      "bbox": [
+        8,
+        3,
+        2389,
+        1238
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "underwater-2",
+      "mad": 0.0045,
+      "psnr": 63.35,
+      "maxDiff": 102,
+      "pctOver8": 0.003,
+      "pctOver32": 0.002,
+      "bbox": [
+        8,
+        3,
+        2370,
+        1212
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "underwater-3",
+      "mad": 0.0046,
+      "psnr": 62.47,
+      "maxDiff": 106,
+      "pctOver8": 0.003,
+      "pctOver32": 0.001,
+      "bbox": [
+        85,
+        3,
+        2432,
+        783
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "underwater-4",
+      "mad": 0.0047,
+      "psnr": 61.38,
+      "maxDiff": 136,
+      "pctOver8": 0.004,
+      "pctOver32": 0.002,
+      "bbox": [
+        23,
+        0,
+        2440,
+        656
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "underwater-5",
+      "mad": 0.0044,
+      "psnr": 62.12,
+      "maxDiff": 92,
+      "pctOver8": 0.004,
+      "pctOver32": 0.003,
+      "bbox": [
+        159,
+        0,
+        1968,
+        1060
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "waterline-0",
+      "mad": 0.0437,
+      "psnr": 45.66,
+      "maxDiff": 140,
+      "pctOver8": 0.047,
+      "pctOver32": 0.022,
+      "bbox": [
+        0,
+        7,
+        2496,
+        1247
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "waterline-1",
+      "mad": 0.0447,
+      "psnr": 45.67,
+      "maxDiff": 141,
+      "pctOver8": 0.044,
+      "pctOver32": 0.02,
+      "bbox": [
+        3,
+        14,
+        2559,
+        1197
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "waterline-2",
+      "mad": 0.0385,
+      "psnr": 49.09,
+      "maxDiff": 144,
+      "pctOver8": 0.032,
+      "pctOver32": 0.014,
+      "bbox": [
+        9,
+        12,
+        2559,
+        1226
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "waterline-3",
+      "mad": 0.0334,
+      "psnr": 54.14,
+      "maxDiff": 144,
+      "pctOver8": 0.024,
+      "pctOver32": 0.006,
+      "bbox": [
+        31,
+        10,
+        2551,
+        1256
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "waterline-4",
+      "mad": 0.0326,
+      "psnr": 55.08,
+      "maxDiff": 143,
+      "pctOver8": 0.016,
+      "pctOver32": 0.005,
+      "bbox": [
+        33,
+        0,
+        2558,
+        948
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "waterline-5",
+      "mad": 0.0355,
+      "psnr": 54.02,
+      "maxDiff": 144,
+      "pctOver8": 0.021,
+      "pctOver32": 0.007,
+      "bbox": [
+        0,
+        1,
+        2306,
+        1262
+      ],
+      "verdict": "within noise"
+    }
+  ]
+}

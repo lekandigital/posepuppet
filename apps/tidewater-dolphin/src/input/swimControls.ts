@@ -40,6 +40,12 @@ export type TrackingStateHud = 'live' | 'stale' | 'low-confidence' | 'autopilot'
 export interface SwimControls {
   /** Poll once per render frame; dtMs since last poll. */
   intent(dtMs: number): SwimIntent;
+  /**
+   * CP10 continuation: the keyboard half is only live while the dolphin is the active player
+   * (Tidewater's walker / boat own WASD in the other play modes). Body-input reception is never
+   * paused, so reacquisition stays smooth when the dolphin takes over again.
+   */
+  setEnabled(on: boolean): void;
   hudState(): { tracking: TrackingStateHud; kickRate: number; seated: boolean; recentered: boolean; hipsQuiet: boolean };
   /** transport introspection for the topology spec */
   debug(): {
@@ -95,7 +101,15 @@ export function createSwimControls(win: Window = window): SwimControls {
   const keys = new Set<string>();
   let lastKeyAt = -Infinity;
   let kbKickAccum = 0;
+  let enabled = true;
+  // keys typed into the settings panel's fields (slider value edits) are not swim input — the same
+  // guard Tidewater's own Input applies
+  const typing = (e: KeyboardEvent): boolean => {
+    const t = e.target as HTMLElement | null;
+    return !!t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA' || t.isContentEditable === true);
+  };
   const down = (e: KeyboardEvent) => {
+    if (!enabled || typing(e)) return;
     const k = e.key.toLowerCase();
     if (['w', 'a', 's', 'd', 'q', 'e', 'x', 'shift', ' '].includes(k)) {
       if (k === 'shift' && !keys.has('shift')) kbKickAccum += 1; // tap = one kick
@@ -208,6 +222,13 @@ export function createSwimControls(win: Window = window): SwimControls {
   }
 
   return {
+    setEnabled(on: boolean): void {
+      if (on === enabled) return;
+      enabled = on;
+      keys.clear();
+      kbKickAccum = 0;
+      if (!on) lastKeyAt = -Infinity; // no keyboard-priority carry-over into the next mode
+    },
     intent(dtMs: number): SwimIntent {
       const now = performance.now();
       if (now - lastKeyAt < KEYBOARD_PRIORITY_MS) {

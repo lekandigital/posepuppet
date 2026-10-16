@@ -24,6 +24,7 @@ const D = ( expr ) => evaluate( `window.__TIDEWATER_DOLPHIN.${ expr }` );
 const state = () => D( 'state()' );
 const cam = () => D( 'camera()' );
 const setIntent = ( p ) => D( `test.setIntent( ${ JSON.stringify( p ) } )` );
+const kick = ( amp = 0.8 ) => D( `test.kick( ${ amp } )` );
 const place = ( x, z, y, yaw, speed = 4 ) => D( `test.placeAndFace( ${ x }, ${ z }, ${ y }, ${ yaw }, ${ speed } )` );
 
 // sample the state every `every` ms for `ms`, returning the samples
@@ -45,10 +46,10 @@ async function run( ms, every = 100 ) {
 const url = 'http://127.0.0.1:5199/?noAudio';
 await navigate( url );
 await waitFor( '!!(window.__TIDEWATER_DOLPHIN && window.__app && window.__app.ui)', { label: 'app ready', timeoutMs: 600000 } );
-await sleep( 500 );
-// dismiss the start overlay (click), keep the window's keyboard focus on the page
-await evaluate( `(() => { const b = document.querySelector( '.tw-start-cta' ); if ( b ) b.click(); return true; })()` );
-await sleep( 800 );
+// dismiss the start overlay once it is up (it appears after the loader fades), keep the keyboard focus on the page
+await waitFor( `(() => { const s = document.querySelector( '.tw-start' ); return !! s && ! s.hidden && s.classList.contains( 'is-on' ); })()`, { label: 'start overlay', timeoutMs: 30000 } ).catch( () => {} );
+await evaluate( `(() => { const s = document.querySelector( '.tw-start' ); if ( s ) s.click(); return true; })()` );
+await sleep( 900 );
 
 // ---------------------------------------------------------------- model / animation
 const first = await D( 'firstFrame()' );
@@ -67,13 +68,11 @@ check( 'four additive layers (SwimLeft/Right/Up/Down) advancing', add.length ===
 // ---------------------------------------------------------------- swimming
 await place( 0, 66, - 2.5, Math.PI, 2 );
 await setIntent( { kicks: 0, kickRate: 1.6, pitch: 0, roll: 0, burst: false, brake: false, autopilot: false } );
-// steady kicks: inject one kick every 0.6 s through setIntent (kicks is a per-poll count delta)
+// steady kicks: exactly one kick every 0.6 s (test.kick is a one-shot, frame-rate independent)
 let s0 = await state();
-for ( let i = 0; i < 10; i ++ ) { await setIntent( { kicks: 1, kickRate: 1.6, kickAmp: 0.8, autopilot: false } ); await sleep( 60 ); await setIntent( { kicks: 0, kickRate: 1.6, autopilot: false } ); await sleep( 540 ); }
+for ( let i = 0; i < 10; i ++ ) { await kick( 0.8 ); await sleep( 600 ); }
 let s1 = await state();
-// (a setIntent kick request stays in force until the next setIntent, i.e. for the few frames of
-// the 60 ms window — each "tap" lands several kicks; the count is therefore ≥ 10)
-check( 'kicks propel (10 kick windows over 6 s → speed > 2.5 m/s, kickCount ≥ +10)', s1.speed > 2.5 && s1.kickCount - s0.kickCount >= 10, { speed: + s1.speed.toFixed( 2 ), kicks: s1.kickCount - s0.kickCount, anim: s1.animation.base } );
+check( 'kicks propel (10 kicks over 6 s → speed > 2.5 m/s, kickCount +10)', s1.speed > 2.5 && s1.kickCount - s0.kickCount === 10, { speed: + s1.speed.toFixed( 2 ), kicks: s1.kickCount - s0.kickCount, anim: s1.animation.base } );
 check( 'travelled north toward the island (z decreased)', s1.z < s0.z - 8, { dz: + ( s1.z - s0.z ).toFixed( 1 ) } );
 check( 'sim runs at 120 Hz', s1.simHz > 110 && s1.simHz < 130, + s1.simHz.toFixed( 1 ) );
 check( 'camera NormalFollow while cruising', ( await cam() ).state === 'NormalFollow', ( await cam() ).state );
@@ -103,7 +102,7 @@ check( 'camera SlowHover when stopped', hoverStates.filter( ( s ) => s === 'Slow
 // turn: bank right with kicks
 await setIntent( { brake: false, roll: 1, kicks: 0, kickRate: 1.6, autopilot: false } );
 const yaw0 = ( await state() ).yaw;
-for ( let i = 0; i < 5; i ++ ) { await setIntent( { roll: 1, kicks: 1, kickRate: 1.6, kickAmp: 0.8, autopilot: false } ); await sleep( 60 ); await setIntent( { roll: 1, kicks: 0, kickRate: 1.6, autopilot: false } ); await sleep( 440 ); }
+for ( let i = 0; i < 5; i ++ ) { await kick( 0.8 ); await sleep( 500 ); }
 s1 = await state();
 const addT = await D( 'model.additive()' );
 check( 'banking right turns right (yaw +) with roll ≈ ROLL_MAX', s1.yaw - yaw0 > 0.8 && s1.roll > 0.6, { dyaw: + ( s1.yaw - yaw0 ).toFixed( 2 ), roll: + s1.roll.toFixed( 2 ) } );
@@ -124,7 +123,8 @@ await D( `test.setAssist( 'expert' )` );
 await place( 0, 85, - 7.0, Math.PI, 3 ); // level pose at depth (the dive left the pitch at its +85° cap)
 await setIntent( { pitch: - 1, kicks: 0, kickRate: 1.6, autopilot: false } );
 await sleep( 450 );
-for ( let i = 0; i < 7; i ++ ) { await setIntent( { pitch: 0, kicks: 1, kickRate: 1.6, kickAmp: 0.6, autopilot: false } ); await sleep( 60 ); await setIntent( { pitch: 0, kicks: 0, kickRate: 1.6, autopilot: false } ); await sleep( 540 ); }
+await setIntent( { pitch: 0, kicks: 0, kickRate: 1.6, autopilot: false } );
+for ( let i = 0; i < 7; i ++ ) { await kick( 0.6 ); await sleep( 600 ); }
 await setIntent( { pitch: 1, kicks: 0, kickRate: 0, autopilot: false } );
 await sleep( 450 );
 await setIntent( { pitch: 0, brake: true, kicks: 0, kickRate: 0, autopilot: false } );
@@ -196,7 +196,7 @@ await screenshot( resolve( SHOTS, '07-reef.jpg' ), 'jpeg', 86 );
 // pier piles: swim along the pier from its head toward the beach (piles at x ≈ 53.5 / 56.5)
 await place( 55, 38, - 2.2, Math.PI, 3 );
 await setIntent( { pitch: 0, roll: 0, kicks: 0, kickRate: 1.6, autopilot: false } );
-for ( let i = 0; i < 6; i ++ ) { await setIntent( { kicks: 1, kickRate: 1.6, kickAmp: 0.8, autopilot: false } ); await sleep( 60 ); await setIntent( { kicks: 0, kickRate: 1.6, autopilot: false } ); await sleep( 640 ); }
+for ( let i = 0; i < 6; i ++ ) { await kick( 0.8 ); await sleep( 700 ); }
 const pierRun = await run( 3000, 120 );
 const pierCorr = await D( 'world.obstacleStats()' );
 const piles = await evaluate( `window.__app.colliders.cylinders.filter( ( c ) => c.tag === 'pile' ).map( ( c ) => [ c.x, c.z, c.radius ] )` );

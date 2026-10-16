@@ -1,7 +1,7 @@
 {
   "url": "http://127.0.0.1:5199/?noAudio",
-  "at": "2026-10-16T08:12:50.452Z",
-  "passed": 41,
+  "at": "2026-10-16T13:34:45.443Z",
+  "passed": 42,
   "total": 42,
   "results": [
     {
@@ -41,14 +41,14 @@
       "ok": true,
       "detail": {
         "min": [
-          -0.4166194674909167,
-          -2.878977138112915,
-          63.01516956413771
+          -0.4159907492007628,
+          -2.8753017494353537,
+          62.47315408452569
         ],
         "max": [
-          0.41661133634736913,
-          -1.9249953112108322,
-          65.91084485841996
+          0.41597652269481983,
+          -1.9345814790698244,
+          65.36253669889402
         ]
       }
     },
@@ -63,11 +63,11 @@
       ]
     },
     {
-      "name": "kicks propel (10 kick windows over 6 s → speed > 2.5 m/s, kickCount ≥ +10)",
+      "name": "kicks propel (10 kicks over 6 s → speed > 2.5 m/s, kickCount +10)",
       "ok": true,
       "detail": {
-        "speed": 5,
-        "kicks": 513,
+        "speed": 4.99,
+        "kicks": 10,
         "anim": "SwimForward"
       }
     },
@@ -75,13 +75,13 @@
       "name": "travelled north toward the island (z decreased)",
       "ok": true,
       "detail": {
-        "dz": -37.8
+        "dz": -27.1
       }
     },
     {
       "name": "sim runs at 120 Hz",
       "ok": true,
-      "detail": 120
+      "detail": 119.9
     },
     {
       "name": "camera NormalFollow while cruising",
@@ -104,7 +104,7 @@
     {
       "name": "follow distance grows with speed (> 6 m)",
       "ok": true,
-      "detail": 7.44
+      "detail": 7.55
     },
     {
       "name": "brake: cruise → < 0.5 m/s within 1.5 s",
@@ -113,14 +113,18 @@
     },
     {
       "name": "camera SlowHover when stopped",
-      "ok": false,
-      "detail": "SurfaceTransition"
+      "ok": true,
+      "detail": [
+        "SlowHover",
+        "SlowHover",
+        "SlowHover"
+      ]
     },
     {
       "name": "banking right turns right (yaw +) with roll ≈ ROLL_MAX",
       "ok": true,
       "detail": {
-        "dyaw": 5.22,
+        "dyaw": 4.31,
         "roll": 0.9
       }
     },
@@ -143,14 +147,14 @@
       "name": "pitch + dives (y below −5 m in 2.5 s from −2.5 m)",
       "ok": true,
       "detail": {
-        "y": -6.99,
-        "depthHere": 9.3
+        "y": -7.2,
+        "depthHere": 9.6
       }
     },
     {
       "name": "seabed clearance kept (y − floor ≥ 1.0 m)",
       "ok": true,
-      "detail": 2.33
+      "detail": 2.4
     },
     {
       "name": "gentle nose-up with kicks surfaces to the soft ceiling (y ≈ −0.4, no breach)",
@@ -164,9 +168,9 @@
       "name": "swell ride: rendered y differs from sim y by the measured wave height near the surface",
       "ok": true,
       "detail": {
-        "renderY": -0.71,
+        "renderY": -0.44,
         "y": -0.4,
-        "wl": -0.31
+        "wl": -0.04
       }
     },
     {
@@ -182,8 +186,8 @@
       "name": "breach: phase air observed, apex above the surface, back to swim",
       "ok": true,
       "detail": {
-        "airFrames": 21,
-        "apexY": 3.12,
+        "airFrames": 34,
+        "apexY": 3.14,
         "breaches": 1,
         "splashes": 1
       }
@@ -192,7 +196,6 @@
       "name": "Jump clip during the breach, SwimForward after re-entry",
       "ok": true,
       "detail": [
-        "SwimForward",
         "SwimForwardFast",
         "Jump"
       ]
@@ -202,58 +205,58 @@
       "ok": true,
       "detail": [
         "FastTravel",
-        "Airborne",
         "SurfaceTransition",
+        "Airborne",
         "ReEntryRecovery"
       ]
     },
     {
       "name": "camera lifted above the waterline while airborne",
       "ok": true,
-      "detail": 4.18
+      "detail": 4.23
     },
     {
       "name": "camera path continuous through the breach (< 2.8 m per 50 ms sample)",
       "ok": true,
-      "detail": 2.12
+      "detail": 0.6
     },
     {
       "name": "R recenter eases the camera behind facing",
       "ok": true,
       "detail": {
-        "before": 0.19,
-        "after": 0
+        "before": 0.18,
+        "after": 0.02
       }
     },
     {
       "name": "beach approach: always in water, never shallower than ~1.6 m, turned back by the containment current",
       "ok": true,
       "detail": {
-        "minZ": -8.9,
-        "shallowestDepth": 1.85,
-        "minShoreDist": 1.1
+        "minZ": -9.7,
+        "shallowestDepth": 1.81,
+        "minShoreDist": -1.2
       }
     },
     {
       "name": "beach approach: no seabed penetration (y − floor ≥ 0.9 m throughout)",
       "ok": true,
-      "detail": 1.25
+      "detail": 1.15
     },
     {
       "name": "beach approach: camera never clips the seabed (clearance ≥ 0.5 m)",
       "ok": true,
-      "detail": 1.6
+      "detail": 1.91
     },
     {
       "name": "reef crossing: no structure penetration (y − ground ≥ 0.8 m), always in water",
       "ok": true,
       "detail": {
-        "minClear": 3.43,
-        "xEnd": -38.5,
+        "minClear": 3.41,
+        "xEnd": -38.6,
         "contact": {
           "inContact": false,
           "wedgeT": 0,
-          "dispSpeed": 0.7088763070922255
+          "dispSpeed": 0.8792844617173046
         }
       }
     },
@@ -261,7 +264,7 @@
       "name": "reef crossing: camera clearance ≥ 0.5 m, no EmergencyRecenter",
       "ok": true,
       "detail": {
-        "minCamClear": 4.37,
+        "minCamClear": 2.84,
         "states": [
           "NormalFollow"
         ]
@@ -271,9 +274,9 @@
       "name": "pier: the dolphin's centre never enters a pile (obstacle correction active)",
       "ok": true,
       "detail": {
-        "corrections": 7,
+        "corrections": 13,
         "lastCorrectionM": 0,
-        "usAvg": 26
+        "usAvg": 13
       }
     },
     {
@@ -281,7 +284,7 @@
       "ok": true,
       "detail": {
         "tracking": "none",
-        "speed": 1.41
+        "speed": 1.78
       }
     },
     {
@@ -309,9 +312,9 @@
       "name": "live fps measured (visible 1440×760 review window)",
       "ok": true,
       "detail": {
-        "median": 43.1,
-        "min": 25.8,
-        "cpuMs": 7.97,
+        "median": 68.7,
+        "min": 65.9,
+        "cpuMs": 1.91,
         "renderSize": [
           1440,
           760,
@@ -324,7 +327,7 @@
     {
       "name": "camera rig update cost < 400 µs",
       "ok": true,
-      "detail": 106
+      "detail": 39
     },
     {
       "name": "no console errors during the trials",
@@ -334,19 +337,19 @@
   ],
   "fps": {
     "samples": [
-      35.94249201278038,
-      43.92971246006235,
-      56.36363636363634,
-      45.39175054272901,
-      43.12879827484757,
-      43.18806438947829,
-      25.76370997423657,
-      41.95804195804195,
-      41.23306499116293,
-      39.74562798092118
+      68.80283074503674,
+      65.88141345578032,
+      66.87647521636389,
+      67.06114398422088,
+      66.70590543456971,
+      67.75067750677619,
+      69.97201119552217,
+      68.89763779527556,
+      68.66784382970411,
+      71.09004739336571
     ],
-    "median": 43.12879827484757,
-    "cpuMs": 7.967641921407492,
+    "median": 68.66784382970411,
+    "cpuMs": 1.9116082565686505,
     "size": [
       1440,
       760,

@@ -9,17 +9,26 @@
 // audio — is constructed, configured and updated exactly as App.js does, in the same
 // order and with the same parameters. The differences (all marked `CP10:`):
 //
-//   1. The first-person Player is not constructed; the BodyArcade DolphinPlayer
-//      (120 Hz swim sim, GAMICO dolphin, chase camera rig, keyboard / body input)
-//      owns the camera pose instead, and feeds its own water-query slot.
-//   2. The fishing Game is not constructed (rod, bites, fight, catch card, cooler,
-//      vendors' trading, HUD, minimap, guide, fuel, sonar, floodlights). The stalls
-//      that Game built as scenery — Joe's fish stand with its fish on ice, Marta's
-//      chandlery, both vendor characters idling — are built here directly.
-//   3. The free camera (F) keeps Tidewater's 62° lens; the chase camera uses the
-//      BodyArcade rig's 55° lens; the lens switches with the mode.
-//   4. Pointer lock is not requested (the chase camera has no mouse look).
-//   5. Wildlife is told the dolphin is the viewer (it used the walker).
+//   1. PLAY MODES (CP10 continuation). Tidewater's first-person Player (walker /
+//      swimmer / deck / helm) and its BoatController are constructed exactly as in
+//      App.js, but the BodyArcade DolphinPlayer (120 Hz swim sim, GAMICO dolphin,
+//      chase camera rig, keyboard / body input) is the DEFAULT player. One controller
+//      owns the input and the camera at a time (`playerMode`: 'dolphin' | 'walk' |
+//      'boat', the Play tab of the settings panel); the others idle — the dolphin
+//      keeps simulating on a neutral autopilot (hovers where it was left), the
+//      walker / boat are simply not updated. Switching never rebuilds the world.
+//   2. FISHING (CP10 continuation). Tidewater's fishing Game is constructed as in
+//      App.js (it also builds the stalls — Joe's fish stand with its fish on ice,
+//      Marta's chandlery, the vendor characters — which stay as scenery in every
+//      mode), but it only UPDATES while "Fishing gameplay" is on in the Play tab
+//      (default off) and the walker or the boat is the player. Off, or in dolphin
+//      mode: the line comes in, the rod goes away and its HUD / minimap / guide are
+//      hidden; the game state is kept for the session.
+//   3. The free camera (F) and the walker / boat keep Tidewater's 62° lens; the
+//      chase camera uses the BodyArcade rig's 55° lens; the lens follows the owner.
+//   4. Pointer lock is requested on click only in the walker / boat modes (the
+//      chase camera has no mouse look).
+//   5. Wildlife is told who the viewer is (the dolphin, or Tidewater's player).
 //   6. ?noDolphin leaves the dolphin out of the scene (environment-parity captures).
 //
 // Nothing here changes what the water, sky, terrain or post look like.
@@ -81,12 +90,14 @@ import { Underwater, LENS_REACH } from '../vendor/tidewater/src/post/Underwater.
 import { PostFX } from '../vendor/tidewater/src/post/PostFX.js';
 import { AirHaze } from '../vendor/tidewater/src/post/AirHaze.js';
 import { FlyCamera } from '../vendor/tidewater/src/player/FlyCamera.js';
-// CP10: Player and Game are retired; the stalls Game built are kept as scenery
-import { FishStand, STAND } from '../vendor/tidewater/src/game/FishStand.js';
-import { Chandlery, CHANDLERY } from '../vendor/tidewater/src/game/Chandlery.js';
-import { CatchDisplay } from '../vendor/tidewater/src/game/CatchDisplay.js';
+// CP10 continuation: Tidewater's Player (walker / boat) and fishing Game are selectable, non-default
+import { Player } from '../vendor/tidewater/src/player/Player.js';
+import { Game } from '../vendor/tidewater/src/game/Game.js';
+import { STAND } from '../vendor/tidewater/src/game/FishStand.js';
+import { CHANDLERY } from '../vendor/tidewater/src/game/Chandlery.js';
 import { DolphinPlayer, DEFAULT_SPAWN } from './dolphin/dolphinPlayer';
 import { RIG } from './dolphin/cameraRig';
+import { SceneryAdditions } from './additions/SceneryAdditions.js';
 import { BoatController } from '../vendor/tidewater/src/player/BoatController.js';
 import { BoatSpray } from '../vendor/tidewater/src/player/BoatSpray.js';
 import { WakeSim } from '../vendor/tidewater/src/ocean/WakeSim.js';
@@ -95,8 +106,9 @@ import { SoundScape } from '../vendor/tidewater/src/audio/SoundScape.js';
 import { updateCameraVelocity, useStaticVelocity } from '../vendor/tidewater/src/post/CameraVelocity.js';
 
 const _up = new Vector3( 0, 1, 0 );
-// CP10: Tidewater's own lens for the free camera (Engine.js constructs the camera with it)
+// CP10: Tidewater's own lens for the free camera and its player (Engine.js constructs the camera with it)
 const TIDEWATER_FOV = 62;
+export const PLAY_MODES = [ 'dolphin', 'walk', 'boat' ];
 
 export class DolphinApp {
 
@@ -112,6 +124,14 @@ export class DolphinApp {
 		this.qs = new URLSearchParams( location.search );
 		this.dolphin = null;
 		this.ui = null;
+		// CP10 continuation: play-mode ownership and the optional fishing activity (both menu-driven;
+		// a fresh session is always the dolphin with fishing off — no startup preference is stored)
+		this.playerMode = 'dolphin';
+		this.fishing = false;
+		this._fishingActive = false;
+		this._walkerPose = null; // where the walker was left (restored on the next switch to Walking)
+		this.modeSwitches = 0;
+		this.onPlayerMode = null; // ( mode, prev ) hook for the UI
 
 	}
 
@@ -339,9 +359,12 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		// interactive wake around the boat (Kelvin pattern, bow/stern waves, prop wash foam)
 		this.wake = new WakeSim( renderer, { terrainGPU: this.terrainGPU, boat: this.boatCtl, colliders: this.colliders } );
 		this.surface.wake = this.wake;
-		// CP10: the BodyArcade dolphin replaces the first-person Player as the thing the camera
-		// follows. Same world inputs the walker used (terrain, reef floor, colliders, water
-		// query) plus Tidewater's spray and audio for splashes. ?noDolphin: environment only.
+		// CP10 continuation: Tidewater's own first-person Player (walker / swimmer / deck / helm),
+		// constructed exactly as App.js does — selectable from the Play tab, idle by default
+		this.player = new Player( { camera, input: this.input, terrain: this.terrainData, colliders: this.colliders, query: this.query, boat: this.boatCtl, reef: this.reef } );
+		// CP10: the BodyArcade dolphin is the DEFAULT player — the thing the camera follows. Same
+		// world inputs the walker uses (terrain, reef floor, colliders, water query) plus
+		// Tidewater's spray and audio for splashes. ?noDolphin: environment only.
 		await progress( 0.31, 'Waking the dolphin…' );
 		const app = this;
 		this.dolphin = await DolphinPlayer.create( {
@@ -392,13 +415,21 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		// ---------------------------------------------------------------- audio
 		// recorded field recordings (public/audio, credits in public/audio/CREDITS.md); ?noAudio turns it off
 		this.audio = qs.has( 'noAudio' ) ? null : new SoundScape();
-		// CP10: no fishing game. The scenery Game constructed stays: Joe's fish stand (with the
-		// fish on ice CatchDisplay lays out on it) and Marta's chandlery, each with its vendor
-		// character idling — built in Game's order so the seeded ?bench layout is unchanged.
-		this.stand = new FishStand( { scene, terrain: this.terrainData, colliders: this.colliders } );
-		this.display = new CatchDisplay( { scene, stall: this.stand.iceFish() } );
-		this.chandlery = new Chandlery( { scene, terrain: this.terrainData, colliders: this.colliders, material: this.stand.material } );
-		this.vendors = [ this.stand.vendor, this.chandlery.vendor ];
+		this.player.audio = this.audio;
+		// CP10 continuation: Tidewater's fishing game, constructed as in App.js (same order, so the
+		// seeded ?bench layout is unchanged). It builds the scenery that stays in every mode — Joe's
+		// fish stand with the fish on ice, Marta's chandlery, both vendor characters — plus the rod,
+		// the saved progress and the boat's floodlights. It only updates while fishing is enabled
+		// in the Play tab and the walker / boat is the player (see applyFishing).
+		this.game = new Game( this );
+		this.stand = this.game.stand;
+		this.display = this.game.display;
+		this.chandlery = this.game.chandlery;
+		this.vendors = this.game.vendors;
+		// CP10 continuation: optional, reversible scenery additions (Play tab → Scenery additions);
+		// all categories off = the pristine Tidewater scene, exactly
+		this.additions = new SceneryAdditions( this );
+		await this.additions.load();
 		// the lanterns at Joe's fish stand and Marta's chandlery (lit from dusk like the village lamps);
 		// positions are in each stall's frame (x right, z toward the customer), turned by its yaw
 		for ( const [ s, lx, ly, lz ] of [ [ STAND, - 0.9, 1.85, 0.1 ], [ CHANDLERY, - 0.75, 1.58, - 1.45 ] ] ) {
@@ -413,7 +444,9 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		engine.domElement.addEventListener( 'click', () => {
 
 			if ( window.__ui && window.__ui.isPointerOverUI ) return;
-			// CP10: no pointer lock — the chase camera has no mouse look; a click only unlocks audio
+			// CP10: pointer lock only for Tidewater's mouse-look modes (walker / boat); the chase
+			// camera has no mouse look, so in dolphin mode a click only unlocks audio
+			if ( this.playerMode !== 'dolphin' ) this.input.requestLock();
 			if ( this.audio ) this.audio.resume();
 
 		} );
@@ -564,10 +597,11 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 
 	}
 
-	// Free (debug) camera on F. CP10: the dolphin holds still (its animation keeps cycling) while
-	// the free camera is out, and resumes on its chase camera where it was left. The lens follows
-	// the owner: Tidewater's 62° for the free camera (so review views match the pristine app),
-	// the BodyArcade rig's 55° for the chase.
+	// Free (debug) camera on F. CP10: in dolphin mode the dolphin holds still (its animation keeps
+	// cycling) while the free camera is out, and resumes on its chase camera where it was left; in
+	// the walker / boat modes Tidewater's own behaviour (the walker continues from the camera, the
+	// boat resumes). The lens follows the owner: Tidewater's 62° for the free camera (so review
+	// views match the pristine app) and its player, the BodyArcade rig's 55° for the chase.
 	setFreeCam( on ) {
 
 		if ( on === this.freeCam ) return;
@@ -580,12 +614,228 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 			this.camera.fov = TIDEWATER_FOV;
 			this.camera.updateProjectionMatrix();
 
-		} else {
+		} else if ( this.playerMode === 'dolphin' ) {
 
 			this.camera.fov = RIG.FOV;
 			this.camera.updateProjectionMatrix();
 
+		} else if ( this.player.mode !== 'boat' && this.player.mode !== 'deck' ) {
+
+			this.dropPlayerAtCamera();
+
 		}
+
+	}
+
+	// Leaving the free camera (walker modes): the player continues from where the camera is, facing
+	// the same way, and falls from there (swimming at once if the camera is under water). Verbatim
+	// Tidewater App.js.
+	dropPlayerAtCamera() {
+
+		const p = this.player, c = this.camera.position;
+		const e = new Euler().setFromQuaternion( this.camera.quaternion, 'YXZ' );
+		p.yaw = e.y;
+		p.pitch = MathUtils.clamp( e.x, - 1.5, 1.5 );
+		p.velocity.set( 0, 0, 0 );
+		const ground = Math.max( this.terrainData.heightAt( c.x, c.z ), this.colliders.groundHeightAt( c.x, c.z, c.y ) );
+		const water = this.cameraWaterHeight ?? 0;
+		if ( c.y < water ) {
+
+			p.mode = 'swim';
+			p.position.set( c.x, Math.max( c.y - 0.16, ground + 0.3 ), c.z );
+
+		} else {
+
+			// drop from where the camera is: gravity brings you down onto the ground or a deck, or into
+			// the sea (the walker starts swimming once it is out of its depth)
+			p.mode = 'walk';
+			p.position.set( c.x, Math.max( c.y - 1.62, ground ), c.z );
+			p.grounded = false;
+
+		}
+
+		p.waterH = water;
+		p.waterMean = water;
+
+	}
+
+	// ---------------------------------------------------------------- play modes (CP10 continuation)
+
+	// The mode the menu shows: Tidewater's own E-key boarding can take the walker onto the boat.
+	get displayedMode() {
+
+		if ( this.playerMode === 'dolphin' ) return 'dolphin';
+		const m = this.player.mode;
+		return m === 'boat' || m === 'deck' ? 'boat' : 'walk';
+
+	}
+
+	// Hand the input and the camera to one controller. Nothing in the world is rebuilt: the ocean,
+	// sky, terrain, wildlife, audio and the dolphin's rig all keep running; only the owner changes.
+	setPlayerMode( mode ) {
+
+		if ( ! PLAY_MODES.includes( mode ) ) return false;
+		const prev = this.playerMode;
+		const p = this.player;
+		const aboard = p.mode === 'boat' || p.mode === 'deck';
+		if ( mode === this.displayedMode ) return false;
+		if ( this.freeCam ) this.freeCam = false; // the new owner takes the camera (no drop)
+		const START = { x: WORLD.start.position.x, z: WORLD.start.position.z, yaw: WORLD.start.yaw };
+
+		// ---- leave the current owner
+		if ( prev === 'dolphin' ) this.dolphin.setControlled( false );
+		else if ( ! aboard ) this._walkerPose = { x: p.position.x, y: p.position.y, z: p.position.z, yaw: p.yaw, pitch: p.pitch, mode: p.mode };
+
+		// ---- enter the new one (Tidewater's own transitions wherever it has one)
+		this.playerMode = mode;
+		if ( mode === 'dolphin' ) {
+
+			// at the helm: stand up (leaveHelm — engine off, standing on deck); the boat stays put
+			if ( p.mode === 'boat' ) p.leaveHelm();
+			this._moorIfDocked();
+			p.busy = false;
+			if ( document.pointerLockElement ) document.exitPointerLock?.();
+			this.camera.fov = RIG.FOV;
+			this.camera.updateProjectionMatrix();
+			this.dolphin.resume();
+
+		} else if ( mode === 'walk' ) {
+
+			this.camera.fov = TIDEWATER_FOV;
+			this.camera.updateProjectionMatrix();
+			if ( aboard ) {
+
+				// off the boat: Tidewater's step-ashore target beside it if there is one (pier deck,
+				// sand); else stand up, leave the boat where it is and walk from where the walker was
+				// last on foot (or Tidewater's start)
+				const target = p.ashoreTarget();
+				if ( target ) {
+
+					p.exitBoat( target );
+					p.update( 0 );
+
+				} else {
+
+					if ( p.mode === 'boat' ) p.leaveHelm();
+					this._moorIfDocked();
+					this.placeWalker( this._walkerPose || START );
+
+				}
+
+			} else this.placeWalker( this._walkerPose || START );
+
+		} else {
+
+			this.camera.fov = TIDEWATER_FOV;
+			this.camera.updateProjectionMatrix();
+			if ( p.mode === 'deck' ) p.takeHelm(); // already aboard: sit down at the wheel
+			else if ( ! aboard ) p.enterBoat(); // boardBoat() + takeHelm(): Tidewater's own flow, straight to the wheel
+			p.update( 0 ); // the helm camera this frame (no frame from the previous owner's camera)
+
+		}
+
+		this.input.consumeLook();
+		this.modeSwitches ++;
+		this.applyFishing();
+		if ( typeof this.onPlayerMode === 'function' ) this.onPlayerMode( mode, prev );
+		return true;
+
+	}
+
+	// a boat left at the dock ties up again (as Tidewater's exitBoat does)
+	_moorIfDocked() {
+
+		const b = this.boatCtl;
+		if ( ! b.driven && b.position.distanceTo( WORLD.boatDock.position ) < 14 && b.speed < 1.5 ) {
+
+			b.moored = true;
+			b.mooring.anchor.set( b.position.x, 0, b.position.z );
+			b.mooring.heading = b.getYaw();
+
+		}
+
+	}
+
+	// put Tidewater's walker down at a spot: on the ground (terrain or a deck) or swimming
+	placeWalker( { x, z, y = null, yaw = Math.PI, pitch = - 0.05, mode = 'walk' } ) {
+
+		const p = this.player;
+		const ground = Math.max( this.terrainData.heightAt( x, z ), this.colliders.groundHeightAt( x, z, 50 ) );
+		const water = this.cameraWaterHeight ?? 0;
+		p.mode = mode === 'swim' ? 'swim' : 'walk';
+		p.position.set( x, p.mode === 'swim' ? ( y ?? water - 0.16 ) : ( y !== null && y > ground - 0.05 ? y : ground ), z );
+		p.velocity.set( 0, 0, 0 );
+		p.grounded = p.mode === 'walk';
+		p.floating = true;
+		p.yaw = yaw;
+		p.pitch = MathUtils.clamp( pitch, - 1.5, 1.5 );
+		p.waterH = water;
+		p.waterMean = water;
+		p.bob = 0;
+		p.stepDist = 0;
+		p.prompt = null;
+		p.busy = false;
+		p._camY = null;
+		p.update( 0 ); // the walker's camera this frame
+
+	}
+
+	// "Fishing gameplay" (Play tab): Tidewater's fishing, only while the walker / boat is the player
+	setFishing( on ) {
+
+		on = !! on;
+		if ( on === this.fishing ) return;
+		this.fishing = on;
+		this.applyFishing();
+		if ( this.ui ) this.ui.ui.toast( on ? ( this.playerMode === 'dolphin' ? 'Fishing on · switch to Walking or Boat to fish' : 'Fishing on · R takes out the rod' ) : 'Fishing off' );
+
+	}
+
+	get fishingActive() {
+
+		return this._fishingActive;
+
+	}
+
+	applyFishing() {
+
+		const active = this.fishing && this.playerMode !== 'dolphin';
+		if ( active === this._fishingActive ) return;
+		this._fishingActive = active;
+		const g = this.game;
+		if ( ! active ) {
+
+			// line in, rod away, fish off the line, panels closed — the saved progress stays
+			g.cancelLine( true );
+			if ( g.rod.equipped ) g.rod.equip( false );
+			g.rod.update( 0, { visible: false, fight: null } );
+			if ( g.landing || g.display.shown ) g.endLanding();
+			if ( g.hud ) {
+
+				g.hud.toggleInventory( false );
+				g.hud.closeStand();
+				g.hud.hideCatch();
+
+			}
+
+			this.player.busy = false;
+
+		}
+
+		this.setFishingUIVisible( active );
+
+	}
+
+	// the fishing HUD (purse / cooler, fuel, sonar, fight meter, bite cue, cast bar, aim dot, catch
+	// card, panels), the minimap and the first-play guide: shown only while fishing is active
+	setFishingUIVisible( on ) {
+
+		const g = this.game;
+		if ( ! g.hud ) return; // not built yet (Game builds it on its first update)
+		const h = g.hud;
+		const els = [ h.purse, h.fight, h.bite, h.cast, h.dot, h.catchScrim, h.catchCard, h.inv, h.stand, g.minimap && g.minimap.el, g.guide && g.guide.el, g.guide && g.guide.coach ];
+		for ( const el of els ) if ( el ) el.style.display = on ? '' : 'none';
+		if ( ! on && g.guide && g.guide.open ) g.guide.close();
 
 	}
 
@@ -662,12 +912,22 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		this.boatCtl.update( dt );
 		this.boatSpray.update( dt );
 		this.wake.update( dt );
-		// CP10: the dolphin (controls → 120 Hz sim → animation → chase camera) in the Player's slot;
-		// with the free camera out it only animates
+		// CP10: one player owns the input and the camera. Dolphin mode: controls → 120 Hz sim →
+		// animation → chase camera (with the free camera out it only animates). Walker / boat modes:
+		// Tidewater's Player as in App.js; the dolphin keeps simulating on its neutral autopilot.
+		const dolphinMode = this.playerMode === 'dolphin';
 		if ( this.freeCam ) this.fly.update( dt );
+		else if ( ! dolphinMode ) this.player.update( dt );
 		this.dolphin.update( dt, { paused: this.freeCam } );
-		// CP10: no Game.update — the vendors idle on their own (animated when the camera is near)
-		for ( const v of this.vendors ) v.update( dt, this.camera.position );
+		// CP10: the fishing game updates only while enabled and the walker / boat is the player;
+		// otherwise the vendors idle on their own (animated when the camera is near)
+		if ( this._fishingActive ) {
+
+			const hadHud = !! this.game.hud;
+			this.game.update( dt );
+			if ( ! hadHud && this.game.hud ) this.setFishingUIVisible( true );
+
+		} else for ( const v of this.vendors ) v.update( dt, this.camera.position );
 		this.updateSun();
 
 		this.atmosphere.update( dt, this.camera.position.y );
@@ -711,7 +971,8 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		if ( this.vegetation ) this.vegetation.update( dt, this.camera );
 		if ( this.whale ) this.whale.update( dt, this.camera );
 		this.boat.update( dt );
-		this.wildlife.update( dt, this.camera, this.freeCam ? null : this.dolphin.viewer ); // CP10: the dolphin is the viewer
+		this.wildlife.update( dt, this.camera, this.freeCam ? null : dolphinMode ? this.dolphin.viewer : this.player ); // CP10: the player is the viewer
+		this.additions.update( dt, this.camera );
 		this.localLights.update( this.camera, dt );
 
 		// ---- render
@@ -778,7 +1039,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 			nearPier: Math.abs( p.x - WORLD.pier.x ) < 12 && p.z > WORLD.pier.zStart - 5 && p.z < WORLD.pier.zEnd + 8,
 			boat: {
 				active: this.boatCtl.driven, rpm: this.boatCtl.rpm, throttle: this.boatCtl.throttle, speed: this.boatCtl.velocity.length(),
-				position: this.boat.group.position, listenerInside: false, // CP10: nobody is at the helm
+				position: this.boat.group.position, listenerInside: this.playerMode !== 'dolphin' && this.player.mode === 'boat' && this.player.camMode === 'first',
 			},
 		} );
 

@@ -183,5 +183,100 @@ check('containment band is the sampler\'s (12 m), never the 55 m region band', n
   check('head-on swim at a pile: corrected every step, centre never enters the pile', !inside && obs.stats.corrections > 0, { corrections: obs.stats.corrections, x: +sim.state.x.toFixed(2), z: +sim.state.z.toFixed(2) });
 }
 
+// ---------------------------------------------------------------- chase camera: no waterline exclusion (CP10 continuation)
+// The inherited anti-shimmer hold (±0.75 m band, 0.35 m minimum |eye − surface|, side lock) must stay
+// removed: the eye follows the chase geometry onto and through the sea surface so Tidewater's own
+// near-plane waterline renderer can show the split above / below view.
+{
+  const { CameraRig, RIG } = await import('../src/dolphin/cameraRig');
+  const { PerspectiveCamera, Vector3 } = await import('../vendor/tidewater/src/engine/index.js');
+  const rigConst = RIG as unknown as Record<string, unknown>;
+  check('RIG carries no SURFACE_BAND / SHIMMER_MIN_Y / SHIMMER_HOLD_S (waterline exclusion removed)', !('SURFACE_BAND' in rigConst) && !('SHIMMER_MIN_Y' in rigConst) && !('SHIMMER_HOLD_S' in rigConst));
+  const src = readFileSync(resolve(HERE, '..', 'src', 'dolphin', 'cameraRig.ts'), 'utf8');
+  check('cameraRig.ts has no anti-shimmer code path', !/RIG\.SHIMMER|RIG\.SURFACE_BAND|applyAntiShimmer\(|shimmerHoldT|\.side\b/.test(src));
+  const open = { resolve: (_f: unknown, to: Vector3) => ({ pos: to.clone(), obstructed: false }), clampPoint: (p: Vector3) => p, losClear: () => true };
+  const mkRig = (waterlineAt?: (x: number, z: number) => number) => {
+    const cam = new PerspectiveCamera(62, 16 / 9, 0.1, 60000);
+    return { cam, rig: new CameraRig(cam as never, open as never, { terrainCompression: true, waterlineAt }) };
+  };
+  const simState = (y: number, speed: number, vz: number) => ({ x: 0, y, z: 0, yaw: 0, pitch: 0, roll: 0, phase: 'swim' as const, wvx: 0, wvy: 0, wvz: vz, vx: 0, vy: 0, vz, speed });
+  check('rig takes the host lens: fov 55, near 0.1 (Tidewater\'s lens plane)', (() => { const { cam } = mkRig(); return cam.fov === 55 && cam.near === 0.1; })());
+
+  // 1. level cruise 0.8 m below a flat surface: the chase geometry puts the eye 0.3 m ABOVE the surface
+  //    (HEIGHT 1.1): inside the old ±0.75 band, where the old rig pushed it down to −0.35
+  {
+    const { rig } = mkRig();
+    const s = simState(-0.8, 3, 3);
+    for (let i = 0; i < 120 * 6; i++) { s.z += 3 / 120; rig.update(s as never, 1 / 120); }
+    const c = rig.evalState(s);
+    check('eye settles where the chase geometry puts it (y ≈ +0.30 m, inside the old exclusion band)', Math.abs(c.y - 0.3) < 0.03, { eyeY: +c.y.toFixed(3) });
+  }
+  // 2. the eye can rest ON the surface: dolphin 1.1 m down → desired eye at the waterline
+  {
+    const { rig } = mkRig();
+    const s = simState(-1.1, 3, 3);
+    for (let i = 0; i < 120 * 6; i++) { s.z += 3 / 120; rig.update(s as never, 1 / 120); }
+    const c = rig.evalState(s);
+    check('eye rests on the surface (|y| < 3 cm) — the straddling lens the pristine game shows', Math.abs(c.y) < 0.03 && Math.abs(c.eyeAboveWaterM) < 0.03, { eyeY: +c.y.toFixed(3) });
+  }
+  // 3. a slow dive from −0.6 m to −3 m and back: the eye passes through [−0.35, 0.35] continuously
+  //    (samples inside the band, no step larger than the spring would produce) and the crossings count
+  {
+    const { rig } = mkRig();
+    const s = simState(-0.6, 2, 2);
+    let inBand = 0, maxStep = 0, prevY: number | null = null;
+    const T = 12, N = 120 * T;
+    for (let i = 0; i < N; i++) {
+      const t = i / 120;
+      s.y = -1.8 + 1.2 * Math.cos((2 * Math.PI * t) / T); // −0.6 → −3.0 → −0.6
+      s.z += 2 / 120;
+      rig.update(s as never, 1 / 120);
+      const y = rig.evalState(s).y;
+      if (Math.abs(y) < 0.35) inBand++;
+      if (prevY !== null) maxStep = Math.max(maxStep, Math.abs(y - prevY));
+      prevY = y;
+    }
+    const c = rig.evalState(s);
+    check('dive / ascent: the eye spends time inside the old band and moves continuously (< 2 cm per 1/120 s)', inBand > 120 && maxStep < 0.02, { inBandSamples: inBand, maxStepM: +maxStep.toFixed(4) });
+    check('eye / waterline crossings are counted (two per dive-and-return)', c.surfaceCrossings >= 2, c.surfaceCrossings);
+  }
+  // 4. airborne: no hard lift above the surface — the eye follows the dolphin (HEIGHT above it, pulled back)
+  {
+    const { rig } = mkRig();
+    const s = { ...simState(0.2, 6, 6), phase: 'air' as const, vy: 2 };
+    for (let i = 0; i < 120 * 3; i++) { s.z += 6 / 120; rig.update(s as never, 1 / 120); }
+    const c = rig.evalState(s);
+    check('airborne framing = chase geometry (eye ≈ dolphin + 1.1 m), follow distance pulled back by BREACH_PULLBACK', Math.abs(c.y - (0.2 + RIG.HEIGHT)) < 0.05 && c.desiredDistM > RIG.FOLLOW_DIST + 1.5, { eyeY: +c.y.toFixed(3), dist: +c.desiredDistM.toFixed(2), state: c.state });
+  }
+  // 5. the SlowHover regression: a dolphin hovering at the soft ceiling with the swell ride lifting its
+  //    rendered y by a ±0.3 m wave must NOT re-trigger SurfaceTransition on every passing wave
+  {
+    let t = 0;
+    const wave = () => 0.3 * Math.sin(2 * Math.PI * t / 4);
+    const { rig } = mkRig(wave);
+    const s = simState(-0.4, 0, 0);
+    const seen = new Set<string>();
+    for (let i = 0; i < 120 * 8; i++) {
+      t += 1 / 120;
+      const rs = { ...s, y: -0.4 + wave() }; // what the presentation layer feeds the rig (swell ride)
+      rig.update(rs as never, 1 / 120);
+      if (i > 120 * 2) seen.add(rig.evalState(rs).state);
+    }
+    check('hover at the surface in a swell: SlowHover, never SurfaceTransition (crossing detector is surface-relative)', seen.has('SlowHover') && !seen.has('SurfaceTransition'), [...seen]);
+  }
+  // 6. a real breach still produces SurfaceTransition (the dolphin crosses the surface itself)
+  {
+    const { rig } = mkRig(() => 0.2);
+    const s = simState(-0.3, 6, 6);
+    const seen = new Set<string>();
+    for (let i = 0; i < 120 * 1.5; i++) {
+      s.y += 0.02; s.z += 6 / 120; // rises through the 0.2 m waterline
+      rig.update(s as never, 1 / 120);
+      seen.add(rig.evalState(s).state);
+    }
+    check('crossing the actual surface still flags SurfaceTransition', seen.has('SurfaceTransition'), [...seen]);
+  }
+}
+
 console.log(failed === 0 ? '\nall passed' : `\n${failed} FAILED`);
 process.exit(failed === 0 ? 0 : 1);

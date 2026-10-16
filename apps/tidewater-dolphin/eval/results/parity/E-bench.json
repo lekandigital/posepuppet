@@ -1,0 +1,942 @@
+{
+  "beach": {
+    "wall": 25.19,
+    "gpu": 22.551,
+    "gpuMedian": 22.61,
+    "cpu": 1.276,
+    "passes": [
+      [
+        "opaque",
+        4.629
+      ],
+      [
+        "water + transparent",
+        4.26
+      ],
+      [
+        "TAAU",
+        2.259
+      ],
+      [
+        "Clouds Trace",
+        2.184
+      ],
+      [
+        "haze march",
+        1.334
+      ],
+      [
+        "GTAO",
+        0.844
+      ],
+      [
+        "beauty (AO + haze + underwater)",
+        0.761
+      ],
+      [
+        "Motion Blur Tiles",
+        0.693
+      ],
+      [
+        "final (grade + tonemap)",
+        0.688
+      ],
+      [
+        "refraction",
+        0.605
+      ],
+      [
+        "Ocean FFT",
+        0.479
+      ],
+      [
+        "causticsFine",
+        0.433
+      ],
+      [
+        "Clouds Resolve",
+        0.359
+      ],
+      [
+        "opaque depth half",
+        0.315
+      ],
+      [
+        "Clouds Panorama",
+        0.286
+      ],
+      [
+        "bloom down",
+        0.275
+      ],
+      [
+        "Shore Sim",
+        0.274
+      ],
+      [
+        "Underwater Light Map 0",
+        0.27
+      ],
+      [
+        "Underwater Light Map 1",
+        0.141
+      ],
+      [
+        "bloom up",
+        0.138
+      ],
+      [
+        "causticsBroad",
+        0.135
+      ],
+      [
+        "Spray Update",
+        0.096
+      ],
+      [
+        "Caustics Mips",
+        0.092
+      ],
+      [
+        "Surf Crests",
+        0.092
+      ]
+    ]
+  },
+  "pier": {
+    "wall": 28.598,
+    "gpu": 26.147,
+    "gpuMedian": 26.214,
+    "cpu": 1.212,
+    "passes": [
+      [
+        "water + transparent",
+        8.516
+      ],
+      [
+        "opaque",
+        4.212
+      ],
+      [
+        "TAAU",
+        2.368
+      ],
+      [
+        "Clouds Trace",
+        2.23
+      ],
+      [
+        "haze march",
+        1.696
+      ],
+      [
+        "refraction",
+        1.407
+      ],
+      [
+        "beauty (AO + haze + underwater)",
+        0.748
+      ],
+      [
+        "final (grade + tonemap)",
+        0.638
+      ],
+      [
+        "causticsFine",
+        0.499
+      ],
+      [
+        "Ocean FFT",
+        0.455
+      ],
+      [
+        "opaque depth half",
+        0.359
+      ],
+      [
+        "bloom down",
+        0.303
+      ],
+      [
+        "Clouds Resolve",
+        0.277
+      ],
+      [
+        "Motion Blur Tiles",
+        0.233
+      ],
+      [
+        "Clouds Panorama",
+        0.227
+      ],
+      [
+        "Shore Sim",
+        0.215
+      ],
+      [
+        "Underwater Light Map 1",
+        0.184
+      ],
+      [
+        "Underwater Light Map 0",
+        0.141
+      ],
+      [
+        "GTAO",
+        0.138
+      ],
+      [
+        "bloom up",
+        0.128
+      ],
+      [
+        "Surf Crests",
+        0.114
+      ],
+      [
+        "Caustics Mips",
+        0.086
+      ],
+      [
+        "medium",
+        0.085
+      ],
+      [
+        "AO blur y",
+        0.085
+      ]
+    ]
+  },
+  "sunGlitter": {
+    "wall": 30.154,
+    "gpu": 27.403,
+    "gpuMedian": 27.46,
+    "cpu": 1.613,
+    "passes": [
+      [
+        "water + transparent",
+        6.723
+      ],
+      [
+        "opaque",
+        5.542
+      ],
+      [
+        "refraction",
+        2.763
+      ],
+      [
+        "Clouds Trace",
+        2.43
+      ],
+      [
+        "TAAU",
+        2.39
+      ],
+      [
+        "haze march",
+        1.753
+      ],
+      [
+        "beauty (AO + haze + underwater)",
+        0.759
+      ],
+      [
+        "final (grade + tonemap)",
+        0.534
+      ],
+      [
+        "Ocean FFT",
+        0.512
+      ],
+      [
+        "causticsFine",
+        0.481
+      ],
+      [
+        "opaque depth half",
+        0.363
+      ],
+      [
+        "bloom down",
+        0.311
+      ],
+      [
+        "Clouds Resolve",
+        0.301
+      ],
+      [
+        "Shore Sim",
+        0.289
+      ],
+      [
+        "Motion Blur Tiles",
+        0.257
+      ],
+      [
+        "Clouds Panorama",
+        0.225
+      ],
+      [
+        "Underwater Light Map 0",
+        0.187
+      ],
+      [
+        "Underwater Light Map 1",
+        0.173
+      ],
+      [
+        "GTAO",
+        0.163
+      ],
+      [
+        "bloom up",
+        0.133
+      ],
+      [
+        "Surf Crests",
+        0.09
+      ],
+      [
+        "AO blur x",
+        0.085
+      ],
+      [
+        "AO blur y",
+        0.084
+      ],
+      [
+        "haze shafts temporal",
+        0.082
+      ]
+    ]
+  },
+  "village": {
+    "wall": 26.962,
+    "gpu": 24.218,
+    "gpuMedian": 24.314,
+    "cpu": 1.72,
+    "passes": [
+      [
+        "opaque",
+        10.109
+      ],
+      [
+        "TAAU",
+        2.376
+      ],
+      [
+        "Clouds Trace",
+        1.966
+      ],
+      [
+        "haze march",
+        1.635
+      ],
+      [
+        "GTAO",
+        1.082
+      ],
+      [
+        "beauty (AO + haze + underwater)",
+        0.919
+      ],
+      [
+        "final (grade + tonemap)",
+        0.636
+      ],
+      [
+        "causticsFine",
+        0.553
+      ],
+      [
+        "Motion Blur Tiles",
+        0.5
+      ],
+      [
+        "Ocean FFT",
+        0.454
+      ],
+      [
+        "shadow cascade 0",
+        0.444
+      ],
+      [
+        "opaque depth half",
+        0.412
+      ],
+      [
+        "shadow cascade 1",
+        0.314
+      ],
+      [
+        "Clouds Resolve",
+        0.307
+      ],
+      [
+        "bloom down",
+        0.306
+      ],
+      [
+        "Clouds Panorama",
+        0.222
+      ],
+      [
+        "Underwater Light Map 1",
+        0.209
+      ],
+      [
+        "Underwater Light Map 0",
+        0.165
+      ],
+      [
+        "shadow cascade 2",
+        0.149
+      ],
+      [
+        "bloom up",
+        0.142
+      ],
+      [
+        "water + transparent",
+        0.134
+      ],
+      [
+        "Shore Sim",
+        0.11
+      ],
+      [
+        "Surf Crests",
+        0.102
+      ],
+      [
+        "AO blur x",
+        0.098
+      ]
+    ]
+  },
+  "underwater": {
+    "wall": 17.669,
+    "gpu": 15.112,
+    "gpuMedian": 15.139,
+    "cpu": 1.995,
+    "passes": [
+      [
+        "opaque",
+        4.187
+      ],
+      [
+        "TAAU",
+        2.399
+      ],
+      [
+        "underwater shafts",
+        1.267
+      ],
+      [
+        "water + transparent",
+        1.043
+      ],
+      [
+        "refraction",
+        0.737
+      ],
+      [
+        "beauty (AO + haze + underwater)",
+        0.684
+      ],
+      [
+        "final (grade + tonemap)",
+        0.572
+      ],
+      [
+        "GTAO",
+        0.499
+      ],
+      [
+        "Ocean FFT",
+        0.474
+      ],
+      [
+        "Motion Blur Tiles",
+        0.365
+      ],
+      [
+        "opaque depth half",
+        0.35
+      ],
+      [
+        "bloom down",
+        0.297
+      ],
+      [
+        "Shore Sim",
+        0.261
+      ],
+      [
+        "causticsFine",
+        0.256
+      ],
+      [
+        "Clouds Panorama",
+        0.217
+      ],
+      [
+        "Underwater Light Map 1",
+        0.206
+      ],
+      [
+        "bloom up",
+        0.142
+      ],
+      [
+        "Surf Crests",
+        0.112
+      ],
+      [
+        "Underwater Light Map 0",
+        0.103
+      ],
+      [
+        "AO blur x",
+        0.098
+      ],
+      [
+        "AO blur y",
+        0.091
+      ],
+      [
+        "medium",
+        0.091
+      ],
+      [
+        "shadow cascade 0",
+        0.082
+      ],
+      [
+        "haze shafts temporal",
+        0.072
+      ]
+    ]
+  },
+  "aerial": {
+    "wall": 27.367,
+    "gpu": 24.95,
+    "gpuMedian": 24.969,
+    "cpu": 1.209,
+    "passes": [
+      [
+        "opaque",
+        6.961
+      ],
+      [
+        "water + transparent",
+        6.151
+      ],
+      [
+        "TAAU",
+        2.412
+      ],
+      [
+        "refraction",
+        1.734
+      ],
+      [
+        "haze march",
+        1.605
+      ],
+      [
+        "beauty (AO + haze + underwater)",
+        0.848
+      ],
+      [
+        "final (grade + tonemap)",
+        0.567
+      ],
+      [
+        "Ocean FFT",
+        0.461
+      ],
+      [
+        "Motion Blur Tiles",
+        0.455
+      ],
+      [
+        "opaque depth half",
+        0.39
+      ],
+      [
+        "GTAO",
+        0.383
+      ],
+      [
+        "Clouds Resolve",
+        0.323
+      ],
+      [
+        "Clouds Panorama",
+        0.289
+      ],
+      [
+        "bloom down",
+        0.283
+      ],
+      [
+        "Shore Sim",
+        0.27
+      ],
+      [
+        "Underwater Light Map 0",
+        0.24
+      ],
+      [
+        "causticsFine",
+        0.218
+      ],
+      [
+        "Underwater Light Map 1",
+        0.145
+      ],
+      [
+        "bloom up",
+        0.135
+      ],
+      [
+        "Surf Crests",
+        0.103
+      ],
+      [
+        "AO blur x",
+        0.091
+      ],
+      [
+        "AO blur y",
+        0.089
+      ],
+      [
+        "medium",
+        0.082
+      ],
+      [
+        "haze shafts temporal",
+        0.073
+      ]
+    ]
+  },
+  "palms": {
+    "wall": 25.876,
+    "gpu": 23.691,
+    "gpuMedian": 23.658,
+    "cpu": 1.011,
+    "passes": [
+      [
+        "opaque",
+        8.473
+      ],
+      [
+        "Clouds Trace",
+        2.394
+      ],
+      [
+        "TAAU",
+        2.334
+      ],
+      [
+        "haze march",
+        1.278
+      ],
+      [
+        "GTAO",
+        1.083
+      ],
+      [
+        "Motion Blur Tiles",
+        0.981
+      ],
+      [
+        "water + transparent",
+        0.98
+      ],
+      [
+        "beauty (AO + haze + underwater)",
+        0.847
+      ],
+      [
+        "final (grade + tonemap)",
+        0.691
+      ],
+      [
+        "Ocean FFT",
+        0.447
+      ],
+      [
+        "causticsFine",
+        0.369
+      ],
+      [
+        "opaque depth half",
+        0.362
+      ],
+      [
+        "Clouds Resolve",
+        0.351
+      ],
+      [
+        "shadow cascade 1",
+        0.288
+      ],
+      [
+        "bloom down",
+        0.287
+      ],
+      [
+        "Shore Sim",
+        0.262
+      ],
+      [
+        "Clouds Panorama",
+        0.246
+      ],
+      [
+        "refraction",
+        0.246
+      ],
+      [
+        "Underwater Light Map 0",
+        0.2
+      ],
+      [
+        "Underwater Light Map 1",
+        0.14
+      ],
+      [
+        "bloom up",
+        0.131
+      ],
+      [
+        "Surf Crests",
+        0.122
+      ],
+      [
+        "Motion Blur Neighbourhood",
+        0.119
+      ],
+      [
+        "Spray Update",
+        0.096
+      ]
+    ]
+  },
+  "spawnArea": {
+    "wall": 24.987,
+    "gpu": 22.589,
+    "gpuMedian": 22.675,
+    "cpu": 1.211,
+    "passes": [
+      [
+        "opaque",
+        8.468
+      ],
+      [
+        "underwater shafts",
+        2.361
+      ],
+      [
+        "TAAU",
+        2.342
+      ],
+      [
+        "water + transparent",
+        2.157
+      ],
+      [
+        "refraction",
+        1.574
+      ],
+      [
+        "GTAO",
+        0.779
+      ],
+      [
+        "beauty (AO + haze + underwater)",
+        0.641
+      ],
+      [
+        "final (grade + tonemap)",
+        0.528
+      ],
+      [
+        "Ocean FFT",
+        0.453
+      ],
+      [
+        "opaque depth half",
+        0.382
+      ],
+      [
+        "causticsFine",
+        0.354
+      ],
+      [
+        "bloom down",
+        0.323
+      ],
+      [
+        "Shore Sim",
+        0.238
+      ],
+      [
+        "Motion Blur Tiles",
+        0.233
+      ],
+      [
+        "Clouds Panorama",
+        0.204
+      ],
+      [
+        "Underwater Light Map 0",
+        0.179
+      ],
+      [
+        "Underwater Light Map 1",
+        0.176
+      ],
+      [
+        "bloom up",
+        0.125
+      ],
+      [
+        "AO blur x",
+        0.109
+      ],
+      [
+        "Surf Crests",
+        0.104
+      ],
+      [
+        "AO blur y",
+        0.092
+      ],
+      [
+        "medium",
+        0.08
+      ],
+      [
+        "shadow cascade 0",
+        0.079
+      ],
+      [
+        "haze shafts temporal",
+        0.073
+      ]
+    ]
+  },
+  "deepWater": {
+    "wall": 20.523,
+    "gpu": 17.867,
+    "gpuMedian": 17.826,
+    "cpu": 1.528,
+    "passes": [
+      [
+        "opaque",
+        5.92
+      ],
+      [
+        "TAAU",
+        2.328
+      ],
+      [
+        "underwater shafts",
+        2.299
+      ],
+      [
+        "refraction",
+        0.983
+      ],
+      [
+        "water + transparent",
+        0.754
+      ],
+      [
+        "GTAO",
+        0.749
+      ],
+      [
+        "beauty (AO + haze + underwater)",
+        0.642
+      ],
+      [
+        "final (grade + tonemap)",
+        0.54
+      ],
+      [
+        "Ocean FFT",
+        0.454
+      ],
+      [
+        "opaque depth half",
+        0.333
+      ],
+      [
+        "bloom down",
+        0.306
+      ],
+      [
+        "Motion Blur Tiles",
+        0.296
+      ],
+      [
+        "Shore Sim",
+        0.281
+      ],
+      [
+        "causticsFine",
+        0.242
+      ],
+      [
+        "Clouds Panorama",
+        0.223
+      ],
+      [
+        "Underwater Light Map 0",
+        0.165
+      ],
+      [
+        "Underwater Light Map 1",
+        0.142
+      ],
+      [
+        "bloom up",
+        0.133
+      ],
+      [
+        "AO blur x",
+        0.097
+      ],
+      [
+        "shadow cascade 0",
+        0.092
+      ],
+      [
+        "causticsBroad",
+        0.09
+      ],
+      [
+        "AO blur y",
+        0.086
+      ],
+      [
+        "Surf Crests",
+        0.086
+      ],
+      [
+        "medium",
+        0.078
+      ]
+    ]
+  },
+  "total": {
+    "wall": 227.326,
+    "gpu": 204.528
+  }
+}

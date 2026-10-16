@@ -9,8 +9,9 @@
 // by pixel. A second pass with dt > 0 records a moving-water sequence.
 //
 //   node eval/capture.mjs --target=pristine        --tag=A            # pristine Tidewater :5189
-//   node eval/capture.mjs --target=dolphin-hidden  --tag=Bhidden      # integrated, dolphin not in the scene
-//   node eval/capture.mjs --target=dolphin         --tag=B            # integrated, dolphin visible
+//   node eval/capture.mjs --target=dolphin-hidden  --tag=Bhidden      # integrated, dolphin not in the scene, additions off
+//   node eval/capture.mjs --target=dolphin         --tag=B            # integrated, dolphin visible, additions off
+//   node eval/capture.mjs --target=enhanced        --tag=E            # integrated, dolphin visible, scenery additions on
 //   options: --views=a,b,c  --seq  --perf  --out=eval/captures  --frames=64
 
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -26,15 +27,17 @@ const opt = ( k, d ) => ( argv.find( ( a ) => a.startsWith( `--${ k }=` ) ) ?? `
 const flag = ( k ) => argv.includes( `--${ k }` );
 
 const target = opt( 'target', 'pristine' );
-const tag = opt( 'tag', target === 'pristine' ? 'A' : target === 'dolphin-hidden' ? 'Bhidden' : 'B' );
+const tag = opt( 'tag', target === 'pristine' ? 'A' : target === 'dolphin-hidden' ? 'Bhidden' : target === 'enhanced' ? 'E' : 'B' );
 const outDir = resolve( HERE, opt( 'out', 'captures' ) );
 const views = opt( 'views', '' ) ? opt( 'views', '' ).split( ',' ) : ALL_VIEWS;
 const frames = Number( opt( 'frames', 64 ) );
 
+// (?original: the scenery-additions layer off — the pristine scene exactly; ?enhanced: all additions on)
 const TARGETS = {
 	'pristine': { url: 'http://127.0.0.1:5189/?bench&noAudio', debugViews: '/src/core/DebugViews.js' },
-	'dolphin-hidden': { url: 'http://127.0.0.1:5199/?bench&noAudio&noDolphin', debugViews: '/vendor/tidewater/src/core/DebugViews.js' },
-	'dolphin': { url: 'http://127.0.0.1:5199/?bench&noAudio', debugViews: '/vendor/tidewater/src/core/DebugViews.js' },
+	'dolphin-hidden': { url: 'http://127.0.0.1:5199/?bench&noAudio&noDolphin&original', debugViews: '/vendor/tidewater/src/core/DebugViews.js' },
+	'dolphin': { url: 'http://127.0.0.1:5199/?bench&noAudio&original', debugViews: '/vendor/tidewater/src/core/DebugViews.js' },
+	'enhanced': { url: 'http://127.0.0.1:5199/?bench&noAudio&enhanced', debugViews: '/vendor/tidewater/src/core/DebugViews.js' },
 };
 const T = TARGETS[ target ];
 if ( ! T ) throw new Error( 'unknown --target' );
@@ -67,6 +70,8 @@ const env = await evaluate( `(async () => {
 		post: { ao: app.post.params.aoStrength.value, bloom: app.post.params.bloom.value, sharpen: app.post.params.sharpen.value, saturation: app.post.params.saturation.value, contrast: app.post.params.contrast.value, vignette: app.post.params.vignette.value, grain: app.post.params.grain.value, aaMode: app.post.aaMode, motionBlur: app.post.motionBlur ? app.post.motionBlur.shutter.value : null },
 		camera: { fov: app.camera.fov, near: app.camera.near, far: app.camera.far },
 		dolphin: window.__TIDEWATER_DOLPHIN ? window.__TIDEWATER_DOLPHIN.state() : null,
+		playerMode: app.playerMode ?? 'tidewater-player',
+		additions: app.additions ? app.additions.stats() : null,
 		flags: location.search,
 	};
 })()` );

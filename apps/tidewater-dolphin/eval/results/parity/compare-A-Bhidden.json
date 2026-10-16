@@ -1,0 +1,466 @@
+{
+  "a": "A",
+  "b": "Bhidden",
+  "comparedAt": "2026-10-16T13:49:53.850Z",
+  "tolerances": {
+    "identical": "MAD < 0.05 and no pixel > 32",
+    "withinNoise": "MAD < 0.5 and < 0.5 % pixels > 32"
+  },
+  "rows": [
+    {
+      "view": "addShellsBeach",
+      "mad": 0.0009,
+      "psnr": 73.55,
+      "maxDiff": 27,
+      "pctOver8": 0.002,
+      "pctOver32": 0,
+      "bbox": [
+        302,
+        120,
+        2302,
+        483
+      ],
+      "verdict": "identical"
+    },
+    {
+      "view": "addWoodEast",
+      "mad": 0.0001,
+      "psnr": 85.92,
+      "maxDiff": 13,
+      "pctOver8": 0,
+      "pctOver32": 0,
+      "bbox": [
+        1184,
+        333,
+        2070,
+        457
+      ],
+      "verdict": "identical"
+    },
+    {
+      "view": "aerial",
+      "mad": 0.0161,
+      "psnr": 50.84,
+      "maxDiff": 213,
+      "pctOver8": 0.043,
+      "pctOver32": 0.01,
+      "bbox": [
+        21,
+        102,
+        2278,
+        1211
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "bayOffshore",
+      "mad": 0.0065,
+      "psnr": 54.19,
+      "maxDiff": 192,
+      "pctOver8": 0.009,
+      "pctOver32": 0.003,
+      "bbox": [
+        0,
+        442,
+        2519,
+        999
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "beach",
+      "mad": 0.0795,
+      "psnr": 55,
+      "maxDiff": 154,
+      "pctOver8": 0.034,
+      "pctOver32": 0.003,
+      "bbox": [
+        8,
+        5,
+        2557,
+        1249
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "causticsSun",
+      "mad": 0.0002,
+      "psnr": 79.63,
+      "maxDiff": 20,
+      "pctOver8": 0.001,
+      "pctOver32": 0,
+      "bbox": [
+        0,
+        6,
+        639,
+        51
+      ],
+      "verdict": "identical"
+    },
+    {
+      "view": "deepBlue",
+      "mad": 0.0027,
+      "psnr": 69.56,
+      "maxDiff": 32,
+      "pctOver8": 0.002,
+      "pctOver32": 0,
+      "bbox": [
+        86,
+        52,
+        2519,
+        1166
+      ],
+      "verdict": "identical"
+    },
+    {
+      "view": "deepWater",
+      "mad": 0,
+      "psnr": 89.76,
+      "maxDiff": 16,
+      "pctOver8": 0,
+      "pctOver32": 0,
+      "bbox": [
+        1725,
+        484,
+        1725,
+        484
+      ],
+      "verdict": "identical"
+    },
+    {
+      "view": "palms",
+      "mad": 0.0463,
+      "psnr": 53.21,
+      "maxDiff": 165,
+      "pctOver8": 0.067,
+      "pctOver32": 0.004,
+      "bbox": [
+        37,
+        0,
+        2555,
+        1266
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "pier",
+      "mad": 0.0223,
+      "psnr": 49.27,
+      "maxDiff": 218,
+      "pctOver8": 0.031,
+      "pctOver32": 0.011,
+      "bbox": [
+        10,
+        52,
+        2541,
+        1262
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "pierShallows",
+      "mad": 0.0229,
+      "psnr": 58.83,
+      "maxDiff": 91,
+      "pctOver8": 0.026,
+      "pctOver32": 0.001,
+      "bbox": [
+        0,
+        2,
+        2548,
+        1260
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "reefCoral",
+      "mad": 0,
+      "psnr": "inf",
+      "maxDiff": 0,
+      "pctOver8": 0,
+      "pctOver32": 0,
+      "bbox": null,
+      "verdict": "identical"
+    },
+    {
+      "view": "shallowSeabed",
+      "mad": 0.0069,
+      "psnr": 63.67,
+      "maxDiff": 71,
+      "pctOver8": 0.006,
+      "pctOver32": 0.001,
+      "bbox": [
+        0,
+        4,
+        2555,
+        1182
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "spawnArea",
+      "mad": 0.0002,
+      "psnr": 77.22,
+      "maxDiff": 39,
+      "pctOver8": 0.001,
+      "pctOver32": 0,
+      "bbox": [
+        1513,
+        87,
+        1701,
+        675
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "sunFlare",
+      "mad": 0.0231,
+      "psnr": 50.66,
+      "maxDiff": 184,
+      "pctOver8": 0.072,
+      "pctOver32": 0.016,
+      "bbox": [
+        6,
+        9,
+        2557,
+        1264
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "sunGlitter",
+      "mad": 0.0035,
+      "psnr": 69.37,
+      "maxDiff": 21,
+      "pctOver8": 0.002,
+      "pctOver32": 0,
+      "bbox": [
+        40,
+        552,
+        2439,
+        1261
+      ],
+      "verdict": "identical"
+    },
+    {
+      "view": "sunShafts",
+      "mad": 0.0195,
+      "psnr": 48.65,
+      "maxDiff": 207,
+      "pctOver8": 0.095,
+      "pctOver32": 0.04,
+      "bbox": [
+        425,
+        706,
+        1007,
+        946
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "sunset",
+      "mad": 0.0005,
+      "psnr": 77.42,
+      "maxDiff": 12,
+      "pctOver8": 0.001,
+      "pctOver32": 0,
+      "bbox": [
+        1087,
+        336,
+        2347,
+        520
+      ],
+      "verdict": "identical"
+    },
+    {
+      "view": "sunsetWest",
+      "mad": 0.0146,
+      "psnr": 60.68,
+      "maxDiff": 94,
+      "pctOver8": 0.014,
+      "pctOver32": 0.002,
+      "bbox": [
+        0,
+        13,
+        2540,
+        1260
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "surf",
+      "mad": 0.0384,
+      "psnr": 51.96,
+      "maxDiff": 177,
+      "pctOver8": 0.025,
+      "pctOver32": 0.006,
+      "bbox": [
+        6,
+        4,
+        2550,
+        1263
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "surfSide",
+      "mad": 0.0224,
+      "psnr": 53.6,
+      "maxDiff": 159,
+      "pctOver8": 0.037,
+      "pctOver32": 0.012,
+      "bbox": [
+        0,
+        48,
+        2542,
+        1261
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "swash",
+      "mad": 0.0162,
+      "psnr": 55.9,
+      "maxDiff": 181,
+      "pctOver8": 0.019,
+      "pctOver32": 0.004,
+      "bbox": [
+        14,
+        14,
+        2543,
+        1232
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "swashAbove",
+      "mad": 0.0008,
+      "psnr": 67.54,
+      "maxDiff": 79,
+      "pctOver8": 0.001,
+      "pctOver32": 0,
+      "bbox": [
+        633,
+        57,
+        2484,
+        1224
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "swashFilm",
+      "mad": 0.0024,
+      "psnr": 62.7,
+      "maxDiff": 103,
+      "pctOver8": 0.004,
+      "pctOver32": 0.001,
+      "bbox": [
+        20,
+        3,
+        2550,
+        1231
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "tCove",
+      "mad": 0.0463,
+      "psnr": 56.14,
+      "maxDiff": 95,
+      "pctOver8": 0.055,
+      "pctOver32": 0.001,
+      "bbox": [
+        3,
+        0,
+        2559,
+        1258
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "tMorning",
+      "mad": 0.0731,
+      "psnr": 46.94,
+      "maxDiff": 216,
+      "pctOver8": 0.094,
+      "pctOver32": 0.014,
+      "bbox": [
+        4,
+        8,
+        2544,
+        1266
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "underwater",
+      "mad": 0,
+      "psnr": "inf",
+      "maxDiff": 0,
+      "pctOver8": 0,
+      "pctOver32": 0,
+      "bbox": null,
+      "verdict": "identical"
+    },
+    {
+      "view": "village",
+      "mad": 0.0428,
+      "psnr": 51.76,
+      "maxDiff": 133,
+      "pctOver8": 0.061,
+      "pctOver32": 0.013,
+      "bbox": [
+        0,
+        4,
+        2552,
+        1266
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "waterline",
+      "mad": 0.0009,
+      "psnr": 71.57,
+      "maxDiff": 37,
+      "pctOver8": 0.002,
+      "pctOver32": 0,
+      "bbox": [
+        148,
+        636,
+        2479,
+        1128
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "waterlineBay",
+      "mad": 0.0054,
+      "psnr": 59.28,
+      "maxDiff": 63,
+      "pctOver8": 0.04,
+      "pctOver32": 0.002,
+      "bbox": [
+        279,
+        650,
+        2354,
+        876
+      ],
+      "verdict": "within noise"
+    },
+    {
+      "view": "waterlineDrops",
+      "mad": 0.0021,
+      "psnr": 62.28,
+      "maxDiff": 161,
+      "pctOver8": 0.006,
+      "pctOver32": 0.001,
+      "bbox": [
+        79,
+        0,
+        2524,
+        812
+      ],
+      "verdict": "within noise"
+    }
+  ]
+}

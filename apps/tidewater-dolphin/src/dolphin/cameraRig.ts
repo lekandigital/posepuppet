@@ -2,7 +2,7 @@
 // ported cp01 baseline camera — critically damped spring position with
 // asymmetric damping, smoothed-velocity look-ahead, speed-based follow
 // distance, a camera state machine with parameter cross-fades, analytic
-// pool-wall collision, R recenter, and the waterline anti-shimmer hold.
+// pool-wall collision and R recenter.
 // All initial values from Implementation Master §7.5 / cp02 §6.
 //
 // The three virtues of the deleted cp01 camera carry over:
@@ -33,8 +33,26 @@
 // reversed-Z projection, waterline compositing, temporal state and post chain
 // render through the chase pose. `near` stays 0.1 (RIG.NEAR == Tidewater's
 // lens plane); `far` is left to Tidewater (60 000 m: island + sky + clouds).
-// Every constant, spring, state and clamp below is the approved cp02/cp05/
-// cp05C/cp09 behavior, unchanged.
+//
+// CP10 continuation (user directive, "Fix the split-waterline problem"): the
+// waterline anti-shimmer hold inherited from the old BodyArcade renderer is
+// REMOVED for the Tidewater host — the ±0.75 m SURFACE_BAND, the 0.35 m
+// SHIMMER_MIN_Y exclusion, the per-crossing SHIMMER_HOLD_S side lock, the
+// swim-side / air-side clamps on the desired point and the matching clamp in
+// the TerrainCompressed probe. The eye now goes wherever the chase geometry
+// puts it, including onto and through the sea surface, so Tidewater's own
+// near-plane waterline renderer (vendor post/Underwater.js: LENS_REACH,
+// per-pixel medium, meniscus) decides what the lens sees — waves crossing a
+// stationary lens produce the same split above / below view as the pristine
+// game. Airborne framing is still the BREACH_PULLBACK on the follow distance
+// (an ordinary framing effect), no longer a rendering constraint. The surface-
+// crossing detector that drives SurfaceTransition is measured against the
+// local waterline (the dolphin crossing the actual sea surface), not y = 0:
+// with the swell ride lifting the rendered dolphin by the wave height, the
+// flat check fired on every passing wave and held the state machine in
+// SurfaceTransition while hovering (the 41/42 play-test miss). Every other
+// constant, spring, state and clamp is the approved cp02/cp05/cp05C/cp09
+// behavior, unchanged.
 
 import { Vector3, MathUtils } from '../../vendor/tidewater/src/engine/index.js';
 import type { SimState } from './sim';
@@ -103,9 +121,9 @@ export const RIG = {
   FAR: 900,                 // pool far plane
   HOVER_SPEED: 0.75,        // m/s — SlowHover below (Track E min-control)
   FAST_SPEED: 5,            // m/s — FastTravel above
-  SURFACE_BAND: 0.75,       // m — anti-shimmer active within ±band of y 0
-  SHIMMER_MIN_Y: 0.35,      // m — minimum |camera y| held near the surface
-  SHIMMER_HOLD_S: 0.15,     // s — hold per crossing [DERIVED anti-artifact rule]
+  // (cp02's SURFACE_BAND / SHIMMER_MIN_Y / SHIMMER_HOLD_S anti-shimmer hold is
+  // deliberately absent in the Tidewater rig — see the header; a regression
+  // test asserts it stays absent)
   EMERGENCY_LOS_S: 0.3,     // s — LOS blocked longer than this → emergency
   EMERGENCY_DIST_FACTOR: 3, // distance error > 3× target → emergency
   T90_EMERGENCY: 0.15,      // s — emergency fast recenter
@@ -179,8 +197,10 @@ export interface CameraEvalState {
   rollRad: number;
   /** seconds remaining in the R-recenter ease window (0 = inactive) */
   recenterActiveS: number;
-  antiShimmerEngagements: number;
+  /** times the EYE crossed the local waterline (the lens went through the surface) */
   surfaceCrossings: number;
+  /** eye height relative to the local waterline, m (|value| < ~0.1 → the lens straddles the surface) */
+  eyeAboveWaterM: number;
   losBlockedS: number;
   emergencyCount: number;
   /** rolling mean rig CPU cost per update, µs (measured by the caller) */
@@ -219,14 +239,14 @@ export class CameraRig {
   private recenterT = 0;
   private reentryT = 0;
   private surfaceT = 0;
-  private shimmerHoldT = 0;
-  private side: -1 | 1 = -1; // which side of y 0 the camera occupies
-  private prevDolphinY = -2.5;
+  /** dolphin height relative to the local waterline last update (surface-crossing detector) */
+  private prevDolphinRel = -2.5;
+  /** eye height relative to the local waterline last update (crossing counter) */
+  private prevEyeRel: number | null = null;
   private prevWasAir = false;
   private emergency = false;
   private emergencyCount = 0;
   private losBlockedS = 0;
-  private antiShimmerCount = 0;
   private crossings = 0;
   private aimErrorRad = 0;
   private azimuthErrorRad = 0;
@@ -268,10 +288,10 @@ export class CameraRig {
     collision: CameraCollisionLike = new CameraCollision(7.5, 7.5, RIG.COLLISION_RADIUS),
     // cp05: TerrainCompressed is region-only; the pool rig stays exactly
     // the approved cp02 behavior (the state remains a stub there)
-    // cp05C: optional visual-waterline callback — with the Gerstner ocean
-    // the render surface is wavy, so the anti-shimmer band and the swim/air
-    // clamps become surface-relative. Absent (pool view), the waterline is
-    // the constant y = 0 and behavior is bit-identical to the approved cp02.
+    // cp05C: optional visual-waterline callback — with a wavy sea the
+    // dolphin's surface-crossing detector (SurfaceTransition) and the eye
+    // crossing counter are measured against the local surface. Absent (pool
+    // view), the waterline is the constant y = 0.
     opts: {
       terrainCompression?: boolean;
       waterlineAt?: (x: number, z: number) => number;
@@ -307,6 +327,7 @@ export class CameraRig {
     this.snapGraceS = 1.2;
     this.camVel.set(0, 0, 0);
     this.aimVel.set(0, 0, 0);
+    this.prevEyeRel = null; // a teleport is not a surface crossing
   }
 
   update(s: SimState, dt: number): void {
@@ -332,12 +353,14 @@ export class CameraRig {
     if (this.recenterT > 0) this.recenterT = Math.max(0, this.recenterT - dt);
     if (this.reentryT > 0) this.reentryT = Math.max(0, this.reentryT - dt);
     if (this.surfaceT > 0) this.surfaceT = Math.max(0, this.surfaceT - dt);
-    if (this.shimmerHoldT > 0) this.shimmerHoldT = Math.max(0, this.shimmerHoldT - dt);
     if (!air && this.prevWasAir) this.reentryT = RIG.REENTRY_S;
-    if (Math.sign(s.y) !== Math.sign(this.prevDolphinY) && Math.abs(s.y - this.prevDolphinY) < 2) {
-      this.surfaceT = RIG.SURFACE_BLEND_S; // dolphin crossed y 0
+    // the dolphin crossed the SEA SURFACE (local waterline; y 0 in the pool) — a breach or a
+    // re-entry, not a passing wave lifting the rendered dolphin at the surface
+    const dolphinRel = s.y - this.wl;
+    if (Math.sign(dolphinRel) !== Math.sign(this.prevDolphinRel) && Math.abs(dolphinRel - this.prevDolphinRel) < 2) {
+      this.surfaceT = RIG.SURFACE_BLEND_S;
     }
-    this.prevDolphinY = s.y;
+    this.prevDolphinRel = dolphinRel;
     this.prevWasAir = air;
 
     // --- state parameter targets ---
@@ -382,13 +405,9 @@ export class CameraRig {
       d.y + RIG.HEIGHT * this.compressFactor,
       d.z - fz * this.dist,
     );
-    // waterline discipline (carried cp01 virtue): while swimming, the eye
-    // stays on the underwater side of the anti-shimmer band (the vendored
-    // surface hides a submerged dolphin from an above-water eye); while
-    // airborne it lifts above (breach air-lift) — the crossing itself is
-    // sprung and continuous.
-    if (air) desired.y = Math.max(desired.y, this.wl + RIG.SHIMMER_MIN_Y + 0.15);
-    else desired.y = Math.min(desired.y, this.wl - RIG.SHIMMER_MIN_Y);
+    // No waterline discipline here (CP10 continuation): the eye may sit on,
+    // straddle or pass through the sea surface; Tidewater's renderer shows the
+    // split view. Airborne framing is the BREACH_PULLBACK above.
 
     // --- collision on the desired point (pool walls / region BVH
     // sphere-cast; dolly-in on block) ---
@@ -409,7 +428,7 @@ export class CameraRig {
         const distU = this.dist / this.compressFactor;
         const probe = this.tmpV.set(
           d.x - fx * distU,
-          Math.min(d.y + RIG.HEIGHT, air ? Infinity : this.wl - RIG.SHIMMER_MIN_Y),
+          d.y + RIG.HEIGHT,
           d.z - fz * distU,
         );
         const probeLen = probe.distanceTo(d);
@@ -499,9 +518,12 @@ export class CameraRig {
       this.camVel.multiplyScalar(maxStep / step);
     }
 
-    // --- wall guarantee + waterline anti-shimmer hold ---
+    // --- wall guarantee (solid geometry only; the sea surface is not a wall) ---
     this.collision.clampPoint(this.camPos);
-    this.applyAntiShimmer(desired.y);
+    // eye / waterline crossings: a metric for the waterline tests, never a clamp
+    const eyeRel = this.camPos.y - this.wl;
+    if (this.prevEyeRel !== null && Math.sign(eyeRel) !== Math.sign(this.prevEyeRel)) this.crossings++;
+    this.prevEyeRel = eyeRel;
 
     // --- aim: look-ahead along smoothed velocity (facing during recenter) ---
     const vs = this.velSmooth.length();
@@ -554,45 +576,6 @@ export class CameraRig {
     }
   }
 
-  /**
-   * Waterline anti-shimmer (cp02 §6 [DERIVED], flagged): within ±SURFACE_BAND
-   * of y 0 the eye holds |y| ≥ SHIMMER_MIN_Y on its current side for at least
-   * SHIMMER_HOLD_S per crossing — a committed crossing passes straight
-   * through (continuous, never a cut) and then holds on the new side.
-   */
-  private applyAntiShimmer(desiredY: number): void {
-    // cp05C: the band is measured relative to the visual waterline at the
-    // dolphin column (wl = 0 in the pool — identical arithmetic to cp02)
-    const y = this.camPos.y - this.wl;
-    const dY = desiredY - this.wl;
-    if (Math.abs(y) >= RIG.SURFACE_BAND) {
-      this.side = y >= 0 ? 1 : -1;
-      return;
-    }
-    const wantSide: -1 | 1 = dY >= 0 ? 1 : -1;
-    const committed =
-      wantSide !== this.side && Math.abs(dY) >= RIG.SHIMMER_MIN_Y && this.shimmerHoldT === 0;
-    if (committed) {
-      const crossed = Math.sign(y) === wantSide && Math.abs(y) > 0;
-      if (crossed) {
-        this.side = wantSide;
-        this.shimmerHoldT = RIG.SHIMMER_HOLD_S;
-        this.crossings++;
-      }
-      return; // passing through the band — do not clamp mid-crossing
-    }
-    // not crossing: hold clear of the surface on the current side
-    if (this.side === -1 && y > -RIG.SHIMMER_MIN_Y) {
-      this.camPos.y = this.wl - RIG.SHIMMER_MIN_Y;
-      if (this.camVel.y > 0) this.camVel.y = 0;
-      this.antiShimmerCount++;
-    } else if (this.side === 1 && y < RIG.SHIMMER_MIN_Y) {
-      this.camPos.y = this.wl + RIG.SHIMMER_MIN_Y;
-      if (this.camVel.y < 0) this.camVel.y = 0;
-      this.antiShimmerCount++;
-    }
-  }
-
   evalState(dolphin?: { x: number; y: number; z: number }): CameraEvalState {
     const followDistM = dolphin
       ? this.camPos.distanceTo(this.tmpV.set(dolphin.x, dolphin.y, dolphin.z))
@@ -610,8 +593,8 @@ export class CameraRig {
       azimuthErrorRad: this.azimuthErrorRad,
       rollRad: this.rollRad,
       recenterActiveS: this.recenterT,
-      antiShimmerEngagements: this.antiShimmerCount,
       surfaceCrossings: this.crossings,
+      eyeAboveWaterM: this.camPos.y - this.wl,
       losBlockedS: this.losBlockedS,
       emergencyCount: this.emergencyCount,
       updateUsAvg: this.updateUsAvg,

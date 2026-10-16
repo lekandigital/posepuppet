@@ -142,6 +142,9 @@ apps/tidewater-dolphin/vendor/tidewater/dist/
 apps/tidewater-dolphin/eval/captures/
 !apps/tidewater-dolphin/eval/evidence/
 !apps/tidewater-dolphin/eval/evidence/**
+# CP10 continuation: the curated review evidence (compact JPEGs ≤ 1600 px, parity JSON)
+!apps/tidewater-dolphin/eval/results/
+!apps/tidewater-dolphin/eval/results/**
 
 # Stage-3 planning references (post-CP05 addendum): the pinned ZyFou
 # ProceduralTerrains snapshot and the 13 Ecco waterline frames are intentional

@@ -1,0 +1,150 @@
+{
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+  "devicePixelRatio": 1,
+  "innerSize": [
+    1440,
+    760
+  ],
+  "adapter": {
+    "vendor": "apple",
+    "architecture": "metal-3",
+    "timestampQuery": true
+  },
+  "settings": {
+    "timeOfDay": 16.2,
+    "sunAzimuth": 0,
+    "timeSpeed": 0,
+    "exposure": 0.55,
+    "renderScale": 1
+  },
+  "renderScale": 1,
+  "exposure": 0.55,
+  "sea": {
+    "windSpeed": 7,
+    "windDirection": 25,
+    "fetch": 120,
+    "choppiness": 0.9,
+    "swell": 0.48,
+    "foamBias": 0.58,
+    "foamDecay": 0.35
+  },
+  "shore": {
+    "amplitude": 0.34,
+    "period": 9,
+    "gamma": 0.78,
+    "curl": 1
+  },
+  "clouds": {
+    "coverage": 0.49,
+    "cirrus": null
+  },
+  "haze": {
+    "density": 1.6,
+    "shafts": 1
+  },
+  "caustics": 0.75,
+  "post": {
+    "ao": 1,
+    "bloom": 0.05,
+    "sharpen": 0.45,
+    "saturation": 1.06,
+    "contrast": 1.04,
+    "vignette": 0.28,
+    "grain": 0.012,
+    "aaMode": "taa",
+    "motionBlur": 0.5
+  },
+  "camera": {
+    "fov": 55,
+    "near": 0.1,
+    "far": 60000
+  },
+  "dolphin": {
+    "phase": "swim",
+    "x": 4.073655442761756e-18,
+    "y": -2.5,
+    "z": 65.9667360789609,
+    "yaw": 3.141592653589793,
+    "pitch": 0,
+    "roll": 0,
+    "speed": 1.9944483024691357,
+    "kickCount": 0,
+    "breachCount": 0,
+    "inWater": true,
+    "shoreDist": 53.12457440361082,
+    "depthHere": 6.116082109820043,
+    "assist": "full",
+    "tracking": "none",
+    "fps": 0.8064516129032258,
+    "simHz": 1.6129032258064515,
+    "splashes": 0,
+    "modelLengthM": 2.863239450634748,
+    "animation": {
+      "base": "SwimForward",
+      "running": true
+    },
+    "renderY": -2.4891619901896647,
+    "waterlineM": 0.09666106297940516,
+    "controlled": true
+  },
+  "playerMode": "dolphin",
+  "additions": {
+    "ready": true,
+    "categories": {
+      "sunkenWood": {
+        "enabled": true,
+        "instances": 11,
+        "visibleTriangles": 7996,
+        "drawCalls": 3
+      },
+      "seabedShells": {
+        "enabled": true,
+        "instances": 30,
+        "visibleTriangles": 55972,
+        "drawCalls": 3
+      }
+    }
+  },
+  "flags": "?bench&noAudio&enhanced",
+  "target": "enhanced",
+  "tag": "E",
+  "capturedAt": "2026-10-16T13:46:21.278Z",
+  "benchSize": [
+    2560,
+    1267
+  ],
+  "frames": 64,
+  "views": [
+    "beach",
+    "surf",
+    "surfSide",
+    "swash",
+    "swashAbove",
+    "swashFilm",
+    "sunGlitter",
+    "deepBlue",
+    "aerial",
+    "shallowSeabed",
+    "underwater",
+    "waterline",
+    "sunset",
+    "sunsetWest",
+    "pier",
+    "village",
+    "pierShallows",
+    "palms",
+    "tCove",
+    "tMorning",
+    "sunFlare",
+    "bayOffshore",
+    "deepWater",
+    "reefCoral",
+    "causticsSun",
+    "sunShafts",
+    "waterlineBay",
+    "waterlineDrops",
+    "spawnArea",
+    "addWoodEast",
+    "addShellsBeach"
+  ]
+}

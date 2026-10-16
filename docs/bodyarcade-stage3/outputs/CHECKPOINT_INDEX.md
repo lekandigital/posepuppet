@@ -9,10 +9,16 @@ this file is the `CHECKPOINT_INDEX.md` the Implementation Master references.
 
 1. The user's current launch prompt.
 2. The current checkpoint prompt file (this directory).
+2a. `../decisions/POST_CP09_TIDEWATER_ADOPTION_AND_CP10_CONTINUATION.md` — the
+   **Tidewater adoption (2026-10-16); newest user decision**: CP10 is the
+   adoption of Tidewater as the host world (branch `bodyarcade-tidewater-cp10`,
+   `apps/tidewater-dolphin/`), with the dolphin as the default player beside
+   Tidewater's selectable walking / boat / optional fishing. Retires the CP05C /
+   CP05A / CP08 / CP09 systems from the ACTIVE experience (they stay recoverable
+   in `apps/shared-world/`). Report: `apps/tidewater-dolphin/eval/CP10_REPORT.md`.
 3. `../decisions/POST_CP05B_OCEAN_REPLACEMENT_AMENDMENTS.md` — the
-   **ocean-replacement addendum (2026-08-08); newest user decision**; wins over
-   everything below wherever they conflict; required reading before CP05C and
-   every later checkpoint.
+   ocean-replacement addendum (2026-08-08); wins over everything below wherever
+   they conflict for the `apps/shared-world/` line.
 4. `../decisions/POST_CP05_TERRAIN_WATERLINE_CHECKPOINT_AMENDMENTS.md` — the
    post-CP05 addendum; wins over the master and older checkpoint prompts
    except where the ocean-replacement addendum supersedes it (notably its §2.1
@@ -52,7 +58,7 @@ Pinned references installed with the addendum:
 | 07 | `CHECKPOINT_07_PLACEHOLDER_WORLD.md` | Future — re-run on this line (ocean addendum §6); side-branch implementation superseded | Demo review |
 | 08 | `CHECKPOINT_08_ECCO_ATMOSPHERE_AND_FINAL_WATER_OPTICS.md` | Future — re-scoped to atmosphere zones and final tuning (ocean addendum §7) | Demo review |
 | 09 | `CHECKPOINT_09_CAVES_AND_OVERHANGS.md` | Future — not authorized | Demo review |
-| 10 | `CHECKPOINT_10_VEGETATION_AND_LATER_ASSET_PASSES.md` | Future — not authorized | Demo review |
+| 10 | **Tidewater environment adoption + dolphin integration** — `../decisions/POST_CP09_TIDEWATER_ADOPTION_AND_CP10_CONTINUATION.md` (the vegetation-only `CHECKPOINT_10_VEGETATION_AND_LATER_ASSET_PASSES.md` is superseded) | **Implemented** on `bodyarcade-tidewater-cp10` (`apps/tidewater-dolphin/`); awaiting the user's visual review | Demo review |
 | 11 | Fish and ambient life motion (prompt authored at launch; master §9 + addendum §10.3 asset gate) | Future — not authorized | Demo review |
 | 12 | Ruins and architecture (prompt authored at launch; async license gate; addendum §10.3) | Future — not authorized | Demo review |
 | 13 | Minimal audio pass (prompt authored at launch; master §8.4) | Future — not authorized | Demo review |

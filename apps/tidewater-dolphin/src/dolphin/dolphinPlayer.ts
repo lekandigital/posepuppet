@@ -14,9 +14,15 @@
 // one water-query slot, and splash spray / audio events.
 //
 // Presentation-only adapters (never read back into the sim; digests unchanged):
-//  - waterline: the rig's surface-relative anti-shimmer band samples the
+//  - waterline: the rig's surface-relative crossing detector samples the
 //    Tidewater wave height at the dolphin column through the GPU WaterQuery
-//    (1–3 frames latency, low-passed) — the cp05C `waterlineAt` seam;
+//    (1–3 frames latency, low-passed) — the cp05C `waterlineAt` seam. The
+//    RENDERER's waterline (Underwater.js) uses Tidewater's own camera query
+//    (slot 0, the camera's position), never this value;
+//  - play modes (CP10 continuation): when Tidewater's walker or boat is the
+//    active player, the dolphin keeps simulating with a neutral autopilot
+//    intent (it slows to a hover where it was left) and neither reads the
+//    keyboard nor drives the camera; `resume()` hands both back.
 //  - swell ride (default on, ?noSwellRide to compare): near the surface the
 //    rendered dolphin (and the camera target) is lifted by the measured wave
 //    height so it sits in Tidewater's actual swell instead of the sim's flat
@@ -85,6 +91,8 @@ export interface EvalState {
   animation: { base: string; running: boolean };
   renderY: number;
   waterlineM: number;
+  /** the dolphin is the active player (false in the walker / boat play modes) */
+  controlled: boolean;
 }
 
 export class DolphinPlayer {
@@ -110,6 +118,8 @@ export class DolphinPlayer {
   private rigUs = 0;
   private rigN = 0;
   private splashes = 0;
+  /** the dolphin is the active player (keyboard / body input + chase camera) */
+  private controlled = true;
   private prevPhase: 'swim' | 'air' = 'swim';
   private prevPitch = 0;
   private wl = 0;
@@ -117,6 +127,9 @@ export class DolphinPlayer {
   private wasUnder = false;
   private firstFrame: { actionRunning: boolean; base: string } | null = null;
   private testIntent: Partial<SwimIntent> | null = null;
+  /** one-shot scripted kicks (test.kick): consumed by exactly one update, whatever the frame rate */
+  private testKicks = 0;
+  private testKickAmp = 0.8;
   private shot: ShotMode | null = null;
   private renderState: { x: number; y: number; z: number; yaw: number; pitch: number; roll: number; phase: 'swim' | 'air'; wvx: number; wvy: number; wvz: number; vx: number; vy: number; vz: number } | null = null;
   private readonly tmpV = new Vector3();
@@ -146,8 +159,12 @@ export class DolphinPlayer {
     this.prevPitch = this.sim.state.pitch;
     this.statAt = performance.now();
 
-    // assist keys (dolphin parity) + R recenter (cp02) — as regionGame.ts
+    // assist keys (dolphin parity) + R recenter (cp02) — as regionGame.ts; only while the dolphin
+    // is the active player (R is Tidewater's fishing-rod key in the other modes)
     addEventListener('keydown', (e) => {
+      if (!this.controlled) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
       if (e.key === '1') this.sim.assist = 'full';
       if (e.key === '2') this.sim.assist = 'standard';
       if (e.key === '3') this.sim.assist = 'expert';
@@ -193,6 +210,32 @@ export class DolphinPlayer {
     this.applyPresentation(0);
     this.actor.model.update(0);
     this.firstFrame = null;
+  }
+
+  /**
+   * Play modes: the dolphin stops reading input and driving the camera while Tidewater's walker /
+   * boat is the player; it keeps simulating (neutral autopilot → a hover where it was left).
+   */
+  setControlled(on: boolean): void {
+    if (on === this.controlled) return;
+    this.controlled = on;
+    this.controls.setEnabled(on);
+  }
+
+  get isControlled(): boolean {
+    return this.controlled;
+  }
+
+  /** the dolphin becomes the player again: valid water (else the spawn), camera snapped behind it */
+  resume(): void {
+    const s = this.sim.state;
+    if (!Number.isFinite(s.x + s.y + s.z) || !this.sim.inWater(s.x, s.z)) this.placeAtSpawn();
+    this.acc = 0;
+    this.setControlled(true);
+    this.rig.snap();
+    this.applyPresentation(0);
+    this.rig.update(this.renderState as never, 1 / 120); // the snapped pose, this frame
+    this.wasUnder = this.host.camera.position.y < this.host.cameraWaterHeight() - 0.05; // no spurious splash cue
   }
 
   /** the dolphin's water-query point (before query.update()) */
@@ -253,13 +296,22 @@ export class DolphinPlayer {
 
   /**
    * One host frame. paused (free camera / shot mode): no sim steps and the
-   * camera is left to its owner; the animation keeps cycling.
+   * camera is left to its owner; the animation keeps cycling. Not controlled
+   * (walker / boat play modes): the sim runs on a neutral autopilot intent and
+   * the camera belongs to Tidewater's player.
    */
   update(dtS: number, { paused = false } = {}): void {
     const now = performance.now();
     const dtMs = Math.min(100, dtS * 1000);
-    const live = this.controls.intent(dtMs);
-    const intent: SwimIntent = this.testIntent ? { ...live, ...this.testIntent } : live;
+    const live = this.controls.intent(dtMs); // polled every frame: keeps the body-input transport state fresh
+    const control = this.controlled;
+    let intent: SwimIntent = !control
+      ? { ...NEUTRAL_INTENT, autopilot: true }
+      : this.testIntent ? { ...live, ...this.testIntent } : live;
+    if (control && this.testKicks > 0) {
+      intent = { ...intent, kicks: intent.kicks + this.testKicks, kickAmp: this.testKickAmp };
+      this.testKicks = 0;
+    }
 
     this.readWaterline(dtS);
 
@@ -301,19 +353,22 @@ export class DolphinPlayer {
       cam.fov = this.shot.fov;
       cam.updateProjectionMatrix();
       cam.lookAt(this.tmpV.set(this.shot.look[0], this.shot.look[1], this.shot.look[2]));
-    } else if (!paused) {
+    } else if (!paused && control) {
       const t0 = performance.now();
       this.rig.update(rs as never, dtS);
       this.rigUs += (performance.now() - t0) * 1000;
       this.rigN++;
     }
 
-    // camera submerge / emerge (Tidewater's own transition sounds, as its swimmer played them)
-    const under = this.host.camera.position.y < this.host.cameraWaterHeight() - 0.05;
-    if (under !== this.wasUnder && this.host.audio && this.frames > 2) {
-      if (under) this.host.audio.submerge(); else this.host.audio.emerge();
+    // camera submerge / emerge (Tidewater's own transition sounds, as its swimmer played them) —
+    // only while this camera is the player's (the walker plays its own)
+    if (control) {
+      const under = this.host.camera.position.y < this.host.cameraWaterHeight() - 0.05;
+      if (under !== this.wasUnder && this.host.audio && this.frames > 2) {
+        if (under) this.host.audio.submerge(); else this.host.audio.emerge();
+      }
+      this.wasUnder = under;
     }
-    this.wasUnder = under;
 
     this.frames++;
     if (now - this.statAt > 1000) {
@@ -385,6 +440,7 @@ export class DolphinPlayer {
       animation: { base: this.actor.activeActionName(), running: this.actor.actionRunning() },
       renderY: this.renderState ? this.renderState.y : s.y,
       waterlineM: this.wl,
+      controlled: this.controlled,
     };
   }
 
@@ -428,6 +484,8 @@ export class DolphinPlayer {
           }
         },
         setIntent(p: Partial<SwimIntent> | null) { self.testIntent = p; },
+        /** exactly n kicks on the next update (frame-rate independent scripting) */
+        kick(amp = 0.8, n = 1) { self.testKicks += n; self.testKickAmp = amp; },
         setAssist(a: AssistMode) { self.sim.assist = a; },
         teleport(x: number, z: number, y = -2.5) { self.sim.state.x = x; self.sim.state.z = z; self.sim.state.y = y; },
         setYaw(yaw: number) {
