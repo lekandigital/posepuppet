@@ -1,0 +1,61 @@
+<!doctype html>
+<!--
+BodyArcade Tidewater Dolphin (Checkpoint 10) — app shell. Derived from Tidewater's index.html
+(vendor/tidewater/index.html): same mount points, loader, fonts and stylesheet (served from the
+unmodified vendored tree); the title, loader copy and tips describe the dolphin instead of the
+fishing game. The key art is Tidewater's own.
+-->
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Tidewater · BodyArcade Dolphin</title>
+	<link rel="preload" as="image" href="ui/keyart-720.jpg" imagesrcset="ui/keyart-720.jpg 1280w, ui/keyart.jpg 2560w" imagesizes="100vw" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat+Brush&family=Kalam:wght@400;700&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="/vendor/tidewater/src/ui/ui.css" />
+	<style>
+		html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+		#app, #app canvas { display: block; }
+		#fps { position: fixed; top: 10px; left: 12px; z-index: 50; font: 500 12px/1.2 'JetBrains Mono', ui-monospace, monospace;
+			color: #e8f6ff; background: rgba(8, 14, 22, 0.55); padding: 5px 9px; border-radius: 6px; pointer-events: none;
+			backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); letter-spacing: 0.02em; }
+	</style>
+</head>
+<body>
+	<div id="app"></div>
+	<div id="fps">-- fps</div>
+	<div id="loader" role="status" aria-live="polite" aria-label="Loading Tidewater">
+		<img class="loader-art" src="ui/keyart-720.jpg" srcset="ui/keyart-720.jpg 1280w, ui/keyart.jpg 2560w" sizes="100vw" alt="" decoding="async" fetchpriority="high" onload="this.classList.add('is-in')" />
+		<div class="loader-scrim"></div>
+		<div class="loader-inner">
+			<div class="loader-brand">
+				<p class="loader-kicker">BodyArcade · a dolphin in the Tidewater island</p>
+				<h1 class="loader-title">TIDEWATER</h1>
+				<p class="loader-tagline">Swim the bay, work the reef, breach into the sunlight — the island, sea and sky are Tidewater's own.</p>
+			</div>
+			<div class="loader-panel">
+				<div class="loader-row">
+					<span class="loader-status">Starting…</span>
+					<span class="loader-meta"><span class="loader-pct">0%</span><span class="loader-time">0:00</span></span>
+				</div>
+				<div class="loader-bar"><div class="loader-fill"></div><div class="loader-glint"></div></div>
+				<div class="loader-note">The first launch compiles the shaders and can take a minute or two. Later visits load much faster.</div>
+				<div class="loader-tips">
+					<span class="loader-tip-label">Tip</span>
+					<div class="loader-tip-list">
+						<p class="loader-tip">Tap <kbd>Shift</kbd> to kick; hold it for a steady rhythm. Each kick is a surge, and the glide between kicks is long.</p>
+						<p class="loader-tip"><kbd>W</kbd> noses down, <kbd>S</kbd> noses up. <kbd>A</kbd> and <kbd>D</kbd> bank into a turn — tight when slow, wide when fast.</p>
+						<p class="loader-tip">Speed plus a nose-up near the surface breaches. <kbd>Space</kbd> bursts to nine metres a second.</p>
+						<p class="loader-tip"><kbd>R</kbd> eases the camera back behind you. <kbd>X</kbd> brakes to a hover.</p>
+						<p class="loader-tip">With PosePuppet open on the same origin, your body swims the dolphin: kick rhythm, lean, crouch, hands forward to burst.</p>
+						<p class="loader-tip">The settings panel (<kbd>H</kbd>) exposes Tidewater's sea state, time of day, clouds, haze and post-processing.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+--- vendor/tidewater/src/ui/AppUI.js	2026-09-25 00:01:49
++++ /tmp/DolphinAppUI.normalized.js	2026-10-16 03:45:08
+@@ -1,9 +1,16 @@
+-import * as THREE from '../engine/index.js';
+-import { UI } from './UI.js';
+-import { G } from '../core/Globals.js';
+-import { GroundBounce } from '../materials/GroundBounce.js';
++// DolphinAppUI — binds Tidewater's settings panel + HUD (vendor/tidewater/src/ui/UI.js,
++// unmodified) to the dolphin app. Derived from Tidewater's src/ui/AppUI.js: every ocean /
++// shore / sky / effects / performance control is identical (same objects, same ranges, same
++// defaults — the panel edits the SAME Tidewater uniforms the pristine app exposes). Differences
++// (CP10): the Camera tab has no boat-camera select (there is no boat mode); the per-frame HUD
++// shows the dolphin's state (swimming / surface / diving / airborne, tracking source) instead
++// of the walker's; the boat gauges stay hidden.
+ 
+-// Binds the Tidewater UI (panel + HUD) to the running app.
++import * as THREE from './engine/index.js';
++import { UI } from './ui/UI.js';
++import { G } from './core/Globals.js';
++import { GroundBounce } from './materials/GroundBounce.js';
++
+ const SEA = {
+ 	Calm: { wind: 3.5, fetch: 40, chop: 0.75, swell: 0.28, surf: 0.18, period: 11, whitecaps: 0.2 },
+ 	Breezy: { wind: 7, fetch: 120, chop: 0.9, swell: 0.48, surf: 0.34, period: 9, whitecaps: 0.5 },
+@@ -11,7 +18,7 @@
+ 	Storm: { wind: 20, fetch: 900, chop: 1.2, swell: 1.0, surf: 0.9, period: 12, whitecaps: 1 },
+ };
+ 
+-export class AppUI {
++export class DolphinAppUI {
+ 
+ 	constructor( app, ui = new UI() ) {
+ 
+@@ -20,7 +27,6 @@
+ 		const fft = app.fft;
+ 		const shore = app.shore;
+ 
+-		// ---- plain values the controls bind to; onChange pushes them into the simulation
+ 		const s = this.s = {
+ 			wind: fft.local.windSpeed,
+ 			windDir: fft.local.windDirection,
+@@ -41,7 +47,6 @@
+ 			cirrus: app.clouds && app.clouds.cirrus ? app.clouds.cirrus.value : 0.5,
+ 			exposure: 0,
+ 			fov: app.camera.fov,
+-			camMode: 'third',
+ 			ao: app.post.params.aoStrength.value,
+ 			bloom: app.post.params.bloom.value,
+ 			flare: app.post.flare ? app.post.flare.strength.value : 1,
+@@ -68,9 +73,6 @@
+ 
+ 		const whitecaps = () => {
+ 
+-			// more whitecaps: foam starts at less compression (and more of it in fresh wind), lasts longer.
+-			// Only crests near breaking (strong compression) foam: a laxer threshold paints every crest line
+-			// with a white streak, which real open water at these wind speeds doesn't have.
+ 			fft.foamBias.value = 0.5 + 0.16 * s.whitecaps + 0.01 * THREE.MathUtils.clamp( s.wind - 7, - 5, 12 );
+ 			fft.foamDecay.value = 0.6 - 0.35 * s.whitecaps;
+ 
+@@ -78,7 +80,6 @@
+ 
+ 		const clarity = () => {
+ 
+-			// scale absorption/scattering around the tropical defaults
+ 			const k = 1 / Math.max( 0.2, s.clarity );
+ 			G.waterAbsorption.value.set( 0.42, 0.075, 0.035 ).multiplyScalar( 0.6 + 0.4 * k );
+ 			G.waterScattering.value.set( 0.012, 0.018, 0.024 ).multiplyScalar( k * k );
+@@ -185,9 +186,10 @@
+ 		atmo.addSlider( { label: 'Exposure', object: s, key: 'exposure', min: - 3, max: 3, step: 0.1, unit: 'EV', onChange: ( v ) => { app.settings.exposure = 0.55 * Math.pow( 2, v ); } } );
+ 
+ 		// ---------------------------------------------------------------- Camera
++		// CP10: no boat-camera select. The field-of-view slider edits the live lens (the chase
++		// rig's 55° while following, Tidewater's 62° in the free camera).
+ 		const cam = ui.addTab( 'camera', 'Camera', 'camera' );
+ 		const view = cam.addFolder( 'View', { icon: 'camera' } );
+-		view.addSelect( { label: 'Boat camera', object: s, key: 'camMode', options: [ { label: '1st person', value: 'first' }, { label: '3rd person', value: 'third' } ], onChange: ( v ) => { app.player.camMode = v; } } );
+ 		view.addSlider( { label: 'Field of view', object: s, key: 'fov', min: 35, max: 100, step: 1, unit: '°', onChange: ( v ) => {
+ 
+ 			app.camera.fov = v;
+@@ -195,6 +197,7 @@
+ 
+ 		} } );
+ 		view.addButton( { label: 'Free camera (F)', icon: 'camera', onClick: () => app.setFreeCam( ! app.freeCam ) } );
++		view.addButton( { label: 'Recenter chase camera (R)', icon: 'camera', onClick: () => app.dolphin && app.dolphin.rig.recenter() } );
+ 
+ 		// ---------------------------------------------------------------- Effects
+ 		const fx = ui.addTab( 'effects', 'Effects', 'effects' );
+@@ -226,9 +229,9 @@
+ 		live.addInfo( { label: 'Frame rate', get: () => `${ ( app.fps || 0 ).toFixed( 0 ) } fps` } );
+ 		live.addInfo( { label: 'CPU per frame', get: () => `${ ( app.cpuMs || 0 ).toFixed( 2 ) } ms` } );
+ 		live.addInfo( { label: 'Render size', get: () => `${ app.sceneRenderer.width } × ${ app.sceneRenderer.height }` } );
++		live.addInfo( { label: 'Sim rate', get: () => app.dolphin ? `${ app.dolphin.state().simHz.toFixed( 0 ) } Hz` : '—' } );
+ 		const quality = perf.addFolder( 'Quality', { icon: 'layers' } );
+ 		quality.addSlider( { label: 'Render scale', object: s, key: 'renderScale', min: 0.5, max: 1, step: 0.05, format: ( v ) => `${ Math.round( v * 100 ) }%`, tooltip: 'Internal resolution; the temporal upscaler reconstructs the full output resolution.', onChange: ( v ) => app.setRenderScale( v ) } );
+-		// anti-aliasing: the TAA with 2..16 jitter positions averaged per pixel, or none
+ 		s.aa = app.post.aaMode === 'none' ? 0 : app.post.taau.jitterPhaseOverride;
+ 		quality.addSelect( { label: 'Anti-aliasing', object: s, key: 'aa', tooltip: 'Temporal anti-aliasing: each pixel averages this many sub-pixel sample positions over successive frames (it also smooths dithered fades and shadow noise). More samples cost nothing per frame but take a few more frames to settle.', options: [ { label: 'Off', value: 0 }, { label: '2x', value: 2 }, { label: '4x', value: 4 }, { label: '8x', value: 8 }, { label: '16x', value: 16 } ], onChange: ( v ) => {
+ 
+@@ -252,41 +255,33 @@
+ 		const ui = this.ui;
+ 		ui.setStats( { fps: app.fps, frameMs: dt * 1000 } );
+ 		this.s.renderScale = app.post.scale;
++		this.s.fov = app.camera.fov;
++		ui.setBoatGauges( { visible: false } );
+ 
+-		const p = app.player;
+ 		if ( app.freeCam ) {
+ 
+ 			ui.setMode( 'Free camera' );
+-			ui.setPrompt( 'F', 'Walk' );
+-			ui.setBoatGauges( { visible: false } );
++			ui.setPrompt( 'F', 'Back to the dolphin' );
+ 			ui.setDepth( { visible: false } );
+ 			return;
+ 
+ 		}
+ 
+-		const mode = p.mode === 'boat' ? `Boat · ${ p.camMode === 'first' ? '1st' : '3rd' } person`
+-			: p.mode === 'deck' ? 'On deck'
+-			: p.mode === 'swim' ? ( app.camera.position.y < ( app.cameraWaterHeight ?? 0 ) - 0.3 ? 'Diving' : 'Swimming' ) : 'Walking';
++		const d = app.dolphin;
++		if ( ! d ) return;
++		const st = d.state();
++		const under = app.camera.position.y < ( app.cameraWaterHeight ?? 0 ) - 0.3;
++		const mode = st.phase === 'air' ? 'Dolphin · airborne'
++			: st.y > - 0.8 ? 'Dolphin · at the surface'
++			: under ? 'Dolphin · diving' : 'Dolphin · swimming';
+ 		ui.setMode( mode );
+-		if ( p.prompt ) ui.setPrompt( p.prompt.key, p.prompt.text );
++		const tr = st.tracking;
++		if ( tr === 'autopilot' || tr === 'stale' || tr === 'low-confidence' ) ui.setPrompt( '…', 'Body tracking lost · gliding until it returns (keyboard always works)' );
++		else if ( tr === 'live' ) ui.setPrompt( '●', 'Body input live' );
+ 		else ui.setPrompt( null );
+ 
+-		const b = app.boatCtl;
+-		if ( p.mode === 'boat' ) {
+-
+-			const f = b.forward( new THREE.Vector3() );
+-			ui.setBoatGauges( {
+-				visible: true,
+-				throttle: b.throttle,
+-				rpm: b.rpm,
+-				speedKnots: b.speed * 1.94384,
+-				heading: ( THREE.MathUtils.radToDeg( Math.atan2( f.x, - f.z ) ) + 360 ) % 360,
+-			} );
+-
+-		} else ui.setBoatGauges( { visible: false } );
+-
+ 		const depth = ( app.cameraWaterHeight ?? 0 ) - app.camera.position.y;
+-		ui.setDepth( { visible: p.mode === 'swim' && depth > 0.3, meters: depth } );
++		ui.setDepth( { visible: depth > 0.3, meters: depth } );
+ 
+ 	}
+ 

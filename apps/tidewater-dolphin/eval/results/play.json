@@ -1,0 +1,358 @@
+{
+  "url": "http://127.0.0.1:5199/?noAudio",
+  "at": "2026-10-16T08:12:50.452Z",
+  "passed": 41,
+  "total": 42,
+  "results": [
+    {
+      "name": "first rendered frame had SwimForward running (no rest pose)",
+      "ok": true,
+      "detail": {
+        "actionRunning": true,
+        "base": "SwimForward"
+      }
+    },
+    {
+      "name": "all 8 clips present",
+      "ok": true,
+      "detail": [
+        "BreatheSurface",
+        "Jump",
+        "SwimDown",
+        "SwimForward",
+        "SwimForwardFast",
+        "SwimLeft",
+        "SwimRight",
+        "SwimUp"
+      ]
+    },
+    {
+      "name": "17 joints bound",
+      "ok": true,
+      "detail": 17
+    },
+    {
+      "name": "measured SwimForward-frame-0 length within 2.89 m ± 2 %",
+      "ok": true,
+      "detail": "2.8632"
+    },
+    {
+      "name": "posed world bounds are finite and ~0.85 m wide",
+      "ok": true,
+      "detail": {
+        "min": [
+          -0.4166194674909167,
+          -2.878977138112915,
+          63.01516956413771
+        ],
+        "max": [
+          0.41661133634736913,
+          -1.9249953112108322,
+          65.91084485841996
+        ]
+      }
+    },
+    {
+      "name": "four additive layers (SwimLeft/Right/Up/Down) advancing",
+      "ok": true,
+      "detail": [
+        "SwimLeft",
+        "SwimRight",
+        "SwimUp",
+        "SwimDown"
+      ]
+    },
+    {
+      "name": "kicks propel (10 kick windows over 6 s → speed > 2.5 m/s, kickCount ≥ +10)",
+      "ok": true,
+      "detail": {
+        "speed": 5,
+        "kicks": 513,
+        "anim": "SwimForward"
+      }
+    },
+    {
+      "name": "travelled north toward the island (z decreased)",
+      "ok": true,
+      "detail": {
+        "dz": -37.8
+      }
+    },
+    {
+      "name": "sim runs at 120 Hz",
+      "ok": true,
+      "detail": 120
+    },
+    {
+      "name": "camera NormalFollow while cruising",
+      "ok": true,
+      "detail": "NormalFollow"
+    },
+    {
+      "name": "burst reaches > 8 m/s and SwimForwardFast",
+      "ok": true,
+      "detail": {
+        "speed": 9,
+        "anim": "SwimForwardFast"
+      }
+    },
+    {
+      "name": "camera FastTravel above 5 m/s",
+      "ok": true,
+      "detail": "FastTravel"
+    },
+    {
+      "name": "follow distance grows with speed (> 6 m)",
+      "ok": true,
+      "detail": 7.44
+    },
+    {
+      "name": "brake: cruise → < 0.5 m/s within 1.5 s",
+      "ok": true,
+      "detail": 0
+    },
+    {
+      "name": "camera SlowHover when stopped",
+      "ok": false,
+      "detail": "SurfaceTransition"
+    },
+    {
+      "name": "banking right turns right (yaw +) with roll ≈ ROLL_MAX",
+      "ok": true,
+      "detail": {
+        "dyaw": 5.22,
+        "roll": 0.9
+      }
+    },
+    {
+      "name": "SwimRight additive layer weighted while banking right",
+      "ok": true,
+      "detail": [
+        "SwimLeft:0.00",
+        "SwimRight:1.00",
+        "SwimUp:0.00",
+        "SwimDown:0.00"
+      ]
+    },
+    {
+      "name": "camera roll couples to bank (0.10 ×, opposite sign)",
+      "ok": true,
+      "detail": -0.09
+    },
+    {
+      "name": "pitch + dives (y below −5 m in 2.5 s from −2.5 m)",
+      "ok": true,
+      "detail": {
+        "y": -6.99,
+        "depthHere": 9.3
+      }
+    },
+    {
+      "name": "seabed clearance kept (y − floor ≥ 1.0 m)",
+      "ok": true,
+      "detail": 2.33
+    },
+    {
+      "name": "gentle nose-up with kicks surfaces to the soft ceiling (y ≈ −0.4, no breach)",
+      "ok": true,
+      "detail": {
+        "y": -0.4,
+        "breaches": 0
+      }
+    },
+    {
+      "name": "swell ride: rendered y differs from sim y by the measured wave height near the surface",
+      "ok": true,
+      "detail": {
+        "renderY": -0.71,
+        "y": -0.4,
+        "wl": -0.31
+      }
+    },
+    {
+      "name": "BreatheSurface after > 2 s slow near the surface",
+      "ok": true,
+      "detail": {
+        "anim": "BreatheSurface",
+        "y": -0.4,
+        "speed": 0
+      }
+    },
+    {
+      "name": "breach: phase air observed, apex above the surface, back to swim",
+      "ok": true,
+      "detail": {
+        "airFrames": 21,
+        "apexY": 3.12,
+        "breaches": 1,
+        "splashes": 1
+      }
+    },
+    {
+      "name": "Jump clip during the breach, SwimForward after re-entry",
+      "ok": true,
+      "detail": [
+        "SwimForward",
+        "SwimForwardFast",
+        "Jump"
+      ]
+    },
+    {
+      "name": "camera Airborne / SurfaceTransition / ReEntryRecovery states seen",
+      "ok": true,
+      "detail": [
+        "FastTravel",
+        "Airborne",
+        "SurfaceTransition",
+        "ReEntryRecovery"
+      ]
+    },
+    {
+      "name": "camera lifted above the waterline while airborne",
+      "ok": true,
+      "detail": 4.18
+    },
+    {
+      "name": "camera path continuous through the breach (< 2.8 m per 50 ms sample)",
+      "ok": true,
+      "detail": 2.12
+    },
+    {
+      "name": "R recenter eases the camera behind facing",
+      "ok": true,
+      "detail": {
+        "before": 0.19,
+        "after": 0
+      }
+    },
+    {
+      "name": "beach approach: always in water, never shallower than ~1.6 m, turned back by the containment current",
+      "ok": true,
+      "detail": {
+        "minZ": -8.9,
+        "shallowestDepth": 1.85,
+        "minShoreDist": 1.1
+      }
+    },
+    {
+      "name": "beach approach: no seabed penetration (y − floor ≥ 0.9 m throughout)",
+      "ok": true,
+      "detail": 1.25
+    },
+    {
+      "name": "beach approach: camera never clips the seabed (clearance ≥ 0.5 m)",
+      "ok": true,
+      "detail": 1.6
+    },
+    {
+      "name": "reef crossing: no structure penetration (y − ground ≥ 0.8 m), always in water",
+      "ok": true,
+      "detail": {
+        "minClear": 3.43,
+        "xEnd": -38.5,
+        "contact": {
+          "inContact": false,
+          "wedgeT": 0,
+          "dispSpeed": 0.7088763070922255
+        }
+      }
+    },
+    {
+      "name": "reef crossing: camera clearance ≥ 0.5 m, no EmergencyRecenter",
+      "ok": true,
+      "detail": {
+        "minCamClear": 4.37,
+        "states": [
+          "NormalFollow"
+        ]
+      }
+    },
+    {
+      "name": "pier: the dolphin's centre never enters a pile (obstacle correction active)",
+      "ok": true,
+      "detail": {
+        "corrections": 7,
+        "lastCorrectionM": 0,
+        "usAvg": 26
+      }
+    },
+    {
+      "name": "no input → tracking \"none\", autopilot glide (pitch/roll level, speed decaying, still in water)",
+      "ok": true,
+      "detail": {
+        "tracking": "none",
+        "speed": 1.41
+      }
+    },
+    {
+      "name": "body-input transport listening (BroadcastChannel + postMessage), nothing received",
+      "ok": true,
+      "detail": {
+        "lastTs": -1,
+        "ageMs": null,
+        "gotBroadcast": false,
+        "gotMessage": false,
+        "axes": null
+      }
+    },
+    {
+      "name": "fixed-step replay digest identical across two runs",
+      "ok": true,
+      "detail": "0.000000,-2.500000,56.212920,3.141593,5.000000,240,0|0.00000…"
+    },
+    {
+      "name": "replay digest with obstacle correction = bare sim away from obstacles (spawn run)",
+      "ok": true,
+      "detail": "identical"
+    },
+    {
+      "name": "live fps measured (visible 1440×760 review window)",
+      "ok": true,
+      "detail": {
+        "median": 43.1,
+        "min": 25.8,
+        "cpuMs": 7.97,
+        "renderSize": [
+          1440,
+          760,
+          1440,
+          760,
+          1
+        ]
+      }
+    },
+    {
+      "name": "camera rig update cost < 400 µs",
+      "ok": true,
+      "detail": 106
+    },
+    {
+      "name": "no console errors during the trials",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "fps": {
+    "samples": [
+      35.94249201278038,
+      43.92971246006235,
+      56.36363636363634,
+      45.39175054272901,
+      43.12879827484757,
+      43.18806438947829,
+      25.76370997423657,
+      41.95804195804195,
+      41.23306499116293,
+      39.74562798092118
+    ],
+    "median": 43.12879827484757,
+    "cpuMs": 7.967641921407492,
+    "size": [
+      1440,
+      760,
+      1440,
+      760,
+      1
+    ]
+  }
+}

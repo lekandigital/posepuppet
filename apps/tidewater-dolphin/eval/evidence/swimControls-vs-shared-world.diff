@@ -1,0 +1,11 @@
+--- ../shared-world/src/input/swimControls.ts	2026-07-18 02:24:42
++++ src/input/swimControls.ts	2026-10-16 02:30:48
+@@ -18,7 +18,7 @@
+ import {
+   assertSignalShape, createBroadcastSource, type BodySignal,
+ } from '@bodyarcade/body-input';
+-import { NEUTRAL_INTENT, type SwimIntent } from '../game/sim';
++import { NEUTRAL_INTENT, type SwimIntent } from '../dolphin/sim';
+ 
+ const ENVELOPE = 'bodyarcade.body-input.v1';
+ const SIGNAL_STALE_MS = 350;

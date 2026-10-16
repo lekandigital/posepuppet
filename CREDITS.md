@@ -1,7 +1,50 @@
 # BodyArcade Shared-World — Asset Credits
 
-_Last updated: 2026-08-16 (Checkpoint 09 caves pass). This file is mirrored
-by the in-app credits panel (`/shared-world/?view=credits`)._
+_Last updated: 2026-10-16 (Checkpoint 10 — Tidewater environment adoption).
+This file is mirrored by the in-app credits panels
+(`/shared-world/?view=credits` for the Three.js region app; the F1 controls
+sheet and `?credits` of `apps/tidewater-dolphin/`)._
+
+## Checkpoint 10 — Tidewater host environment (`apps/tidewater-dolphin/`)
+
+- **Tidewater** — island, ocean, sky, rendering engine, village, pier, reef,
+  vegetation, wildlife, whale, boat and soundscape — by Daniel Greenheck /
+  DRG Software Solutions LLC — **MIT** ("Copyright (c) 2026 DRG Software
+  Solutions LLC"; license text preserved verbatim at
+  `apps/tidewater-dolphin/vendor/tidewater/LICENSE`).
+  Source: https://github.com/dgreenheck/tidewater — live build
+  https://dgreenheck.github.io/tidewater/ — pinned at commit
+  `4811ba48d795197de5621985f404e765c0b7c0ef` (2026-09-24), vendored
+  unmodified at `apps/tidewater-dolphin/vendor/tidewater/` with a per-file
+  SHA-256 manifest (`BODYARCADE_SOURCE_RECORD.md`). The integrated app imports
+  the vendored modules in place; its own orchestration copies (App.js →
+  `src/DolphinApp.js`, main.js → `src/main.ts`, AppUI.js →
+  `src/DolphinAppUI.js`) and the `SkinnedModel` additive-layer extension are
+  recorded in the CP10 report.
+  Third-party assets inside Tidewater keep their own licences, audited
+  2026-10-16 against the vendored credit files:
+  - 42 Freesound field recordings (`vendor/tidewater/public/audio/`) — **CC0 1.0**
+    (per-file author / source table in `public/audio/CREDITS.md`).
+  - Poly Haven photogrammetry debris (dead quiver trunk / branches, lambis
+    shell) and the vendor-stall props and textures — **CC0 1.0**
+    (`public/models/debris/CREDITS.md`, `public/models/props/CREDITS.md`).
+  - Vendor characters `joe.glb` / `marta.glb` — Microsoft Rocketbox Avatar
+    Library — **MIT** (`public/models/characters/LICENSE-Rocketbox.md`).
+  - Humpback whale — original procedural model by DRG Software (MIT with the code).
+  - Stall lettering fonts Permanent Marker (Apache-2.0), Cabin Sketch and
+    Oswald (SIL OFL 1.1) — licence texts in `vendor/tidewater/tools/props/fonts/`.
+  - SMAA area / search lookup textures — from three.js (MIT).
+  - Cloud noise volumes (`public/clouds/*.bin`) — DRG Software's Sky Pro WebGPU,
+    published under the repository MIT licence by its copyright holder.
+  - Inter / JetBrains Mono / Caveat Brush / Kalam web fonts — loaded from Google
+    Fonts at runtime (OFL), not redistributed.
+- **Dolphin** — the same GAMICO asset as below, byte-identical copy at
+  `apps/tidewater-dolphin/public/models/dolphin/dolphin.glb` with
+  `LICENSE-dolphin.txt` alongside (SHA-256
+  `e2cca876f8935269df8b9b658962f5db349bb9e11e6ed695a8c691bb94ef6cb4`). Runtime
+  modification unchanged: the `Jump` clip's baked `Dolphin_Root` translation
+  channel is stripped at load. No other asset was added in CP10 (optional
+  downloaded assets are deferred past the visual-approval gate).
 
 ## 3D Models
 

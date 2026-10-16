@@ -1,0 +1,51 @@
+{
+  "at": "2026-10-16T08:03:51.871Z",
+  "window": "1440×760 css px, dpr 1, built-in display, visible",
+  "runs": [
+    {
+      "name": "pristine (walker at the start, free camera at the beach view)",
+      "url": "http://127.0.0.1:5189/?noAudio",
+      "renderSize": [
+        1440,
+        760,
+        1440,
+        760
+      ],
+      "fpsMedian": 80,
+      "fpsMin": 64.9,
+      "fpsMax": 90,
+      "cpuMsMedian": 1.47,
+      "simHz": null
+    },
+    {
+      "name": "integrated, dolphin chase camera at spawn (gliding)",
+      "url": "http://127.0.0.1:5199/?noAudio",
+      "renderSize": [
+        1440,
+        760,
+        1440,
+        760
+      ],
+      "fpsMedian": 74.8,
+      "fpsMin": 68,
+      "fpsMax": 76.7,
+      "cpuMsMedian": 1.68,
+      "simHz": 120.35010940847688
+    },
+    {
+      "name": "integrated, free camera at the beach view (dolphin waiting)",
+      "url": "http://127.0.0.1:5199/?noAudio",
+      "renderSize": [
+        1440,
+        760,
+        1440,
+        760
+      ],
+      "fpsMedian": 84.6,
+      "fpsMin": 79.9,
+      "fpsMax": 89.9,
+      "cpuMsMedian": 1.22,
+      "simHz": 0
+    }
+  ]
+}

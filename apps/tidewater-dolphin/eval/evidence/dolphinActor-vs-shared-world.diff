@@ -1,0 +1,286 @@
+--- ../shared-world/src/game/dolphinActor.ts	2026-07-18 04:59:14
++++ src/dolphin/dolphinActor.ts	2026-10-16 02:56:05
+@@ -1,15 +1,27 @@
+-// The GAMICO dolphin: GLTF load, the Master §7.6 animation controller
++// The GAMICO dolphin: GLB load, the Master §7.6 animation controller
+ // over the 8 measured clips, and the runtime body-length measurement
+ // (BL policy, Master §7.1 — measure, never rescale).
+ //
+ // Track C operational law: the rest pose renders nose-down — an
+-// AnimationAction MUST be running before the first rendered frame, so
++// animation MUST be running before the first rendered frame, so
+ // loadDolphin() returns only after SwimForward is playing and applied.
+ // The Jump clip bakes ~2 m of Dolphin_Root translation; that track is
+ // stripped at load so gameplay code owns breach motion.
++//
++// CP10 (Tidewater host): ported from apps/shared-world/src/game/dolphinActor.ts.
++// The GLTFLoader / AnimationMixer / SkinnedMesh of three.js are replaced by
++// Tidewater's own engine loader (engine/loaders/GLTF.js) and GPU skinning
++// (engine/render/Skinning.js) through DolphinSkinnedModel, which adds the
++// additive layers three.js provided. Every constant, the state machine, the
++// crossfade durations, the timeScale law and the additive weighting below are
++// the approved values, unchanged. The model renders through Tidewater's native
++// material / shadow / motion-vector / underwater-lighting pipeline (glTF PBR:
++// base colour, ORM, normal map, double-sided; plus the ORM-red ambient
++// occlusion three.js applied through aoMap, so the shading matches).
+ 
+-import * as THREE from 'three';
+-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
++import { Group, Box3, Vector3 } from '../../vendor/tidewater/src/engine/index.js';
++import { loadGLB } from '../../vendor/tidewater/src/engine/loaders/GLTF.js';
++import { DolphinSkinnedModel } from './DolphinSkinnedModel.js';
+ 
+ /** Presentation inputs read from sim state each frame (never fed back). */
+ export interface DolphinPose {
+@@ -26,17 +38,21 @@
+ }
+ 
+ export interface DolphinActor {
+-  group: THREE.Group;
++  group: Group;
++  /** the engine skinned model (meshes are children of group) */
++  model: DolphinSkinnedModel;
+   /** nose-to-fluke world extent along +Z, SwimForward frame 0, metres */
+   measuredLengthM: number;
+   /** posed skinned-mesh AABB in world space (cp02 coverage-band probe) */
+-  worldBounds(): THREE.Box3;
++  worldBounds(): Box3;
+   clipNames: string[];
+-  /** name of the current base AnimationAction */
++  /** name of the current base animation layer */
+   activeActionName(): string;
+-  /** is any AnimationAction currently running? */
++  /** is any animation layer currently running? */
+   actionRunning(): boolean;
+   update(dt: number, pose: DolphinPose): void;
++  /** show / hide the meshes (parity captures render the environment alone) */
++  setVisible(v: boolean): void;
+ }
+ 
+ // Master §6.3 bindings (all [DERIVED], flagged for the cp01 review):
+@@ -48,128 +64,122 @@
+ const IDLE_SPEED = 0.75;    // MIN_CONTROL_SPEED: idle = SwimForward @ 0.7
+ const XFADE_S = 0.3;        // base-clip cross-fade (0.2–0.4 band)
+ const KB_KICK_REF_HZ = 1.6; // timeScale = 0.7 + 0.9·rate/1.6, clamped 0.7–1.6
++const JUMP_XFADE_S = 0.15;  // air entry cross-fade (dolphinActor.ts, unchanged)
+ 
+-export async function loadDolphin(url: string): Promise<DolphinActor> {
+-  const gltf = await new GLTFLoader().loadAsync(url);
+-  const group = new THREE.Group();
+-  group.add(gltf.scene);
++interface GltfChannel { node: number; path: string; times: Float32Array; values: Float32Array; step: boolean }
++interface GltfClip { name: string; duration: number; channels: GltfChannel[] }
+ 
+-  let skinned: THREE.SkinnedMesh | null = null;
+-  gltf.scene.traverse((o) => {
+-    if ((o as THREE.SkinnedMesh).isSkinnedMesh) {
+-      skinned = o as THREE.SkinnedMesh;
+-    }
+-    o.frustumCulled = false; // clips move bones beyond the static bounds
+-  });
+-  if (!skinned) throw new Error('dolphin.glb: no skinned mesh found');
+-  const mesh: THREE.SkinnedMesh = skinned;
+-
+-  const clips = gltf.animations;
++export async function loadDolphin(url: string): Promise<DolphinActor> {
++  const gltf = await loadGLB(url);
++  const clips: GltfClip[] = gltf.animations;
+   const byName = new Map(clips.map((c) => [c.name, c]));
+-  const need = (name: string): THREE.AnimationClip => {
++  const need = (name: string): GltfClip => {
+     const c = byName.get(name);
+     if (!c) throw new Error(`dolphin.glb: missing clip ${name}`);
+     return c;
+   };
++  for (const n of ['SwimForward', 'SwimForwardFast', 'SwimLeft', 'SwimRight', 'SwimUp', 'SwimDown', 'BreatheSurface', 'Jump']) need(n);
+ 
+   // Strip the Jump clip's baked root translation (Track C Item 3 gotcha 2):
+-  // gameplay code moves the dolphin; the clip keeps rotations only.
+-  const jumpClip = need('Jump').clone();
+-  jumpClip.tracks = jumpClip.tracks.filter(
+-    (t) => !(t.name.includes('Dolphin_Root') && t.name.endsWith('.position')),
+-  );
++  // gameplay code moves the dolphin; the clip keeps rotations only. (three.js
++  // filtered the `Dolphin_Root.position` track; here it is the translation
++  // channel targeting the Dolphin_Root node — the same data.)
++  const jump = need('Jump');
++  const rootNodes = new Set(gltf.nodes.map((n: { name: string }, i: number) => (n.name.includes('Dolphin_Root') ? i : -1)).filter((i: number) => i >= 0));
++  const strippedJump: GltfClip = {
++    ...jump,
++    channels: jump.channels.filter((ch) => !(ch.path === 'translation' && rootNodes.has(ch.node))),
++  };
++  if (strippedJump.channels.length === jump.channels.length) throw new Error('dolphin.glb: Jump root translation track not found');
++  gltf.animations = clips.map((c) => (c === jump ? strippedJump : c));
+ 
+-  // Additive bank/pitch layers — convert BEFORE creating actions (the
+-  // forum-documented over-scale pitfall, Master §7.6).
+-  const additive = (name: string): THREE.AnimationClip =>
+-    THREE.AnimationUtils.makeClipAdditive(need(name).clone());
+-  const leftClip = additive('SwimLeft');
+-  const rightClip = additive('SwimRight');
+-  const upClip = additive('SwimUp');
+-  const downClip = additive('SwimDown');
++  // ORM red = occlusion (the glTF occlusionTexture is the metallicRoughness
++  // texture here); three.js applied it as aoMap on TEXCOORD_1 (identical to
++  // TEXCOORD_0 in this asset). Tidewater's default glTF surface skips AO.
++  const model = await DolphinSkinnedModel.create(gltf, {
++    materials: () => ({
++      surface: /* wgsl */ `
++#if HAS_ORM
++	s.ao *= orm.r;
++#endif
++`,
++    }),
++  } as never);
++  const group = new Group();
++  group.name = 'dolphin';
++  group.add(model.group);
+ 
+-  const mixer = new THREE.AnimationMixer(gltf.scene);
+-  const fwd = mixer.clipAction(need('SwimForward'));
+-  const fast = mixer.clipAction(need('SwimForwardFast'));
+-  const breathe = mixer.clipAction(need('BreatheSurface'));
+-  const jump = mixer.clipAction(jumpClip);
+-  jump.setLoop(THREE.LoopOnce, 1);
+-  jump.clampWhenFinished = true;
++  // Additive bank/pitch layers (three.js makeClipAdditive semantics; see
++  // DolphinSkinnedModel). Created BEFORE the first pose, like the actions.
++  const left = model.addAdditive('SwimLeft');
++  const right = model.addAdditive('SwimRight');
++  const up = model.addAdditive('SwimUp');
++  const down = model.addAdditive('SwimDown');
+ 
+-  const left = mixer.clipAction(leftClip);
+-  const right = mixer.clipAction(rightClip);
+-  const up = mixer.clipAction(upClip);
+-  const down = mixer.clipAction(downClip);
+-  for (const a of [left, right, up, down]) {
+-    a.blendMode = THREE.AdditiveAnimationBlendMode;
+-    a.setEffectiveWeight(0);
+-    a.play();
+-  }
+-
+   // SwimForward active before any render (rest pose is nose-down).
+-  fwd.play();
+-  mixer.update(0);
++  model.play('SwimForward', { fade: XFADE_S, loop: true, speed: 1, from: 0 });
++  model.update(0);
+   group.updateMatrixWorld(true);
+ 
+   // Runtime measurement (Master §7.1): skinned world-space nose-to-fluke
+-  // extent along +Z with SwimForward at frame 0. computeBoundingBox() on a
+-  // SkinnedMesh applies the current bone transforms per vertex.
+-  mesh.computeBoundingBox();
+-  const box = mesh.boundingBox!.clone().applyMatrix4(mesh.matrixWorld);
+-  const measuredLengthM = box.max.z - box.min.z;
++  // extent along +Z with SwimForward at frame 0 (CPU skinning with this
++  // frame's joint matrices — the computeBoundingBox() equivalent).
++  const b0 = model.skinnedBounds(group.matrixWorld);
++  const measuredLengthM = b0.max[2] - b0.min[2];
+ 
+-  let base: THREE.AnimationAction = fwd;
+   let baseName = 'SwimForward';
+   let breatheTimer = 0;
+   let airPrev = false;
+ 
+-  const switchBase = (next: THREE.AnimationAction, name: string) => {
+-    if (next === base) return;
+-    next.enabled = true;
+-    next.reset().play();
+-    base.crossFadeTo(next, XFADE_S, false);
+-    base = next;
++  const speedOf = (name: string, ts: number) => {
++    for (const l of model.layers as { clip: { name: string }; speed: number }[]) if (l.clip.name === name) l.speed = ts;
++  };
++
++  const switchBase = (name: string, fade = XFADE_S, loop = true) => {
++    if (name === baseName) return;
++    model.play(name, { fade, loop, speed: 1, from: 0 });
+     baseName = name;
+   };
+ 
+   return {
+     group,
++    model,
+     measuredLengthM,
+-    worldBounds(): THREE.Box3 {
+-      mesh.computeBoundingBox();
+-      return mesh.boundingBox!.clone().applyMatrix4(mesh.matrixWorld);
++    worldBounds(): Box3 {
++      group.updateMatrixWorld(true);
++      const b = model.skinnedBounds(group.matrixWorld);
++      return new Box3(new Vector3(b.min[0], b.min[1], b.min[2]), new Vector3(b.max[0], b.max[1], b.max[2]));
+     },
+     clipNames: clips.map((c) => c.name),
+     activeActionName: () => baseName,
+-    actionRunning: () => base.isRunning() || jump.isRunning(),
++    actionRunning: () => model.layers.length > 0,
++    setVisible(v: boolean) {
++      for (const m of model.meshes as { visible: boolean }[]) m.visible = v;
++    },
+     update(dt: number, pose: DolphinPose): void {
+       // --- base-clip state machine ---
+       if (pose.phase === 'air') {
+         if (!airPrev) {
+-          jump.reset().play();
+-          base.crossFadeTo(jump, 0.15, false);
+-          base = jump;
++          // jump.reset().play(); base.crossFadeTo(jump, 0.15); LoopOnce + clampWhenFinished
++          model.play('Jump', { fade: JUMP_XFADE_S, loop: false, speed: 1, from: 0 });
+           baseName = 'Jump';
+         }
+       } else {
+         if (airPrev) {
+           // re-entry: recover to the swim loop
+-          fwd.enabled = true;
+-          fwd.reset().play();
+-          base.crossFadeTo(fwd, XFADE_S, false);
+-          base = fwd;
++          model.play('SwimForward', { fade: XFADE_S, loop: true, speed: 1, from: 0 });
+           baseName = 'SwimForward';
+         }
+         // surface breathing gate
+         const nearSurface = Math.abs(pose.y) < BREATHE_Y && pose.speed < BREATHE_SPEED;
+         breatheTimer = nearSurface ? breatheTimer + dt : 0;
+-        if (base !== jump) {
++        if (baseName !== 'Jump') {
+           if (breatheTimer > BREATHE_HOLD_S) {
+-            switchBase(breathe, 'BreatheSurface');
++            switchBase('BreatheSurface');
+           } else if (pose.speed > FAST_ON) {
+-            switchBase(fast, 'SwimForwardFast');
+-          } else if (base === fast ? pose.speed < FAST_OFF : true) {
+-            switchBase(fwd, 'SwimForward');
++            switchBase('SwimForwardFast');
++          } else if (baseName === 'SwimForwardFast' ? pose.speed < FAST_OFF : true) {
++            switchBase('SwimForward');
+           }
+         }
+       }
+@@ -179,19 +189,19 @@
+       // idle below MIN_CONTROL_SPEED = SwimForward at 0.7 (Track C gap-fill)
+       const cadence = pose.speed < IDLE_SPEED ? 0 : pose.kickRate;
+       const ts = clamp(0.7 + 0.9 * (cadence / KB_KICK_REF_HZ), 0.7, 1.6);
+-      fwd.timeScale = ts;
+-      fast.timeScale = ts;
++      speedOf('SwimForward', ts);
++      speedOf('SwimForwardFast', ts);
+ 
+       // --- additive layers: bank sign-selects the turn cycle, pitch rate
+       // the pitch cycle; weights bounded 0..1 ---
+       const bankW = clamp(Math.abs(pose.bank) / 0.9, 0, 1);
+-      left.setEffectiveWeight(pose.bank < 0 ? bankW : 0);
+-      right.setEffectiveWeight(pose.bank > 0 ? bankW : 0);
++      left.weight = pose.bank < 0 ? bankW : 0;
++      right.weight = pose.bank > 0 ? bankW : 0;
+       const pitchW = clamp(Math.abs(pose.pitchRate) / 1.5, 0, 1);
+-      up.setEffectiveWeight(pose.pitchRate < 0 ? pitchW : 0);
+-      down.setEffectiveWeight(pose.pitchRate > 0 ? pitchW : 0);
++      up.weight = pose.pitchRate < 0 ? pitchW : 0;
++      down.weight = pose.pitchRate > 0 ? pitchW : 0;
+ 
+-      mixer.update(dt);
++      model.update(dt);
+     },
+   };
+ }

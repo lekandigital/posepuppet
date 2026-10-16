@@ -1,0 +1,151 @@
+--- ../shared-world/src/game/cameraRig.ts	2026-08-16 09:50:21
++++ src/dolphin/cameraRig.ts	2026-10-16 02:30:48
+@@ -23,11 +23,36 @@
+ //
+ // The rig is presentation-only: it reads sim state and never writes it
+ // (replay digests are camera-independent by construction).
++//
++// CP10 (Tidewater host): ported verbatim from apps/shared-world/src/game/
++// cameraRig.ts with exactly two changes — (1) `three` is replaced by the
++// Tidewater engine's three-compatible CPU math (Vector3 / MathUtils; identical
++// API, no renderer involved), and (2) the rig no longer constructs its own
++// THREE.PerspectiveCamera: it drives the HOST camera it is given (Tidewater's
++// engine camera), writing position / quaternion / fov so Tidewater's own
++// reversed-Z projection, waterline compositing, temporal state and post chain
++// render through the chase pose. `near` stays 0.1 (RIG.NEAR == Tidewater's
++// lens plane); `far` is left to Tidewater (60 000 m: island + sky + clouds).
++// Every constant, spring, state and clamp below is the approved cp02/cp05/
++// cp05C/cp09 behavior, unchanged.
+ 
+-import * as THREE from 'three';
++import { Vector3, MathUtils } from '../../vendor/tidewater/src/engine/index.js';
+ import type { SimState } from './sim';
+ import { CameraCollision, type CameraCollisionLike } from './cameraCollision';
+ 
++/** The host camera surface the rig writes (Tidewater's PerspectiveCamera). */
++export interface HostCamera {
++  position: Vector3;
++  up: Vector3;
++  quaternion: { x: number; y: number; z: number; w: number };
++  fov: number;
++  near: number;
++  far: number;
++  lookAt(target: Vector3): unknown;
++  rotateZ(angle: number): unknown;
++  updateProjectionMatrix(): void;
++}
++
+ export type CameraStateName =
+   | 'NormalFollow'
+   | 'SlowHover'
+@@ -102,9 +127,9 @@
+ 
+ /** In-place vector SmoothDamp (critically damped; GPG4 form). */
+ function smoothDampV3(
+-  current: THREE.Vector3,
+-  target: THREE.Vector3,
+-  velocity: THREE.Vector3,
++  current: Vector3,
++  target: Vector3,
++  velocity: Vector3,
+   smoothTime: number,
+   dt: number,
+ ): void {
+@@ -171,18 +196,18 @@
+ }
+ 
+ export class CameraRig {
+-  readonly camera: THREE.PerspectiveCamera;
++  readonly camera: HostCamera;
+   readonly collision: CameraCollisionLike;
+ 
+   private state: CameraStateName = 'NormalFollow';
+   private stateTime = 0;
+ 
+-  private readonly camPos = new THREE.Vector3();
+-  private readonly camVel = new THREE.Vector3();
+-  private readonly aimPos = new THREE.Vector3();
+-  private readonly aimVel = new THREE.Vector3();
+-  private readonly velSmooth = new THREE.Vector3();
+-  private readonly prevDesired = new THREE.Vector3();
++  private readonly camPos = new Vector3();
++  private readonly camVel = new Vector3();
++  private readonly aimPos = new Vector3();
++  private readonly aimVel = new Vector3();
++  private readonly velSmooth = new Vector3();
++  private readonly prevDesired = new Vector3();
+ 
+   private dist: number = RIG.FOLLOW_DIST;
+   private readonly distVel = { v: 0 };
+@@ -228,18 +253,19 @@
+   updateUsAvg = 0;
+ 
+   // temporaries (no per-frame allocation)
+-  private readonly tmpDesired = new THREE.Vector3();
+-  private readonly tmpDolphin = new THREE.Vector3();
+-  private readonly tmpAimTarget = new THREE.Vector3();
+-  private readonly tmpV = new THREE.Vector3();
+-  private readonly tmpErr = new THREE.Vector3();
++  private readonly tmpDesired = new Vector3();
++  private readonly tmpDolphin = new Vector3();
++  private readonly tmpAimTarget = new Vector3();
++  private readonly tmpV = new Vector3();
++  private readonly tmpErr = new Vector3();
+ 
+   constructor(
+-    aspect: number,
++    // CP10: the HOST camera (Tidewater's). The rig used to construct its own
++    // THREE.PerspectiveCamera(RIG.FOV, aspect, RIG.NEAR, far); here it takes
++    // ownership of the lens state of the camera it is handed instead: fov =
++    // RIG.FOV, near = RIG.NEAR (== Tidewater's 0.1 lens plane), far untouched.
++    camera: HostCamera,
+     collision: CameraCollisionLike = new CameraCollision(7.5, 7.5, RIG.COLLISION_RADIUS),
+-    // far plane: 900 in the pool, 2500 in the region (Master §7.5 —
+-    // additive cp04B parameter; the pool default is unchanged)
+-    far: number = RIG.FAR,
+     // cp05: TerrainCompressed is region-only; the pool rig stays exactly
+     // the approved cp02 behavior (the state remains a stub there)
+     // cp05C: optional visual-waterline callback — with the Gerstner ocean
+@@ -253,7 +279,10 @@
+       interiorFollowScale?: (x: number, y: number, z: number) => number;
+     } = {},
+   ) {
+-    this.camera = new THREE.PerspectiveCamera(RIG.FOV, aspect, RIG.NEAR, far);
++    this.camera = camera;
++    this.camera.fov = RIG.FOV;
++    this.camera.near = RIG.NEAR;
++    this.camera.updateProjectionMatrix();
+     this.collision = collision;
+     this.terrainCompression = opts.terrainCompression ?? false;
+     this.waterlineAt = opts.waterlineAt ?? null;
+@@ -312,10 +341,10 @@
+     this.prevWasAir = air;
+ 
+     // --- state parameter targets ---
+-    const speedDist = THREE.MathUtils.lerp(
++    const speedDist = MathUtils.lerp(
+       RIG.FOLLOW_DIST,
+       RIG.FOLLOW_DIST_BURST,
+-      THREE.MathUtils.clamp(speed / 9, 0, 1),
++      MathUtils.clamp(speed / 9, 0, 1),
+     );
+     let distTarget = speedDist;
+     if (air) distTarget = speedDist + RIG.BREACH_PULLBACK;
+@@ -476,7 +505,7 @@
+ 
+     // --- aim: look-ahead along smoothed velocity (facing during recenter) ---
+     const vs = this.velSmooth.length();
+-    const lead = RIG.LOOK_AHEAD * THREE.MathUtils.clamp(vs / RIG.FAST_SPEED, 0, 1);
++    const lead = RIG.LOOK_AHEAD * MathUtils.clamp(vs / RIG.FAST_SPEED, 0, 1);
+     const aimTarget = this.tmpAimTarget.copy(d);
+     if (this.recenterT > 0) {
+       aimTarget.x += fx * lead;
+@@ -497,7 +526,7 @@
+     // aim error: camera forward vs live desired aim direction
+     const fwd = this.tmpV.set(0, 0, -1).applyQuaternion(this.camera.quaternion);
+     const toAim = aimTarget.sub(this.camPos).normalize(); // aimTarget is a temp — consumed here
+-    this.aimErrorRad = Math.acos(THREE.MathUtils.clamp(fwd.dot(toAim), -1, 1));
++    this.aimErrorRad = Math.acos(MathUtils.clamp(fwd.dot(toAim), -1, 1));
+ 
+     // --- state reporting (priority order; TerrainCompressed live at cp05) ---
+     const next: CameraStateName = this.emergency

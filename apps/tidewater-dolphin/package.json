@@ -1,0 +1,25 @@
+{
+  "name": "@bodyarcade/tidewater-dolphin",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "BodyArcade Checkpoint 10 — the GAMICO dolphin (BodyArcade 120 Hz swim sim, chase camera, body input) inside the pristine Tidewater island (Daniel Greenheck, MIT; pinned 4811ba4). Tidewater is the host engine; it is vendored unmodified under vendor/tidewater/.",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5199 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 5199",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx test/unit.ts",
+    "pristine": "npm --prefix vendor/tidewater run dev",
+    "review": "node review.mjs",
+    "capture": "node eval/capture.mjs",
+    "test:play": "node test/play.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.7.2",
+    "vite": "^8.3.0",
+    "webgpu": "^0.6.1"
+  }
+}
