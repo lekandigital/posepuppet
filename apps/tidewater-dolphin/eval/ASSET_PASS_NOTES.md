@@ -14,10 +14,10 @@ boat / fishing modes was changed; the additions are an optional, reversible laye
   recipe) and a generated `CREDITS.md`; in-app credits updated (F1 sheet, `?credits`;
   repo-root `CREDITS.md`).
 - **Six new scenery categories** (Play tab → Scenery additions; `?original` / `?enhanced`):
-  seagrass meadows (270 instances), kelp wall (154), the wreck (26), drowned temple (103),
+  seagrass meadows (370 instances), kelp wall (141), the wreck (25), drowned temple (103),
   added wildlife (2 manatees, a hammerhead, 451 reef fish of Tidewater's own species at the
   wreck and the temple), lighthouse & shore scrub (71). The two CP10 categories (driftwood,
-  shells) are unchanged. 670 placement records, deterministic (seeded), all solid tops below
+  shells) are unchanged. 756 placement records, deterministic (seeded), all solid tops below
   −2.5 m so the dolphin's swimmable mask is identical with the additions on or off.
 - **Runtime architecture** (`src/additions/`): `GLBScenery.js` (engine glTF reader → engine
   textures / materials with Tidewater's underwater lighting, instancing per model × LOD ×
@@ -67,14 +67,14 @@ per asset; the live-listing check at release remains the user's step (lab policy
 ## 3. Sites (composition on the headless bay survey)
 
 - **Seagrass meadows**: bed A on the shallow bay floor east of the spawn (centre 50, 74; 4.5–8.5 m;
-  150 clumps in 7 patches) — the manatees' pasture; bed B on the east plateau (100, 121;
-  5.5–9.5 m; 110 clumps) with the sunken skiff and algae rocks.
-- **Kelp wall**: the east wall of the deep channel (x 54–76, z 94–134, 7–13 m): 64 stalks —
+  210 clumps in 7 patches) — the manatees' pasture; bed B on the east plateau (100, 121;
+  5.5–9.5 m; 150 clumps) with the sunken skiff and algae rocks.
+- **Kelp wall**: the east wall of the deep channel (x 54–76, z 94–134, 7–13 m): 64 stalks less a clearing round the hull —
   tall (7–11 m) in the deeper half, short on the shelf — in clumps, 14 thickets and 70 weed
   clumps at their feet, boulders on the slope; the swimming corridor up the channel (x < 52)
   stays open; every frond tip below −1.5 m.
-- **The wreck**: at the foot of the wall at (56, 114), 12.9 m, heeled to port, bow up-slope,
-  keel sunk; weed and boulders around it; mast tip at −9 m. The hull is in the contact
+- **The wreck**: at the foot of the wall at (56, 114), 12.9 m, heeled to port, keel laid along
+  the slope (pitch from the terrain), sunk 0.35 m; weed and boulders around it; mast tip ≈ −9 m. The hull is in the contact
   surface (dolphin, camera, walker, fish).
 - **Drowned temple**: a colonnade (two rows, 10 m apart) from the channel floor at 11 m down
   to the basin at 17 m, the temple at (4.5, 156) on the empty basin floor (19.9 m), the
@@ -114,29 +114,90 @@ per asset; the live-listing check at release remains the user's step (lab policy
 
 ## 5. Verification and evidence
 
-Environment: Claude Code cloud container, headless Chromium 153 on Chrome's software WebGPU
-adapter (SwiftShader), 1280 × 720 — Tidewater's full renderer, but no product performance
-numbers; several vendor pipelines (haze, environment mips, ocean mips) exceed SwiftShader's
-per-stage texture limits and are skipped there (`&noHaze` for the captures), exactly as before
-this pass. No native GPU and no hands-on gameplay test happened in this session.
+Environment: Claude Code cloud container (4 cores, 16 GB, a ~12 GB memory cgroup for the
+session's processes), headless Chromium 153 on Chrome's software WebGPU adapter (SwiftShader),
+1280 × 720. No native GPU and no hands-on gameplay test happened in this session.
 
 | check | where | result |
 |---|---|---|
 | `npx tsc --noEmit` | cloud | pass |
 | `npx vite build` | cloud | pass (dist 86 MB incl. 27 addition files) |
-| `npx tsx test/unit.ts` | cloud, headless | all passed (86 checks; 17 new) |
-| `npx tsx test/controls.ts` | cloud, headless | all passed |
-| app load, `?enhanced` | cloud, software WebGPU | 25 models ready, 670 records, 451 site fish, no loader / shader error from the layer |
-| `node test/modes.mjs` (live) | cloud, software WebGPU | see §5.1 |
-| chase-camera shots at each site, Enhanced vs Original | cloud, software WebGPU | see §5.2 |
+| `npx tsx test/unit.ts` | cloud, headless | **all passed** (86 checks; 17 new: placement determinism, pinned counts, tops, clearances, composite ground) |
+| `npx tsx test/controls.ts` | cloud, headless | **all passed** |
+| app load, `?enhanced` (first load of the session) | cloud, software WebGPU | the layer itself loaded: 25 models ready, 670 records, 451 site fish, no loader / shader error from the layer; the render loop never started (see below) |
+| `node test/modes.mjs`, `test/play.mjs` (live) | cloud, software WebGPU | **ENVIRONMENT_BLOCKED** — the app cannot finish loading in this container (below) |
+| in-app chase-camera shots, Enhanced vs Original | cloud, software WebGPU | **ENVIRONMENT_BLOCKED** (below); replaced by the standalone preview in §5.2 |
+| standalone site preview (three.js, WebGL, same placement, same GLBs, real terrain heights) | cloud | 18 views, §5.2 |
 
-### 5.1 Live modes test
+### 5.1 Why the full app could not be rendered here (measured)
 
-_(filled in below once the run completes)_
+Tidewater's loader precompiles every pipeline of every material in the scene, hidden or not
+("Compiling shaders…"). On SwiftShader each compiled pipeline retains a large JIT footprint:
+the GPU process grew by ~2 GB every 30 s and was killed by the memory cgroup
+(`dmesg`: `Memory cgroup out of memory: Killed process (chrome) anon-rss 12.7 GB`), after which
+the page reports "A valid external Instance reference no longer exists". Measured with a
+watcher sampling the GPU process every 30 s:
 
-### 5.2 Visual inspection
+| load | GPU process peak | outcome |
+|---|---|---|
+| `?enhanced&noHaze&noVeg&noClouds` (all additions) | 11.6 GB at 270 s | killed |
+| `?noAdditions&noHaze&noVeg&noClouds` (**no imported models at all** — the pristine pipeline set) | 11.5 GB at 240 s | killed |
 
-_(filled in below once the captures complete: `eval/results/images/additions-*.jpg`)_
+The baseline fails the same way, so the limit is Tidewater's own pipeline count on this
+adapter in this container, not the additions. Several vendor pipelines (haze, environment
+mips, ocean mips) also exceed SwiftShader's per-stage binding limits and are skipped there, as
+before this pass. Three switches were added for memory-limited runs and low-end machines:
+`?noAdditions` (load nothing), `?additions=kelpWall,wreck` (load only these categories),
+`?lazyAdditions` (attach after the precompile); and the layer's own material count was cut
+from 40 to 33 (shared stone and weed materials, no shadow variants for small props).
+
+### 5.2 Visual evidence (standalone preview, `eval/preview/`)
+
+`export-sites.mjs` runs the app's own placement code on Tidewater's deterministic terrain and
+reef (no GPU) and exports the records, the swimmer loops, the fish zones, Tidewater's solid
+reef / bay items (as proxies) and a 1 m terrain grid; `preview-sites.mjs` renders the converted
+GLBs at those records with three.js in headless Chromium (WebGL) from the dolphin's eye
+positions (chase framing, a 2.9 m capsule for scale) and from above. It shows placement, scale,
+orientation, ground contact, clearances and the Enhanced / Original difference exactly; it does
+NOT show Tidewater's water, lighting, caustics, fog or materials (untextured scans are flat
+grey there, kelp fronds are unlit from below). Images in `eval/results/images/`:
+
+- `preview-meadow-enhanced/original.jpg` — bed A from the dolphin's height: a seagrass meadow
+  (clumps 0.7–1.9 m) over the bare sand of the original, the manatee loop in yellow.
+- `preview-kelpwall-enhanced/original.jpg` — from the channel floor up the wall: stalks,
+  thickets, understory, the wreck in its clearing; the original is bare sand and bay rocks.
+- `preview-wreck-bow.jpg`, `preview-wreck-above.jpg` — the hull laid along the slope, heeled to
+  port, keel 0.35 m in the sand, mast and rigging standing, weed around; boulders 11–12 m off.
+- `preview-colonnade.jpg`, `preview-temple-door.jpg`, `preview-statue.jpg` — the colonnade
+  (standing, broken and fallen columns), the temple at its end, the ruin walls, kelp on the rim,
+  the carved head's corner of the basin.
+- `preview-plateau.jpg` — bed B with the sunken skiff.
+- `preview-lighthouse-beach.jpg`, `preview-shore-east.jpg` — the lighthouse on the eastern
+  headland seen from the beach water; the back-beach scrub line.
+- `preview-over-temple.jpg`, `preview-over-kelpwall.jpg`, `preview-over-bay.jpg` — site
+  layouts from above and the whole bay.
+- `assets-converted-thumbs.jpg`, `assets-future-thumbs.jpg` — every converted GLB (all LODs
+  side by side, 1.8 m reference post) and the staged future-game assets.
+
+Iterations made on this evidence: the wreck was first sunk 1.2 m into the slope by the
+"lowest point of the footprint" rule (only the mast showed) → the keel is now laid along the
+terrain slope and rests on the centre ground; kelp grew through the hull → a clearing is cut
+round it; two of the temple's boulders blocked the carved head → moved; the seagrass beds were
+thin → 370 clumps at 0.38–0.66 scale.
+
+### 5.3 What the user should check locally (Apple Silicon, headed Chrome, `node review.mjs`)
+
+1. Load `?enhanced`, then `node test/modes.mjs` and `node test/play.mjs` from a second shell:
+   the live checks (25 GLBs loaded, field tops, composite ground, provenance, toggles) and the
+   dolphin regression suite.
+2. Swim from the spawn east over bed A (manatees), then south-east down the channel to the
+   kelp wall and the wreck, then south down the colonnade into the basin; surface near the
+   eastern headland (lighthouse). Look for: kelp sway and frond lighting, the stone surface on
+   the boulders and the head, the algae film, fish at the wreck and the temple, the hammerhead's
+   patrol, the camera over the wreck and the temple roof.
+3. Toggle each category off and on in the Play tab (and Original / Enhanced) while at a site.
+4. Frame time with everything on at the kelp wall and at the temple vs Original (the kelp's
+   alpha-tested fronds are the overdraw hot spot); the loader's "Compiling shaders…" time.
 
 ## 6. Remaining issues and recommended next work
 

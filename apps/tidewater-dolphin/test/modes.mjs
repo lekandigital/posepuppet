@@ -177,7 +177,7 @@ s = await snapshot();
 check( 'scenery additions ready, both CP10 categories placed (deterministic counts)', s.additions.ready && s.additions.categories.sunkenWood.instances === 11 && s.additions.categories.seabedShells.instances === 30, s.additions.categories );
 // asset-integration pass: the imported-model categories (public/models/additions/), their live
 // structure fields and fish communities
-const IMPORTED = { seagrassMeadows: 270, kelpWall: 154, wreck: 26, drownedTemple: 103, wildlife: 3, headland: 71 };
+const IMPORTED = { seagrassMeadows: 370, kelpWall: 141, wreck: 25, drownedTemple: 103, wildlife: 3, headland: 71 };
 check( 'imported categories placed (pinned deterministic counts)', Object.entries( IMPORTED ).every( ( [ id, n ] ) => s.additions.categories[ id ] && s.additions.categories[ id ].instances === n ), Object.fromEntries( Object.keys( IMPORTED ).map( ( id ) => [ id, s.additions.categories[ id ]?.instances ] ) ) );
 check( 'every imported GLB loaded (25 models, no loader error)', await A( `[ ...app.additions.models.values() ].length === 25 && [ ...app.additions.models.values() ].every( ( m ) => m.ready && ! m.error )` ), await A( `[ ...app.additions.models.values() ].filter( ( m ) => ! m.ready || m.error ).map( ( m ) => m.id )` ) );
 check( 'solid sites have structure fields whose tops stay below −2.5 m (swimmable mask unchanged)', [ 'seagrassMeadows', 'kelpWall', 'wreck', 'drownedTemple' ].every( ( id ) => s.additions.categories[ id ].fieldTop !== null && s.additions.categories[ id ].fieldTop < - 2.5 ), Object.fromEntries( [ 'seagrassMeadows', 'kelpWall', 'wreck', 'drownedTemple' ].map( ( id ) => [ id, s.additions.categories[ id ].fieldTop ] ) ) );

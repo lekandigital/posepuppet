@@ -67,7 +67,7 @@ const ASSET_INFO = {
 // size (m, from manifest.json) is used by the placement before the GLB is loaded.
 const GREEN = [ [ 0.14, 0.34, 0.1 ], [ 0.3, 0.5, 0.15 ] ];
 export const MODELS = {
-	kelp_tall: { kind: 'textured', sway: { height: 9.2, amp: 0.85, speed: 0.55 }, castShadow: false, lodDist: [ 16, 34, 60 ], sizeDist: 2, algae: 0, size: [ 4.5, 9.2, 4.5 ] },
+	kelp_tall: { kind: 'textured', foliage: true, sway: { height: 9.2, amp: 0.85, speed: 0.55 }, castShadow: false, lodDist: [ 16, 34, 60 ], sizeDist: 2, algae: 0, size: [ 4.5, 9.2, 4.5 ] },
 	seaweed_a: { kind: 'tint', tint: GREEN, sway: { height: 2.8, amp: 0.3, speed: 0.8 }, castShadow: false, lodDist: [ 14, 30, 55 ], sizeDist: 3, algae: 0, size: [ 0.08, 1.89, 3.28 ] },
 	seaweed_b: { kind: 'tint', tint: GREEN, sway: { height: 2.8, amp: 0.3, speed: 0.8 }, castShadow: false, lodDist: [ 14, 30, 55 ], sizeDist: 3, algae: 0, size: [ 0.69, 2.29, 1.69 ] },
 	seaweed_c: { kind: 'tint', tint: GREEN, sway: { height: 2.8, amp: 0.3, speed: 0.8 }, castShadow: false, lodDist: [ 14, 30, 55 ], sizeDist: 3, algae: 0, size: [ 3.1, 2.81, 2.77 ] },
@@ -88,8 +88,8 @@ export const MODELS = {
 	manatee: { kind: 'textured', swim: true, bodyLength: 3.5, swimAxis: [ 0, 1, 0 ], swimAmp: 0.13, swimK: 3.2, halfHeight: 0.58, algae: 0, size: [ 1.68, 1.15, 3.49 ] },
 	hammerhead: { kind: 'shark', swim: true, bodyLength: 3.6, swimAxis: [ 1, 0, 0 ], swimAmp: 0.2, swimK: 4.6, halfHeight: 0.7, algae: 0, size: [ 1.73, 1.4, 3.6 ] },
 	lighthouse: { kind: 'textured', solid: false, castShadow: true, lodDist: [ 60, 200, 1400 ], sizeDist: 8, algae: 0, size: [ 14.65, 19.55, 7.02 ] },
-	shrub_rooibos: { kind: 'textured', armIsAO: true, castShadow: true, lodDist: [ 20, 50, 160 ], sizeDist: 4, algae: 0, size: [ 0.72, 0.92, 0.84 ] },
-	shrub_03: { kind: 'textured', armIsAO: true, castShadow: true, lodDist: [ 20, 50, 160 ], sizeDist: 4, algae: 0, size: [ 0.5, 1.01, 0.38 ] },
+	shrub_rooibos: { kind: 'textured', foliage: true, armIsAO: true, castShadow: true, lodDist: [ 20, 50, 160 ], sizeDist: 4, algae: 0, size: [ 0.72, 0.92, 0.84 ] },
+	shrub_03: { kind: 'textured', foliage: true, armIsAO: true, castShadow: true, lodDist: [ 20, 50, 160 ], sizeDist: 4, algae: 0, size: [ 0.5, 1.01, 0.38 ] },
 	dry_branches: { kind: 'textured', armIsAO: true, castShadow: false, lodDist: [ 18, 45, 140 ], sizeDist: 4, algae: 0, size: [ 0.45, 0.48, 1.82 ] },
 	bark_debris: { kind: 'textured', armIsAO: true, castShadow: false, lodDist: [ 14, 35, 90 ], sizeDist: 4, algae: 0, size: [ 0.28, 0.1, 0.6 ] },
 };
@@ -373,9 +373,9 @@ export class SceneryAdditions {
 		const app = this.app;
 		if ( ! app.reef || ! app.reef.structureAt ) return - Infinity;
 		let m = - Infinity;
-		for ( let a = 0; a < 8; a ++ ) for ( const d of [ r * 0.5, r ] ) {
+		for ( let a = 0; a < 12; a ++ ) for ( const d of [ r * 0.25, r * 0.5, r * 0.75, r ] ) {
 
-			const px = x + Math.cos( a / 8 * TAU ) * d, pz = z + Math.sin( a / 8 * TAU ) * d;
+			const px = x + Math.cos( a / 12 * TAU ) * d, pz = z + Math.sin( a / 12 * TAU ) * d;
 			const s = app.reef.structureAt( px, pz ) - app.terrainData.heightAt( px, pz );
 			if ( s > m ) m = s;
 
@@ -486,7 +486,7 @@ export class SceneryAdditions {
 
 	// a solid thing on the sand: footprint clear of Tidewater's structures, its top below TOP_LIMIT;
 	// sunk a little into the sand; returns null when the spot does not work
-	_settle( models, rand, id, x, z, { s = 1, yaw = rand() * TAU, pitch = 0, roll = 0, sink = 0.15, clearance = 1.5, top = TOP_LIMIT } = {} ) {
+	_settle( models, rand, id, x, z, { s = 1, yaw = rand() * TAU, pitch = 0, roll = 0, sink = 0.15, clearance = 1.5, top = TOP_LIMIT, alignSlope = false } = {} ) {
 
 		const size = MODELS[ id ].size;
 		const sx = Array.isArray( s ) ? Math.max( s[ 0 ], s[ 2 ] ) : s, sy = Array.isArray( s ) ? s[ 1 ] : s;
@@ -497,6 +497,18 @@ export class SceneryAdditions {
 		// a thing lying on its side (pitch ~90°) is as tall as it is long
 		const height = Math.abs( pitch ) > 1 ? Math.max( size[ 0 ] * sx, size[ 2 ] * sx ) * 0.5 : size[ 1 ] * sy;
 		if ( g + height - sink > top ) return null;
+		if ( alignSlope ) {
+
+			// a hull / base laid along the slope: pitch follows the ground along the heading
+			// (+z forward; a positive pitch lowers the +z end), resting on the centre ground
+			const half = size[ 2 ] * ( Array.isArray( s ) ? s[ 2 ] : s ) * 0.45;
+			const fx = Math.sin( yaw ), fz = Math.cos( yaw );
+			const gA = this.app.terrainData.heightAt( x + fx * half, z + fz * half ), gB = this.app.terrainData.heightAt( x - fx * half, z - fz * half );
+			pitch = - Math.atan2( gA - gB, half * 2 );
+			return this._rec( models, id, { x, y: g - sink, z, yaw, pitch, roll, s, rnd: rand() } );
+
+		}
+
 		// rest on the lowest point of the footprint so nothing floats on a slope
 		let gMin = g;
 		for ( let a = 0; a < 8; a ++ ) { const gg = this.app.terrainData.heightAt( x + Math.cos( a / 8 * TAU ) * foot * 0.7, z + Math.sin( a / 8 * TAU ) * foot * 0.7 ); if ( gg < gMin ) gMin = gg; }
@@ -534,8 +546,8 @@ export class SceneryAdditions {
 		const models = {};
 		// bed A: the shallow bay floor east of the spawn (5–8 m), where Tidewater's own tufts grow,
 		// the manatees' pasture; bed B: the east plateau (6–9 m)
-		this._meadow( models, rand, 50, 74, 17, 150, 7, [ 4.5, 8.5 ], [ 0.3, 0.52 ] );
-		this._meadow( models, rand, 100, 121, 14, 110, 6, [ 5.5, 9.5 ], [ 0.32, 0.55 ] );
+		this._meadow( models, rand, 50, 74, 17, 210, 7, [ 4.5, 8.5 ], [ 0.38, 0.66 ] );
+		this._meadow( models, rand, 100, 121, 14, 150, 6, [ 5.5, 9.5 ], [ 0.38, 0.66 ] );
 		// the sunken skiff on the plateau, upright, half silted; a few algae rocks in both beds
 		for ( const [ x, z ] of [ [ 104, 126 ], [ 101, 130 ], [ 108, 118 ] ] ) if ( this._settle( models, rand, 'skiff', x, z, { s: 1, yaw: 0.8 + rand() * 0.6, roll: 0.12, sink: 0.3 } ) ) break;
 		for ( const [ cx, cz, r, n ] of [ [ 50, 74, 16, 5 ], [ 100, 121, 13, 4 ] ] ) {
@@ -573,7 +585,7 @@ export class SceneryAdditions {
 			if ( placedXZ.length > 6 && rand() < 0.55 && ! placedXZ.some( ( o ) => Math.hypot( o[ 0 ] - x, o[ 1 ] - z ) < 6 ) ) continue;
 			if ( placedXZ.some( ( o ) => Math.hypot( o[ 0 ] - x, o[ 1 ] - z ) < 1.8 ) ) continue;
 			const deep = - g > 10;
-			const s = deep ? 0.8 + rand() * 0.4 : 0.5 + rand() * 0.25;
+			const s = deep ? 0.7 + rand() * 0.55 : 0.5 + rand() * 0.25;
 			if ( this._stand( models, rand, 'kelp_tall', x, z, s ) ) { stalks ++; placedXZ.push( [ x, z ] ); }
 
 		}
@@ -613,12 +625,15 @@ export class SceneryAdditions {
 		let hull = null;
 		for ( const [ x, z ] of [ [ 56, 114 ], [ 54, 110 ], [ 58, 120 ], [ 52, 116 ], [ 57, 124 ] ] ) {
 
-			hull = this._settle( models, rand, 'wreck_boat', x, z, { s: 1, yaw: 0.55, roll: 0.5, pitch: 0.08, sink: 0.55, clearance: 2.5 } );
+			hull = this._settle( models, rand, 'wreck_boat', x, z, { s: 1, yaw: 0.55, roll: 0.5, sink: 0.35, clearance: 2.5, alignSlope: true } );
 			if ( hull ) break;
 
 		}
 
 		if ( ! hull ) return { models };
+		// a clearing in the kelp forest where the hull came to rest (the kelp wall is placed first)
+		const kw = this.placed.kelpWall && this.placed.kelpWall.models;
+		if ( kw ) for ( const id of [ 'kelp_tall', 'kelp_bush', 'seaweed_a', 'seaweed_b', 'seaweed_c' ] ) if ( kw[ id ] ) kw[ id ] = kw[ id ].filter( ( r ) => Math.hypot( r.x - hull.x, r.z - hull.z ) > ( id === 'kelp_tall' ? 6.5 : 5 ) );
 		// weed on and around the hull, a few boulders alongside
 		for ( let i = 0, tries = 0; i < 22 && tries < 200; tries ++ ) {
 
@@ -628,7 +643,7 @@ export class SceneryAdditions {
 
 		}
 
-		for ( const [ id, dx, dz, s ] of [ [ 'rock_lump', 7, 4, 1.1 ], [ 'rock_lump', - 6, 6, 0.9 ], [ 'rock_slab', 9, - 7, 0.8 ] ] ) {
+		for ( const [ id, dx, dz, s ] of [ [ 'rock_lump', 12, 6, 1.0 ], [ 'rock_slab', - 11, 9, 0.8 ] ] ) {
 
 			for ( let k = 0; k < 5; k ++ ) if ( this._settle( models, rand, id, hull.x + dx + ( rand() - 0.5 ) * 3 * k, hull.z + dz + ( rand() - 0.5 ) * 3 * k, { s, sink: 0.3 } ) ) break;
 
@@ -678,7 +693,7 @@ export class SceneryAdditions {
 		}
 
 		// boulders on the basin rim and floor
-		for ( const [ id, x, z, s ] of [ [ 'rock_cluster', - 14, 136, 0.95 ], [ 'rock_cluster', 24, 162, 0.85 ], [ 'rock_tall', - 6, 164, 1 ], [ 'rock_tall', 15, 132, 0.8 ], [ 'rock_slab', - 3, 138, 1 ], [ 'rock_slab', 12, 160, 0.9 ], [ 'boulder_layered', - 12, 158, 0.8 ], [ 'rock_lump', 8, 150, 1.2 ], [ 'rock_lump', - 5, 156, 1 ] ] ) {
+		for ( const [ id, x, z, s ] of [ [ 'rock_cluster', - 22, 152, 0.95 ], [ 'rock_cluster', 24, 162, 0.85 ], [ 'rock_tall', - 6, 164, 1 ], [ 'rock_tall', 15, 132, 0.8 ], [ 'rock_slab', 14, 128, 1 ], [ 'rock_slab', 12, 160, 0.9 ], [ 'boulder_layered', - 12, 158, 0.8 ], [ 'rock_lump', 8, 150, 1.2 ], [ 'rock_lump', - 5, 156, 1 ] ] ) {
 
 			for ( let k = 0; k < 6; k ++ ) if ( this._settle( models, rand, id, x + ( rand() - 0.5 ) * 4 * k, z + ( rand() - 0.5 ) * 4 * k, { s, sink: 0.4 } ) ) break;
 

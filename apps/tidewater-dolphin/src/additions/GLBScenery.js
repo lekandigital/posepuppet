@@ -99,6 +99,10 @@ const SURFACE = /* wgsl */`
 	let nm = textureSample( texNormal, smpAnisoRepeat, uv ).xyz * 2.0 - 1.0;
 	s.normal = perturbNormalByMap( p, N, uv, nm );
 #endif
+#if FOLIAGE
+	// thin fronds / leaves: part of the direct light comes through from behind
+	s.translucency = s.albedo * 0.45;
+#endif
 #if KIND_TINT
 	// untextured blades: a per-instance green between two tones, darker toward the base, lit
 	// through from behind like thin foliage
@@ -195,7 +199,7 @@ export function buildMaterial( gm, T, opts, name ) {
 		INSTANCED_FADE: swim ? 0 : 1,
 		HAS_ALBEDO: textures.texAlbedo ? 1 : 0, HAS_NORMAL: textures.texNormal ? 1 : 0, HAS_ORM: textures.texOrm ? 1 : 0,
 		ARM_AO: opts.armIsAO ? 1 : 0,
-		KIND_TINT: kind === 'tint' ? 1 : 0, KIND_STONE: kind === 'stone' ? 1 : 0, KIND_SHARK: kind === 'shark' ? 1 : 0,
+		KIND_TINT: kind === 'tint' ? 1 : 0, KIND_STONE: kind === 'stone' ? 1 : 0, KIND_SHARK: kind === 'shark' ? 1 : 0, FOLIAGE: opts.foliage ? 1 : 0,
 	};
 	let appliesHillShadow = false;
 	if ( kind === 'stone' ) {

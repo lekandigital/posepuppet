@@ -431,7 +431,7 @@ check('containment band is the sampler\'s (12 m), never the 55 m region band', n
   const P = a1.placed;
   const count = (id: string) => { const c = P[id]; let n = c.scan ? c.scan.length : 0; for (const k in c.models || {}) n += c.models[k].length; return n + (c.swimmers || []).length; };
   check('the two CP10 categories are unchanged (11 driftwood, 30 shells)', count('sunkenWood') === 11 && count('seabedShells') === 30, { wood: count('sunkenWood'), shells: count('seabedShells') });
-  const expect: Record<string, number> = { seagrassMeadows: 270, kelpWall: 154, wreck: 26, drownedTemple: 103, wildlife: 3, headland: 71 };
+  const expect: Record<string, number> = { seagrassMeadows: 370, kelpWall: 141, wreck: 25, drownedTemple: 103, wildlife: 3, headland: 71 };
   for (const id in expect) check(`${id}: ${expect[id]} instances placed (pinned deterministic count)`, count(id) === expect[id], count(id));
   check('the wreck, the temple, the ruin and the lighthouse found a spot', !!P.wreck.hull && !!P.drownedTemple.temple && !!P.drownedTemple.ruin && !!P.headland.lighthouse, { hull: P.wreck.hull, temple: P.drownedTemple.temple, lighthouse: P.headland.lighthouse });
   check('fish communities at the wreck and the temple (Tidewater species only)', P.wildlife.fish.length === 2 && P.wildlife.fish.every((f: { groups: unknown[][] }) => f.groups.length >= 8));
