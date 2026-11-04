@@ -16,7 +16,7 @@ import { GroundBounce } from '../vendor/tidewater/src/materials/GroundBounce.js'
 import { ADDITION_CATEGORIES } from './additions/SceneryAdditions.js';
 
 const MODE_CONTROLS = {
-	dolphin: 'Shift kick · W/S pitch · A/D bank · Q/E depth · Space burst · X brake · R recenter · 1/2/3 assist · body input via PosePuppet',
+	dolphin: 'Space swim · WASD steer (W dive, S climb) · Shift charge · X brake · V camera · R recenter · drag to look',
 	walk: 'WASD move · mouse look (click the view) · Shift sprint · Space jump / swim up · C dive · E board the boat, climb ladders, talk',
 	boat: 'W/S throttle · A/D steer · Shift boost · V helm / chase camera · E leave the helm, step ashore · mouse look',
 };
@@ -71,6 +71,13 @@ export class DolphinAppUI {
 			fishing: app.fishing,
 			assist: app.dolphin ? app.dolphin.sim.assist : 'full',
 			swellRide: app.dolphin ? app.dolphin.opts.swellRide : true,
+			controlProfile: app.dolphin ? app.dolphin.controls.prefs().profile : 'ecco',
+			inputSource: app.dolphin ? app.dolphin.controls.prefs().inputSource : 'auto',
+			invertY: app.dolphin ? app.dolphin.controls.prefs().invertY : false,
+			steerSensitivity: app.dolphin ? app.dolphin.controls.prefs().steerSensitivity : 1,
+			lookSensitivity: app.dolphin ? app.dolphin.controls.prefs().lookSensitivity : 1,
+			cameraStyle: app.dolphin ? app.dolphin.rig.getStyle() : 'follow',
+			cameraDistance: app.dolphin ? app.dolphin.controls.prefs().cameraDistance : 1,
 			camMode: app.player ? app.player.camMode : 'third',
 			environment: app.additions && app.additions.anyOn ? 'enhanced' : 'original',
 		};
@@ -95,7 +102,32 @@ export class DolphinAppUI {
 		fish.addInfo( { label: 'Where', get: () => ! app.fishing ? 'Off (default)' : app.playerMode === 'dolphin' ? 'On — switch to Walking or Boat to fish' : 'On — R takes out the rod, I opens the cooler' } );
 		const dol = play.addFolder( 'Dolphin', { icon: 'swim', open: false } );
 		dol.addSelect( { label: 'Assist', object: s, key: 'assist', segmented: true, tooltip: 'Full: auto-level and drift help. Standard. Expert: you hold every angle.', options: [ { label: 'Full', value: 'full' }, { label: 'Standard', value: 'standard' }, { label: 'Expert', value: 'expert' } ], onChange: ( v ) => { if ( app.dolphin ) app.dolphin.sim.assist = v; } } );
-		dol.addToggle( { label: 'Ride the swell', object: s, key: 'swellRide', tooltip: 'Presentation only: near the surface the rendered dolphin lifts with the measured wave height so it sits in Tidewater\'s actual swell. The deterministic sim is untouched.', onChange: ( v ) => { if ( app.dolphin ) app.dolphin.opts.swellRide = v; } } );
+		dol.addToggle( { label: 'Ride the swell', object: s, key: 'swellRide', tooltip: 'Presentation only: near the surface the rendered dolphin lifts with the measured wave height so it sits in Tidewater\'s actual swell. The chase camera does not ride the wave — waves cross the lens. The deterministic sim is untouched.', onChange: ( v ) => { if ( app.dolphin ) app.dolphin.opts.swellRide = v; } } );
+		const ctl = play.addFolder( 'Dolphin Controls', { icon: 'keyboard' } );
+		ctl.addSelect( {
+			label: 'Scheme', object: s, key: 'controlProfile', segmented: true,
+			tooltip: 'Ecco-Inspired is the default: hold Space to swim, Shift to charge, WASD to steer. Legacy BodyArcade keeps the older Shift-to-kick mapping.',
+			options: [ { label: 'Ecco-Inspired', value: 'ecco' }, { label: 'Legacy BodyArcade', value: 'legacy' } ],
+			onChange: ( v ) => app.dolphin && app.dolphin.controls.setPrefs( { profile: v } ),
+		} );
+		ctl.addSelect( {
+			label: 'Input', object: s, key: 'inputSource', segmented: true,
+			tooltip: 'Auto uses whichever you touch (keyboard, gamepad, or PosePuppet). Keyboard and a live gamepad always beat stale body tracking.',
+			options: [ { label: 'Auto', value: 'auto' }, { label: 'Keyboard', value: 'keyboard' }, { label: 'Gamepad', value: 'gamepad' }, { label: 'Body', value: 'body' } ],
+			onChange: ( v ) => app.dolphin && app.dolphin.controls.setPrefs( { inputSource: v } ),
+		} );
+		ctl.addSelect( {
+			label: 'Camera style', object: s, key: 'cameraStyle', segmented: true,
+			tooltip: 'Follow stays behind you. Remote is looser and cinematic. Surface / Scenic favours the waterline when you are shallow — still Tidewater\'s own split rendering, never locked above water. V cycles these.',
+			options: [ { label: 'Follow', value: 'follow' }, { label: 'Remote', value: 'remote' }, { label: 'Surface', value: 'scenic' } ],
+			onChange: ( v ) => app.dolphin && app.dolphin.setCameraStyle( v ),
+		} );
+		ctl.addToggle( { label: 'Invert vertical', object: s, key: 'invertY', tooltip: 'Flips dive / climb on keyboard W/S and the left stick.', onChange: ( v ) => app.dolphin && app.dolphin.controls.setPrefs( { invertY: v } ) } );
+		ctl.addSlider( { label: 'Steering sensitivity', object: s, key: 'steerSensitivity', min: 0.4, max: 2, step: 0.05, onChange: ( v ) => app.dolphin && app.dolphin.controls.setPrefs( { steerSensitivity: v } ) } );
+		ctl.addSlider( { label: 'Look sensitivity', object: s, key: 'lookSensitivity', min: 0.3, max: 3, step: 0.05, onChange: ( v ) => app.dolphin && app.dolphin.controls.setPrefs( { lookSensitivity: v } ) } );
+		ctl.addSlider( { label: 'Camera distance', object: s, key: 'cameraDistance', min: 0.7, max: 1.4, step: 0.05, tooltip: 'Scales how far the chase camera sits behind the dolphin.', onChange: ( v ) => { if ( app.dolphin ) { app.dolphin.controls.setPrefs( { cameraDistance: v } ); app.dolphin.applyControlPrefs(); } } } );
+		ctl.addInfo( { label: 'Keyboard', get: () => s.controlProfile === 'legacy' ? 'Shift kick · Space burst · W/S pitch · A/D turn · X brake' : 'Space swim · Shift charge · W dive · S climb · A/D turn · X brake · V camera · R recenter · drag look' } );
+		ctl.addInfo( { label: 'Gamepad', get: () => 'Left stick steer · A swim · B charge · X brake · Y camera · Right stick look · Start menu' } );
 		dol.addInfo( { label: 'Body input', get: () => {
 
 			if ( ! app.dolphin ) return '—';
@@ -130,7 +162,7 @@ export class DolphinAppUI {
 			s.camMode = app.player.camMode;
 			if ( this.camModeCtl ) this.camModeCtl.setVisible( mode === 'boat' );
 			ui.refresh();
-			ui.toast( mode === 'dolphin' ? 'Dolphin · Shift to kick' : mode === 'walk' ? 'Walking · click the view to look around' : 'Boat · at the helm — W throttle, A/D steer, V camera' );
+			ui.toast( mode === 'dolphin' ? 'Dolphin · hold Space to swim' : mode === 'walk' ? 'Walking · click the view to look around' : 'Boat · at the helm — W throttle, A/D steer, V camera' );
 
 		};
 
@@ -336,7 +368,10 @@ export class DolphinAppUI {
 		this.s.fov = app.camera.fov;
 		this.s.mode = app.displayedMode;
 		this.s.fishing = app.fishing;
-		if ( app.dolphin ) this.s.assist = app.dolphin.sim.assist;
+		if ( app.dolphin ) {
+			this.s.assist = app.dolphin.sim.assist;
+			this.s.cameraStyle = app.dolphin.rig.getStyle();
+		}
 		if ( app.player && this.s.camMode !== app.player.camMode ) this.s.camMode = app.player.camMode;
 
 		if ( app.freeCam ) {
@@ -391,6 +426,7 @@ export class DolphinAppUI {
 		const tr = st.tracking;
 		if ( tr === 'autopilot' || tr === 'stale' || tr === 'low-confidence' ) ui.setPrompt( '…', 'Body tracking lost · gliding until it returns (keyboard always works)' );
 		else if ( tr === 'live' ) ui.setPrompt( '●', 'Body input live' );
+		else if ( tr === 'gamepad' ) ui.setPrompt( 'A', 'Hold A to swim · left stick steers' );
 		else ui.setPrompt( null );
 
 		const depth = ( app.cameraWaterHeight ?? 0 ) - app.camera.position.y;

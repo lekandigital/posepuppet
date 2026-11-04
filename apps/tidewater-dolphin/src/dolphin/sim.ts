@@ -38,6 +38,12 @@ export interface SwimIntent {
   burst: boolean;
   /** active brake (keyboard X): strong decel toward hover */
   brake: boolean;
+  /**
+   * 0..1 analog swim hold (Ecco-inspired). Holding accelerates toward cruise and
+   * counters glide drag; 0 is a pure glide. Optional so older scripts that only
+   * set kicks / burst stay byte-compatible.
+   */
+  swim?: number;
   /** -1..1, + = descend (crouch), − = ascend (stretch tall) */
   depthTrim: number;
   /** tracking lost — glide straight, level out, never snap */
@@ -46,7 +52,7 @@ export interface SwimIntent {
 
 export const NEUTRAL_INTENT: SwimIntent = {
   pitch: 0, roll: 0, kicks: 0, kickAmp: 0, kickRate: 0,
-  burst: false, brake: false, depthTrim: 0, autopilot: false,
+  burst: false, brake: false, swim: 0, depthTrim: 0, autopilot: false,
 };
 
 /** All feel constants in one table (the Gate-approval unit) — Master §7.4. */
@@ -59,6 +65,7 @@ export const SIM = {
   GLIDE_TAU: 6.0,           // s — proportional drag; long dolphin glide
                             // (Track E candidate ≈2.9 s on offer at review)
   MAX_SPEED: 5,             // [GOVERNED] cruise
+  SWIM_ACCEL: 3.6,          // m/s² while Swim is held (rest → cruise ≈ 1.4 s)
   BURST_ACCEL: 6,           // m/s² while burst held [DERIVED ~0.67 s to cap]
   BURST_MAX_SPEED: 9,       // [GOVERNED] burst
   // attitude
@@ -277,6 +284,8 @@ export class SwimSim {
     const surgeOut = s.surge * (dt / SIM.SURGE_ATTACK_TAU);
     s.surge -= surgeOut;
     s.speed += surgeOut;
+    const swim = clamp(intent.swim ?? 0, 0, 1);
+    if (swim > 0 && !intent.brake) s.speed += SIM.SWIM_ACCEL * swim * dt;
     if (intent.burst) s.speed += SIM.BURST_ACCEL * dt;
     s.speed -= s.speed * (dt / SIM.GLIDE_TAU); // proportional drag — the glide
     if (intent.brake) {

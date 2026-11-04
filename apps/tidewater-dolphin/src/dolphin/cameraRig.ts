@@ -37,9 +37,9 @@
 // CP10 continuation (user directive, "Fix the split-waterline problem"): the
 // waterline anti-shimmer hold inherited from the old BodyArcade renderer is
 // REMOVED for the Tidewater host — the ±0.75 m SURFACE_BAND, the 0.35 m
-// SHIMMER_MIN_Y exclusion, the per-crossing SHIMMER_HOLD_S side lock, the
-// swim-side / air-side clamps on the desired point and the matching clamp in
-// the TerrainCompressed probe. The eye now goes wherever the chase geometry
+// SHIMMER_MIN_Y exclusion, the per-crossing SHIMMER_HOLD_S hold, the swim /
+// air clamps on the desired point and the matching clamp in the
+// TerrainCompressed probe. The eye now goes wherever the chase geometry
 // puts it, including onto and through the sea surface, so Tidewater's own
 // near-plane waterline renderer (vendor post/Underwater.js: LENS_REACH,
 // per-pixel medium, meniscus) decides what the lens sees — waves crossing a
@@ -50,9 +50,17 @@
 // local waterline (the dolphin crossing the actual sea surface), not y = 0:
 // with the swell ride lifting the rendered dolphin by the wave height, the
 // flat check fired on every passing wave and held the state machine in
-// SurfaceTransition while hovering (the 41/42 play-test miss). Every other
-// constant, spring, state and clamp is the approved cp02/cp05/cp05C/cp09
-// behavior, unchanged.
+// SurfaceTransition while hovering (the 41/42 play-test miss).
+//
+// CP10 follow-up (gameplay waterline): HEIGHT 1.1 m above a dolphin that
+// cruises at SURFACE_Y −0.4 put the eye ~0.7 m above mean sea, and the rig
+// followed the swell-ridden presentation Y, so waves carried the lens instead
+// of crossing it. The default Follow camera now (1) positions against the
+// sim body Y, not the presentation swell, and (2) blends HEIGHT down toward
+// HEIGHT_SURFACE as the dolphin approaches mean water, parking the eye near
+// the mean so Tidewater's waves can pass through the lens during ordinary
+// shallow cruising. Remote and Scenic styles change follow tightness / skim
+// preference only — never the water shaders.
 
 import { Vector3, MathUtils } from '../../vendor/tidewater/src/engine/index.js';
 import type { SimState } from './sim';
@@ -70,6 +78,10 @@ export interface HostCamera {
   rotateZ(angle: number): unknown;
   updateProjectionMatrix(): void;
 }
+
+export type CameraStyle = 'follow' | 'remote' | 'scenic';
+
+export const CAMERA_STYLES: CameraStyle[] = ['follow', 'remote', 'scenic'];
 
 export type CameraStateName =
   | 'NormalFollow'
@@ -102,7 +114,11 @@ export const RIG = {
   FOLLOW_DIST: 4.8,         // m behind at rest/cruise floor   [§7.5: 8.75 × 0.55]
   FOLLOW_DIST_BURST: 7.55,  // m behind at burst (lerp 0→9)    [§7.5: 13.75 × 0.55]
   HOVER_DIST: 3.3,          // m in SlowHover [DERIVED, flagged; §7.5: 6.0 × 0.55]
-  HEIGHT: 1.1,              // m above the dolphin             [§7.5: 2.0 × 0.55]
+  HEIGHT: 1.1,              // m above the dolphin, deep water [§7.5: 2.0 × 0.55]
+  HEIGHT_SURFACE: 0.22,     // m above the sim body near mean water (eye ≈ −0.18 at SURFACE_Y)
+  HEIGHT_SCENIC: 0.38,      // Scenic: eye nearer mean, more sky in the upper frame
+  SKIM_DEEP_Y: -3.6,        // below this, full HEIGHT
+  SKIM_NEAR_Y: -0.55,       // at/above this, full surface skim
   LOOK_AHEAD: 3.44,         // m along the smoothed velocity   [§7.5: 6.25 × 0.55]
   T90_VEL_LP: 0.25,         // s — velocity low-pass for the look-ahead
   T90_CATCH: 0.18,          // s — position catch-up (target receding)
@@ -139,6 +155,14 @@ export const RIG = {
   COMPRESS_RELEASE_RATIO: 0.8, // [DERIVED hysteresis, flagged] release above 80 %…
   COMPRESS_RELEASE_S: 0.5,     // …sustained 0.5 s [DERIVED, flagged]
 } as const;
+
+/** Vertical chase offset: deep water keeps HEIGHT 1.1; near the mean the eye drops toward the surface. */
+export function chaseHeight(bodyY: number, air: boolean, style: CameraStyle = 'follow'): number {
+  if (air) return RIG.HEIGHT;
+  const w = MathUtils.smoothstep(RIG.SKIM_DEEP_Y, RIG.SKIM_NEAR_Y, bodyY);
+  const hSurf = style === 'scenic' ? RIG.HEIGHT_SCENIC : RIG.HEIGHT_SURFACE;
+  return MathUtils.lerp(RIG.HEIGHT, hSurf, w);
+}
 
 const T90_TO_SMOOTH = 2 / 3.8897; // see damping-form note above
 const LN10 = Math.log(10);
@@ -201,6 +225,14 @@ export interface CameraEvalState {
   surfaceCrossings: number;
   /** eye height relative to the local waterline, m (|value| < ~0.1 → the lens straddles the surface) */
   eyeAboveWaterM: number;
+  /** eye height relative to mean sea level (y = 0), m */
+  eyeAboveMeanM: number;
+  /** Follow / Remote / Scenic */
+  style: CameraStyle;
+  /** current vertical chase offset, m */
+  chaseHeightM: number;
+  /** sim-body Y used for positioning (not the swell-ridden presentation Y) */
+  bodyY: number;
   losBlockedS: number;
   emergencyCount: number;
   /** rolling mean rig CPU cost per update, µs (measured by the caller) */
@@ -272,6 +304,16 @@ export class CameraRig {
   /** rolling rig CPU cost, written by the caller (game loop) */
   updateUsAvg = 0;
 
+  /** Ecco-inspired camera style (Follow is the default). */
+  private style: CameraStyle = 'follow';
+  private followYaw = 0;
+  private orbitYaw = 0;
+  private orbitPitch = 0;
+  private lastHeight = RIG.HEIGHT;
+  private lastBodyY = 0;
+  /** 0.7–1.4 follow-distance multiplier from the menu */
+  distScale = 1;
+
   // temporaries (no per-frame allocation)
   private readonly tmpDesired = new Vector3();
   private readonly tmpDolphin = new Vector3();
@@ -312,6 +354,28 @@ export class CameraRig {
   /** R key: ease the camera directly behind facing over RECENTER_S. */
   recenter(): void {
     this.recenterT = RIG.RECENTER_S;
+    this.orbitYaw = 0;
+    this.orbitPitch = 0;
+  }
+
+  getStyle(): CameraStyle {
+    return this.style;
+  }
+
+  setStyle(style: CameraStyle): void {
+    if (CAMERA_STYLES.includes(style)) this.style = style;
+  }
+
+  cycleStyle(): CameraStyle {
+    const i = CAMERA_STYLES.indexOf(this.style);
+    this.style = CAMERA_STYLES[(i + 1) % CAMERA_STYLES.length]!;
+    return this.style;
+  }
+
+  /** Mouse / right-stick look: yaw around the dolphin, pitch of the chase point. */
+  addLook(yawDelta: number, pitchDelta: number): void {
+    this.orbitYaw += yawDelta;
+    this.orbitPitch = MathUtils.clamp(this.orbitPitch + pitchDelta, -0.65, 0.5);
   }
 
   /**
@@ -327,13 +391,24 @@ export class CameraRig {
     this.snapGraceS = 1.2;
     this.camVel.set(0, 0, 0);
     this.aimVel.set(0, 0, 0);
+    this.followYaw = 0;
+    this.orbitYaw = 0;
+    this.orbitPitch = 0;
     this.prevEyeRel = null; // a teleport is not a surface crossing
   }
 
-  update(s: SimState, dt: number): void {
+  /**
+   * @param view.bodyY  sim-body height used for chase positioning. The presented
+   *                    dolphin (s.y) may include swell-ride; passing the physical
+   *                    Y stops the lens from riding every wave. Defaults to s.y.
+   */
+  update(s: SimState, dt: number, view?: { bodyY?: number }): void {
     if (dt <= 0) return;
+    const bodyY = view?.bodyY ?? s.y;
+    this.lastBodyY = bodyY;
     const d = this.tmpDolphin.set(s.x, s.y, s.z);
     const air = s.phase === 'air';
+    const style = this.style;
 
     // cp05C: sample the visual waterline once per update at the dolphin
     // column (constant 0 without the callback — pool behavior unchanged)
@@ -356,7 +431,7 @@ export class CameraRig {
     if (!air && this.prevWasAir) this.reentryT = RIG.REENTRY_S;
     // the dolphin crossed the SEA SURFACE (local waterline; y 0 in the pool) — a breach or a
     // re-entry, not a passing wave lifting the rendered dolphin at the surface
-    const dolphinRel = s.y - this.wl;
+    const dolphinRel = bodyY - this.wl;
     if (Math.sign(dolphinRel) !== Math.sign(this.prevDolphinRel) && Math.abs(dolphinRel - this.prevDolphinRel) < 2) {
       this.surfaceT = RIG.SURFACE_BLEND_S;
     }
@@ -372,6 +447,9 @@ export class CameraRig {
     let distTarget = speedDist;
     if (air) distTarget = speedDist + RIG.BREACH_PULLBACK;
     else if (speed < RIG.HOVER_SPEED) distTarget = RIG.HOVER_DIST;
+    if (style === 'remote') distTarget *= 1.18;
+    else if (style === 'scenic') distTarget *= 1.08;
+    distTarget *= this.distScale;
     if (this.interiorFollowScale) {
       distTarget *= this.interiorFollowScale(d.x, d.y, d.z);
     }
@@ -397,17 +475,28 @@ export class CameraRig {
       dt,
     );
 
-    // --- desired position: behind horizontal facing, height above ---
-    const fx = Math.sin(s.yaw);
-    const fz = Math.cos(s.yaw);
+    // --- desired position: behind (lagged in Remote), height from sim body ---
+    // Follow yaw tracks facing tightly; Remote lets the dolphin turn in front of
+    // the viewer. Orbit from mouse / right stick is added on top.
+    if (!this.initialized) this.followYaw = s.yaw;
+    const yawTau = style === 'remote' ? 0.85 : style === 'scenic' ? 0.22 : 0.12;
+    const yawK = 1 - Math.exp(-dt / yawTau);
+    this.followYaw += angleDelta(this.followYaw, s.yaw) * yawK;
+    if (this.recenterT > 0) this.followYaw += angleDelta(this.followYaw, s.yaw) * Math.min(1, dt / 0.12);
+    const chaseYaw = this.followYaw + this.orbitYaw;
+    const fx = Math.sin(chaseYaw);
+    const fz = Math.cos(chaseYaw);
+    const height = chaseHeight(bodyY, air, style) * this.compressFactor;
+    this.lastHeight = height;
+    const distXZ = this.dist * Math.cos(this.orbitPitch);
+    const pitchLift = this.dist * Math.sin(this.orbitPitch);
     const desired = this.tmpDesired.set(
-      d.x - fx * this.dist,
-      d.y + RIG.HEIGHT * this.compressFactor,
-      d.z - fz * this.dist,
+      d.x - fx * distXZ,
+      bodyY + height + pitchLift,
+      d.z - fz * distXZ,
     );
-    // No waterline discipline here (CP10 continuation): the eye may sit on,
-    // straddle or pass through the sea surface; Tidewater's renderer shows the
-    // split view. Airborne framing is the BREACH_PULLBACK above.
+    // Positioning uses the sim body, not the swell-ridden presentation Y, so
+    // waves pass through the lens. Aim still looks at the presented dolphin.
 
     // --- collision on the desired point (pool walls / region BVH
     // sphere-cast; dolly-in on block) ---
@@ -428,7 +517,7 @@ export class CameraRig {
         const distU = this.dist / this.compressFactor;
         const probe = this.tmpV.set(
           d.x - fx * distU,
-          d.y + RIG.HEIGHT,
+          bodyY + RIG.HEIGHT,
           d.z - fz * distU,
         );
         const probeLen = probe.distanceTo(d);
@@ -475,7 +564,7 @@ export class CameraRig {
       this.losBlockedS = 0;
     }
     const followDist = this.camPos.distanceTo(d);
-    const targetDist = Math.hypot(this.dist, RIG.HEIGHT);
+    const targetDist = Math.hypot(this.dist, height);
     if (
       !this.emergency &&
       (this.losBlockedS > RIG.EMERGENCY_LOS_S ||
@@ -499,8 +588,11 @@ export class CameraRig {
     const camAz = Math.atan2(this.camPos.x - d.x, this.camPos.z - d.z);
     const behindAz = Math.atan2(-fx, -fz);
     this.azimuthErrorRad = Math.abs(angleDelta(camAz, behindAz));
+    const catchAz = style === 'remote' ? 1.35 : 0.4;
+    const settleT90 = style === 'remote' ? 0.72 : RIG.T90_SETTLE;
+    const catchT90 = style === 'remote' ? 0.42 : RIG.T90_CATCH;
     let posT90: number =
-      recede > 0.15 || this.azimuthErrorRad > 0.4 ? RIG.T90_CATCH : RIG.T90_SETTLE;
+      recede > 0.15 || this.azimuthErrorRad > catchAz ? catchT90 : settleT90;
     if (obstructed) posT90 = Math.min(posT90, RIG.T90_OBSTRUCT);
     if (this.recenterT > 0) posT90 = Math.min(posT90, RIG.T90_CATCH);
     if (this.emergency) posT90 = RIG.T90_EMERGENCY;
@@ -595,6 +687,10 @@ export class CameraRig {
       recenterActiveS: this.recenterT,
       surfaceCrossings: this.crossings,
       eyeAboveWaterM: this.camPos.y - this.wl,
+      eyeAboveMeanM: this.camPos.y,
+      style: this.style,
+      chaseHeightM: this.lastHeight,
+      bodyY: this.lastBodyY,
       losBlockedS: this.losBlockedS,
       emergencyCount: this.emergencyCount,
       updateUsAvg: this.updateUsAvg,

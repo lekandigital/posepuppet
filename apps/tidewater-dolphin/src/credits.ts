@@ -22,16 +22,20 @@ export const TIDEWATER_NOTICE =
 
 const CONTROLS_HTML = `
 	<section>
-		<h3>Swim — Dolphin (default)</h3>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>Shift</kbd></span><span class="tw-help-text">Kick<small>Tap for one kick, hold for a steady rhythm</small></span></div>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>W</kbd><kbd>S</kbd></span><span class="tw-help-text">Pitch<small>W dives, S surfaces</small></span></div>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>A</kbd><kbd>D</kbd></span><span class="tw-help-text">Bank and turn</span></div>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>Q</kbd><kbd>E</kbd></span><span class="tw-help-text">Depth trim<small>Q up, E down</small></span></div>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>Space</kbd></span><span class="tw-help-text">Burst</span></div>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>X</kbd></span><span class="tw-help-text">Brake</span></div>
+		<h3>Swim — Dolphin (default, Ecco-Inspired)</h3>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>Space</kbd></span><span class="tw-help-text">Swim<small>Hold to accelerate and keep speed. Release to glide. A tap adds a tail stroke.</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>W</kbd><kbd>S</kbd></span><span class="tw-help-text">Dive and climb<small>W noses down, S noses up</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>A</kbd><kbd>D</kbd></span><span class="tw-help-text">Turn<small>Banks naturally — tight when slow, wide when fast</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>Shift</kbd></span><span class="tw-help-text">Charge<small>Hold for the fast swim, up to 9 m/s</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>X</kbd><kbd>Ctrl</kbd></span><span class="tw-help-text">Brake<small>Slow to a hover</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>Q</kbd><kbd>E</kbd></span><span class="tw-help-text">Depth trim<small>Q up, E down — optional</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>Z</kbd><kbd>C</kbd></span><span class="tw-help-text">Extra roll<small>Optional; ordinary turns don’t need it</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>V</kbd></span><span class="tw-help-text">Camera style<small>Follow · Remote · Surface</small></span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>R</kbd></span><span class="tw-help-text">Recenter the camera</span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd class="tw-kbd-ico" aria-label="Mouse">🖱</kbd></span><span class="tw-help-text">Look around<small>Drag on the view. The dolphin keeps swimming its own way.</small></span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></span><span class="tw-help-text">Assist<small>Full · standard · expert</small></span></div>
-		<div class="tw-help-row"><span class="tw-keys">PosePuppet</span><span class="tw-help-text">Swim with your body<small>Kick rhythm, lean to pitch and bank, crouch / stretch for depth, hands forward to burst. Keyboard always wins while touched.</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys">Gamepad</span><span class="tw-help-text">Left stick steers, A swims, B charges, X brakes, Y changes camera, right stick looks, Start opens the menu.</span></div>
+		<div class="tw-help-row"><span class="tw-keys">PosePuppet</span><span class="tw-help-text">Swim with your body<small>Kick rhythm, lean to pitch and bank, crouch / stretch for depth, hands forward to burst. Keyboard and a live gamepad win while you use them. Legacy BodyArcade (Shift to kick) is in Dolphin Controls.</small></span></div>
 	</section>
 	<section>
 		<h3>Walking · Boat — Play tab (H)</h3>
@@ -41,7 +45,7 @@ const CONTROLS_HTML = `
 		<div class="tw-help-row"><span class="tw-keys"><kbd>Space</kbd></span><span class="tw-help-text">Jump, swim up</span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>C</kbd></span><span class="tw-help-text">Dive</span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>E</kbd></span><span class="tw-help-text">Interact<small>Board, helm, step ashore, trade</small></span></div>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>V</kbd></span><span class="tw-help-text">Boat camera<small>1st / 3rd person</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>V</kbd></span><span class="tw-help-text">Boat camera<small>1st / 3rd person. In Dolphin mode, V cycles Follow / Remote / Surface.</small></span></div>
 	</section>
 	<section>
 		<h3>Fishing — when enabled (Play tab)</h3>
@@ -57,7 +61,7 @@ const CONTROLS_HTML = `
 		<div class="tw-help-row"><span class="tw-keys"><kbd>T</kbd></span><span class="tw-help-text">Pause time</span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>L</kbd></span><span class="tw-help-text">Flashlight</span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>M</kbd></span><span class="tw-help-text">Mute</span></div>
-		<div class="tw-help-row"><span class="tw-keys"><kbd>H</kbd></span><span class="tw-help-text">Settings panel<small>Play tab: mode, fishing, scenery additions</small></span></div>
+		<div class="tw-help-row"><span class="tw-keys"><kbd>H</kbd></span><span class="tw-help-text">Settings panel<small>Play tab: mode, fishing, Dolphin Controls, scenery additions</small></span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>P</kbd></span><span class="tw-help-text">Photo mode<small>Hides all interface</small></span></div>
 		<div class="tw-help-row"><span class="tw-keys"><kbd>F1</kbd><kbd>?</kbd></span><span class="tw-help-text">This sheet</span></div>
 	</section>`;
@@ -80,17 +84,17 @@ export function installCredits(ui: { helpEl?: HTMLElement; startEl?: HTMLElement
     const guide = help.querySelector('.tw-help-guide');
     if (guide) guide.innerHTML = CREDITS_HTML;
     const sub = help.querySelector('.tw-help-head p');
-    if (sub) sub.textContent = 'BodyArcade dolphin in the Tidewater island (default: keyboard or PosePuppet body input, no mouse look). Tidewater\'s walking, boat and fishing are in the Play tab of the settings panel (H).';
+    if (sub) sub.textContent = 'BodyArcade dolphin in the Tidewater island. Hold Space to swim, WASD to steer, Shift to charge. Drag to look. Walking, boat, fishing and Dolphin Controls are in the Play tab (H).';
   }
   const start = ui.startEl;
   if (start) {
     const keys = start.querySelector('.tw-start-keys');
     if (keys) {
       keys.innerHTML =
-        '<span><kbd>Shift</kbd>Kick</span>' +
-        '<span><span class="tw-wasd"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span>Pitch · bank</span>' +
-        '<span><kbd>Space</kbd>Burst</span>' +
-        '<span><kbd>R</kbd>Recenter</span>' +
+        '<span><kbd>Space</kbd>Swim</span>' +
+        '<span><span class="tw-wasd"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span>Dive · turn · climb</span>' +
+        '<span><kbd>Shift</kbd>Charge</span>' +
+        '<span><kbd>V</kbd>Camera</span>' +
         '<span><kbd>F1</kbd>All controls</span>';
     }
     const title = start.querySelector('.tw-start-title');

@@ -202,22 +202,29 @@ check('containment band is the sampler\'s (12 m), never the 55 m region band', n
   const simState = (y: number, speed: number, vz: number) => ({ x: 0, y, z: 0, yaw: 0, pitch: 0, roll: 0, phase: 'swim' as const, wvx: 0, wvy: 0, wvz: vz, vx: 0, vy: 0, vz, speed });
   check('rig takes the host lens: fov 55, near 0.1 (Tidewater\'s lens plane)', (() => { const { cam } = mkRig(); return cam.fov === 55 && cam.near === 0.1; })());
 
-  // 1. level cruise 0.8 m below a flat surface: the chase geometry puts the eye 0.3 m ABOVE the surface
-  //    (HEIGHT 1.1): inside the old ±0.75 band, where the old rig pushed it down to −0.35
+  // 1. ordinary shallow cruise (SURFACE_Y −0.4): the eye skims just under mean sea, not 1.1 m above the dolphin
   {
     const { rig } = mkRig();
-    const s = simState(-0.8, 3, 3);
-    for (let i = 0; i < 120 * 6; i++) { s.z += 3 / 120; rig.update(s as never, 1 / 120); }
+    const s = simState(-0.4, 3, 3);
+    for (let i = 0; i < 120 * 6; i++) { s.z += 3 / 120; rig.update(s as never, 1 / 120, { bodyY: -0.4 }); }
     const c = rig.evalState(s);
-    check('eye settles where the chase geometry puts it (y ≈ +0.30 m, inside the old exclusion band)', Math.abs(c.y - 0.3) < 0.03, { eyeY: +c.y.toFixed(3) });
+    check('shallow cruise parks the eye near mean sea (slightly under, not +0.7 m in the air)', c.y < 0.05 && c.y > -0.35 && c.chaseHeightM < 0.4, { eyeY: +c.y.toFixed(3), h: +c.chaseHeightM.toFixed(3) });
   }
-  // 2. the eye can rest ON the surface: dolphin 1.1 m down → desired eye at the waterline
+  // 2. deep cruise keeps the old 1.1 m chase height
   {
     const { rig } = mkRig();
-    const s = simState(-1.1, 3, 3);
-    for (let i = 0; i < 120 * 6; i++) { s.z += 3 / 120; rig.update(s as never, 1 / 120); }
+    const s = simState(-6, 3, 3);
+    for (let i = 0; i < 120 * 6; i++) { s.z += 3 / 120; rig.update(s as never, 1 / 120, { bodyY: -6 }); }
     const c = rig.evalState(s);
-    check('eye rests on the surface (|y| < 3 cm) — the straddling lens the pristine game shows', Math.abs(c.y) < 0.03 && Math.abs(c.eyeAboveWaterM) < 0.03, { eyeY: +c.y.toFixed(3) });
+    check('deep cruise keeps HEIGHT 1.1 (eye ≈ −4.9 m)', Math.abs(c.y - (-6 + RIG.HEIGHT)) < 0.08 && c.chaseHeightM > 1.0, { eyeY: +c.y.toFixed(3), h: +c.chaseHeightM.toFixed(3) });
+  }
+  // 2b. the eye can still rest on the surface when the body is placed there (no exclusion band)
+  {
+    const { rig } = mkRig();
+    const s = simState(-0.22, 3, 3);
+    for (let i = 0; i < 120 * 6; i++) { s.z += 3 / 120; rig.update(s as never, 1 / 120, { bodyY: -0.22 }); }
+    const c = rig.evalState(s);
+    check('eye can rest on the surface (|y| < 8 cm) — no waterline exclusion', Math.abs(c.y) < 0.08, { eyeY: +c.y.toFixed(3) });
   }
   // 3. a slow dive from −0.6 m to −3 m and back: the eye passes through [−0.35, 0.35] continuously
   //    (samples inside the band, no step larger than the spring would produce) and the crossings count
@@ -249,20 +256,33 @@ check('containment band is the sampler\'s (12 m), never the 55 m region band', n
     check('airborne framing = chase geometry (eye ≈ dolphin + 1.1 m), follow distance pulled back by BREACH_PULLBACK', Math.abs(c.y - (0.2 + RIG.HEIGHT)) < 0.05 && c.desiredDistM > RIG.FOLLOW_DIST + 1.5, { eyeY: +c.y.toFixed(3), dist: +c.desiredDistM.toFixed(2), state: c.state });
   }
   // 5. the SlowHover regression: a dolphin hovering at the soft ceiling with the swell ride lifting its
-  //    rendered y by a ±0.3 m wave must NOT re-trigger SurfaceTransition on every passing wave
+  //    rendered y by a ±0.3 m wave must NOT re-trigger SurfaceTransition on every passing wave.
+  //    The chase positions on the sim body, so the eye stays put while the wave crosses it.
   {
     let t = 0;
     const wave = () => 0.3 * Math.sin(2 * Math.PI * t / 4);
     const { rig } = mkRig(wave);
     const s = simState(-0.4, 0, 0);
     const seen = new Set<string>();
+    const eyeYs: number[] = [];
+    let signFlips = 0;
+    let prevRel: number | null = null;
     for (let i = 0; i < 120 * 8; i++) {
       t += 1 / 120;
-      const rs = { ...s, y: -0.4 + wave() }; // what the presentation layer feeds the rig (swell ride)
-      rig.update(rs as never, 1 / 120);
-      if (i > 120 * 2) seen.add(rig.evalState(rs).state);
+      const rs = { ...s, y: -0.4 + wave() };
+      rig.update(rs as never, 1 / 120, { bodyY: -0.4 });
+      if (i > 120 * 2) {
+        const c = rig.evalState(rs);
+        seen.add(c.state);
+        eyeYs.push(c.y);
+        const rel = c.eyeAboveWaterM;
+        if (prevRel !== null && Math.sign(rel) !== Math.sign(prevRel) && Math.abs(rel) > 0.02) signFlips++;
+        prevRel = rel;
+      }
     }
+    const eyeSpan = Math.max(...eyeYs) - Math.min(...eyeYs);
     check('hover at the surface in a swell: SlowHover, never SurfaceTransition (crossing detector is surface-relative)', seen.has('SlowHover') && !seen.has('SurfaceTransition'), [...seen]);
+    check('waves cross a nearly still lens (eye moves < 8 cm while the waterline swings ±0.3 m)', eyeSpan < 0.08 && signFlips >= 2, { eyeSpan: +eyeSpan.toFixed(3), signFlips });
   }
   // 6. a real breach still produces SurfaceTransition (the dolphin crosses the surface itself)
   {

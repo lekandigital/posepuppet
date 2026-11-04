@@ -24,15 +24,16 @@
 //    intent (it slows to a hover where it was left) and neither reads the
 //    keyboard nor drives the camera; `resume()` hands both back.
 //  - swell ride (default on, ?noSwellRide to compare): near the surface the
-//    rendered dolphin (and the camera target) is lifted by the measured wave
-//    height so it sits in Tidewater's actual swell instead of the sim's flat
-//    SURFACE_Y plane. Weight 1 within 0.6 m of the surface → 0 at 3 m depth
-//    [DERIVED]. The deterministic sim state is untouched.
+//    rendered dolphin is lifted by the measured wave height so it sits in
+//    Tidewater's actual swell instead of the sim's flat SURFACE_Y plane.
+//    Weight 1 within 0.6 m of the surface → 0 at 3 m depth [DERIVED]. The
+//    chase camera positions against the sim body Y (waves cross the lens);
+//    aim still tracks the presented dolphin. The deterministic sim is untouched.
 
 import { Vector3, MathUtils } from '../../vendor/tidewater/src/engine/index.js';
 import { SPRAY } from '../../vendor/tidewater/src/fx/Spray.js';
 import { SwimSim, SIM, NEUTRAL_INTENT, type AssistMode, type SwimIntent } from './sim';
-import { CameraRig, RIG, type CameraEvalState, type HostCamera } from './cameraRig';
+import { CameraRig, RIG, CAMERA_STYLES, type CameraEvalState, type CameraStyle, type HostCamera } from './cameraRig';
 import { loadDolphin, type DolphinActor } from './dolphinActor';
 import { createSwimControls, type SwimControls } from '../input/swimControls';
 import {
@@ -146,7 +147,15 @@ export class DolphinPlayer {
     ]);
     this.sim = new SwimSim(this.sampler);
     this.placeAtSpawn();
-    this.controls = createSwimControls();
+    this.controls = createSwimControls(window, {
+      onRecenter: () => { if (this.controlled) this.rig.recenter(); },
+      onCycleCamera: () => { if (this.controlled) this.cycleCameraStyle(); },
+      onMenu: () => {
+        const ui = (window as unknown as { __ui?: { togglePanel?: (on?: boolean) => void } }).__ui;
+        ui?.togglePanel?.();
+      },
+    });
+    this.applyControlPrefs();
     this.obstacles = new TidewaterObstacles(host.colliders);
     this.obstacles.addBox(dock.x, dock.z, BOAT_HALF_BEAM, BOAT_HALF_LENGTH, dock.heading, -3, 3, 'boatDock');
     this.camCollision = new TidewaterCameraCollision(this.sampler, host.colliders, RIG.COLLISION_RADIUS, 5);
@@ -159,8 +168,7 @@ export class DolphinPlayer {
     this.prevPitch = this.sim.state.pitch;
     this.statAt = performance.now();
 
-    // assist keys (dolphin parity) + R recenter (cp02) — as regionGame.ts; only while the dolphin
-    // is the active player (R is Tidewater's fishing-rod key in the other modes)
+    // assist keys — only while the dolphin is the active player (R / V are swimControls)
     addEventListener('keydown', (e) => {
       if (!this.controlled) return;
       const t = e.target as HTMLElement | null;
@@ -168,7 +176,6 @@ export class DolphinPlayer {
       if (e.key === '1') this.sim.assist = 'full';
       if (e.key === '2') this.sim.assist = 'standard';
       if (e.key === '3') this.sim.assist = 'expert';
-      if (e.key === 'r' || e.key === 'R') this.rig.recenter();
     });
     const qa = new URLSearchParams(location.search).get('assist');
     if (qa === 'full' || qa === 'standard' || qa === 'expert') this.sim.assist = qa;
@@ -224,6 +231,27 @@ export class DolphinPlayer {
 
   get isControlled(): boolean {
     return this.controlled;
+  }
+
+  applyControlPrefs(): void {
+    const p = this.controls.prefs();
+    this.rig.setStyle(p.cameraStyle);
+    this.rig.distScale = p.cameraDistance;
+    this.host.camera.fov = p.fov;
+    this.host.camera.updateProjectionMatrix();
+  }
+
+  cycleCameraStyle(): CameraStyle {
+    const next = this.rig.cycleStyle();
+    this.controls.setPrefs({ cameraStyle: next });
+    const label = next === 'follow' ? 'Follow' : next === 'remote' ? 'Remote' : 'Surface / Scenic';
+    (window as unknown as { __ui?: { toast?: (m: string) => void } }).__ui?.toast?.(`Camera · ${label}`);
+    return next;
+  }
+
+  setCameraStyle(style: CameraStyle): void {
+    this.rig.setStyle(style);
+    this.controls.setPrefs({ cameraStyle: style });
   }
 
   /** the dolphin becomes the player again: valid water (else the spawn), camera snapped behind it */
@@ -303,7 +331,8 @@ export class DolphinPlayer {
   update(dtS: number, { paused = false } = {}): void {
     const now = performance.now();
     const dtMs = Math.min(100, dtS * 1000);
-    const live = this.controls.intent(dtMs); // polled every frame: keeps the body-input transport state fresh
+    const live = this.controls.intent(dtMs); // polled every frame: keeps the body-input / gamepad state fresh
+    const look = this.controls.cameraInput(dtS);
     const control = this.controlled;
     let intent: SwimIntent = !control
       ? { ...NEUTRAL_INTENT, autopilot: true }
@@ -354,8 +383,9 @@ export class DolphinPlayer {
       cam.updateProjectionMatrix();
       cam.lookAt(this.tmpV.set(this.shot.look[0], this.shot.look[1], this.shot.look[2]));
     } else if (!paused && control) {
+      if (look.lookYaw || look.lookPitch) this.rig.addLook(look.lookYaw, look.lookPitch);
       const t0 = performance.now();
-      this.rig.update(rs as never, dtS);
+      this.rig.update(rs as never, dtS, { bodyY: s.y });
       this.rigUs += (performance.now() - t0) * 1000;
       this.rigN++;
     }
@@ -453,6 +483,16 @@ export class DolphinPlayer {
       credits: CREDITS_ATTRIBUTION,
       firstFrame: () => this.firstFrame,
       camera: (): CameraEvalState => this.rig.evalState(this.sim.state),
+      cameraStyle: () => this.rig.getStyle(),
+      controlPrefs: () => this.controls.prefs(),
+      setControlPrefs: (p: Parameters<SwimControls['setPrefs']>[0]) => {
+        const next = this.controls.setPrefs(p);
+        this.applyControlPrefs();
+        return next;
+      },
+      cycleCameraStyle: () => this.cycleCameraStyle(),
+      setCameraStyle: (s: CameraStyle) => this.setCameraStyle(s),
+      CAMERA_STYLES,
       coverage: () => this.coverage(),
       RIG,
       SIM,
@@ -504,6 +544,13 @@ export class DolphinPlayer {
         resetToSpawn() { self.resetToSpawn(); },
         setVisible(v: boolean) { self.actor.setVisible(v); },
         setSwellRide(v: boolean) { self.opts.swellRide = v; },
+        setControlPrefs(p: Parameters<SwimControls['setPrefs']>[0]) {
+          const next = self.controls.setPrefs(p);
+          self.applyControlPrefs();
+          return next;
+        },
+        cycleCameraStyle() { return self.cycleCameraStyle(); },
+        setCameraStyle(s: CameraStyle) { self.setCameraStyle(s); },
         contactState() { return self.sim.contactState(); },
         /** deterministic replay — the cp04A/cp05C contract verbatim (fresh sim at spawn; digest format shared) */
         runScript(script: { steps: number; intent: Partial<SwimIntent> }[], withObstacles = true): string {
