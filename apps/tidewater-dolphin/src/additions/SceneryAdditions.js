@@ -60,7 +60,9 @@ const ASSET_INFO = {
 };
 
 // ---------------------------------------------------------------- the imported models
-// kind / sway / tint: GLBScenery.buildMaterial; solid: rasterised into the structure field;
+// kind / sway / tint: GLBScenery.buildMaterial (stone and tint models share one material per look,
+// the stone palette rides in the instance data); solid: rasterised into the structure field;
+// castShadow: shadow-pass pipelines only for the things whose shadows read (fewer pipelines);
 // lodDist: LOD0 → LOD1, LOD1 → LOD2 (or out), fade out (m, + sizeDist x the instance radius);
 // size (m, from manifest.json) is used by the placement before the GLB is loaded.
 const GREEN = [ [ 0.14, 0.34, 0.1 ], [ 0.3, 0.5, 0.15 ] ];
@@ -71,24 +73,24 @@ export const MODELS = {
 	seaweed_c: { kind: 'tint', tint: GREEN, sway: { height: 2.8, amp: 0.3, speed: 0.8 }, castShadow: false, lodDist: [ 14, 30, 55 ], sizeDist: 3, algae: 0, size: [ 3.1, 2.81, 2.77 ] },
 	kelp_bush: { kind: 'tint', tint: [ [ 0.07, 0.2, 0.05 ], [ 0.13, 0.3, 0.09 ] ], sway: { height: 4.9, amp: 0.45, speed: 0.6 }, castShadow: false, lodDist: [ 18, 40, 65 ], sizeDist: 2, algae: 0, size: [ 3.98, 4.91, 5.02 ] },
 	wreck_boat: { kind: 'textured', solid: true, castShadow: true, lodDist: [ 30, 90, 400 ], algae: 0.75, size: [ 4.36, 5.43, 7.88 ] },
-	skiff: { kind: 'textured', solid: true, castShadow: true, lodDist: [ 25, 70, 300 ], algae: 0.75, size: [ 3.44, 1.0, 4.82 ] },
+	skiff: { kind: 'textured', solid: true, castShadow: false, lodDist: [ 25, 70, 300 ], algae: 0.75, size: [ 3.44, 1.0, 4.82 ] },
 	temple: { kind: 'textured', solid: true, castShadow: true, lodDist: [ 40, 110, 500 ], algae: 0.6, size: [ 10.79, 7.89, 10.79 ] },
 	column: { kind: 'textured', solid: true, castShadow: true, lodDist: [ 30, 90, 400 ], algae: 0.6, size: [ 1.19, 5.97, 1.19 ] },
-	slab: { kind: 'textured', solid: true, castShadow: true, lodDist: [ 20, 60, 200 ], algae: 0.6, size: [ 0.9, 2.14, 2.35 ] },
-	statue_head: { kind: 'stone', stonePal: 0.62, stoneTile: 0.8, solid: true, castShadow: true, lodDist: [ 30, 90, 400 ], algae: 0.6, size: [ 3.1, 3.69, 2.62 ] },
+	slab: { kind: 'textured', solid: true, castShadow: false, lodDist: [ 20, 60, 200 ], algae: 0.6, size: [ 0.9, 2.14, 2.35 ] },
+	statue_head: { kind: 'stone', stonePal: 0.62, stoneTile: 0.65, solid: true, castShadow: true, lodDist: [ 30, 90, 400 ], algae: 0.6, size: [ 3.1, 3.69, 2.62 ] },
 	ruin_wall: { kind: 'textured', solid: true, castShadow: true, lodDist: [ 40, 110, 500 ], algae: 0.6, size: [ 11.51, 7.79, 17.68 ] },
-	rock_tall: { kind: 'stone', stonePal: 0.34, stoneTile: 0.7, solid: true, castShadow: true, lodDist: [ 30, 90, 400 ], algae: 0.55, size: [ 4.73, 5.4, 5.84 ] },
-	rock_slab: { kind: 'stone', stonePal: 0.42, stoneTile: 0.7, solid: true, castShadow: true, lodDist: [ 30, 90, 400 ], algae: 0.55, size: [ 6.45, 2.87, 5.43 ] },
-	rock_cluster: { kind: 'stone', stonePal: 0.3, stoneTile: 0.75, solid: true, castShadow: true, lodDist: [ 30, 90, 400 ], algae: 0.55, size: [ 7.27, 8.2, 7.94 ] },
-	rock_lump: { kind: 'stone', stonePal: 0.5, stoneTile: 0.5, solid: true, castShadow: true, lodDist: [ 24, 70, 300 ], algae: 0.55, size: [ 2.17, 1.86, 2.28 ] },
-	rock_mossy: { kind: 'textured', solid: true, castShadow: true, lodDist: [ 20, 60, 200 ], algae: 0.3, size: [ 2.2, 1.1, 1.98 ] },
+	rock_tall: { kind: 'stone', stonePal: 0.34, stoneTile: 0.65, solid: true, castShadow: true, lodDist: [ 30, 90, 400 ], algae: 0.55, size: [ 4.73, 5.4, 5.84 ] },
+	rock_slab: { kind: 'stone', stonePal: 0.42, stoneTile: 0.65, solid: true, castShadow: true, lodDist: [ 30, 90, 400 ], algae: 0.55, size: [ 6.45, 2.87, 5.43 ] },
+	rock_cluster: { kind: 'stone', stonePal: 0.3, stoneTile: 0.65, solid: true, castShadow: true, lodDist: [ 30, 90, 400 ], algae: 0.55, size: [ 7.27, 8.2, 7.94 ] },
+	rock_lump: { kind: 'stone', stonePal: 0.5, stoneTile: 0.65, solid: true, castShadow: false, lodDist: [ 24, 70, 300 ], algae: 0.55, size: [ 2.17, 1.86, 2.28 ] },
+	rock_mossy: { kind: 'textured', solid: true, castShadow: false, lodDist: [ 20, 60, 200 ], algae: 0.3, size: [ 2.2, 1.1, 1.98 ] },
 	boulder_layered: { kind: 'textured', solid: true, castShadow: true, lodDist: [ 30, 90, 400 ], algae: 0.55, size: [ 4.62, 6.17, 4.65 ] },
 	manatee: { kind: 'textured', swim: true, bodyLength: 3.5, swimAxis: [ 0, 1, 0 ], swimAmp: 0.13, swimK: 3.2, halfHeight: 0.58, algae: 0, size: [ 1.68, 1.15, 3.49 ] },
 	hammerhead: { kind: 'shark', swim: true, bodyLength: 3.6, swimAxis: [ 1, 0, 0 ], swimAmp: 0.2, swimK: 4.6, halfHeight: 0.7, algae: 0, size: [ 1.73, 1.4, 3.6 ] },
 	lighthouse: { kind: 'textured', solid: false, castShadow: true, lodDist: [ 60, 200, 1400 ], sizeDist: 8, algae: 0, size: [ 14.65, 19.55, 7.02 ] },
 	shrub_rooibos: { kind: 'textured', armIsAO: true, castShadow: true, lodDist: [ 20, 50, 160 ], sizeDist: 4, algae: 0, size: [ 0.72, 0.92, 0.84 ] },
 	shrub_03: { kind: 'textured', armIsAO: true, castShadow: true, lodDist: [ 20, 50, 160 ], sizeDist: 4, algae: 0, size: [ 0.5, 1.01, 0.38 ] },
-	dry_branches: { kind: 'textured', armIsAO: true, castShadow: true, lodDist: [ 18, 45, 140 ], sizeDist: 4, algae: 0, size: [ 0.45, 0.48, 1.82 ] },
+	dry_branches: { kind: 'textured', armIsAO: true, castShadow: false, lodDist: [ 18, 45, 140 ], sizeDist: 4, algae: 0, size: [ 0.45, 0.48, 1.82 ] },
 	bark_debris: { kind: 'textured', armIsAO: true, castShadow: false, lodDist: [ 14, 35, 90 ], sizeDist: 4, algae: 0, size: [ 0.28, 0.1, 0.6 ] },
 };
 

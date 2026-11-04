@@ -121,7 +121,7 @@ const SURFACE = /* wgsl */`
 	let Cc = textureSample( terrainDetailTex, smpAniso4Repeat, uvC );
 	let w = terrainTriWeights( N );
 	let T3 = A * w.x + B * w.y + Cc * w.z;
-	let S = debrisStoneSurface( T3, N, mat.stonePal, 0.0, seed, tile );
+	let S = debrisStoneSurface( T3, N, iData.w, 0.0, seed, tile );
 	s.albedo = S.albedo * mat.color;
 	s.roughness = S.rough;
 	s.normal = terrainPerturbNormal( p, N, S.hd * 2.0, 1.0 );
@@ -235,6 +235,20 @@ export function buildMaterial( gm, T, opts, name ) {
 
 }
 
+// Untextured kinds share one material per look (the per-model palette rides in the instance
+// data): one set of pipelines for every scanned rock and the statue, one for the weed clumps —
+// fewer pipelines to compile at start-up (Tidewater precompiles every material of every pass).
+const SHARED_MATERIALS = new Map();
+
+function sharedMaterialKey( def, opts ) {
+
+	if ( opts.mode === 'swim' ) return null;
+	if ( def.kind === 'stone' ) return 'stone:' + ( def.stoneTile ?? 0.6 ) + ':' + ( def.algae ?? 0.55 );
+	if ( def.kind === 'tint' ) return 'tint:' + JSON.stringify( def.tint ) + ':' + JSON.stringify( def.sway ) + ':' + ( def.algae ?? 0 );
+	return null;
+
+}
+
 // ---------------------------------------------------------------- model
 
 // A converted GLB: per LOD, the engine geometries with their materials. Textures are decoded
@@ -300,9 +314,11 @@ export class SceneryModel {
 				orm: await tex( pbr.metallicRoughnessTexture, false ),
 				normal: await tex( gm.normalTexture, false ),
 			} : {};
-			const m = buildMaterial( gm, T, { ...this.def, mode: opts.mode || 'instanced', terrainGPU: opts.terrainGPU }, 'additions-' + this.id + '-' + ( gm.name || index ) );
+			const key = sharedMaterialKey( this.def, opts );
+			if ( key && SHARED_MATERIALS.has( key ) ) { matCache.set( index, SHARED_MATERIALS.get( key ) ); return SHARED_MATERIALS.get( key ); }
+			const m = buildMaterial( gm, T, { ...this.def, mode: opts.mode || 'instanced', terrainGPU: opts.terrainGPU }, key ? 'additions-' + key : 'additions-' + this.id + '-' + ( gm.name || index ) );
 			matCache.set( index, m );
-			this.materials.push( m );
+			if ( key ) SHARED_MATERIALS.set( key, m ); else this.materials.push( m );
 			return m;
 
 		};
@@ -446,6 +462,8 @@ export class ModelInstances {
 			const s = Array.isArray( r.s ) ? Math.max( ...r.s ) : ( r.s ?? 1 );
 			r.radius = M.radius * s;
 			r.center = this._c.copy( M.center ).applyMatrix4( r.matrix ).clone();
+			// iData.w: the sway amplitude of a swaying model, the stone palette of a scanned rock
+			if ( M.def.kind === 'stone' ) r.sway = M.def.stonePal ?? 0.45;
 
 		}
 
