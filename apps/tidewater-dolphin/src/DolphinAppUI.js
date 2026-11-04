@@ -144,7 +144,7 @@ export class DolphinAppUI {
 			const add = play.addFolder( 'Scenery additions', { icon: 'layers' } );
 			add.addSelect( {
 				label: 'Environment', object: s, key: 'environment', segmented: true,
-				tooltip: 'Original: exactly the pristine Tidewater scene. Enhanced: the optional additions below (all made of assets already in Tidewater, Poly Haven CC0). Compare freely; nothing of the original is changed either way.',
+				tooltip: 'Original: exactly the pristine Tidewater scene. Enhanced: the optional additions below — Tidewater\'s own Poly Haven scans re-used, and models from the user\'s Ubuntu library (CC0 / CC-BY, see the credits) placed at authored sites. Compare freely; nothing of the original is changed either way.',
 				options: [ { label: 'Original Tidewater', value: 'original' }, { label: 'Enhanced', value: 'enhanced' } ],
 				onChange: ( v ) => { app.additions.setAll( v === 'enhanced' ); for ( const c of ADDITION_CATEGORIES ) s[ 'add_' + c.id ] = v === 'enhanced'; ui.refresh(); },
 			} );

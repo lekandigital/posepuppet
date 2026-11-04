@@ -154,3 +154,13 @@ apps/tidewater-dolphin/eval/captures/
 !docs/bodyarcade-stage3/references/**/*.png
 !docs/bodyarcade-stage3/references/**/*.jpg
 !docs/bodyarcade-stage3/references/**/*.jpeg
+
+# Asset-integration pass (2026-11-04): imported scenery models for the Tidewater dolphin live
+# under apps/tidewater-dolphin/public/models/additions/ (already un-ignored with the app's
+# public tree); the staged future-game models (converted, licence-clean, with manifest and
+# credits) are kept persistently under assets/future-games/.
+!assets/
+!assets/future-games/
+!assets/future-games/**
+# the asset tools' node_modules may be a symlink into a scratch install (not a directory for git)
+apps/tidewater-dolphin/tools/assets/node_modules

@@ -1,0 +1,2657 @@
+{
+	"generated": "2026-11-04T12:16:28.546Z",
+	"assets": {
+		"kelp_tall": {
+			"id": "kelp_tall",
+			"file": "kelp_tall.glb",
+			"bytes": 680128,
+			"sha256": "b80a57d38916a585f23bbd3800e96c36dcf1e568e2149280e45f30af513212ed",
+			"provenance": {
+				"labId": "man-animated-kelp-52aea21d",
+				"title": "Animated Kelp",
+				"creator": "JosephWPugsley",
+				"site": "sketchfab.com",
+				"url": "https://sketchfab.com/3d-models/74c400fd4d81469199268ac27451d03f",
+				"license": "CC-BY",
+				"licenseLabel": "cc-by-4.0",
+				"attributionDraft": "- **Animated Kelp** — by JosephWPugsley — **CC-BY 4.0**. Source: https://sketchfab.com/3d-models/animated-kelp-74c400fd4d81469199268ac27451d03f — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/man-animated-kelp-52aea21d.glb",
+				"labSha256": "677c0acda84b16f6d057c88f2089173407edfcdff9cee54844b9c03a34ab0bb3",
+				"labBytes": 3713404
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 4.6,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"thin": 0.55,
+						"thinMaterials": {},
+						"ratio": 0.7,
+						"error": 0.03
+					},
+					{
+						"thin": 0.25,
+						"thinMaterials": {},
+						"ratio": 0.5,
+						"error": 0.05
+					}
+				],
+				"note": "tall brown kelp stalk (rigged in the source); rest pose baked, sway in the vertex stage"
+			},
+			"bounds": {
+				"min": [
+					-2.246,
+					0,
+					-2.239
+				],
+				"max": [
+					2.246,
+					9.2,
+					2.239
+				],
+				"size": [
+					4.492,
+					9.2,
+					4.477
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 7120
+				},
+				{
+					"node": "LOD1",
+					"tris": 2881
+				},
+				{
+					"node": "LOD2",
+					"tris": 849
+				}
+			],
+			"materials": [
+				{
+					"name": "KelpStem",
+					"alphaMode": "MASK",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "KelpLeaves",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "KelpStem",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 575K",
+					"to": "1024x1024 jpeg 37K",
+					"alpha": false
+				},
+				{
+					"name": "kelpLeaves",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 1861K",
+					"to": "1024x1024 jpeg 157K",
+					"alpha": false
+				}
+			]
+		},
+		"seaweed_a": {
+			"id": "seaweed_a",
+			"file": "seaweed_a.glb",
+			"bytes": 94304,
+			"sha256": "5763a3a71a16f4f3dcac7a26a05223d455a52beab997dd301ddec799d98903db",
+			"provenance": {
+				"labId": "man-sea-weed-ad496274",
+				"title": "Sea Weed",
+				"creator": "rkuhlf",
+				"site": "sketchfab.com",
+				"url": "https://sketchfab.com/3d-models/d97c596b189845b681cc8eef8a3ab429",
+				"license": "CC-BY",
+				"licenseLabel": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+				"attributionDraft": "- **Sea Weed** — by rkuhlf — **CC-BY 4.0**. Source: https://sketchfab.com/3d-models/sea-weed-d97c596b189845b681cc8eef8a3ab429 — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/man-sea-weed-ad496274.glb",
+				"labSha256": "a9a66878890846a3a64910584f763d6b7e1dd5b90609319b180a885dc47b2b2f",
+				"labBytes": 204736
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": "/^Seaweed\\.002$/",
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.5,
+						"error": 0.03
+					}
+				],
+				"note": "blade clump A of the three in the source"
+			},
+			"bounds": {
+				"min": [
+					-0.039,
+					0,
+					-1.64
+				],
+				"max": [
+					0.039,
+					1.886,
+					1.64
+				],
+				"size": [
+					0.079,
+					1.886,
+					3.281
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 176
+				},
+				{
+					"node": "LOD1",
+					"tris": 176
+				}
+			],
+			"materials": [
+				{
+					"name": "Seaweed",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"seaweed_b": {
+			"id": "seaweed_b",
+			"file": "seaweed_b.glb",
+			"bytes": 113312,
+			"sha256": "f74b38f4a2e7c078011cf99ebd8be927641f103fdb617f3e6955c22388d81f17",
+			"provenance": {
+				"labId": "man-sea-weed-ad496274",
+				"title": "Sea Weed",
+				"creator": "rkuhlf",
+				"site": "sketchfab.com",
+				"url": "https://sketchfab.com/3d-models/d97c596b189845b681cc8eef8a3ab429",
+				"license": "CC-BY",
+				"licenseLabel": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+				"attributionDraft": "- **Sea Weed** — by rkuhlf — **CC-BY 4.0**. Source: https://sketchfab.com/3d-models/sea-weed-d97c596b189845b681cc8eef8a3ab429 — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/man-sea-weed-ad496274.glb",
+				"labSha256": "a9a66878890846a3a64910584f763d6b7e1dd5b90609319b180a885dc47b2b2f",
+				"labBytes": 204736
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": "/^Seaweed$/",
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.5,
+						"error": 0.03
+					}
+				],
+				"note": "blade clump B"
+			},
+			"bounds": {
+				"min": [
+					-0.347,
+					0,
+					-0.846
+				],
+				"max": [
+					0.347,
+					2.287,
+					0.846
+				],
+				"size": [
+					0.693,
+					2.287,
+					1.691
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 364
+				},
+				{
+					"node": "LOD1",
+					"tris": 336
+				}
+			],
+			"materials": [
+				{
+					"name": "Seaweed",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"seaweed_c": {
+			"id": "seaweed_c",
+			"file": "seaweed_c.glb",
+			"bytes": 112436,
+			"sha256": "a5bdad446bb826494913e5b70e5cdf8886be3a52930b89370cc7a3d7178be2ac",
+			"provenance": {
+				"labId": "man-sea-weed-ad496274",
+				"title": "Sea Weed",
+				"creator": "rkuhlf",
+				"site": "sketchfab.com",
+				"url": "https://sketchfab.com/3d-models/d97c596b189845b681cc8eef8a3ab429",
+				"license": "CC-BY",
+				"licenseLabel": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+				"attributionDraft": "- **Sea Weed** — by rkuhlf — **CC-BY 4.0**. Source: https://sketchfab.com/3d-models/sea-weed-d97c596b189845b681cc8eef8a3ab429 — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/man-sea-weed-ad496274.glb",
+				"labSha256": "a9a66878890846a3a64910584f763d6b7e1dd5b90609319b180a885dc47b2b2f",
+				"labBytes": 204736
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": "/^Seaweed\\.001$/",
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.5,
+						"error": 0.03
+					}
+				],
+				"note": "blade clump C (wide)"
+			},
+			"bounds": {
+				"min": [
+					-1.551,
+					0,
+					-1.385
+				],
+				"max": [
+					1.551,
+					2.815,
+					1.385
+				],
+				"size": [
+					3.102,
+					2.815,
+					2.77
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 324
+				},
+				{
+					"node": "LOD1",
+					"tris": 312
+				}
+			],
+			"materials": [
+				{
+					"name": "Seaweed",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"kelp_bush": {
+			"id": "kelp_bush",
+			"file": "kelp_bush.glb",
+			"bytes": 487552,
+			"sha256": "da4d17acc468acaf535df2dc09b85f35fe24b6f892383ac5312c1f58205be3fe",
+			"provenance": {
+				"labId": "man-kelp-cb222ee3",
+				"title": "Kelp",
+				"creator": "Mazelya",
+				"site": "sketchfab.com",
+				"url": "https://sketchfab.com/3d-models/d1758bd85ec04eaab14fe50028108a10",
+				"license": "CC-BY",
+				"licenseLabel": "cc-by-4.0",
+				"attributionDraft": "- **Kelp** — by Mazelya — **CC-BY 4.0**. Source: https://sketchfab.com/3d-models/kelp-d1758bd85ec04eaab14fe50028108a10 — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/man-kelp-cb222ee3.glb",
+				"labSha256": "84f7be2e037e08797fdcaf8863fc407128b8c746e3042939478417dee27c5b66",
+				"labBytes": 10569580
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 2.4,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": {
+					"ratio": 0.2,
+					"error": 0.4
+				},
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"thin": 0.5,
+						"ratio": 0.5,
+						"error": 0.5
+					}
+				],
+				"note": "dense kelp thicket, 365k → ~10k tris (meshoptimizer), colour at runtime"
+			},
+			"bounds": {
+				"min": [
+					-1.992,
+					0,
+					-2.511
+				],
+				"max": [
+					1.992,
+					4.908,
+					2.511
+				],
+				"size": [
+					3.985,
+					4.908,
+					5.022
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 14369
+				},
+				{
+					"node": "LOD1",
+					"tris": 4175
+				}
+			],
+			"materials": [
+				{
+					"name": "Material",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"wreck_boat": {
+			"id": "wreck_boat",
+			"file": "wreck_boat.glb",
+			"bytes": 2156172,
+			"sha256": "20f99acabbf38ad6e83a0108bd1bb0d00f03685ace4ec32eac0bca60a63657cb",
+			"provenance": {
+				"labId": "man-fantasy-fishing-boat-e318dbb5",
+				"title": "Fantasy Fishing Boat",
+				"creator": "eb78",
+				"site": "sketchfab.com",
+				"url": "https://sketchfab.com/3d-models/bf7d68cb9db5469a9895064de1499d68",
+				"license": "CC-BY",
+				"licenseLabel": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+				"attributionDraft": "- **Fantasy Fishing Boat** — by eb78 — **CC-BY 4.0**. Source: https://sketchfab.com/3d-models/fantasy-fishing-boat-bf7d68cb9db5469a9895064de1499d68 — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/man-fantasy-fishing-boat-e318dbb5.glb",
+				"labSha256": "236165e0591d188977aeb0c4badaafd7e362173364a9ca3a1671e3cfe9c46175",
+				"labBytes": 12891776
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": "/^(Oar_L|Oar_R)$/",
+				"dropMaterials": "/^SmallSail$/",
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": {
+					"Rope": {
+						"ratio": 0.25,
+						"error": 0.03
+					},
+					"Wood": {
+						"ratio": 0.5,
+						"error": 0.01
+					},
+					"Bolt": {
+						"ratio": 0.3,
+						"error": 0.03
+					},
+					"Wood_Color": {
+						"ratio": 0.6,
+						"error": 0.01
+					}
+				},
+				"lods": [
+					{
+						"ratio": 0.3,
+						"error": 0.03
+					}
+				],
+				"note": "fishing boat as a wreck: sail and oars removed, ropes / wood decimated, 2K → 1K textures"
+			},
+			"bounds": {
+				"min": [
+					-2.182,
+					0,
+					-3.939
+				],
+				"max": [
+					2.182,
+					5.431,
+					3.939
+				],
+				"size": [
+					4.363,
+					5.431,
+					7.877
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 19283
+				},
+				{
+					"node": "LOD1",
+					"tris": 5976
+				}
+			],
+			"materials": [
+				{
+					"name": "Bolt",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						0.22,
+						0.21,
+						0.2,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "Wood_Color",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": false
+					}
+				},
+				{
+					"name": "Wood",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": false
+					}
+				},
+				{
+					"name": "Planks",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": true
+					}
+				},
+				{
+					"name": "Rope",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "ScrewSet001_2K_NormalGL",
+					"slot": "baseColor",
+					"from": "2048x2048 jpeg 349K",
+					"to": "1024x1024 jpeg 79K",
+					"alpha": false
+				},
+				{
+					"name": "Metal026_2K_Color",
+					"slot": "baseColor",
+					"from": "2048x2048 jpeg 751K",
+					"to": "1024x1024 jpeg 194K",
+					"alpha": false
+				},
+				{
+					"name": "Wood035_2K-JPG_NormalGL",
+					"slot": "normalTexture",
+					"from": "2048x2048 jpeg 1517K",
+					"to": "1024x1024 jpeg 173K",
+					"alpha": false
+				},
+				{
+					"name": "Wood035_2K-JPG_Yellow",
+					"slot": "baseColorTexture",
+					"from": "2048x2048 jpeg 1150K",
+					"to": "1024x1024 jpeg 265K",
+					"alpha": false
+				},
+				{
+					"name": "Image",
+					"slot": "metallicRoughnessTexture",
+					"from": "1x1 png 0K",
+					"to": "1x1 jpeg 0K",
+					"alpha": false
+				},
+				{
+					"name": "Wood035_2K-JPG_Color",
+					"slot": "baseColorTexture",
+					"from": "2048x2048 jpeg 1093K",
+					"to": "1024x1024 jpeg 250K",
+					"alpha": false
+				},
+				{
+					"name": "Planks031A_2K_NormalGL",
+					"slot": "normalTexture",
+					"from": "2048x2048 jpeg 1263K",
+					"to": "1024x1024 jpeg 151K",
+					"alpha": false
+				},
+				{
+					"name": "Planks031A_2K_Color",
+					"slot": "baseColorTexture",
+					"from": "2048x2048 jpeg 715K",
+					"to": "1024x1024 jpeg 170K",
+					"alpha": false
+				},
+				{
+					"name": "Planks031A_2K_Metalness-Planks031A_2K_Roughness",
+					"slot": "metallicRoughnessTexture",
+					"from": "2048x2048 png 3177K",
+					"to": "1024x1024 jpeg 87K",
+					"alpha": false
+				},
+				{
+					"name": "Rope001_2K-JPG_NormalGL",
+					"slot": "normalTexture",
+					"from": "2048x1024 jpeg 722K",
+					"to": "1024x512 jpeg 124K",
+					"alpha": false
+				},
+				{
+					"name": "Red_Rope",
+					"slot": "baseColorTexture",
+					"from": "2048x1024 jpeg 449K",
+					"to": "1024x512 jpeg 97K",
+					"alpha": false
+				}
+			]
+		},
+		"skiff": {
+			"id": "skiff",
+			"file": "skiff.glb",
+			"bytes": 212032,
+			"sha256": "e46e875950aed0f0e7bd6e4779008ef064f566e0dea2c55d37a903f20c9c69fd",
+			"provenance": {
+				"labId": "oga-medieval-boat-2ee13865",
+				"title": "Medieval Boat",
+				"creator": "AnyRPG",
+				"site": null,
+				"url": "https://opengameart.org/content/medieval-boat",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Medieval Boat** — by AnyRPG — **CC0**. Source: https://opengameart.org/content/medieval-boat — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-medieval-boat-2ee13865.glb",
+				"labSha256": "28d4c56f410872858cf40406754ddc10901ca2a6a0de7ff9e38391b53fc8c9f3",
+				"labBytes": 272584
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 0.6,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [],
+				"note": "weathered rowing skiff (sunken), ×0.6 → 4.8 m"
+			},
+			"bounds": {
+				"min": [
+					-1.722,
+					0,
+					-2.411
+				],
+				"max": [
+					1.722,
+					0.998,
+					2.411
+				],
+				"size": [
+					3.443,
+					0.998,
+					4.822
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 320
+				}
+			],
+			"materials": [
+				{
+					"name": "WoodPlanksOld",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "WoodPlanksOld",
+					"slot": "baseColorTexture",
+					"from": "1128x1100 jpeg 245K",
+					"to": "1024x999 jpeg 186K",
+					"alpha": false
+				}
+			]
+		},
+		"temple": {
+			"id": "temple",
+			"file": "temple.glb",
+			"bytes": 417840,
+			"sha256": "0fd561bceea6b773a222eef519d4dafc7a2c43adec02f55cb0db77ed7f249b38",
+			"provenance": {
+				"labId": "oga-medieval-stone-temple-321df6dc",
+				"title": "Medieval Stone Temple",
+				"creator": "AnyRPG",
+				"site": null,
+				"url": "https://opengameart.org/content/medieval-stone-temple",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Medieval Stone Temple** — by AnyRPG — **CC0**. Source: https://opengameart.org/content/medieval-stone-temple — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-medieval-stone-temple-321df6dc.glb",
+				"labSha256": "20f0224701337dd30b187d83926966e87598988ee7de5de18c70039fecfc3922",
+				"labBytes": 256380
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1.8,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.4,
+						"error": 0.02
+					}
+				],
+				"note": "octagonal stone temple, ×1.8 → 10.8 m wide, 7.9 m tall"
+			},
+			"bounds": {
+				"min": [
+					-5.397,
+					0,
+					-5.397
+				],
+				"max": [
+					5.397,
+					7.893,
+					5.397
+				],
+				"size": [
+					10.793,
+					7.893,
+					10.794
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 3062
+				},
+				{
+					"node": "LOD1",
+					"tris": 2548
+				}
+			],
+			"materials": [
+				{
+					"name": "Stone",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "Stone",
+					"slot": "baseColorTexture",
+					"from": "520x512 jpeg 68K",
+					"to": "520x512 jpeg 62K",
+					"alpha": false
+				}
+			]
+		},
+		"column": {
+			"id": "column",
+			"file": "column.glb",
+			"bytes": 177248,
+			"sha256": "142166b4cdbbc9f3bc71f8ad7ef071c2573d7244ac00d482ed1a1ee0aebb5ad4",
+			"provenance": {
+				"labId": "oga-ancient-column-5d793e27",
+				"title": "Ancient column",
+				"creator": "OdinTdh",
+				"site": null,
+				"url": "https://opengameart.org/content/ancient-column",
+				"license": "CC-BY",
+				"licenseLabel": "CC-BY 4.0",
+				"attributionDraft": "- **Ancient column** — by OdinTdh — **CC-BY 4.0**. Source: https://opengameart.org/content/ancient-column — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-ancient-column-5d793e27.glb",
+				"labSha256": "5556d8b1b69221546a1d95bc7d1bbf18347926350bd4fef3bdc04db8833447da",
+				"labBytes": 7882912
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 0.4,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.5,
+						"error": 0.02
+					}
+				],
+				"note": "ancient column, ×0.4 → 6 m"
+			},
+			"bounds": {
+				"min": [
+					-0.594,
+					0,
+					-0.594
+				],
+				"max": [
+					0.594,
+					5.971,
+					0.594
+				],
+				"size": [
+					1.187,
+					5.971,
+					1.187
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 572
+				},
+				{
+					"node": "LOD1",
+					"tris": 286
+				}
+			],
+			"materials": [
+				{
+					"name": "mcolumn",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "Image_1",
+					"slot": "baseColorTexture",
+					"from": "2048x2048 png 7680K",
+					"to": "1024x1024 jpeg 144K",
+					"alpha": false
+				}
+			]
+		},
+		"slab": {
+			"id": "slab",
+			"file": "slab.glb",
+			"bytes": 556616,
+			"sha256": "cdbaf5035087ef73a65fadf87835553e6077526c94809cf540b4fefe42420396",
+			"provenance": {
+				"labId": "oga-broken-stone-slab-bc221e53",
+				"title": "Broken Stone Slab",
+				"creator": "Kutejnikov",
+				"site": null,
+				"url": "https://opengameart.org/content/broken-stone-slab",
+				"license": "CC0",
+				"licenseLabel": "cc0 (public domain)",
+				"attributionDraft": "- **Broken Stone Slab** — by Kutejnikov — **CC0**. Source: https://opengameart.org/content/broken-stone-slab — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-broken-stone-slab-bc221e53.glb",
+				"labSha256": "7bb3e08e915b2709048d222c2731bb608f1267ba34a2d3c31e5463c9888f743d",
+				"labBytes": 5195556
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 2,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [],
+				"note": "carved broken slab on a plinth, ×2 → 2.1 m"
+			},
+			"bounds": {
+				"min": [
+					-0.449,
+					0,
+					-1.176
+				],
+				"max": [
+					0.449,
+					2.142,
+					1.176
+				],
+				"size": [
+					0.897,
+					2.142,
+					2.351
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 186
+				}
+			],
+			"materials": [
+				{
+					"name": "Material.001",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": true
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "Material_Normal_OpenGL",
+					"slot": "normalTexture",
+					"from": "1024x1024 png 2504K",
+					"to": "1024x1024 jpeg 181K",
+					"alpha": false
+				},
+				{
+					"name": "Material_Base_Color",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 1789K",
+					"to": "1024x1024 jpeg 190K",
+					"alpha": false
+				},
+				{
+					"name": "Material_Roughness",
+					"slot": "metallicRoughnessTexture",
+					"from": "1024x1024 png 773K",
+					"to": "1024x1024 jpeg 164K",
+					"alpha": false
+				}
+			]
+		},
+		"statue_head": {
+			"id": "statue_head",
+			"file": "statue_head.glb",
+			"bytes": 138912,
+			"sha256": "880cbc2052426319d114217b62ce1daa18ffa213df18991901edfec42e802051",
+			"provenance": {
+				"labId": "oga-figure-head-human-statute-9870bacd",
+				"title": "Figure Head Human Statute",
+				"creator": "DaGameKnower",
+				"site": null,
+				"url": "https://opengameart.org/content/figure-head-human-statute",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Figure Head Human Statute** — by DaGameKnower — **CC0**. Source: https://opengameart.org/content/figure-head-human-statute — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-figure-head-human-statute-9870bacd.glb",
+				"labSha256": "06fcd658db64e3f383df0407950e790790ffbf2b2e239757c21e8ef3c465258a",
+				"labBytes": 299148
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 0.7,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": {
+					"ratio": 0.5,
+					"error": 0.01
+				},
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.3,
+						"error": 0.03
+					}
+				],
+				"note": "carved stone head, ×0.7 → 3.7 m; procedural stone at runtime"
+			},
+			"bounds": {
+				"min": [
+					-1.549,
+					0,
+					-1.311
+				],
+				"max": [
+					1.549,
+					3.694,
+					1.311
+				],
+				"size": [
+					3.099,
+					3.694,
+					2.623
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 5684
+				},
+				{
+					"node": "LOD1",
+					"tris": 1704
+				}
+			],
+			"materials": [
+				{
+					"name": "figur",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"ruin_wall": {
+			"id": "ruin_wall",
+			"file": "ruin_wall.glb",
+			"bytes": 948848,
+			"sha256": "257d6afa44fb5bf48a5dc3a54b13c9785d2625402a878de238899e634548e633",
+			"provenance": {
+				"labId": "oga-3td-fantasy-ruins-pack-56d92afe--k-cathedralruins-01",
+				"title": "3TD Fantasy Ruins Pack — CathedralRuins_01",
+				"creator": "Ron Kapaun",
+				"site": "opengameart.org",
+				"url": "https://opengameart.org/content/3td-fantasy-ruins-pack",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **3TD Fantasy Ruins Pack** — by Ron Kapaun — **CC0**. Source: https://opengameart.org/content/3td-fantasy-ruins-pack — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-3td-fantasy-ruins-pack-56d92afe--k-cathedralruins-01.glb",
+				"labSha256": "33763bfd08b8d56ab1ee1d84cd9b8db0ccdfd85190a569b82319018289c6477f",
+				"labBytes": 780056
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 0.6,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.4,
+						"error": 0.02
+					}
+				],
+				"note": "ruined cathedral walls (kit piece 01), ×0.6"
+			},
+			"bounds": {
+				"min": [
+					-5.755,
+					0,
+					-8.838
+				],
+				"max": [
+					5.755,
+					7.795,
+					8.838
+				],
+				"size": [
+					11.511,
+					7.795,
+					17.676
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 4660
+				},
+				{
+					"node": "LOD1",
+					"tris": 3975
+				}
+			],
+			"materials": [
+				{
+					"name": "BrickOldRound03",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "FloorBrick_color_02A",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "BrickDebris01",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "BrickOldColor34",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "WoodDebris17",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "CementDirty1",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "3td_BrickOldRound_03",
+					"slot": "baseColorTexture",
+					"from": "512x512 jpeg 72K",
+					"to": "512x512 jpeg 67K",
+					"alpha": false
+				},
+				{
+					"name": "2td_FloorBrick_color_02A",
+					"slot": "baseColorTexture",
+					"from": "512x512 jpeg 75K",
+					"to": "512x512 jpeg 69K",
+					"alpha": false
+				},
+				{
+					"name": "3td_BrickDebris_01",
+					"slot": "baseColorTexture",
+					"from": "512x512 jpeg 120K",
+					"to": "512x512 jpeg 104K",
+					"alpha": false
+				},
+				{
+					"name": "3td_BrickOldColor_34",
+					"slot": "baseColorTexture",
+					"from": "512x512 jpeg 100K",
+					"to": "512x512 jpeg 90K",
+					"alpha": false
+				},
+				{
+					"name": "3td_WoodDebris_17",
+					"slot": "baseColorTexture",
+					"from": "512x512 jpeg 89K",
+					"to": "512x512 jpeg 80K",
+					"alpha": false
+				},
+				{
+					"name": "3td_ConcreteDirty_01",
+					"slot": "baseColorTexture",
+					"from": "512x512 jpeg 51K",
+					"to": "512x512 jpeg 49K",
+					"alpha": false
+				}
+			]
+		},
+		"rock_tall": {
+			"id": "rock_tall",
+			"file": "rock_tall.glb",
+			"bytes": 148020,
+			"sha256": "934b1d7a20117550bf351ea375ae1effc775cfa41301a841a3bafe57d996b586",
+			"provenance": {
+				"labId": "oga-free-photogrammetric-rock-c12a348c",
+				"title": "Free Photogrammetric Rock",
+				"creator": "Yughues",
+				"site": null,
+				"url": "https://opengameart.org/content/free-photogrammetric-rock",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Free Photogrammetric Rock** — by Yughues — **CC0**. Source: https://opengameart.org/content/free-photogrammetric-rock — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-free-photogrammetric-rock-c12a348c.glb",
+				"labSha256": "62b39e8f4b057b6389c02ddf3002ad524c611625620eef42d9d36f7cd9fb5850",
+				"labBytes": 803156
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": {
+					"ratio": 0.2,
+					"error": 0.01
+				},
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.25,
+						"error": 0.03
+					}
+				],
+				"note": "photogrammetric boulder, 32k → ~6k tris"
+			},
+			"bounds": {
+				"min": [
+					-2.366,
+					0,
+					-2.922
+				],
+				"max": [
+					2.366,
+					5.399,
+					2.922
+				],
+				"size": [
+					4.731,
+					5.399,
+					5.844
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 6387
+				},
+				{
+					"node": "LOD1",
+					"tris": 1595
+				}
+			],
+			"materials": [
+				{
+					"name": "DefaultMaterial",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"rock_slab": {
+			"id": "rock_slab",
+			"file": "rock_slab.glb",
+			"bytes": 160888,
+			"sha256": "3b60fd900e5b69e0f7b072b75b1752f72b4728967bd2f4349495b67312f6cf21",
+			"provenance": {
+				"labId": "oga-free-photogrammetric-rock-2-9431b7f6",
+				"title": "Free Photogrammetric Rock 2",
+				"creator": "Yughues",
+				"site": null,
+				"url": "https://opengameart.org/content/free-photogrammetric-rock-2",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Free Photogrammetric Rock 2** — by Yughues — **CC0**. Source: https://opengameart.org/content/free-photogrammetric-rock-2 — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-free-photogrammetric-rock-2-9431b7f6.glb",
+				"labSha256": "2ab074c31185b435b3f919c5aed5755cf2aa5fff5806fa764b8bd0c696363dee",
+				"labBytes": 1569708
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": {
+					"ratio": 0.11,
+					"error": 0.01
+				},
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.25,
+						"error": 0.03
+					}
+				],
+				"note": "photogrammetric slab, 64k → ~7k tris"
+			},
+			"bounds": {
+				"min": [
+					-3.225,
+					0,
+					-2.713
+				],
+				"max": [
+					3.225,
+					2.872,
+					2.713
+				],
+				"size": [
+					6.45,
+					2.872,
+					5.427
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 7040
+				},
+				{
+					"node": "LOD1",
+					"tris": 1760
+				}
+			],
+			"materials": [
+				{
+					"name": "DefaultMaterial",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"rock_cluster": {
+			"id": "rock_cluster",
+			"file": "rock_cluster.glb",
+			"bytes": 204112,
+			"sha256": "3524af1eeae2eecda89d38f05a2232aee66e8b9961bea62af39790e62cefa835",
+			"provenance": {
+				"labId": "oga-free-photogrammetric-rock-cluster-eeb0ab52",
+				"title": "Free Photogrammetric Rock - Cluster",
+				"creator": "Yughues",
+				"site": null,
+				"url": "https://opengameart.org/content/free-photogrammetric-rock-cluster",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Free Photogrammetric Rock - Cluster** — by Yughues — **CC0**. Source: https://opengameart.org/content/free-photogrammetric-rock-cluster — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-free-photogrammetric-rock-cluster-eeb0ab52.glb",
+				"labSha256": "8b99112a5d74d7e3e242d41044cd51c5e60d203310805f551b8b28a421ed0b73",
+				"labBytes": 1599896
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": {
+					"ratio": 0.14,
+					"error": 0.01
+				},
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.25,
+						"error": 0.03
+					}
+				],
+				"note": "photogrammetric boulder cluster, 64k → ~9k tris"
+			},
+			"bounds": {
+				"min": [
+					-3.634,
+					0,
+					-3.97
+				],
+				"max": [
+					3.634,
+					8.2,
+					3.97
+				],
+				"size": [
+					7.268,
+					8.2,
+					7.94
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 8960
+				},
+				{
+					"node": "LOD1",
+					"tris": 2240
+				}
+			],
+			"materials": [
+				{
+					"name": "DefaultMaterial",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"rock_lump": {
+			"id": "rock_lump",
+			"file": "rock_lump.glb",
+			"bytes": 73796,
+			"sha256": "df27564ad2f27645b5fa412254b4b88af682c53590018e7af566d744032c7218",
+			"provenance": {
+				"labId": "oga-rock-c65ffa52",
+				"title": "Rock",
+				"creator": "kindland",
+				"site": null,
+				"url": "https://opengameart.org/content/rock",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Rock** — by kindland — **CC0**. Source: https://opengameart.org/content/rock — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-rock-c65ffa52.glb",
+				"labSha256": "8b027fa52ea04e05e9533ea8ea0ad2c6c324a7f7010d2f4cf605a62d15a24b96",
+				"labBytes": 128380
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": {
+					"ratio": 0.6,
+					"error": 0.01
+				},
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.3,
+						"error": 0.03
+					}
+				],
+				"note": "scanned lumpy boulder 2.2 m"
+			},
+			"bounds": {
+				"min": [
+					-1.086,
+					0,
+					-1.141
+				],
+				"max": [
+					1.086,
+					1.856,
+					1.141
+				],
+				"size": [
+					2.171,
+					1.856,
+					2.282
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 3054
+				},
+				{
+					"node": "LOD1",
+					"tris": 916
+				}
+			],
+			"materials": [
+				{
+					"name": "DefaultMaterial",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"rock_mossy": {
+			"id": "rock_mossy",
+			"file": "rock_mossy.glb",
+			"bytes": 716900,
+			"sha256": "3cf3e699005650fa100387bbed01c4fffb9adce38a43faa5702cb1f35e0eb48a",
+			"provenance": {
+				"labId": "oga-mossy-rock-beb5f6b8",
+				"title": "Mossy Rock",
+				"creator": "hooded_kian",
+				"site": null,
+				"url": "https://opengameart.org/content/mossy-rock",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Mossy Rock** — by hooded_kian — **CC0**. Source: https://opengameart.org/content/mossy-rock — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-mossy-rock-beb5f6b8.glb",
+				"labSha256": "a9d0eb3e506b5267eab397d6eef2f060334f15ff05f03fcb8a4eaad3db9fe9e7",
+				"labBytes": 4793004
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 2.2,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.3,
+						"error": 0.03
+					}
+				],
+				"note": "textured mossy (algae) rock, ×2.2"
+			},
+			"bounds": {
+				"min": [
+					-1.1,
+					0,
+					-0.99
+				],
+				"max": [
+					1.1,
+					1.1,
+					0.99
+				],
+				"size": [
+					2.2,
+					1.1,
+					1.98
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 5660
+				},
+				{
+					"node": "LOD1",
+					"tris": 1698
+				}
+			],
+			"materials": [
+				{
+					"name": "Rock",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": true
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "Rock_Normal",
+					"slot": "normalTexture",
+					"from": "1024x1024 png 1684K",
+					"to": "1024x1024 jpeg 117K",
+					"alpha": false
+				},
+				{
+					"name": "Rock_Color",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 2058K",
+					"to": "1024x1024 jpeg 190K",
+					"alpha": false
+				},
+				{
+					"name": "Rock_Color",
+					"slot": "metallicRoughnessTexture",
+					"from": "1024x1024 png 787K",
+					"to": "1024x1024 jpeg 181K",
+					"alpha": false
+				}
+			]
+		},
+		"boulder_layered": {
+			"id": "boulder_layered",
+			"file": "boulder_layered.glb",
+			"bytes": 312204,
+			"sha256": "f592ea220c9172514b2ad90c2d286ff4d13aae896a5aae8c592c1f16c918099b",
+			"provenance": {
+				"labId": "oga-3td-cave-pack-pro-v1-0-8eb0a359--k-boulder-01",
+				"title": "3TD Cave Pack Pro v1.0 — Boulder_01",
+				"creator": "Ron Kapaun",
+				"site": "opengameart.org",
+				"url": "https://opengameart.org/content/3td-cave-pack-pro-v10",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **3TD Cave Pack Pro v1.0** — by Ron Kapaun — **CC0**. Source: https://opengameart.org/content/3td-cave-pack-pro-v10 — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-3td-cave-pack-pro-v1-0-8eb0a359--k-boulder-01.glb",
+				"labSha256": "116a62d76eb1863e0c0b698438a1c00662610ccfc784e40941d8267a2687abc2",
+				"labBytes": 1526172
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.4,
+						"error": 0.02
+					}
+				],
+				"note": "textured layered boulder (cave pack piece 01), 6 m"
+			},
+			"bounds": {
+				"min": [
+					-2.308,
+					0,
+					-2.324
+				],
+				"max": [
+					2.308,
+					6.171,
+					2.324
+				],
+				"size": [
+					4.617,
+					6.171,
+					4.648
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 1748
+				},
+				{
+					"node": "LOD1",
+					"tris": 1386
+				}
+			],
+			"materials": [
+				{
+					"name": "layerRock001",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "3td_LayerRock_001_NRM",
+					"slot": "normalTexture",
+					"from": "512x512 png 720K",
+					"to": "512x512 jpeg 80K",
+					"alpha": false
+				},
+				{
+					"name": "3td_LayerRock_001",
+					"slot": "baseColorTexture",
+					"from": "512x512 png 679K",
+					"to": "512x512 jpeg 51K",
+					"alpha": false
+				}
+			]
+		},
+		"manatee": {
+			"id": "manatee",
+			"file": "manatee.glb",
+			"bytes": 38280,
+			"sha256": "e4269f69fa9aa5590dfb0baf46e5875c16d0de2e20188226395d778475e05181",
+			"provenance": {
+				"labId": "oga-low-poly-manatee-with-hand-painted-textu-27532f2c",
+				"title": "Low Poly Manatee with Hand Painted Textures",
+				"creator": "DevMops",
+				"site": null,
+				"url": "https://opengameart.org/content/low-poly-manatee-with-hand-painted-textures",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Low Poly Manatee with Hand Painted Textures** — by DevMops — **CC0**. Source: https://opengameart.org/content/low-poly-manatee-with-hand-painted-textures — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-low-poly-manatee-with-hand-painted-textu-27532f2c.glb",
+				"labSha256": "a282da1c51bd66440857247fd12a639a2202fc17cbfe7975b13e4e437747d09f",
+				"labBytes": 123672
+			},
+			"recipe": {
+				"pivot": "center",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [],
+				"note": "hand-painted manatee, 3.5 m, head +Z"
+			},
+			"bounds": {
+				"min": [
+					-0.839,
+					-0.575,
+					-1.747
+				],
+				"max": [
+					0.839,
+					0.575,
+					1.747
+				],
+				"size": [
+					1.677,
+					1.15,
+					3.495
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 998
+				}
+			],
+			"materials": [
+				{
+					"name": "Manatee material",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "manatee_diffuse",
+					"slot": "baseColorTexture",
+					"from": "256x256 png 93K",
+					"to": "256x256 jpeg 9K",
+					"alpha": false
+				}
+			]
+		},
+		"hammerhead": {
+			"id": "hammerhead",
+			"file": "hammerhead.glb",
+			"bytes": 20428,
+			"sha256": "ce8d9c9a2505db15a25912ccd40b42a4c389f179f9a6802bb327c543953e581a",
+			"provenance": {
+				"labId": "oga-shark-low-poly-a188b214",
+				"title": "Shark (low poly)",
+				"creator": "STKRudy85",
+				"site": null,
+				"url": "https://opengameart.org/content/shark-low-poly",
+				"license": "CC0",
+				"licenseLabel": "cc0 - public domain",
+				"attributionDraft": "- **Shark (low poly)** — by STKRudy85 — **CC0**. Source: https://opengameart.org/content/shark-low-poly — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-shark-low-poly-a188b214.glb",
+				"labSha256": "2407801b9bb0d22f636412ce3020cb4fb82be6e0f9149fff09d74131ee68db4b",
+				"labBytes": 39708
+			},
+			"recipe": {
+				"pivot": "center",
+				"scale": 0.474,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [],
+				"note": "hammerhead shark, rest pose baked from the 5-joint rig (7.6 m in the rest pose) ×0.474 → 3.6 m, head +Z; procedural skin at runtime"
+			},
+			"bounds": {
+				"min": [
+					-0.866,
+					-0.702,
+					-1.798
+				],
+				"max": [
+					0.866,
+					0.702,
+					1.798
+				],
+				"size": [
+					1.731,
+					1.404,
+					3.597
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 1026
+				}
+			],
+			"materials": [
+				{
+					"name": "Material.012",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"lighthouse": {
+			"id": "lighthouse",
+			"file": "lighthouse.glb",
+			"bytes": 309116,
+			"sha256": "6bb6351b054164b7aaa8103fdbc2be222bafc62bdc6ba9e01928ed72b1a45f39",
+			"provenance": {
+				"labId": "oga-3td-harbour-pack-57336c05",
+				"title": "3TD Harbour Pack",
+				"creator": "Ron Kapaun",
+				"site": null,
+				"url": "https://opengameart.org/content/3td-harbour-pack",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **3TD Harbour Pack** — by Ron Kapaun — **CC0**. Source: https://opengameart.org/content/3td-harbour-pack — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-3td-harbour-pack-57336c05.glb",
+				"labSha256": "73668f3184db06b7a80a8213afcf85e23f3fb8950b7a23419773339ac030e782",
+				"labBytes": 1015008
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 0.8,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.5,
+						"error": 0.02
+					}
+				],
+				"note": "stone lighthouse with keeper's house, ×0.8 → 19.5 m"
+			},
+			"bounds": {
+				"min": [
+					-7.323,
+					0,
+					-3.511
+				],
+				"max": [
+					7.323,
+					19.545,
+					3.511
+				],
+				"size": [
+					14.646,
+					19.545,
+					7.022
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 2318
+				},
+				{
+					"node": "LOD1",
+					"tris": 1294
+				}
+			],
+			"materials": [
+				{
+					"name": "SR_White",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "SR_TOP",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.145,
+						0.145,
+						0.145,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "SR_Brick",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "SR_Glass",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.55,
+						0.62,
+						0.68,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "SR_Door",
+					"alphaMode": "MASK",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "3td_Stone_08",
+					"slot": "baseColorTexture",
+					"from": "512x512 jpeg 59K",
+					"to": "512x512 jpeg 55K",
+					"alpha": false
+				},
+				{
+					"name": "3td_WhiteBrick_02",
+					"slot": "baseColorTexture",
+					"from": "512x512 jpeg 70K",
+					"to": "512x512 jpeg 66K",
+					"alpha": false
+				},
+				{
+					"name": "door01",
+					"slot": "baseColorTexture",
+					"from": "512x800 png 772K",
+					"to": "512x800 jpeg 56K",
+					"alpha": false
+				}
+			]
+		},
+		"shrub_rooibos": {
+			"id": "shrub_rooibos",
+			"file": "shrub_rooibos.glb",
+			"bytes": 502380,
+			"sha256": "3932c7ae289b533f919bfc9d3986c293aefb0377c71fadf1bc8c381ac6125723",
+			"provenance": {
+				"labId": "ph-wild-rooibos-bush-d-479071e3",
+				"title": "Wild Rooibos Bush (d)",
+				"creator": "James Ray Cock (modeling), Jenelle van Heerden (photography)",
+				"site": "Poly Haven",
+				"url": "https://polyhaven.com/a/wild_rooibos_bush",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": null,
+				"labSource": "/home/o/model-lab/derived/glb/ph-wild-rooibos-bush-d-479071e3.glb",
+				"labSha256": "d10343aa2dbcb4e7264812fa938c7d0f78a57d32eca0a81d75783eb0df7b3653",
+				"labBytes": 1541132
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 2.2,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.4,
+						"error": 0.03,
+						"lockBorder": true
+					}
+				],
+				"note": "Poly Haven wild rooibos bush (variant d), ×2.2"
+			},
+			"bounds": {
+				"min": [
+					-0.36,
+					0,
+					-0.422
+				],
+				"max": [
+					0.36,
+					0.924,
+					0.422
+				],
+				"size": [
+					0.72,
+					0.924,
+					0.844
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 2684
+				},
+				{
+					"node": "LOD1",
+					"tris": 2122
+				}
+			],
+			"materials": [
+				{
+					"name": "wild_rooibos_bush_twigs",
+					"alphaMode": "MASK",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": true
+					}
+				},
+				{
+					"name": "wild_rooibos_bush",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": true
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "wild_rooibos_bush_diff_8k_rgba_b64c18e77d",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 1029K",
+					"to": "1024x1024 jpeg 87K",
+					"alpha": false
+				},
+				{
+					"name": "wild_rooibos_bush_arm_8k_data_c6f52bac65",
+					"slot": "metallicRoughnessTexture",
+					"from": "1024x1024 jpeg 90K",
+					"to": "1024x1024 jpeg 64K",
+					"alpha": false
+				},
+				{
+					"name": "wild_rooibos_bush_nor_gl_8k_data_67af6c8b49",
+					"slot": "normalTexture",
+					"from": "1024x1024 jpeg 165K",
+					"to": "1024x1024 jpeg 111K",
+					"alpha": false
+				},
+				{
+					"name": "wild_rooibos_bush_diff_8k_color_8f35c1bd03",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 jpeg 98K",
+					"to": "1024x1024 jpeg 91K",
+					"alpha": false
+				}
+			]
+		},
+		"shrub_03": {
+			"id": "shrub_03",
+			"file": "shrub_03.glb",
+			"bytes": 416240,
+			"sha256": "4c1f5421c349c3dfe76616daa1165d47ed14f7e6eb13911c8924d85f0e39edf6",
+			"provenance": {
+				"labId": "ph-shrub-03-a-a580856e",
+				"title": "Shrub 03 (a)",
+				"creator": "Rico Cilliers",
+				"site": "Poly Haven",
+				"url": "https://polyhaven.com/a/shrub_03",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": null,
+				"labSource": "/home/o/model-lab/derived/glb/ph-shrub-03-a-a580856e.glb",
+				"labSha256": "dbf3ebb6ff5faec62c05960751bab0ef50360b8f8322ca72c9eb575756feb52d",
+				"labBytes": 1249020
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 2.5,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.4,
+						"error": 0.03,
+						"lockBorder": true
+					}
+				],
+				"note": "Poly Haven shrub 03 (variant a), ×2.5"
+			},
+			"bounds": {
+				"min": [
+					-0.251,
+					0,
+					-0.189
+				],
+				"max": [
+					0.251,
+					1.007,
+					0.189
+				],
+				"size": [
+					0.502,
+					1.007,
+					0.378
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 2385
+				},
+				{
+					"node": "LOD1",
+					"tris": 951
+				}
+			],
+			"materials": [
+				{
+					"name": "shrub_03",
+					"alphaMode": "MASK",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": true
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "shrub_03_diff_4k_rgba_3693e4033e",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 852K",
+					"to": "1024x1024 jpeg 77K",
+					"alpha": false
+				},
+				{
+					"name": "shrub_03_arm_4k_data_693276b436",
+					"slot": "metallicRoughnessTexture",
+					"from": "1024x1024 jpeg 115K",
+					"to": "1024x1024 jpeg 87K",
+					"alpha": false
+				},
+				{
+					"name": "shrub_03_nor_gl_4k_data_d64f3f08ff",
+					"slot": "normalTexture",
+					"from": "1024x1024 jpeg 183K",
+					"to": "1024x1024 jpeg 137K",
+					"alpha": false
+				}
+			]
+		},
+		"dry_branches": {
+			"id": "dry_branches",
+			"file": "dry_branches.glb",
+			"bytes": 945884,
+			"sha256": "ca2f8f7d2d1f654df487c1000eedacfff4932804a64a2bc7791b3a91aad6c798",
+			"provenance": {
+				"labId": "ph-dry-branches-medium-01-a-13fa7f00",
+				"title": "Dry Branches Medium 01 (a)",
+				"creator": "Rico Cilliers",
+				"site": "Poly Haven",
+				"url": "https://polyhaven.com/a/dry_branches_medium_01",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": null,
+				"labSource": "/home/o/model-lab/derived/glb/ph-dry-branches-medium-01-a-13fa7f00.glb",
+				"labSha256": "ee35ff25d023d16d25fa17f2ea9928977d500cfc24bbb64f1e9dac677817dcf8",
+				"labBytes": 1083056
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1.4,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.3,
+						"error": 0.03
+					}
+				],
+				"note": "Poly Haven dry branches (variant a), ×1.4"
+			},
+			"bounds": {
+				"min": [
+					-0.226,
+					0,
+					-0.909
+				],
+				"max": [
+					0.226,
+					0.477,
+					0.909
+				],
+				"size": [
+					0.452,
+					0.477,
+					1.819
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 5933
+				},
+				{
+					"node": "LOD1",
+					"tris": 1779
+				}
+			],
+			"materials": [
+				{
+					"name": "dry_branches_medium_01",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": true
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "dry_branches_medium_01_diff_8k_color_87658d21ef",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 jpeg 196K",
+					"to": "1024x1024 jpeg 187K",
+					"alpha": false
+				},
+				{
+					"name": "dry_branches_medium_01_arm_8k_data_f15c65faf1",
+					"slot": "metallicRoughnessTexture",
+					"from": "1024x1024 jpeg 256K",
+					"to": "1024x1024 jpeg 184K",
+					"alpha": false
+				},
+				{
+					"name": "dry_branches_medium_01_nor_gl_8k_data_2f642e2e4a",
+					"slot": "normalTexture",
+					"from": "1024x1024 jpeg 436K",
+					"to": "1024x1024 jpeg 312K",
+					"alpha": false
+				}
+			]
+		},
+		"bark_debris": {
+			"id": "bark_debris",
+			"file": "bark_debris.glb",
+			"bytes": 1089224,
+			"sha256": "c5eb7826c124b4801a5d5be24a5c8ea3c2c923b014ff390bb2b9a277faf9bc7e",
+			"provenance": {
+				"labId": "ph-bark-debris-01-a-28282178",
+				"title": "Bark Debris 01 (a)",
+				"creator": "Greg Zaal (photography), Jenelle van Heerden (modeling)",
+				"site": "Poly Haven",
+				"url": "https://polyhaven.com/a/bark_debris_01",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": null,
+				"labSource": "/home/o/model-lab/derived/glb/ph-bark-debris-01-a-28282178.glb",
+				"labSha256": "e0cb488bd7a96f7296b5b7c3506e970de5850e8307ad964ab005306382328607",
+				"labBytes": 2072188
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1.5,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": {
+					"ratio": 0.15,
+					"error": 0.01
+				},
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.3,
+						"error": 0.03
+					}
+				],
+				"note": "Poly Haven bark debris (variant a), 38k → ~6k tris, ×1.5"
+			},
+			"bounds": {
+				"min": [
+					-0.141,
+					0,
+					-0.298
+				],
+				"max": [
+					0.141,
+					0.098,
+					0.298
+				],
+				"size": [
+					0.281,
+					0.098,
+					0.595
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 5768
+				},
+				{
+					"node": "LOD1",
+					"tris": 1730
+				}
+			],
+			"materials": [
+				{
+					"name": "bark_debris_01",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": true
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "bark_debris_01_diff_4k_color_ba1883fb87",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 jpeg 251K",
+					"to": "1024x1024 jpeg 239K",
+					"alpha": false
+				},
+				{
+					"name": "bark_debris_01_arm_4k_data_eb340619d0",
+					"slot": "metallicRoughnessTexture",
+					"from": "1024x1024 jpeg 367K",
+					"to": "1024x1024 jpeg 256K",
+					"alpha": false
+				},
+				{
+					"name": "bark_debris_01_nor_gl_4k_data_5fef6f95dc",
+					"slot": "normalTexture",
+					"from": "1024x1024 jpeg 463K",
+					"to": "1024x1024 jpeg 329K",
+					"alpha": false
+				}
+			]
+		}
+	},
+	"tool": "apps/tidewater-dolphin/tools/assets/convert.mjs"
+}

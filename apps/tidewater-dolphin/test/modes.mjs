@@ -174,12 +174,24 @@ await gameSleep( 0.3 );
 
 // ---------------------------------------------------------------- scenery additions
 s = await snapshot();
-check( 'scenery additions ready, both categories placed (deterministic counts)', s.additions.ready && s.additions.categories.sunkenWood.instances === 11 && s.additions.categories.seabedShells.instances === 30, s.additions.categories );
+check( 'scenery additions ready, both CP10 categories placed (deterministic counts)', s.additions.ready && s.additions.categories.sunkenWood.instances === 11 && s.additions.categories.seabedShells.instances === 30, s.additions.categories );
+// asset-integration pass: the imported-model categories (public/models/additions/), their live
+// structure fields and fish communities
+const IMPORTED = { seagrassMeadows: 270, kelpWall: 154, wreck: 26, drownedTemple: 103, wildlife: 3, headland: 71 };
+check( 'imported categories placed (pinned deterministic counts)', Object.entries( IMPORTED ).every( ( [ id, n ] ) => s.additions.categories[ id ] && s.additions.categories[ id ].instances === n ), Object.fromEntries( Object.keys( IMPORTED ).map( ( id ) => [ id, s.additions.categories[ id ]?.instances ] ) ) );
+check( 'every imported GLB loaded (25 models, no loader error)', await A( `[ ...app.additions.models.values() ].length === 25 && [ ...app.additions.models.values() ].every( ( m ) => m.ready && ! m.error )` ), await A( `[ ...app.additions.models.values() ].filter( ( m ) => ! m.ready || m.error ).map( ( m ) => m.id )` ) );
+check( 'solid sites have structure fields whose tops stay below −2.5 m (swimmable mask unchanged)', [ 'seagrassMeadows', 'kelpWall', 'wreck', 'drownedTemple' ].every( ( id ) => s.additions.categories[ id ].fieldTop !== null && s.additions.categories[ id ].fieldTop < - 2.5 ), Object.fromEntries( [ 'seagrassMeadows', 'kelpWall', 'wreck', 'drownedTemple' ].map( ( id ) => [ id, s.additions.categories[ id ].fieldTop ] ) ) );
+check( 'site fish communities at the wreck and the temple (Tidewater\'s own species)', s.additions.categories.wildlife.fish > 300, s.additions.categories.wildlife.fish );
+const hull = await A( `app.additions.placed.wreck.hull` );
+const probeOn = await A( `app.additions.structureAt( ${ hull.x }, ${ hull.z } )` ), terrainAtHull = await A( `app.terrainData.heightAt( ${ hull.x }, ${ hull.z } )` );
+check( 'the wreck is in the contact surface (structure above the sand under the hull)', probeOn > terrainAtHull + 0.2, { probeOn, terrainAtHull } );
+const dolphinGround = await A( `d.world.terrainHeight( ${ hull.x }, ${ hull.z } )` );
+check( 'the dolphin\'s world sampler sees the wreck (composite ground)', Math.abs( dolphinGround - Math.max( probeOn, terrainAtHull ) ) < 1e-6, { dolphinGround, probeOn } );
 const m1 = await A( `JSON.stringify( app.additions.manifest().records.map( ( r ) => [ r.asset, ...r.position ] ) )` );
 await A( `app.additions.setAll( false )` );
 await gameSleep( 0.1 );
 s = await snapshot();
-check( 'Original Tidewater: every addition hidden (0 draw calls from the layer)', ! s.additions.categories.sunkenWood.enabled && ! s.additions.categories.seabedShells.enabled && s.additions.categories.sunkenWood.drawCalls === 0, s.additions.categories );
+check( 'Original Tidewater: every addition hidden (0 draw calls from the layer, no structure in the ground)', Object.values( s.additions.categories ).every( ( c ) => ! c.enabled && c.drawCalls === 0 ) && ( await A( `app.additions.structureAt( ${ hull.x }, ${ hull.z } )` ) ) === - Infinity, s.additions.categories );
 await A( `app.additions.setCategory( 'seabedShells', true )` );
 await gameSleep( 0.1 );
 s = await snapshot();
@@ -189,11 +201,26 @@ const m2 = await A( `JSON.stringify( app.additions.manifest().records.map( ( r )
 check( 'placements deterministic (identical manifest after toggling)', m1 === m2 );
 const manifest = await A( `app.additions.manifest()` );
 writeFileSync( resolve( OUT, 'additions-manifest.json' ), JSON.stringify( manifest, null, 2 ) );
-const bare = await A( `app.additions.manifest().records.every( ( r ) => { const [ x, y, z ] = r.position; const g = app.terrainData.heightAt( x, z ); return app.reef.structureAt( x, z ) <= g + 0.02 && y > g - 0.3 && y < g + 0.6 && g < - 2.2 && g > - 6.1; } )` );
-check( 'every addition rests on bare sand (no reef structure under it), 2.2–6.1 m deep', bare );
-const clear = await A( `app.additions.manifest().records.every( ( r ) => { const [ x, , z ] = r.position; return Math.abs( x - 55 ) > 4 || z < - 67 || z > 43; } ) && app.additions.manifest().records.every( ( r ) => Math.hypot( r.position[ 0 ] - 64.5, r.position[ 2 ] - 36.5 ) > 12 )` );
+// (the CP10 checks below are unchanged, scoped to the two CP10 scan categories: their records carry assetIndex)
+const bare = await A( `app.additions.manifest().records.filter( ( r ) => r.assetIndex !== undefined ).every( ( r ) => { const [ x, y, z ] = r.position; const g = app.terrainData.heightAt( x, z ); return app.reef.structureAt( x, z ) <= g + 0.02 && y > g - 0.3 && y < g + 0.6 && g < - 2.2 && g > - 6.1; } )` );
+check( 'every CP10 scan addition rests on bare sand (no reef structure under it), 2.2–6.1 m deep', bare );
+const clear = await A( `app.additions.manifest().records.filter( ( r ) => r.position && r.category !== 'headland' ).every( ( r ) => { const [ x, , z ] = r.position; return Math.abs( x - 55 ) > 4 || z < - 67 || z > 43; } ) && app.additions.manifest().records.filter( ( r ) => r.position ).every( ( r ) => Math.hypot( r.position[ 0 ] - 64.5, r.position[ 2 ] - 36.5 ) > 12 )` );
 check( 'additions clear of the pier, its head and the boat dock', clear );
-check( 'every record carries source + licence (Poly Haven CC0, shipped in Tidewater)', manifest.records.every( ( r ) => r.license === 'CC0 1.0' && /polyhaven/.test( r.source ) && /vendor\/tidewater\/public\/models\/debris/.test( r.path ) ) );
+check( 'every CP10 scan record carries source + licence (Poly Haven CC0, shipped in Tidewater)', manifest.records.filter( ( r ) => r.assetIndex !== undefined ).every( ( r ) => r.license === 'CC0 1.0' && /polyhaven/.test( r.source ) && /vendor\/tidewater\/public\/models\/debris/.test( r.path ) ) );
+const imported = manifest.records.filter( ( r ) => r.assetIndex === undefined && r.asset );
+check( 'every imported record carries title, creator, source page, CC0 / CC-BY licence, lab path and SHA-256', imported.length > 600 && imported.every( ( r ) => r.title && r.creator && /^https?:\/\//.test( r.source || '' ) && [ 'CC0', 'CC-BY' ].includes( r.license ) && /model-lab\/derived\/glb/.test( r.labSource || '' ) && /^[0-9a-f]{64}$/.test( r.sha256 || '' ) ), { imported: imported.length, missing: imported.filter( ( r ) => ! ( r.title && r.creator && r.source && r.license && r.sha256 ) ).slice( 0, 3 ) } );
+// per-category toggles of the imported sites: hidden means 0 draw calls and no structure
+for ( const id of [ 'kelpWall', 'wreck', 'drownedTemple', 'wildlife', 'headland', 'seagrassMeadows' ] ) {
+
+	await A( `app.additions.setCategory( '${ id }', false )` );
+	await gameSleep( 0.1 );
+	s = await snapshot();
+	check( `toggle ${ id } off: hidden (0 draw calls)`, ! s.additions.categories[ id ].enabled && s.additions.categories[ id ].drawCalls === 0, s.additions.categories[ id ] );
+	await A( `app.additions.setCategory( '${ id }', true )` );
+
+}
+
+await gameSleep( 0.1 );
 // look at the sunken wood from the dolphin's eye
 await A( `d.test.placeAndFace( 70, 52, - 2.6, Math.atan2( 80 - 70, 64 - 52 ), 0 )` );
 await A( `d.test.setIntent( { brake: true, kicks: 0, kickRate: 0, pitch: 0, roll: 0, burst: false, autopilot: false } )` );
@@ -210,6 +237,19 @@ await A( `app.additions.setAll( false )` );
 await gameSleep( 0.4 );
 await screenshot( resolve( SHOTS, '06-additions-shells-off.jpg' ), 'jpeg', 86 );
 await A( `app.additions.setAll( true )` );
+// the imported sites from the dolphin's eye (Enhanced, then Original at the same spot)
+for ( const [ name, x, z, y, tx, tz ] of [ [ '07-additions-wreck', 65, 100, - 8.5, 56, 114 ], [ '08-additions-temple', - 14, 146, - 12, 6, 156 ], [ '09-additions-kelpwall', 47, 112, - 9.5, 66, 110 ] ] ) {
+
+	await A( `d.test.placeAndFace( ${ x }, ${ z }, ${ y }, Math.atan2( ${ tx } - ${ x }, ${ tz } - ${ z } ), 0 )` );
+	await gameSleep( 1.2 );
+	await screenshot( resolve( SHOTS, name + '.jpg' ), 'jpeg', 86 );
+	await A( `app.additions.setAll( false )` );
+	await gameSleep( 0.4 );
+	await screenshot( resolve( SHOTS, name + '-off.jpg' ), 'jpeg', 86 );
+	await A( `app.additions.setAll( true )` );
+
+}
+
 await A( `d.test.setIntent( null )` );
 
 // ---------------------------------------------------------------- performance by mode (wall clock; product numbers only on a real GPU in a visible window)

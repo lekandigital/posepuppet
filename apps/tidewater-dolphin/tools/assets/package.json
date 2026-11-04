@@ -1,0 +1,22 @@
+{
+  "name": "@bodyarcade/tidewater-asset-tools",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Offline conversion of the user's Ubuntu model-lab GLBs (derived/glb) into the Tidewater runtime GLBs under public/models/additions/ and the staged future-game assets under assets/future-games/. Not part of the app build; install its dependencies here (npm install) — node_modules/ is ignored.",
+  "scripts": {
+    "convert": "node convert.mjs --in <lab-glb-dir> --out ../../public/models/additions",
+    "convert:future": "node convert.mjs --recipes ./recipes-future.mjs --in <lab-glb-dir> --out ../../../../assets/future-games/models",
+    "credits": "node credits.mjs --dir ../../public/models/additions",
+    "thumbs": "node thumbs.mjs --dir ../../public/models/additions --out /tmp/thumbs"
+  },
+  "devDependencies": {
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
+    "gl-matrix": "^3.4.3",
+    "meshoptimizer": "^0.25.0",
+    "sharp": "^0.35.5",
+    "three": "^0.183.0"
+  }
+}

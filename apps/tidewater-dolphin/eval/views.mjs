@@ -34,6 +34,29 @@ export const CUSTOM_VIEWS = {
 	// shell drift on the shallow sand off the beach
 	addWoodEast: { p: [ 70, - 2.4, 52 ], yaw: Math.atan2( - 10, - 12 ), pitch: - 0.15, time: 13.0 },
 	addShellsBeach: { p: [ 9, - 1.9, 16 ], yaw: Math.atan2( - 5, - 8 ), pitch: - 0.16, time: 13.0 },
+	// asset-integration pass — the imported-model sites (Tidewater convention: yaw 0 looks toward
+	// -z; the poses are the dolphin's own eye heights at each site). Same in Original (bare) and
+	// Enhanced captures.
+	// the spawn meadow from the dolphin's cruising height, looking east over the bed toward the pier head
+	addMeadow: { p: [ 34, - 3.8, 84 ], yaw: Math.atan2( - ( 56 - 34 ), - ( 72 - 84 ) ), pitch: - 0.12, time: 13.0 },
+	// the east plateau bed with the sunken skiff
+	addMeadowEast: { p: [ 92, - 4.5, 134 ], yaw: Math.atan2( - ( 104 - 92 ), - ( 124 - 134 ) ), pitch: - 0.1, time: 13.0 },
+	// the kelp wall from the channel floor, looking up-slope through the stalks
+	addKelpWall: { p: [ 46, - 11, 116 ], yaw: Math.atan2( - ( 66 - 46 ), - ( 112 - 116 ) ), pitch: 0.12, time: 13.0 },
+	// the kelp wall from above, the shelf and the stalks' tips against the surface light
+	addKelpTop: { p: [ 70, - 4.5, 100 ], yaw: Math.atan2( - ( 58 - 70 ), - ( 118 - 100 ) ), pitch: - 0.3, time: 15.0 },
+	// the wreck from the wall, a dolphin's approach
+	addWreck: { p: [ 66, - 8.5, 102 ], yaw: Math.atan2( - ( 56 - 66 ), - ( 114 - 102 ) ), pitch: - 0.15, time: 13.0 },
+	// down the colonnade toward the temple
+	addColonnade: { p: [ 4.5, - 9.5, 118 ], yaw: Math.atan2( - ( 4.5 - 4.5 ), - ( 150 - 118 ) ), pitch: - 0.08, time: 13.0 },
+	// the temple and the ruin from the basin's west rim
+	addTemple: { p: [ - 16, - 12, 150 ], yaw: Math.atan2( - ( 8 - ( - 16 ) ), - ( 154 - 150 ) ), pitch: - 0.1, time: 13.0 },
+	// the carved head, close
+	addStatue: { p: [ - 3, - 15.5, 141 ], yaw: Math.atan2( - ( - 9 - ( - 3 ) ), - ( 147 - 141 ) ), pitch: - 0.12, time: 13.0 },
+	// the lighthouse from the bay at the surface, looking east
+	addLighthouse: { p: [ 150, 1.6, 120 ], yaw: Math.atan2( - ( 222 - 150 ), - ( 132 - 120 ) ), pitch: 0.06, time: 16.5 },
+	// the eastern back-beach scrub from the shallows
+	addShoreEast: { p: [ 112, 1.4, 2 ], yaw: Math.atan2( - ( 118 - 112 ), - ( - 30 - 2 ) ), pitch: - 0.02, time: 15.0 },
 };
 
 export const ALL_VIEWS = [ ...STANDARD_VIEWS, ...Object.keys( CUSTOM_VIEWS ) ];

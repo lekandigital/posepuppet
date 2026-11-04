@@ -1,9 +1,37 @@
 # BodyArcade Shared-World — Asset Credits
 
-_Last updated: 2026-10-16 (Checkpoint 10 — Tidewater environment adoption).
+_Last updated: 2026-11-04 (asset-integration pass: imported scenery models; previously 2026-10-16, Checkpoint 10 — Tidewater environment adoption).
 This file is mirrored by the in-app credits panels
 (`/shared-world/?view=credits` for the Three.js region app; the F1 controls
 sheet and `?credits` of `apps/tidewater-dolphin/`)._
+
+## Asset-integration pass (2026-11-04) — imported scenery models and staged future-game assets
+
+- **Tidewater dolphin, optional scenery additions** (`apps/tidewater-dolphin/public/models/additions/`,
+  Play tab → Scenery additions → Enhanced): 25 runtime GLBs converted from 23 models of the
+  user's Ubuntu model-lab by `apps/tidewater-dolphin/tools/assets/convert.mjs`. Per-asset title,
+  author, source page, licence, lab path and SHA-256: `public/models/additions/manifest.json`
+  and the generated `CREDITS.md` beside it; the in-app credits (F1 sheet, `?credits`) carry the
+  CC-BY attributions. Licence classes are the lab's evidence (read from each listing at intake);
+  the live-listing check at release remains the user's step.
+  - **CC-BY 4.0** (modified for BodyArcade): "Animated Kelp" by JosephWPugsley
+    (https://sketchfab.com/3d-models/74c400fd4d81469199268ac27451d03f); "Kelp" by Mazelya
+    (https://sketchfab.com/3d-models/d1758bd85ec04eaab14fe50028108a10); "Sea Weed" by rkuhlf
+    (https://sketchfab.com/3d-models/d97c596b189845b681cc8eef8a3ab429); "Fantasy Fishing Boat" by
+    eb78 (https://sketchfab.com/3d-models/bf7d68cb9db5469a9895064de1499d68); "Ancient column" by
+    OdinTdh (https://opengameart.org/content/ancient-column).
+  - **CC0**: Medieval Stone Temple and Medieval Boat (AnyRPG), Broken Stone Slab (Kutejnikov),
+    Figure Head Human Statute (DaGameKnower), Free Photogrammetric Rock / Rock 2 / Rock Cluster
+    (Yughues), Rock (kindland), Mossy Rock (hooded_kian), 3TD Harbour Pack, 3TD Cave Pack Pro and
+    3TD Fantasy Ruins Pack (Ron Kapaun), Low Poly Manatee with Hand Painted Textures (DevMops),
+    Shark (low poly) (STKRudy85) — all OpenGameArt.org; Wild Rooibos Bush, Shrub 03, Dry Branches
+    Medium 01, Bark Debris 01 — Poly Haven (polyhaven.com).
+- **Staged future-game assets** (`assets/future-games/models/`, not loaded by any app): 10 GLBs —
+  see `assets/future-games/README.md` and its `CREDITS.md` / `manifest.json`. CC-BY 4.0: Five in a
+  Row Ocean Rowing Boat (fiveinarow), Old Rowboat (TooManyDemons), Low-Poly Rowboat (Cas_Models),
+  Rowing Oar (kai9987kai), Wooden Kayak & Paddle (Dominik Biały), Mannequiny The Open 3D
+  Mannequin (hardboileduser). CC0: Simple Wood Boat (mikeask), Canal bridge (ninelionar), Palm
+  tree v2 (Yughues), Medieval Statue (Daniel Andersson).
 
 ## Checkpoint 10 — Tidewater host environment (`apps/tidewater-dolphin/`)
 

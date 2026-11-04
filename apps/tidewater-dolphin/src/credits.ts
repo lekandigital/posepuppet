@@ -12,6 +12,21 @@ export const CREDITS_ATTRIBUTION =
   'https://sketchfab.com/3d-models/realistic-dolphin-rigged-with-25-animations-c16124a10efd4381b1a84468ad6ef7a8 ' +
   '— Modified for BodyArcade (see CREDITS.md for changes).';
 
+/** Asset-integration pass: the imported scenery models (public/models/additions/, CREDITS.md and manifest.json there). */
+export const ADDITIONS_NOTICE =
+  'Optional scenery additions (Play tab → Scenery additions, Enhanced): models from the user\'s own model library, ' +
+  'converted for Tidewater. CC-BY 4.0 (https://creativecommons.org/licenses/by/4.0/), modified for BodyArcade: ' +
+  '"Animated Kelp" by JosephWPugsley (https://sketchfab.com/3d-models/74c400fd4d81469199268ac27451d03f); ' +
+  '"Kelp" by Mazelya (https://sketchfab.com/3d-models/d1758bd85ec04eaab14fe50028108a10); ' +
+  '"Sea Weed" by rkuhlf (https://sketchfab.com/3d-models/d97c596b189845b681cc8eef8a3ab429); ' +
+  '"Fantasy Fishing Boat" by eb78 (https://sketchfab.com/3d-models/bf7d68cb9db5469a9895064de1499d68); ' +
+  '"Ancient column" by OdinTdh (https://opengameart.org/content/ancient-column). ' +
+  'CC0: Medieval Stone Temple and Medieval Boat by AnyRPG, Broken Stone Slab by Kutejnikov, Figure Head Human Statute by DaGameKnower, ' +
+  'Free Photogrammetric Rock / Rock 2 / Rock Cluster by Yughues, Rock by kindland, Mossy Rock by hooded_kian, ' +
+  '3TD Harbour Pack, 3TD Cave Pack Pro and 3TD Fantasy Ruins Pack by Ron Kapaun, Low Poly Manatee by DevMops, Shark (low poly) by STKRudy85 ' +
+  '(all OpenGameArt.org); Wild Rooibos Bush, Shrub 03, Dry Branches Medium 01 and Bark Debris 01 by Poly Haven (polyhaven.com). ' +
+  'Full list with source pages and checksums: models/additions/CREDITS.md.';
+
 export const TIDEWATER_NOTICE =
   'Tidewater — island, ocean, sky, rendering engine and environment — by Daniel Greenheck / ' +
   'DRG Software Solutions LLC, MIT License (Copyright (c) 2026 DRG Software Solutions LLC), ' +
@@ -70,7 +85,16 @@ const CREDITS_HTML = `
 		by <a href="https://sketchfab.com/gamico" target="_blank" rel="noopener noreferrer">GAMICO</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC-BY&nbsp;4.0</a>
 		— modified for BodyArcade (the Jump clip’s baked root translation is stripped at load; full licence at <code>models/dolphin/LICENSE-dolphin.txt</code>).<br>
 		<b>World:</b> <a href="https://github.com/dgreenheck/tidewater" target="_blank" rel="noopener noreferrer">Tidewater</a> by Daniel Greenheck / DRG Software Solutions LLC, MIT (© 2026), pinned 4811ba4 — island, ocean, sky, engine, wildlife, audio (CC0 Freesound), Poly Haven CC0 scans, Microsoft Rocketbox MIT characters.
-		<b>Dolphin gameplay:</b> BodyArcade (120 Hz swim sim, chase camera, PosePuppet body input).
+		<b>Dolphin gameplay:</b> BodyArcade (120 Hz swim sim, chase camera, PosePuppet body input).<br>
+		<b>Scenery additions (Enhanced):</b> models from the user’s library — CC-BY 4.0, modified:
+		<a href="https://sketchfab.com/3d-models/74c400fd4d81469199268ac27451d03f" target="_blank" rel="noopener noreferrer">“Animated Kelp”</a> by JosephWPugsley,
+		<a href="https://sketchfab.com/3d-models/d1758bd85ec04eaab14fe50028108a10" target="_blank" rel="noopener noreferrer">“Kelp”</a> by Mazelya,
+		<a href="https://sketchfab.com/3d-models/d97c596b189845b681cc8eef8a3ab429" target="_blank" rel="noopener noreferrer">“Sea Weed”</a> by rkuhlf,
+		<a href="https://sketchfab.com/3d-models/bf7d68cb9db5469a9895064de1499d68" target="_blank" rel="noopener noreferrer">“Fantasy Fishing Boat”</a> by eb78,
+		<a href="https://opengameart.org/content/ancient-column" target="_blank" rel="noopener noreferrer">“Ancient column”</a> by OdinTdh
+		(<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC-BY&nbsp;4.0</a>);
+		CC0 models by AnyRPG, Kutejnikov, DaGameKnower, Yughues, kindland, hooded_kian, Ron Kapaun, DevMops, STKRudy85 (OpenGameArt) and Poly Haven —
+		full list at <code>models/additions/CREDITS.md</code>.
 	</span>`;
 
 /** Replace the fishing controls / guide in Tidewater's F1 sheet and start overlay with the dolphin's; add credits. */
@@ -110,6 +134,7 @@ export function mountCreditsPage(): void {
     <h1 style="font-size:1.3rem">BodyArcade Tidewater Dolphin — credits</h1>
     <p>${CREDITS_ATTRIBUTION}</p>
     <p>${TIDEWATER_NOTICE}</p>
+    <p>${ADDITIONS_NOTICE}</p>
     <p><a style="color:#8fd4ff" href="./">← back to the game</a></p></div>`;
   document.body.appendChild(el);
 }

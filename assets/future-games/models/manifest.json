@@ -1,0 +1,1183 @@
+{
+	"generated": "2026-11-04T12:18:42.692Z",
+	"assets": {
+		"ocean_rowing_boat": {
+			"id": "ocean_rowing_boat",
+			"file": "ocean_rowing_boat.glb",
+			"bytes": 1948024,
+			"sha256": "b0a4b653adfd1262d66406b2dea9562463f180b1d021319066f105990f221994",
+			"provenance": {
+				"labId": "man-five-in-a-row-ocean-rowing-boat-d8c64d12",
+				"title": "Five in a Row Ocean Rowing Boat",
+				"creator": "fiveinarow",
+				"site": "sketchfab.com",
+				"url": "https://sketchfab.com/3d-models/7a1d2ae2390b42be8858ba51b2806971",
+				"license": "CC-BY",
+				"licenseLabel": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+				"attributionDraft": "- **Five in a Row Ocean Rowing Boat** — by fiveinarow — **CC-BY 4.0**. Source: https://sketchfab.com/3d-models/five-in-a-row-ocean-rowing-boat-7a1d2ae2390b42be8858ba51b2806971 — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/man-five-in-a-row-ocean-rowing-boat-d8c64d12.glb",
+				"labSha256": "21192cb39985cdae3f8bd855625d534916fd6e35f532bf24114b5a8d461cc9fd",
+				"labBytes": 1703832
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": {
+					"ratio": 0.5,
+					"error": 0.005
+				},
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.3,
+						"error": 0.02
+					}
+				],
+				"note": "modern ocean rowing boat (Five in a Row), 37k → ~18k tris, oars as separate nodes dropped into the bake; 1K textures"
+			},
+			"bounds": {
+				"min": [
+					-4.353,
+					0,
+					-3.113
+				],
+				"max": [
+					4.353,
+					1.624,
+					3.113
+				],
+				"size": [
+					8.707,
+					1.624,
+					6.226
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 30364
+				},
+				{
+					"node": "LOD1",
+					"tris": 15674
+				}
+			],
+			"materials": [
+				{
+					"name": "gel coat",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "gel coat hull",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "stern cabin",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "bow wall",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "deck",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.322,
+						0.8,
+						0.616,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "Material.001",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "smoked glass",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.8,
+						0.8,
+						0.8,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "chrome",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.8,
+						0.8,
+						0.8,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "wheels",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.084,
+						0.084,
+						0.084,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "Material",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.8,
+						0.068,
+						0.136,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "Seat",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						0.02,
+						0.01,
+						0.068,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "shaft",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						0.016,
+						0.016,
+						0.016,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "oar blade",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "green",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						0.041,
+						0.8,
+						0.035,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "gold cabin",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 63K",
+					"to": "1024x1024 jpeg 35K",
+					"alpha": false
+				},
+				{
+					"name": "hull UV",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 38K",
+					"to": "1024x1024 jpeg 24K",
+					"alpha": false
+				},
+				{
+					"name": "stern cabin UV",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 41K",
+					"to": "1024x1024 jpeg 20K",
+					"alpha": false
+				},
+				{
+					"name": "bow wall UV",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 29K",
+					"to": "1024x1024 jpeg 107K",
+					"alpha": false
+				},
+				{
+					"name": "solar panel",
+					"slot": "baseColorTexture",
+					"from": "700x1161 png 540K",
+					"to": "700x1161 jpeg 102K",
+					"alpha": false
+				},
+				{
+					"name": "oar UV",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 31K",
+					"to": "1024x1024 jpeg 23K",
+					"alpha": false
+				}
+			]
+		},
+		"rowboat_old": {
+			"id": "rowboat_old",
+			"file": "rowboat_old.glb",
+			"bytes": 153624,
+			"sha256": "1a323de4d21d8b2d47e8c65a3c507a7e045a5a700095290f666498b38b664d89",
+			"provenance": {
+				"labId": "man-old-rowboat-b0702dd1",
+				"title": "Old Rowboat",
+				"creator": "TooManyDemons",
+				"site": "sketchfab.com",
+				"url": "https://sketchfab.com/3d-models/9922d5678af84adeb1c9b479856446ca",
+				"license": "CC-BY",
+				"licenseLabel": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+				"attributionDraft": "- **Old Rowboat** — by TooManyDemons — **CC-BY 4.0**. Source: https://sketchfab.com/3d-models/old-rowboat-9922d5678af84adeb1c9b479856446ca — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/man-old-rowboat-b0702dd1.glb",
+				"labSha256": "27f8577d731190de21b7f5b08725170eba6088b32e4f791ec6ffddbe2b9df210",
+				"labBytes": 120384
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 0.5,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.4,
+						"error": 0.02
+					}
+				],
+				"note": "weathered wooden rowboat with two oars (6.6 m in the lab GLB; a 3.3 m skiff at ×0.5)"
+			},
+			"bounds": {
+				"min": [
+					-1.647,
+					0,
+					-1.679
+				],
+				"max": [
+					1.647,
+					0.98,
+					1.679
+				],
+				"size": [
+					3.293,
+					0.98,
+					3.358
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 5484
+				},
+				{
+					"node": "LOD1",
+					"tris": 2192
+				}
+			],
+			"materials": [
+				{
+					"name": "Material",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.8,
+						0.8,
+						0.8,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"rowboat_lowpoly": {
+			"id": "rowboat_lowpoly",
+			"file": "rowboat_lowpoly.glb",
+			"bytes": 51984,
+			"sha256": "f8197c47c9295006938f1cb122c6454ea20cfea9966d809f2cda5f771abee993",
+			"provenance": {
+				"labId": "man-low-poly-rowboat-2487f979",
+				"title": "Low-Poly Rowboat",
+				"creator": "Cas_Models",
+				"site": "sketchfab.com",
+				"url": "https://sketchfab.com/3d-models/03be66684c9e4d47846696c9d0089c30",
+				"license": "CC-BY",
+				"licenseLabel": "cc-by-4.0",
+				"attributionDraft": "- **Low-Poly Rowboat** — by Cas_Models — **CC-BY 4.0**. Source: https://sketchfab.com/3d-models/low-poly-rowboat-03be66684c9e4d47846696c9d0089c30 — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/man-low-poly-rowboat-2487f979.glb",
+				"labSha256": "5d989bccc2920fb7e8bf479a1d18b636a13d9f0361786cae8fd5a427408b87d8",
+				"labBytes": 52260
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 0.27,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [],
+				"note": "low-poly rowboat with three thwarts and two oars (12.3 m in the lab GLB; 3.3 m at ×0.27)"
+			},
+			"bounds": {
+				"min": [
+					-1.296,
+					0,
+					-1.66
+				],
+				"max": [
+					1.296,
+					0.621,
+					1.66
+				],
+				"size": [
+					2.592,
+					0.621,
+					3.321
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 1468
+				}
+			],
+			"materials": [
+				{
+					"name": "Material",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						0.091,
+						0.036,
+						0.008,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "Material.001",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						0.179,
+						0.09,
+						0.028,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "Material.002",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						0.334,
+						0.18,
+						0.06,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"rowing_oar": {
+			"id": "rowing_oar",
+			"file": "rowing_oar.glb",
+			"bytes": 615984,
+			"sha256": "611b6e2690212f395de1e33d3c2ed52e0609bb9508a0035ad0fb9ea3d8bd6b3b",
+			"provenance": {
+				"labId": "man-rowing-oar-caced567",
+				"title": "Rowing Oar",
+				"creator": "kai9987kai",
+				"site": "sketchfab.com",
+				"url": "https://sketchfab.com/3d-models/b510b52a2b5e4ebe9efa67957c6f1700",
+				"license": "CC-BY",
+				"licenseLabel": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+				"attributionDraft": "- **Rowing Oar** — by kai9987kai — **CC-BY 4.0**. Source: https://sketchfab.com/3d-models/rowing-oar-b510b52a2b5e4ebe9efa67957c6f1700 — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/man-rowing-oar-caced567.glb",
+				"labSha256": "6e4a9c3077010b02f69c4122403c30239575d96e232a44083fe058a40c3b6a44",
+				"labBytes": 2944912
+			},
+			"recipe": {
+				"pivot": "center",
+				"scale": 0.0603,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": {
+					"ratio": 0.07,
+					"error": 0.01
+				},
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.3,
+						"error": 0.03
+					}
+				],
+				"note": "photoscanned wooden oar, 44k → ~3k tris, 53 m in the lab GLB → 3.2 m at ×0.06; long axis x"
+			},
+			"bounds": {
+				"min": [
+					-1.601,
+					-0.061,
+					-0.234
+				],
+				"max": [
+					1.601,
+					0.061,
+					0.234
+				],
+				"size": [
+					3.201,
+					0.121,
+					0.467
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 5668
+				},
+				{
+					"node": "LOD1",
+					"tris": 3334
+				}
+			],
+			"materials": [
+				{
+					"name": "wire_113135006",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "wire_153228184",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "Image_0",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 1765K",
+					"to": "1024x1024 jpeg 212K",
+					"alpha": false
+				}
+			]
+		},
+		"kayak_lowpoly": {
+			"id": "kayak_lowpoly",
+			"file": "kayak_lowpoly.glb",
+			"bytes": 21316,
+			"sha256": "786f2d4ecbe50a046a715a87deeca98fc9ae31ac5a41d4386b2eb8155d997603",
+			"provenance": {
+				"labId": "man-wooden-kayak-paddle-85ee1d97--kayak-lp",
+				"title": "Wooden Kayak & Paddle — kayak (low poly)",
+				"creator": "Dominik Biały",
+				"site": "sketchfab.com",
+				"url": "https://sketchfab.com/3d-models/01cc514c5ace410ea4e5710cbfe89bb8",
+				"license": null,
+				"licenseLabel": null,
+				"attributionDraft": null,
+				"labSource": "/home/o/model-lab/derived/glb/man-wooden-kayak-paddle-85ee1d97--kayak-lp.glb",
+				"labSha256": "0a29b3afc98918c68cedfe0f61eca2e645b67517e25b47c0c762ffb8e2cfad24",
+				"labBytes": 26532
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1.8,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [],
+				"note": "varnished wooden kayak (low-poly piece of \"Wooden Kayak & Paddle\"), 1.9 m in the lab GLB → 3.4 m at ×1.8"
+			},
+			"bounds": {
+				"min": [
+					-1.694,
+					0,
+					-0.23
+				],
+				"max": [
+					1.694,
+					0.298,
+					0.23
+				],
+				"size": [
+					3.389,
+					0.298,
+					0.459
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 1080
+				}
+			],
+			"materials": [
+				{
+					"name": "Kayak",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.8,
+						0.8,
+						0.8,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"simple_wood_boat": {
+			"id": "simple_wood_boat",
+			"file": "simple_wood_boat.glb",
+			"bytes": 18172,
+			"sha256": "6db592de7d1613a95e66a19d0516f38de3397edbc20213a7badabb562f8aaa4d",
+			"provenance": {
+				"labId": "oga-simple-wood-boat-457940ef",
+				"title": "Simple Wood Boat",
+				"creator": "mikeask",
+				"site": "opengameart.org",
+				"url": "https://opengameart.org/content/simple-wood-boat",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Simple Wood Boat** — by mikeask — **CC0**. Source: https://opengameart.org/content/simple-wood-boat — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-simple-wood-boat-457940ef.glb",
+				"labSha256": "5692decba31b4b6d5e1bf6963399bb97ae4334195a24f826625fb5f8d617f24f",
+				"labBytes": 18552
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 0.5,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [],
+				"note": "low-poly wooden rowboat with oars, 8 m in the lab GLB → 4 m at ×0.5; untextured (vertex colours / flat)"
+			},
+			"bounds": {
+				"min": [
+					-1.435,
+					0,
+					-2.009
+				],
+				"max": [
+					1.435,
+					0.832,
+					2.009
+				],
+				"size": [
+					2.869,
+					0.832,
+					4.018
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 320
+				}
+			],
+			"materials": [
+				{
+					"name": "Material.001",
+					"alphaMode": "OPAQUE",
+					"doubleSided": false,
+					"baseColor": [
+						0.8,
+						0.8,
+						0.8,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"mannequin_rigged": {
+			"id": "mannequin_rigged",
+			"file": "mannequin_rigged.glb",
+			"bytes": 1189948,
+			"sha256": "fb549deaba7a717d7ee737a6096ecc0839a31e0b279f92122a7faa680f0f53d7",
+			"provenance": {
+				"labId": "oga-mannequiny-the-open-3d-mannequin-63cf5c43",
+				"title": "Mannequiny The Open 3D Mannequin",
+				"creator": "hardboileduser",
+				"site": "opengameart.org",
+				"url": "https://opengameart.org/content/mannequiny-the-open-3d-mannequin",
+				"license": "CC-BY",
+				"licenseLabel": "CC-BY 4.0",
+				"attributionDraft": "- **Mannequiny The Open 3D Mannequin** — by hardboileduser — **CC-BY 4.0**. Source: https://opengameart.org/content/mannequiny-the-open-3d-mannequin — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-mannequiny-the-open-3d-mannequin-63cf5c43.glb",
+				"labSha256": "60031d75b903042a108dbf8ff23c09257f90acca7285b1a5252d821a21662a9f",
+				"labBytes": 1189396
+			},
+			"recipe": {
+				"passthrough": true,
+				"scale": 1,
+				"note": "rigged, animated open mannequin (45 joints, 14 clips) kept as is: a rower / swimmer stand-in for rig work",
+				"pivot": "as source",
+				"lods": []
+			},
+			"bounds": {
+				"min": [
+					-0.82,
+					-0.005,
+					-0.12
+				],
+				"max": [
+					0.82,
+					1.793,
+					0.196
+				],
+				"size": [
+					1.641,
+					1.798,
+					0.316
+				]
+			},
+			"lods": [
+				{
+					"node": "scene",
+					"tris": 13932
+				}
+			],
+			"rig": {
+				"skins": [
+					45
+				],
+				"clips": [
+					"air_jump",
+					"air_jump_anticipation",
+					"air_land",
+					"dash",
+					"fight_idle",
+					"fight_kick",
+					"fight_punch",
+					"idle",
+					"idle_to_fight",
+					"jump_full",
+					"run",
+					"walk"
+				]
+			},
+			"materials": [
+				{
+					"name": "Azul",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.8,
+						0.82,
+						0.85,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "Negro",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.8,
+						0.82,
+						0.85,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				},
+				{
+					"name": "Blanco",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						0.8,
+						0.82,
+						0.85,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		},
+		"canal_bridge": {
+			"id": "canal_bridge",
+			"file": "canal_bridge.glb",
+			"bytes": 900300,
+			"sha256": "07c584b9d3fa988ad87a2395746fa9350811dd339aaa063d752a4edf450672c6",
+			"provenance": {
+				"labId": "oga-canal-bridge-e89d1458",
+				"title": "Canal bridge",
+				"creator": "ninelionar",
+				"site": "opengameart.org",
+				"url": "https://opengameart.org/content/canal-bridge",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Canal bridge** — by ninelionar — **CC0**. Source: https://opengameart.org/content/canal-bridge — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-canal-bridge-e89d1458.glb",
+				"labSha256": "e13a724f81abe85a0ee3b1cca1c254963d3dac42e104e1d95f7cde4f1d66213e",
+				"labBytes": 17964124
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.5,
+						"error": 0.02
+					}
+				],
+				"note": "mossy stone triple-arch canal bridge, 13.7 m span, 2K → 1K textures (17.5 MB → ~2.5 MB)"
+			},
+			"bounds": {
+				"min": [
+					-2.844,
+					0,
+					-6.863
+				],
+				"max": [
+					2.844,
+					4.235,
+					6.863
+				],
+				"size": [
+					5.688,
+					4.235,
+					13.726
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 3316
+				},
+				{
+					"node": "LOD1",
+					"tris": 1658
+				}
+			],
+			"materials": [
+				{
+					"name": "Material",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": true,
+						"mr": true
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "Normal",
+					"slot": "normalTexture",
+					"from": "2048x2048 png 9715K",
+					"to": "1024x1024 jpeg 336K",
+					"alpha": false
+				},
+				{
+					"name": "BaseColor",
+					"slot": "baseColorTexture",
+					"from": "2048x2048 png 6748K",
+					"to": "1024x1024 jpeg 189K",
+					"alpha": false
+				},
+				{
+					"name": "Metallic-Roughness",
+					"slot": "metallicRoughnessTexture",
+					"from": "2048x2048 png 920K",
+					"to": "1024x1024 jpeg 95K",
+					"alpha": false
+				}
+			]
+		},
+		"palm_tree": {
+			"id": "palm_tree",
+			"file": "palm_tree.glb",
+			"bytes": 207816,
+			"sha256": "a283eeda6aff11d5f0becc2a1941ea3b99a2d6b70464ed0afb44278a1d7374db",
+			"provenance": {
+				"labId": "oga-palm-tree-v2-d5ce75a0",
+				"title": "Palm tree v2",
+				"creator": "Yughues",
+				"site": "opengameart.org",
+				"url": "https://opengameart.org/content/palm-tree-v2",
+				"license": "CC0",
+				"licenseLabel": "CC0",
+				"attributionDraft": "- **Palm tree v2** — by Yughues — **CC0**. Source: https://opengameart.org/content/palm-tree-v2 — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-palm-tree-v2-d5ce75a0.glb",
+				"labSha256": "667e367e808e5bf38dbc6c010699c8b4c8ef2bc38f35023cabc2c0280922f448",
+				"labBytes": 1517512
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": null,
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.5,
+						"error": 0.03,
+						"lockBorder": true
+					}
+				],
+				"note": "realistic coconut palm, 4.4 m (scale per use), alpha-masked fronds"
+			},
+			"bounds": {
+				"min": [
+					-0.992,
+					0,
+					-0.988
+				],
+				"max": [
+					0.992,
+					4.397,
+					0.988
+				],
+				"size": [
+					1.985,
+					4.397,
+					1.977
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 1032
+				},
+				{
+					"node": "LOD1",
+					"tris": 516
+				}
+			],
+			"materials": [
+				{
+					"name": "02 - Default",
+					"alphaMode": "MASK",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": true,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": [
+				{
+					"name": "Map #1",
+					"slot": "baseColorTexture",
+					"from": "1024x1024 png 1451K",
+					"to": "1024x1024 jpeg 153K",
+					"alpha": false
+				}
+			]
+		},
+		"marble_statue": {
+			"id": "marble_statue",
+			"file": "marble_statue.glb",
+			"bytes": 740944,
+			"sha256": "22acc8dcb9670f2805f40fc22f1b590204991be0e1a7bed583c78f51f5b65dd9",
+			"provenance": {
+				"labId": "oga-medieval-statue-671c6449",
+				"title": "Medieval Statue",
+				"creator": "Daniel Andersson",
+				"site": "opengameart.org",
+				"url": "https://opengameart.org/content/medieval-statue",
+				"license": "CC0",
+				"licenseLabel": "public domain",
+				"attributionDraft": "- **Medieval Statue** — by Daniel Andersson — **CC0**. Source: https://opengameart.org/content/medieval-statue — DRAFT — live check pending (CP10 gate: licence must be verified at the live listing and recorded in CREDITS.md).",
+				"labSource": "/home/o/model-lab/derived/glb/oga-medieval-statue-671c6449.glb",
+				"labSha256": "a754c9adc468161856d3279f33097b637868f6a48e230bd7b789cb0b92ef2e28",
+				"labBytes": 14770324
+			},
+			"recipe": {
+				"pivot": "base",
+				"scale": 1,
+				"rotateY": 0,
+				"dropNodes": null,
+				"dropMaterials": null,
+				"keepNodes": null,
+				"simplify": {
+					"ratio": 0.07,
+					"error": 0.005
+				},
+				"simplifyByMaterial": null,
+				"lods": [
+					{
+						"ratio": 0.3,
+						"error": 0.02
+					}
+				],
+				"note": "detailed warrior statue, 425k → ~30k tris, untextured marble (colour at runtime), 1.6 m in the lab GLB"
+			},
+			"bounds": {
+				"min": [
+					-0.292,
+					0,
+					-0.334
+				],
+				"max": [
+					0.292,
+					1.644,
+					0.334
+				],
+				"size": [
+					0.583,
+					1.644,
+					0.668
+				]
+			},
+			"lods": [
+				{
+					"node": "LOD0",
+					"tris": 29762
+				},
+				{
+					"node": "LOD1",
+					"tris": 8865
+				}
+			],
+			"materials": [
+				{
+					"name": "Marble",
+					"alphaMode": "OPAQUE",
+					"doubleSided": true,
+					"baseColor": [
+						1,
+						1,
+						1,
+						1
+					],
+					"textures": {
+						"base": false,
+						"normal": false,
+						"mr": false
+					}
+				}
+			],
+			"textures": []
+		}
+	},
+	"tool": "apps/tidewater-dolphin/tools/assets/convert.mjs"
+}

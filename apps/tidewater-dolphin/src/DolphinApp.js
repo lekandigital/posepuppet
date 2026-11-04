@@ -214,6 +214,14 @@ export class DolphinApp {
 
 		await progress( 0.23, 'Growing the reef…' );
 		this.reef = new Reef( { scene, terrain: this.terrainData, shoreField: this.shoreField } );
+		// Asset-integration pass: the optional, reversible scenery additions (Play tab → Scenery
+		// additions; all categories off = the pristine Tidewater scene, exactly). Placed now (CPU,
+		// deterministic) and loaded before the players exist, because the solid imported
+		// structures are part of the contact surface the dolphin's world sampler, Tidewater's
+		// walker and the reef's fish are built on (SceneryAdditions.ground / .floor).
+		await progress( 0.26, 'Placing the scenery additions…' );
+		this.additions = new SceneryAdditions( this );
+		await this.additions.load();
 
 		this.boat = new BoatModel();
 		scene.add( this.boat.group );
@@ -361,14 +369,16 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		this.surface.wake = this.wake;
 		// CP10 continuation: Tidewater's own first-person Player (walker / swimmer / deck / helm),
 		// constructed exactly as App.js does — selectable from the Play tab, idle by default
-		this.player = new Player( { camera, input: this.input, terrain: this.terrainData, colliders: this.colliders, query: this.query, boat: this.boatCtl, reef: this.reef } );
+		// (reef: the composite floor — Tidewater's reef plus the enabled solid additions — read through
+		// the one method Player uses, floorHeightAt)
+		this.player = new Player( { camera, input: this.input, terrain: this.terrainData, colliders: this.colliders, query: this.query, boat: this.boatCtl, reef: this.additions.floor } );
 		// CP10: the BodyArcade dolphin is the DEFAULT player — the thing the camera follows. Same
 		// world inputs the walker uses (terrain, reef floor, colliders, water query) plus
 		// Tidewater's spray and audio for splashes. ?noDolphin: environment only.
 		await progress( 0.31, 'Waking the dolphin…' );
 		const app = this;
 		this.dolphin = await DolphinPlayer.create( {
-			camera, scene, terrainData: this.terrainData, reef: this.reef, colliders: this.colliders, query: this.query,
+			camera, scene, terrainData: this.terrainData, reef: this.additions.ground, colliders: this.colliders, query: this.query,
 			spray: this.spray, get audio() { return app.audio; },
 			boatDock: { x: WORLD.boatDock.position.x, z: WORLD.boatDock.position.z, heading: WORLD.boatDock.heading },
 			cameraWaterHeight: () => this.cameraWaterHeight ?? 0,
@@ -426,10 +436,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		this.display = this.game.display;
 		this.chandlery = this.game.chandlery;
 		this.vendors = this.game.vendors;
-		// CP10 continuation: optional, reversible scenery additions (Play tab → Scenery additions);
-		// all categories off = the pristine Tidewater scene, exactly
-		this.additions = new SceneryAdditions( this );
-		await this.additions.load();
+		// (the scenery additions were placed and loaded right after the reef, see above)
 		// the lanterns at Joe's fish stand and Marta's chandlery (lit from dusk like the village lamps);
 		// positions are in each stall's frame (x right, z toward the customer), turned by its yaw
 		for ( const [ s, lx, ly, lz ] of [ [ STAND, - 0.9, 1.85, 0.1 ], [ CHANDLERY, - 0.75, 1.58, - 1.45 ] ] ) {

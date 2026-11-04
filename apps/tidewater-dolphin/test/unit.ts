@@ -405,5 +405,63 @@ check('containment band is the sampler\'s (12 m), never the 55 m region band', n
   }
 }
 
+
+// ---------------------------------------------------------------- asset-integration pass: scenery additions placement (headless, no GPU)
+// The placement (sites, instances, swimmer loops, fish zones) is a pure function of Tidewater's
+// deterministic terrain and reef; the GPU side (GLB loading, structure fields) is checked live by
+// test/modes.mjs. The reef is built as the headless survey builds it (eval/survey/bay-survey.mjs).
+{
+  const { TerrainData } = await import('../vendor/tidewater/src/world/TerrainData.js');
+  const { WORLD } = await import('../vendor/tidewater/src/world/WorldLayout.js');
+  const { Reef } = await import('../vendor/tidewater/src/world/Reef.js');
+  const { mulberry32, Noise2D } = await import('../vendor/tidewater/src/util/Noise.js');
+  const { SceneryAdditions, MODELS, ADDITION_CATEGORIES } = await import('../src/additions/SceneryAdditions.js');
+  const T = new TerrainData();
+  const reef = Object.create(Reef.prototype);
+  reef.terrain = T; reef.center = WORLD.reef.center.clone(); reef.radius = WORLD.reef.radius;
+  reef.rng = mulberry32(20260923); reef.noise = new Noise2D(4242); reef.noise2 = new Noise2D(977); reef.timings = {};
+  reef.buildKinds(); reef.initFields(); reef.items = { hard: [], soft: [] }; reef.placeLayers();
+  const mkApp = () => ({ scene: { add() {} }, qs: new URLSearchParams(''), terrainData: T, reef, colliders: null, debris: null, terrainGPU: null, shoreField: null });
+  const t0 = performance.now();
+  const a1 = new SceneryAdditions(mkApp());
+  const placeMs = performance.now() - t0;
+  const a2 = new SceneryAdditions(mkApp());
+  const strip = (k: string, v: unknown) => (k === 'matrix' || k === 'center' || k === 'radius' ? undefined : v);
+  check('additions placement is deterministic (two constructions give identical records)', JSON.stringify(a1.placed, strip) === JSON.stringify(a2.placed, strip), { placeMs: +placeMs.toFixed(0) });
+  const P = a1.placed;
+  const count = (id: string) => { const c = P[id]; let n = c.scan ? c.scan.length : 0; for (const k in c.models || {}) n += c.models[k].length; return n + (c.swimmers || []).length; };
+  check('the two CP10 categories are unchanged (11 driftwood, 30 shells)', count('sunkenWood') === 11 && count('seabedShells') === 30, { wood: count('sunkenWood'), shells: count('seabedShells') });
+  const expect: Record<string, number> = { seagrassMeadows: 270, kelpWall: 154, wreck: 26, drownedTemple: 103, wildlife: 3, headland: 71 };
+  for (const id in expect) check(`${id}: ${expect[id]} instances placed (pinned deterministic count)`, count(id) === expect[id], count(id));
+  check('the wreck, the temple, the ruin and the lighthouse found a spot', !!P.wreck.hull && !!P.drownedTemple.temple && !!P.drownedTemple.ruin && !!P.headland.lighthouse, { hull: P.wreck.hull, temple: P.drownedTemple.temple, lighthouse: P.headland.lighthouse });
+  check('fish communities at the wreck and the temple (Tidewater species only)', P.wildlife.fish.length === 2 && P.wildlife.fish.every((f: { groups: unknown[][] }) => f.groups.length >= 8));
+  // every solid top below the swimmable limit, every kelp / weed tip below the surface band,
+  // everything on the sand (not inside Tidewater's own structures), clear of the pier, the dock and the spawn
+  let badTop = 0, badGround = 0, badClear = 0, badTip = 0, n = 0;
+  for (const c of ADDITION_CATEGORIES) {
+    const models = P[c.id].models || {};
+    for (const id in models) for (const r of models[id]) {
+      n++;
+      const M = MODELS[id];
+      const s = Array.isArray(r.s) ? r.s : [r.s, r.s, r.s];
+      const g = T.heightAt(r.x, r.z);
+      if (id !== 'lighthouse' && reef.structureAt(r.x, r.z) > g + 0.02) badGround++;
+      if (M.solid) {
+        const h = Math.abs(r.pitch || 0) > 1 ? Math.max(M.size[0] * s[0], M.size[2] * s[2]) * 0.5 : M.size[1] * s[1];
+        if (r.y + h > -2.4) badTop++;
+      } else if (M.sway && r.y + M.size[1] * s[1] > -1.4) badTip++;
+      if (c.id !== 'headland' && (Math.hypot(r.x - 0, r.z - 66) < 6 || Math.hypot(r.x - 64.5, r.z - 36.5) < 12 || (Math.abs(r.x - 55) < 4 && r.z > -67 && r.z < 43))) badClear++;
+    }
+  }
+  check(`every solid imported structure tops out below −2.4 m (${n} records)`, badTop === 0, badTop);
+  check('every kelp stalk / weed clump tip stays below −1.4 m', badTip === 0, badTip);
+  check('imported models stand on sand, not inside Tidewater\'s own reef structures', badGround === 0, badGround);
+  check('imported models clear of the dolphin spawn, the boat dock and the pier', badClear === 0, badClear);
+  const lh = P.headland.lighthouse;
+  check('the lighthouse stands on high ground (> 8 m) near the water', !!lh && T.heightAt(lh.x, lh.z) > 8, lh);
+  // the composite ground: without GPU fields every structure query is −Infinity, so the reef wins
+  check('composite ground falls back to the reef where no field is loaded', a1.ground.structureAt(-78, 58) === reef.structureAt(-78, 58) && a1.floor.floorHeightAt(0, 66) === reef.floorHeightAt(0, 66));
+}
+
 console.log(failed === 0 ? '\nall passed' : `\n${failed} FAILED`);
 process.exit(failed === 0 ? 0 : 1);
