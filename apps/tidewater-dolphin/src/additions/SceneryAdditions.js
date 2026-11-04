@@ -306,6 +306,16 @@ export class SceneryAdditions {
 		const dflt = qs.has( 'original' ) ? false : true;
 		for ( const c of ADDITION_CATEGORIES ) this.enabled[ c.id ] = qs.has( 'enhanced' ) ? true : dflt;
 		this.ready = false;
+		// Loading switches (verification / low-end machines): ?noAdditions loads nothing (the layer
+		// is placed but never drawn — the pristine scene with the pristine pipeline set);
+		// ?additions=id,id loads only those categories' models (the others stay empty);
+		// ?lazyAdditions keeps the meshes out of the scene until attach() — after Tidewater's
+		// precompile — so their pipelines compile on first sight instead of all at start-up.
+		this.loadNone = qs.has( 'noAdditions' );
+		this.loadOnly = qs.has( 'additions' ) ? new Set( ( qs.get( 'additions' ) || '' ).split( ',' ).filter( Boolean ) ) : null;
+		this.lazy = qs.has( 'lazyAdditions' );
+		this.attached = false;
+		this._pending = []; // meshes waiting for attach() (lazy)
 		this.models = new Map();
 		this.provenance = null; // public/models/additions/manifest.json (loaded in load())
 		// ---- placement (CPU, deterministic, before anything loads: the fields and the records exist
@@ -833,10 +843,11 @@ export class SceneryAdditions {
 			group.name = 'additions-' + c.id;
 			group.matrixAutoUpdate = false;
 			group.visible = !! this.enabled[ c.id ];
-			this.group.add( group );
+			if ( this.lazy ) this._pending.push( group ); else this.group.add( group );
 			const P = this.placed[ c.id ];
 			const cat = { def: c, group, scan: null, models: [], swimmers: [], fish: [], field: null, instances: P.scan || [] };
 			this.categories.set( c.id, cat );
+			if ( this.loadNone || ( this.loadOnly && ! this.loadOnly.has( c.id ) ) ) continue;
 			if ( P.scan ) {
 
 				if ( source ) {
@@ -915,6 +926,19 @@ export class SceneryAdditions {
 		} catch ( e ) { /* the provenance file is documentation only */ }
 
 		this.ready = true;
+		if ( ! this.lazy ) this.attached = true;
+
+	}
+
+	// lazy mode: put the category groups into the scene (DolphinApp calls this after Tidewater's
+	// precompile, so the imported materials compile on first sight instead of all at start-up)
+	attach() {
+
+		if ( this.attached ) return;
+		for ( const g of this._pending ) this.group.add( g );
+		this._pending = [];
+		this.attached = true;
+		for ( const c of this.categories.values() ) { if ( c.scan ) c.scan.invalidate(); for ( const mi of c.models ) mi.invalidate(); }
 
 	}
 
@@ -1034,7 +1058,7 @@ export class SceneryAdditions {
 
 	stats() {
 
-		const out = { ready: this.ready, categories: {} };
+		const out = { ready: this.ready, attached: this.attached, loadMode: this.loadNone ? 'none' : this.loadOnly ? [ ...this.loadOnly ].join( ',' ) : 'all', lazy: this.lazy, categories: {} };
 		for ( const c of this.categories.values() ) {
 
 			const vis = c.group.visible;

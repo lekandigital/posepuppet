@@ -473,6 +473,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		// stage weights: in the browser the pipeline compile below takes far longer than everything before it
 		await progress( 0.36, 'Compiling shaders…', 0.95 );
 		await this.precompile();
+		this.additions.attach(); // (?lazyAdditions: the imported scenery joins the scene only now)
 		await progress( 0.96, 'Warming up…' );
 		for ( let i = 0; i < 2; i ++ ) {
 
