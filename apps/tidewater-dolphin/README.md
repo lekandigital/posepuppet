@@ -7,8 +7,10 @@ host engine and world, unmodified. Tidewater is vendored at the pinned commit `4
 
 The dolphin is the default player. Tidewater's own walking, boat and (optional, off by default)
 fishing are selectable from the **Play** tab of the settings panel, in the same running world.
-An optional, reversible scenery layer (Poly Haven CC0 scans already in Tidewater) can be
-compared against the pristine scene from the same tab.
+An optional, reversible scenery layer — Tidewater's own Poly Haven scans re-used, and (since the
+asset-integration pass) models from the user's Ubuntu library placed at authored sites: seagrass
+meadows, a kelp wall, a wreck, a drowned temple, wildlife, a lighthouse — can be compared against
+the pristine scene from the same tab (**Original / Enhanced**, per category).
 
 ## Run
 
@@ -116,6 +118,30 @@ hands forward to burst.
 
 Tidewater's `T · L · M · H · P · F1 · F` (pause time · flashlight · mute · settings · photo mode ·
 controls sheet · free review camera) work in every mode.
+
+## Scenery additions (asset-integration pass)
+
+Play tab → **Scenery additions**: Original (exactly the pristine scene) or Enhanced, and a toggle
+per category. Everything is deterministic (seeded), additive, and keeps every solid top below
+−2.5 m so the dolphin's swimmable mask is the same either way; the solid structures join the
+contact surface the dolphin, the camera, the walker and the fish use (`SceneryAdditions.ground`
+/ `.floor`). Start with everything on: `http://127.0.0.1:5199/?enhanced` (`?original` for the
+pristine scene).
+
+| category | where | what (source, licence) |
+|---|---|---|
+| Sunken driftwood · Seabed shells | bay floor east of the pier · shallows off the beach | Tidewater's own Poly Haven scans (CP10 continuation) |
+| Seagrass meadows | the shallow bay floor east of the spawn (5–8 m) and the east plateau | Sea Weed clumps (rkuhlf, CC-BY), a sunken skiff (AnyRPG, CC0), algae rocks (CC0) |
+| Kelp wall | the east wall of the deep channel, x 54–76 / z 94–134, 7–13 m | Animated Kelp (JosephWPugsley, CC-BY), Kelp thickets (Mazelya, CC-BY), weed, photogrammetric boulders (Yughues, CC0) |
+| The wreck | the foot of the wall, (56, 114), 12.9 m | Fantasy Fishing Boat (eb78, CC-BY) — sail and oars gone, heeled, weed-grown |
+| Drowned temple | a colonnade from the channel floor (11 m) into the basin (18 m), the temple at (4.5, 156) | Medieval Stone Temple (AnyRPG, CC0), Ancient columns (OdinTdh, CC-BY), Broken Stone Slab (Kutejnikov, CC0), Figure Head (DaGameKnower, CC0), cathedral ruins and boulders (Ron Kapaun / Yughues, CC0) |
+| Added wildlife | the spawn meadow · the wall and the wreck · the two sites | manatee pair (DevMops, CC0), hammerhead (STKRudy85, CC0), reef-fish communities made of Tidewater's own fish |
+| Lighthouse & shore scrub | the eastern headland (226, 136) · the back-beach at both ends of the beach | 3TD Harbour Pack lighthouse (Ron Kapaun, CC0), Poly Haven shrubs, branches, bark (CC0) |
+
+Provenance, licences, lab paths and checksums: `public/models/additions/manifest.json` and
+`CREDITS.md`; conversion tooling: `tools/assets/` (`convert.mjs`, recipes, `thumbs.mjs`,
+`credits.mjs`); the pass report: `eval/ASSET_PASS_NOTES.md`. Staged assets for future games (not
+loaded here): `assets/future-games/` at the repository root.
 
 ## Layout
 

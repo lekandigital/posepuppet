@@ -1,5 +1,11 @@
 # `ssh box` from Claude Code Cloud — diagnosis and fix
 
+> **Status 2026-11-04 (asset-integration pass):** the corrective action below was applied to the
+> cloud environment and verified in a real session — `ssh -o BatchMode=yes box 'hostname; whoami;
+> pwd'` answers `o-MacPro` / `o` / `/home/o`, the host key is pinned, the remote filesystem is
+> read-only, and `tar` over `ssh` moved the selected lab GLBs at roughly 9 MB/s. The diagnosis is
+> kept for the record.
+
 _2026-11-04, cloud session on `bodyarcade-tidewater-cp10-controls-camera`. The Ubuntu asset
 server ("box") is reached through Cloudflare Access SSH (`box-ssh.1001ud.me`). This records why
 the connection fails from the cloud environment and the smallest change that makes it work._
