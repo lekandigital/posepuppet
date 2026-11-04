@@ -221,21 +221,24 @@ check('containment band is the sampler\'s (12 m), never the 55 m region band', n
   // 2b. the eye can still rest on the surface when the body is placed there (no exclusion band)
   {
     const { rig } = mkRig();
-    const s = simState(-0.22, 3, 3);
-    for (let i = 0; i < 120 * 6; i++) { s.z += 3 / 120; rig.update(s as never, 1 / 120, { bodyY: -0.22 }); }
+    const s = simState(-RIG.HEIGHT_SURFACE, 3, 3);
+    for (let i = 0; i < 120 * 6; i++) { s.z += 3 / 120; rig.update(s as never, 1 / 120, { bodyY: -RIG.HEIGHT_SURFACE }); }
     const c = rig.evalState(s);
     check('eye can rest on the surface (|y| < 8 cm) — no waterline exclusion', Math.abs(c.y) < 0.08, { eyeY: +c.y.toFixed(3) });
   }
-  // 3. a slow dive from −0.6 m to −3 m and back: the eye passes through [−0.35, 0.35] continuously
-  //    (samples inside the band, no step larger than the spring would produce) and the crossings count
+  // 3. a slow dive from −0.2 m (eye just above the mean) to −3 m and back: the eye passes through
+  //    [−0.35, 0.35] continuously (samples inside the band, no step larger than the spring would
+  //    produce) and the eye / waterline crossings count. (CP10 controls pass: with the surface skim
+  //    the eye only rises above the mean when the body does — a dive from the −0.4 ceiling keeps the
+  //    lens under; waves crossing the fixed lens are tested in 5.)
   {
     const { rig } = mkRig();
-    const s = simState(-0.6, 2, 2);
+    const s = simState(-0.2, 2, 2);
     let inBand = 0, maxStep = 0, prevY: number | null = null;
     const T = 12, N = 120 * T;
     for (let i = 0; i < N; i++) {
       const t = i / 120;
-      s.y = -1.8 + 1.2 * Math.cos((2 * Math.PI * t) / T); // −0.6 → −3.0 → −0.6
+      s.y = -1.6 + 1.4 * Math.cos((2 * Math.PI * t) / T); // −0.2 → −3.0 → −0.2
       s.z += 2 / 120;
       rig.update(s as never, 1 / 120);
       const y = rig.evalState(s).y;
@@ -266,7 +269,7 @@ check('containment band is the sampler\'s (12 m), never the 55 m region band', n
     const seen = new Set<string>();
     const eyeYs: number[] = [];
     let signFlips = 0;
-    let prevRel: number | null = null;
+    let prevSign: number | null = null; // sign of the eye / waterline height, with 2 cm hysteresis
     for (let i = 0; i < 120 * 8; i++) {
       t += 1 / 120;
       const rs = { ...s, y: -0.4 + wave() };
@@ -276,8 +279,11 @@ check('containment band is the sampler\'s (12 m), never the 55 m region band', n
         seen.add(c.state);
         eyeYs.push(c.y);
         const rel = c.eyeAboveWaterM;
-        if (prevRel !== null && Math.sign(rel) !== Math.sign(prevRel) && Math.abs(rel) > 0.02) signFlips++;
-        prevRel = rel;
+        if (Math.abs(rel) > 0.02) {
+          const sg = Math.sign(rel);
+          if (prevSign !== null && sg !== prevSign) signFlips++;
+          prevSign = sg;
+        }
       }
     }
     const eyeSpan = Math.max(...eyeYs) - Math.min(...eyeYs);
@@ -295,6 +301,107 @@ check('containment band is the sampler\'s (12 m), never the 55 m region band', n
       seen.add(rig.evalState(s).state);
     }
     check('crossing the actual surface still flags SurfaceTransition', seen.has('SurfaceTransition'), [...seen]);
+  }
+}
+
+// ---------------------------------------------------------------- swim model (CP10 controls pass)
+// Hold-to-swim is a smooth thrust toward a held target, caps govern thrust, overspeed bleeds.
+{
+  const open = { inWater: () => true, shoreDistance: () => 500, depthAt: () => 12, containmentBand: 12 };
+  const mk = (speed = 0.5, y = -2.5) => { const sim = new SwimSim(open as never); sim.state.y = y; sim.state.speed = speed; sim.state.wvx = 0; sim.state.wvz = speed; return sim; };
+  const run = (sim: SwimSim, seconds: number, intent: Partial<typeof NEUTRAL_INTENT>, onStep?: (t: number) => void) => {
+    for (let i = 0; i < Math.round(seconds / SIM.DT); i++) { sim.step({ ...NEUTRAL_INTENT, ...intent }); onStep?.((i + 1) * SIM.DT); }
+  };
+  // hold-to-swim: rest → cruise on a curve, settling exactly at cruise
+  {
+    const sim = mk(0.5); let t45 = -1; let maxDv = 0; let prev = 0.5;
+    run(sim, 4, { swim: 1, kickRate: 1.8 }, (t) => { const v = sim.state.speed; maxDv = Math.max(maxDv, Math.abs(v - prev)); prev = v; if (t45 < 0 && v >= 4.5) t45 = t; });
+    check('hold-to-swim: 0.5 → 4.5 m/s in 0.9–2 s and settles at cruise 5 ± 0.03', t45 > 0.9 && t45 < 2 && near(sim.state.speed, 5, 0.03), { t45: +t45.toFixed(2), final: +sim.state.speed.toFixed(3) });
+    check('hold-to-swim never steps (max per-step Δv < 0.1 m/s, i.e. < 12 m/s²)', maxDv < 0.1, +maxDv.toFixed(4));
+  }
+  // analog hold levels settle below cruise (trigger travel = sustained speed)
+  {
+    const settle = (lvl: number) => { const sim = mk(0.5); run(sim, 10, { swim: lvl, kickRate: 1.4 }); return sim.state.speed; };
+    const v03 = settle(0.3), v06 = settle(0.6), v1 = settle(1);
+    const want = (lvl: number) => SIM.MAX_SPEED * (SIM.SWIM_MIN_FRAC + (1 - SIM.SWIM_MIN_FRAC) * lvl);
+    check('analog swim level sets the sustained speed (0.3 / 0.6 / 1 → 2.9 / 3.8 / 5 m/s ± 0.05)', near(v03, want(0.3), 0.05) && near(v06, want(0.6), 0.05) && near(v1, 5, 0.05), { v03: +v03.toFixed(2), v06: +v06.toFixed(2), v1: +v1.toFixed(2) });
+  }
+  // charge, then release: bleed, never a step (the old clamp dropped 9 → 5 in one 8 ms step)
+  {
+    const sim = mk(5); run(sim, 1.5, { burst: true, swim: 1 }); const v9 = sim.state.speed;
+    let maxDrop = 0; let prev = v9; const trace: number[] = [];
+    // let go of charge, keep swimming: eases back to cruise and stays there
+    run(sim, 3, { swim: 1 }, (t) => { const v = sim.state.speed; maxDrop = Math.max(maxDrop, prev - v); prev = v; if (Math.abs(t * 2 - Math.round(t * 2)) < 1e-9) trace.push(+v.toFixed(2)); });
+    check('charge reaches 9 m/s', near(v9, 9, 0.05), +v9.toFixed(2));
+    check('charge release (still swimming) bleeds 9 → 5 over ~2 s: max per-step drop < 0.1 m/s, 6–8 m/s after 0.5 s, cruise ± 0.05 after 3 s', maxDrop < 0.1 && trace[0]! > 6 && trace[0]! < 8 && near(sim.state.speed, 5, 0.05), { trace, maxDrop: +maxDrop.toFixed(4) });
+    // let go of everything from 9 m/s: a glide, still no step (the old clamp dropped to 5.00 in one 8 ms step)
+    const sim2 = mk(5); run(sim2, 1.5, { burst: true }); let maxDrop2 = 0; let prev2 = sim2.state.speed; let v05 = 0;
+    run(sim2, 1, {}, (t) => { const v = sim2.state.speed; maxDrop2 = Math.max(maxDrop2, prev2 - v); prev2 = v; if (Math.abs(t - 0.5) < 1e-9) v05 = v; });
+    check('charge released into a glide: no step (max per-step drop < 0.1 m/s), still > 6 m/s after 0.5 s', maxDrop2 < 0.1 && v05 > 6, { v05: +v05.toFixed(2), maxDrop: +maxDrop2.toFixed(4) });
+  }
+  // brake: prompt but not a wall
+  {
+    const sim = mk(5); let v04 = 0; let tHover = -1;
+    run(sim, 1.5, { brake: true }, (t) => { if (Math.abs(t - 0.4) < 1e-9) v04 = sim.state.speed; if (tHover < 0 && sim.state.speed < 0.5) tHover = t; });
+    check('brake from cruise: still > 1 m/s at 0.4 s, under 0.5 m/s by 1.0 s', v04 > 1 && tHover > 0.5 && tHover < 1.0, { v04: +v04.toFixed(2), tHover: +tHover.toFixed(2) });
+  }
+  // a tail-stroke tap at cruise lunges ≤ TAP_OVERSHOOT above the cap and comes back
+  {
+    const sim = mk(5); run(sim, 1, { swim: 1 }); let peak = 0;
+    sim.step({ ...NEUTRAL_INTENT, swim: 1, kicks: 1, kickAmp: 0.8 });
+    run(sim, 2, { swim: 1 }, () => { peak = Math.max(peak, sim.state.speed); });
+    check('tap at cruise: peak ≤ cruise + TAP_OVERSHOOT, back within 0.15 m/s of cruise after 2 s', peak > 5.3 && peak <= SIM.MAX_SPEED + SIM.TAP_OVERSHOOT + 1e-6 && near(sim.state.speed, 5, 0.15), { peak: +peak.toFixed(2), after: +sim.state.speed.toFixed(2) });
+  }
+  // breach at cruise: hold swim + full nose-up from −2.5 m
+  {
+    const sim = mk(5, -2.5); let tAir = -1; let apex = -99;
+    run(sim, 3, { swim: 1, kickRate: 1.8, pitch: -1 }, (t) => { if (tAir < 0 && sim.state.phase === 'air') tAir = t; apex = Math.max(apex, sim.state.y); });
+    check('cruise + nose-up from −2.5 m breaches within 2 s, apex above the surface', tAir > 0 && tAir < 2 && apex > 0.3, { tAir: +tAir.toFixed(2), apex: +apex.toFixed(2) });
+  }
+  // determinism of the new law
+  {
+    const digest = () => { const sim = mk(0.5); const parts: string[] = []; for (const seg of [{ s: 2, i: { swim: 1 } }, { s: 1, i: { swim: 1, burst: true } }, { s: 2, i: { roll: 1 } }, { s: 1, i: { brake: true } }, { s: 1, i: { swim: 0.5, pitch: 1 } }]) { run(sim, seg.s, seg.i); parts.push(`${sim.state.x.toFixed(6)},${sim.state.y.toFixed(6)},${sim.state.z.toFixed(6)},${sim.state.speed.toFixed(6)}`); } return parts.join('|'); };
+    check('replay with holds / charge / brake is byte-identical across runs', digest() === digest());
+  }
+}
+
+// ---------------------------------------------------------------- chase camera: look orbit returns behind (CP10 controls pass)
+{
+  const { CameraRig, RIG } = await import('../src/dolphin/cameraRig');
+  const { PerspectiveCamera, Vector3 } = await import('../vendor/tidewater/src/engine/index.js');
+  const open = { resolve: (_f: unknown, to: Vector3) => ({ pos: to.clone(), obstructed: false }), clampPoint: (p: Vector3) => p, losClear: () => true };
+  const mkRig = () => new CameraRig(new PerspectiveCamera(62, 16 / 9, 0.1, 60000) as never, open as never, { terrainCompression: true });
+  const simState = (y: number, speed: number, vz: number) => ({ x: 0, y, z: 0, yaw: 0, pitch: 0, roll: 0, phase: 'swim' as const, wvx: 0, wvy: 0, wvz: vz, vx: 0, vy: 0, vz, speed });
+  const swim = (rig: InstanceType<typeof CameraRig>, s: ReturnType<typeof simState>, seconds: number, steer = 0) => { for (let i = 0; i < 120 * seconds; i++) { s.z += s.speed / 120; rig.update(s as never, 1 / 120, { steer }); } };
+  {
+    const rig = mkRig(); const s = simState(-2, 3, 3); swim(rig, s, 1);
+    rig.addLook(1.0, 0.2);
+    let c = rig.evalState(s);
+    check('mouse / stick look offsets the orbit (yaw 1.0, pitch 0.2)', near(c.orbitYawRad, 1.0) && near(c.orbitPitchRad, 0.2), { yaw: c.orbitYawRad, pitch: c.orbitPitchRad });
+    swim(rig, s, RIG.ORBIT_HOLD_S * 0.9);
+    c = rig.evalState(s);
+    check('the look holds for ORBIT_HOLD_S after the last input', near(c.orbitYawRad, 1.0, 1e-9), c.orbitYawRad);
+    swim(rig, s, 4);
+    c = rig.evalState(s);
+    check('swimming on, the orbit returns behind the dolphin by itself (|yaw| < 0.1 rad, |pitch| < 0.03 after 4.6 s)', Math.abs(c.orbitYawRad) < 0.1 && Math.abs(c.orbitPitchRad) < 0.03, { yaw: +c.orbitYawRad.toFixed(3), pitch: +c.orbitPitchRad.toFixed(3) });
+  }
+  {
+    const rig = mkRig(); const s = simState(-2, 3, 3); swim(rig, s, 1);
+    rig.addLook(1.0, 0); swim(rig, s, 2, 1);
+    check('steering input brings the camera back faster (|yaw| < 0.12 rad after 2 s with the stick held)', Math.abs(rig.evalState(s).orbitYawRad) < 0.12, +rig.evalState(s).orbitYawRad.toFixed(3));
+  }
+  {
+    const rig = mkRig(); const s = simState(-2, 0, 0); rig.update(s as never, 1 / 120);
+    rig.addLook(0.8, -0.3); for (let i = 0; i < 120 * 5; i++) rig.update(s as never, 1 / 120);
+    const c = rig.evalState(s);
+    check('a hovering dolphin keeps the look where the player put it', near(c.orbitYawRad, 0.8, 1e-9) && near(c.orbitPitchRad, -0.3, 1e-9), { yaw: c.orbitYawRad, pitch: c.orbitPitchRad });
+  }
+  {
+    const rig = mkRig(); const s = simState(-2, 3, 3); swim(rig, s, 1);
+    rig.addLook(3.5, 0); // past π: wraps so the return is the short way
+    check('orbit yaw wraps to (−π, π]', rig.evalState(s).orbitYawRad < 0 && rig.evalState(s).orbitYawRad > -Math.PI, rig.evalState(s).orbitYawRad);
+    rig.recenter();
+    check('R clears the orbit', rig.evalState(s).orbitYawRad === 0 && rig.evalState(s).orbitPitchRad === 0);
   }
 }
 

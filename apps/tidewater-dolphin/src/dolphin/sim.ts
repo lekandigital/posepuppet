@@ -18,6 +18,16 @@
 //  - Auto-bank toward BANK_AUTO_MAX merged with manual roll (Track E).
 //  - Near-vertical pitch authority (PITCH_MAX 85°).
 //  - Keyboard brake (X): cruise→~0 in 0.6 s, exits to hover.
+//
+// CP10 controls pass (Tidewater host) — propulsion law changes, all deterministic:
+//  - hold-to-swim is a smooth thrust toward a held TARGET speed (analog on a
+//    trigger: SWIM_MIN_FRAC..1 × cruise) that fades out over SWIM_TAPER, so
+//    arrival at cruise is a curve; the per-press tail stroke stays an impulse.
+//  - the sustained caps (cruise 5 / burst 9) govern THRUST; speed found above a
+//    cap (charge released, breach re-entry, a tap-lunge) bleeds back with
+//    OVERSPEED_TAU instead of stepping down 9→5 in one 8 ms step.
+//  - a tail-stroke tap may lunge TAP_OVERSHOOT above the cap, never further.
+//  - BRAKE_TAU 0.15 → 0.35 s (cruise → hover in ~0.8 s instead of 0.33 s).
 
 import type { WorldSampler } from './worldSampler';
 
@@ -39,9 +49,9 @@ export interface SwimIntent {
   /** active brake (keyboard X): strong decel toward hover */
   brake: boolean;
   /**
-   * 0..1 analog swim hold (Ecco-inspired). Holding accelerates toward cruise and
-   * counters glide drag; 0 is a pure glide. Optional so older scripts that only
-   * set kicks / burst stay byte-compatible.
+   * 0..1 analog swim hold (Ecco-inspired). Holding thrusts toward a held target
+   * speed (SWIM_MIN_FRAC..1 × cruise) and counters glide drag; 0 is a pure glide.
+   * Optional so older scripts that only set kicks / burst keep their shape.
    */
   swim?: number;
   /** -1..1, + = descend (crouch), − = ascend (stretch tall) */
@@ -65,7 +75,11 @@ export const SIM = {
   GLIDE_TAU: 6.0,           // s — proportional drag; long dolphin glide
                             // (Track E candidate ≈2.9 s on offer at review)
   MAX_SPEED: 5,             // [GOVERNED] cruise
-  SWIM_ACCEL: 3.6,          // m/s² while Swim is held (rest → cruise ≈ 1.4 s)
+  SWIM_ACCEL: 5.0,          // m/s² at rest with Swim fully held (rest → cruise ≈ 1.4 s) [CP10 controls pass; was 3.6 + cadence kicks]
+  SWIM_MIN_FRAC: 0.4,       // analog hold: the lightest trigger holds 40 % of cruise, full = cruise
+  SWIM_TAPER: 1.2,          // m/s below the hold target over which the thrust fades out
+  OVERSPEED_TAU: 0.7,       // s — above the sustained cap the speed bleeds toward it (charge release, re-entry)
+  TAP_OVERSHOOT: 1.0,       // m/s a tail-stroke tap may carry above the cap before bleeding back
   BURST_ACCEL: 6,           // m/s² while burst held [DERIVED ~0.67 s to cap]
   BURST_MAX_SPEED: 9,       // [GOVERNED] burst
   // attitude
@@ -82,7 +96,7 @@ export const SIM = {
   VEL_FOLLOW_TAU_CRUISE: 0.35, // s at cruise 5
   VEL_FOLLOW_TAU_BURST: 0.55,  // s at burst 9 (longer fast = wider arcs)
   MIN_CONTROL_SPEED: 0.75,     // m/s hover threshold [Track E 0.3 E-BL/s]
-  BRAKE_TAU: 0.15,          // s exponential decel: 5 m/s → <0.1 in 0.6 s
+  BRAKE_TAU: 0.35,          // s exponential decel: 5 m/s → <0.5 in 0.8 s [CP10 controls pass; was 0.15]
   AUTOLEVEL: { full: 2.2, standard: 1.1, expert: 0 } as Record<AssistMode, number>,
   // depth
   TRIM_SPEED: 3.5,          // m/s vertical from crouch/stretch
@@ -275,7 +289,11 @@ export class SwimSim {
       (SIM.TURN_AUTHORITY_CRUISE - SIM.TURN_AUTHORITY_LOW) * clamp(s.speed / SIM.MAX_SPEED, 0, 1);
     s.yaw += s.roll * authority * dt;
 
-    // --- propulsion: impulse and glide ---
+    // --- propulsion: impulse, hold thrust and glide (CP10 controls pass) ---
+    // Sustained speed is governed (cruise 5 / burst 9). Everything that ARRIVES at a cap does
+    // so on a curve, and everything that finds itself above a cap (charge released, breach
+    // re-entry, a tail-stroke lunge) bleeds back down — the speed never steps.
+    const cap = intent.burst ? SIM.BURST_MAX_SPEED : SIM.MAX_SPEED;
     if (intent.kicks > 0) {
       const amp = SIM.KICK_AMP_FLOOR + (1 - SIM.KICK_AMP_FLOOR) * clamp(intent.kickAmp, 0, 1);
       s.surge += intent.kicks * SIM.KICK_IMPULSE * amp;
@@ -283,19 +301,29 @@ export class SwimSim {
     }
     const surgeOut = s.surge * (dt / SIM.SURGE_ATTACK_TAU);
     s.surge -= surgeOut;
-    s.speed += surgeOut;
+    // a tail stroke may carry the dolphin a little past the sustained cap (the tap-lunge), never further
+    s.speed = Math.min(s.speed + surgeOut, Math.max(s.speed, cap + SIM.TAP_OVERSHOOT));
     const swim = clamp(intent.swim ?? 0, 0, 1);
-    if (swim > 0 && !intent.brake) s.speed += SIM.SWIM_ACCEL * swim * dt;
-    if (intent.burst) s.speed += SIM.BURST_ACCEL * dt;
+    if (swim > 0 && !intent.brake) {
+      // hold-to-swim: thrust toward the held target (analog: SWIM_MIN_FRAC..1 × cruise), fading
+      // over the last SWIM_TAPER m/s so arrival at the target is a curve, not a clamp
+      const target = SIM.MAX_SPEED * (SIM.SWIM_MIN_FRAC + (1 - SIM.SWIM_MIN_FRAC) * swim);
+      const a = SIM.SWIM_ACCEL * (0.6 + 0.4 * swim);
+      // the drag-balance term makes the equilibrium land ON the target (thrust = drag there)
+      const headroom = clamp((target - s.speed) / SIM.SWIM_TAPER + target / (SIM.GLIDE_TAU * a), 0, 1);
+      s.speed += a * headroom * dt;
+    }
+    if (intent.burst) s.speed = Math.min(s.speed + SIM.BURST_ACCEL * dt, Math.max(s.speed, SIM.BURST_MAX_SPEED));
     s.speed -= s.speed * (dt / SIM.GLIDE_TAU); // proportional drag — the glide
+    if (s.speed > cap) s.speed += (cap - s.speed) * (1 - Math.exp(-dt / SIM.OVERSPEED_TAU)); // bleed, never step
     if (intent.brake) {
-      // exponential decel: cruise→~0 in 0.6 s; below MIN_CONTROL_SPEED
+      // exponential decel: cruise → < 0.5 m/s in ~0.8 s; below MIN_CONTROL_SPEED
       // this is the hover state (full rotation authority remains)
       s.speed -= s.speed * Math.min(1, dt / SIM.BRAKE_TAU);
     } else if (this.assist === 'full' && !intent.autopilot && s.speed < SIM.DRIFT_SPEED) {
       s.speed += ((SIM.DRIFT_SPEED - s.speed) * dt) / SIM.DRIFT_TAU; // never strands
     }
-    s.speed = clamp(s.speed, 0, intent.burst ? SIM.BURST_MAX_SPEED : SIM.MAX_SPEED);
+    s.speed = clamp(s.speed, 0, SIM.BURST_MAX_SPEED + SIM.TAP_OVERSHOOT);
 
     // --- velocity chases facing (Track E: body leads, velocity follows) ---
     const cp = Math.cos(s.pitch);

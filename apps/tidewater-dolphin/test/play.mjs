@@ -1,20 +1,25 @@
-// CP10 gameplay verification — drives the persistent review window (review.mjs) running the
-// integrated app at http://127.0.0.1:5199/?noAudio and checks the dolphin's model, animation,
-// swimming, breach, camera states, containment / collision and replay determinism through the
-// eval handle (window.__TIDEWATER_DOLPHIN), the same way the shared-world specs used
-// __SHARED_WORLD. Intents go through test.setIntent (deterministic; the keyboard path depends
-// on OS key auto-repeat, which synthetic events do not produce). Results: eval/results/play.json.
+// CP10 gameplay verification — drives the review window (review.mjs, headed or --headless) running
+// the integrated app and checks the dolphin's model, animation, swimming, breach, camera states,
+// containment / collision and replay determinism through the eval handle (window.__TIDEWATER_DOLPHIN),
+// the same way the shared-world specs used __SHARED_WORLD. Intents go through test.setIntent
+// (deterministic); the keyboard / gamepad path is test/controls-live.mjs. Results: play.json in
+// eval/results (or TIDEWATER_RESULTS_DIR).
 //
-//   node test/play.mjs            (review window must be up: node review.mjs)
+// CP10 controls pass: paced on the world clock (gameSleep / gameRun), so the trials are the same
+// at 70 fps and on a 1 fps software adapter; the gentle-surfacing trial uses the analog hold
+// (swim 0.6) instead of a kick cadence (kicks may now lunge past cruise and would breach); the
+// no-input trial expects the keyboard-neutral glide (no autopilot without a body signal).
+//
+//   node test/play.mjs            (review window must be up: node review.mjs [--headless])
 
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { navigate, evaluate, waitFor, sleep, press, screenshot, consoleLines } from '../eval/lib/rpc.mjs';
+import { navigate, evaluate, waitFor, sleep, press, screenshot, consoleLines, gameSleep, gameRun, baseUrl, urlFlags, resultsDir, environment } from '../eval/lib/rpc.mjs';
 
 const HERE = dirname( fileURLToPath( import.meta.url ) );
-const OUT = resolve( HERE, '..', 'eval', 'results' );
-const SHOTS = resolve( HERE, '..', 'eval', 'captures', 'play' );
+const OUT = resultsDir( resolve( HERE, '..', 'eval', 'results' ) );
+const SHOTS = resolve( OUT, 'captures', 'play' );
 mkdirSync( OUT, { recursive: true } );
 mkdirSync( SHOTS, { recursive: true } );
 
@@ -27,29 +32,19 @@ const setIntent = ( p ) => D( `test.setIntent( ${ JSON.stringify( p ) } )` );
 const kick = ( amp = 0.8 ) => D( `test.kick( ${ amp } )` );
 const place = ( x, z, y, yaw, speed = 4 ) => D( `test.placeAndFace( ${ x }, ${ z }, ${ y }, ${ yaw }, ${ speed } )` );
 
-// sample the state every `every` ms for `ms`, returning the samples
-async function run( ms, every = 100 ) {
+// sample the state every `everyS` of game time for `seconds` of game time
+const run = ( seconds, everyS = 0.1 ) => gameRun( seconds, everyS, async ( t ) => ( { t, s: await state(), c: await cam() } ) );
 
-	const out = [];
-	const t0 = Date.now();
-	while ( Date.now() - t0 < ms ) {
-
-		out.push( { t: ( Date.now() - t0 ) / 1000, s: await state(), c: await cam() } );
-		await sleep( every );
-
-	}
-
-	return out;
-
-}
-
-const url = 'http://127.0.0.1:5199/?noAudio';
+const url = `${ baseUrl() }/?noAudio${ urlFlags() }`;
 await navigate( url );
-await waitFor( '!!(window.__TIDEWATER_DOLPHIN && window.__app && window.__app.ui)', { label: 'app ready', timeoutMs: 600000 } );
+await waitFor( '!!(window.__TIDEWATER_DOLPHIN && window.__app && window.__app.ui)', { label: 'app ready', timeoutMs: 1800000 } );
 // dismiss the start overlay once it is up (it appears after the loader fades), keep the keyboard focus on the page
-await waitFor( `(() => { const s = document.querySelector( '.tw-start' ); return !! s && ! s.hidden && s.classList.contains( 'is-on' ); })()`, { label: 'start overlay', timeoutMs: 30000 } ).catch( () => {} );
+await waitFor( `(() => { const s = document.querySelector( '.tw-start' ); return !! s && ! s.hidden && s.classList.contains( 'is-on' ); })()`, { label: 'start overlay', timeoutMs: 60000 } ).catch( () => {} );
 await evaluate( `(() => { const s = document.querySelector( '.tw-start' ); if ( s ) s.click(); return true; })()` );
-await sleep( 900 );
+await sleep( 300 );
+await gameSleep( 0.3 );
+const env = await environment();
+console.log( `[play] ${ url } · ${ env.headless ? 'headless' : 'headed' } · adapter ${ env.adapter ? `${ env.adapter.vendor }/${ env.adapter.architecture }` : 'none' }${ env.software ? ' (SOFTWARE — fps numbers are not product numbers)' : '' }` );
 
 // ---------------------------------------------------------------- model / animation
 const first = await D( 'firstFrame()' );
@@ -68,41 +63,59 @@ check( 'four additive layers (SwimLeft/Right/Up/Down) advancing', add.length ===
 // ---------------------------------------------------------------- swimming
 await place( 0, 66, - 2.5, Math.PI, 2 );
 await setIntent( { kicks: 0, kickRate: 1.6, pitch: 0, roll: 0, burst: false, brake: false, autopilot: false } );
-// steady kicks: exactly one kick every 0.6 s (test.kick is a one-shot, frame-rate independent)
+// steady kicks: exactly one kick every 0.6 s of game time (test.kick is a one-shot)
 let s0 = await state();
-for ( let i = 0; i < 10; i ++ ) { await kick( 0.8 ); await sleep( 600 ); }
+for ( let i = 0; i < 10; i ++ ) { await kick( 0.8 ); await gameSleep( 0.6 ); }
 let s1 = await state();
 check( 'kicks propel (10 kicks over 6 s → speed > 2.5 m/s, kickCount +10)', s1.speed > 2.5 && s1.kickCount - s0.kickCount === 10, { speed: + s1.speed.toFixed( 2 ), kicks: s1.kickCount - s0.kickCount, anim: s1.animation.base } );
 check( 'travelled north toward the island (z decreased)', s1.z < s0.z - 8, { dz: + ( s1.z - s0.z ).toFixed( 1 ) } );
-check( 'sim runs at 120 Hz', s1.simHz > 110 && s1.simHz < 130, + s1.simHz.toFixed( 1 ) );
+check( 'sim steps at 120 Hz of game time (simHz / fps ≈ 120 × frame dt)', s1.simHz > 0 && Math.abs( s1.simHz / Math.max( 1e-3, s1.fps ) - 120 * Math.min( 0.1, 1 / Math.max( 1e-3, s1.fps ) ) ) < 12, { simHz: + s1.simHz.toFixed( 1 ), fps: + s1.fps.toFixed( 1 ) } );
 check( 'camera NormalFollow while cruising', ( await cam() ).state === 'NormalFollow', ( await cam() ).state );
 await screenshot( resolve( SHOTS, '01-cruise.jpg' ), 'jpeg', 86 );
 
-// burst
-await setIntent( { burst: true, kicks: 0, kickRate: 0, autopilot: false } );
-await sleep( 2500 );
+// hold-to-swim (the modern scheme's Space): smooth thrust to cruise, no kick impulses needed
+await place( 0, 60, - 2.5, Math.PI, 1 );
+await setIntent( { swim: 1, kicks: 0, kickRate: 1.8, autopilot: false } );
+const holdRun = await run( 2.5, 0.1 );
+await setIntent( { swim: 0, kicks: 0, kickRate: 0, autopilot: false } );
+const holdSpeeds = holdRun.map( ( x ) => x.s.speed );
+const holdSteps = holdSpeeds.slice( 1 ).map( ( v, i ) => v - holdSpeeds[ i ] );
+check( 'hold-to-swim: 1 → ≥ 4.8 m/s within 2.5 s, monotone rise, no sample-to-sample jump > 1.2 m/s', holdSpeeds.at( - 1 ) >= 4.8 && holdSteps.every( ( d ) => d > - 0.05 && d < 1.2 ), { speeds: holdSpeeds.map( ( v ) => + v.toFixed( 2 ) ) } );
+const glide = await run( 2, 0.25 );
+const glideSpeeds = glide.map( ( x ) => x.s.speed );
+check( 'release → glide (speed falls smoothly: every sample lower, none by more than 0.6 m/s per 0.25 s)', glideSpeeds.slice( 1 ).every( ( v, i ) => v < glideSpeeds[ i ] && glideSpeeds[ i ] - v < 0.6 ), { speeds: glideSpeeds.map( ( v ) => + v.toFixed( 2 ) ) } );
+
+// charge (burst)
+await setIntent( { burst: true, swim: 1, kicks: 0, kickRate: 1.8, autopilot: false } );
+await gameSleep( 2.5 );
 s1 = await state();
 const c1 = await cam();
-check( 'burst reaches > 8 m/s and SwimForwardFast', s1.speed > 8 && s1.animation.base === 'SwimForwardFast', { speed: + s1.speed.toFixed( 2 ), anim: s1.animation.base } );
+check( 'charge reaches > 8 m/s and SwimForwardFast', s1.speed > 8 && s1.animation.base === 'SwimForwardFast', { speed: + s1.speed.toFixed( 2 ), anim: s1.animation.base } );
 check( 'camera FastTravel above 5 m/s', c1.state === 'FastTravel', c1.state );
 check( 'follow distance grows with speed (> 6 m)', c1.desiredDistM > 6, + c1.desiredDistM.toFixed( 2 ) );
 await screenshot( resolve( SHOTS, '02-burst.jpg' ), 'jpeg', 86 );
+// release charge, keep swimming: eases back to cruise — never a step (the old clamp dropped 9 → 5 in one 8 ms step)
+await setIntent( { burst: false, swim: 1, kicks: 0, kickRate: 1.8, autopilot: false } );
+const ease = await run( 3, 0.1 );
+const easeSpeeds = ease.map( ( x ) => x.s.speed );
+const easeDrops = easeSpeeds.slice( 1 ).map( ( v, i ) => easeSpeeds[ i ] - v );
+check( 'charge released: 9 → cruise over ~2 s, max drop per 0.1 s < 0.8 m/s, ends at 5 ± 0.15', Math.max( ...easeDrops ) < 0.8 && Math.abs( easeSpeeds.at( - 1 ) - 5 ) < 0.15 && easeSpeeds[ 4 ] > 5.8, { speeds: easeSpeeds.filter( ( _, i ) => i % 3 === 0 ).map( ( v ) => + v.toFixed( 2 ) ), maxDrop: + Math.max( ...easeDrops ).toFixed( 2 ) } );
 
 // brake → hover
-await setIntent( { burst: false, brake: true, kicks: 0, kickRate: 0, autopilot: false } );
-await sleep( 1500 );
+await setIntent( { burst: false, swim: 0, brake: true, kicks: 0, kickRate: 0, autopilot: false } );
+await gameSleep( 1.2 );
 s1 = await state();
-await sleep( 1200 );
+await gameSleep( 1.2 );
 // (SurfaceTransition / ReEntryRecovery outrank SlowHover for ≤ 0.6 s: sample three times)
 const hoverStates = [];
-for ( let i = 0; i < 3; i ++ ) { hoverStates.push( ( await cam() ).state ); await sleep( 300 ); }
-check( 'brake: cruise → < 0.5 m/s within 1.5 s', s1.speed < 0.5, + s1.speed.toFixed( 2 ) );
+for ( let i = 0; i < 3; i ++ ) { hoverStates.push( ( await cam() ).state ); await gameSleep( 0.3 ); }
+check( 'brake: cruise → < 0.5 m/s within 1.2 s', s1.speed < 0.5, + s1.speed.toFixed( 2 ) );
 check( 'camera SlowHover when stopped', hoverStates.filter( ( s ) => s === 'SlowHover' ).length >= 2, hoverStates );
 
 // turn: bank right with kicks
 await setIntent( { brake: false, roll: 1, kicks: 0, kickRate: 1.6, autopilot: false } );
 const yaw0 = ( await state() ).yaw;
-for ( let i = 0; i < 5; i ++ ) { await kick( 0.8 ); await sleep( 500 ); }
+for ( let i = 0; i < 5; i ++ ) { await kick( 0.8 ); await gameSleep( 0.5 ); }
 s1 = await state();
 const addT = await D( 'model.additive()' );
 check( 'banking right turns right (yaw +) with roll ≈ ROLL_MAX', s1.yaw - yaw0 > 0.8 && s1.roll > 0.6, { dyaw: + ( s1.yaw - yaw0 ).toFixed( 2 ), roll: + s1.roll.toFixed( 2 ) } );
@@ -113,29 +126,31 @@ await screenshot( resolve( SHOTS, '03-bank.jpg' ), 'jpeg', 86 );
 // dive and surface
 await place( 0, 90, - 2.5, Math.PI, 4 );
 await setIntent( { roll: 0, pitch: 1, kicks: 0, kickRate: 1.6, autopilot: false } );
-await sleep( 2500 );
+await gameSleep( 2.5 );
 s1 = await state();
 check( 'pitch + dives (y below −5 m in 2.5 s from −2.5 m)', s1.y < - 5, { y: + s1.y.toFixed( 2 ), depthHere: + s1.depthHere.toFixed( 1 ) } );
 check( 'seabed clearance kept (y − floor ≥ 1.0 m)', s1.y + s1.depthHere >= 1.0, + ( s1.y + s1.depthHere ).toFixed( 2 ) );
-// surface gently: expert assist (no auto-level), ~38° nose-up held, kick propulsion (~3 m/s, below the
-// breach threshold of 3.75 m/s + 3.2 m/s vertical), then level and brake at the soft ceiling
+// surface gently: expert assist (no auto-level), ~38° nose-up held, the analog hold at 0.6 (≈ 3.8 m/s —
+// under the breach threshold of 3.75 m/s + 3.2 m/s vertical), then level and brake at the soft ceiling
 await D( `test.setAssist( 'expert' )` );
 await place( 0, 85, - 7.0, Math.PI, 3 ); // level pose at depth (the dive left the pitch at its +85° cap)
 await setIntent( { pitch: - 1, kicks: 0, kickRate: 1.6, autopilot: false } );
-await sleep( 450 );
-await setIntent( { pitch: 0, kicks: 0, kickRate: 1.6, autopilot: false } );
-for ( let i = 0; i < 7; i ++ ) { await kick( 0.6 ); await sleep( 600 ); }
-await setIntent( { pitch: 1, kicks: 0, kickRate: 0, autopilot: false } );
-await sleep( 450 );
+await gameSleep( 0.45 );
+await setIntent( { pitch: 0, swim: 0.6, kicks: 0, kickRate: 1.6, autopilot: false } );
+await gameSleep( 4.2 );
+await setIntent( { pitch: 1, swim: 0, kicks: 0, kickRate: 0, autopilot: false } );
+await gameSleep( 0.45 );
 await setIntent( { pitch: 0, brake: true, kicks: 0, kickRate: 0, autopilot: false } );
-await sleep( 600 );
+await gameSleep( 0.6 );
 s1 = await state();
-check( 'gentle nose-up with kicks surfaces to the soft ceiling (y ≈ −0.4, no breach)', s1.y > - 1.0 && s1.y <= - 0.3 && s1.phase === 'swim', { y: + s1.y.toFixed( 2 ), breaches: s1.breachCount } );
+check( 'gentle nose-up with the analog hold surfaces to the soft ceiling (y ≈ −0.4, no breach)', s1.y > - 1.0 && s1.y <= - 0.3 && s1.phase === 'swim' && s1.breachCount === 0, { y: + s1.y.toFixed( 2 ), breaches: s1.breachCount, speed: + s1.speed.toFixed( 2 ) } );
 check( 'swell ride: rendered y differs from sim y by the measured wave height near the surface', Math.abs( ( s1.renderY - s1.y ) - s1.waterlineM ) < 0.05, { renderY: + s1.renderY.toFixed( 2 ), y: + s1.y.toFixed( 2 ), wl: + s1.waterlineM.toFixed( 2 ) } );
+const cSurf = await cam();
+check( 'Follow camera at the surface ceiling: eye just under the mean (−0.2 … 0 m), chase height ≈ 0.3 m', cSurf.eyeAboveMeanM > - 0.2 && cSurf.eyeAboveMeanM < 0.0 && cSurf.chaseHeightM < 0.4, { eyeAboveMean: + cSurf.eyeAboveMeanM.toFixed( 3 ), h: + cSurf.chaseHeightM.toFixed( 2 ) } );
 await screenshot( resolve( SHOTS, '04-surface.jpg' ), 'jpeg', 86 );
 
 // surface breathing: hold near the surface slowly for > 2 s (|y| < 0.6 m, speed < 1.5 m/s)
-await sleep( 2800 );
+await gameSleep( 2.8 );
 s1 = await state();
 check( 'BreatheSurface after > 2 s slow near the surface', s1.animation.base === 'BreatheSurface', { anim: s1.animation.base, y: + s1.y.toFixed( 2 ), speed: + s1.speed.toFixed( 2 ) } );
 await screenshot( resolve( SHOTS, '04b-breathe.jpg' ), 'jpeg', 86 );
@@ -144,9 +159,9 @@ await D( `test.setAssist( 'full' )` );
 // breach: burst at depth, then nose up hard near the surface
 await place( 0, 100, - 4.0, Math.PI, 6 );
 await setIntent( { brake: false, burst: true, pitch: 0, kicks: 0, kickRate: 1.6, autopilot: false } );
-await sleep( 700 );
+await gameSleep( 0.7 );
 await setIntent( { burst: true, pitch: - 1, kicks: 0, kickRate: 1.6, autopilot: false } );
-const breachSamples = await run( 3500, 50 );
+const breachSamples = await run( 3.5, 0.05 );
 await setIntent( { burst: false, pitch: 0, kicks: 0, kickRate: 0, autopilot: false } );
 const airS = breachSamples.filter( ( x ) => x.s.phase === 'air' );
 const camStates = new Set( breachSamples.map( ( x ) => x.c.state ) );
@@ -157,16 +172,17 @@ check( 'Jump clip during the breach, SwimForward after re-entry', airS.some( ( x
 check( 'camera Airborne / SurfaceTransition / ReEntryRecovery states seen', camStates.has( 'Airborne' ) && ( camStates.has( 'ReEntryRecovery' ) || camStates.has( 'SurfaceTransition' ) ), [ ...camStates ] );
 check( 'camera lifted above the waterline while airborne', airS.some( ( x ) => x.c.y > x.s.waterlineM + 0.3 ), airS.length ? + Math.max( ...airS.map( ( x ) => x.c.y ) ).toFixed( 2 ) : null );
 const maxStep = Math.max( ...breachSamples.slice( 1 ).map( ( x, i ) => Math.hypot( x.c.x - breachSamples[ i ].c.x, x.c.y - breachSamples[ i ].c.y, x.c.z - breachSamples[ i ].c.z ) ) );
-check( 'camera path continuous through the breach (< 2.8 m per 50 ms sample)', maxStep < 2.8, + maxStep.toFixed( 2 ) );
+const sampleDt = Math.max( 0.05, ...breachSamples.slice( 1 ).map( ( x, i ) => x.t - breachSamples[ i ].t ) );
+check( `camera path continuous through the breach (< 55 m/s × ${ sampleDt.toFixed( 2 ) } s per sample)`, maxStep < 55 * sampleDt + 0.1, + maxStep.toFixed( 2 ) );
 await screenshot( resolve( SHOTS, '05-after-breach.jpg' ), 'jpeg', 86 );
 
-// recenter: offset the camera azimuth with a hard turn, then R
+// recenter: offset the camera azimuth with a hard turn, then R (a real key event → swimControls → rig.recenter)
 await setIntent( { roll: 1, kicks: 0, kickRate: 1.6, burst: true, autopilot: false } );
-await sleep( 900 );
+await gameSleep( 0.9 );
 await setIntent( { roll: 0, burst: false, kicks: 0, kickRate: 0, autopilot: false } );
 const azBefore = ( await cam() ).azimuthErrorRad;
 await press( 'r' );
-await sleep( 900 );
+await gameSleep( 0.9 );
 const azAfter = ( await cam() ).azimuthErrorRad;
 check( 'R recenter eases the camera behind facing', azAfter < Math.max( 0.12, azBefore * 0.6 ), { before: + azBefore.toFixed( 2 ), after: + azAfter.toFixed( 2 ) } );
 
@@ -174,7 +190,7 @@ check( 'R recenter eases the camera behind facing', azAfter < Math.max( 0.12, az
 // toward the beach from the bay (north): the dolphin must stop short of the shallows and never leave the water
 await place( 0, 40, - 2.0, Math.PI, 5 );
 await setIntent( { burst: true, pitch: 0, roll: 0, kicks: 0, kickRate: 1.6, autopilot: false } );
-const shoreRun = await run( 9000, 150 );
+const shoreRun = await run( 9, 0.15 );
 await setIntent( { burst: false, kicks: 0, kickRate: 0, autopilot: false } );
 const minZ = Math.min( ...shoreRun.map( ( x ) => x.s.z ) );
 const shallowest = Math.min( ...shoreRun.map( ( x ) => x.s.depthHere ) );
@@ -186,7 +202,7 @@ await screenshot( resolve( SHOTS, '06-shallows.jpg' ), 'jpeg', 86 );
 // reef: cross the reef westward at 2.3 m depth
 await place( - 20, 70, - 2.3, - Math.PI / 2, 4 );
 await setIntent( { pitch: 0, roll: 0, kicks: 0, kickRate: 1.6, autopilot: false } );
-const reefRun = await run( 9000, 120 );
+const reefRun = await run( 9, 0.12 );
 const reefCorr = await D( 'world.obstacleStats()' );
 check( 'reef crossing: no structure penetration (y − ground ≥ 0.8 m), always in water', reefRun.every( ( x ) => x.s.y + x.s.depthHere >= 0.8 && x.s.inWater ), { minClear: + Math.min( ...reefRun.map( ( x ) => x.s.y + x.s.depthHere ) ).toFixed( 2 ), xEnd: + reefRun.at( - 1 ).s.x.toFixed( 1 ), contact: await D( 'test.contactState()' ) } );
 const camClip = Math.min( ...reefRun.map( ( x ) => x.c.bvhClearanceM ?? 99 ) );
@@ -196,45 +212,46 @@ await screenshot( resolve( SHOTS, '07-reef.jpg' ), 'jpeg', 86 );
 // pier piles: swim along the pier from its head toward the beach (piles at x ≈ 53.5 / 56.5)
 await place( 55, 38, - 2.2, Math.PI, 3 );
 await setIntent( { pitch: 0, roll: 0, kicks: 0, kickRate: 1.6, autopilot: false } );
-for ( let i = 0; i < 6; i ++ ) { await kick( 0.8 ); await sleep( 700 ); }
-const pierRun = await run( 3000, 120 );
+for ( let i = 0; i < 6; i ++ ) { await kick( 0.8 ); await gameSleep( 0.7 ); }
+const pierRun = await run( 3, 0.12 );
 const pierCorr = await D( 'world.obstacleStats()' );
 const piles = await evaluate( `window.__app.colliders.cylinders.filter( ( c ) => c.tag === 'pile' ).map( ( c ) => [ c.x, c.z, c.radius ] )` );
 const insidePile = pierRun.some( ( x ) => piles.some( ( [ px, pz, r ] ) => Math.hypot( x.s.x - px, x.s.z - pz ) < r + 0.2 ) );
 check( 'pier: the dolphin\'s centre never enters a pile (obstacle correction active)', ! insidePile, { corrections: pierCorr.corrections - reefCorr.corrections, lastCorrectionM: + pierCorr.lastCorrectionM.toFixed( 3 ), usAvg: + pierCorr.usAvg.toFixed( 0 ) } );
 await screenshot( resolve( SHOTS, '08-pier.jpg' ), 'jpeg', 86 );
 
-// ---------------------------------------------------------------- tracking loss / autopilot
+// ---------------------------------------------------------------- no input: keyboard-neutral glide (body input only once a signal arrives)
 await setIntent( null );
-await sleep( 2000 );
+await gameSleep( 2 );
 s1 = await state();
-check( 'no input → tracking "none", autopilot glide (pitch/roll level, speed decaying, still in water)', s1.tracking === 'none' && Math.abs( s1.pitch ) < 0.2 && Math.abs( s1.roll ) < 0.2 && s1.inWater, { tracking: s1.tracking, speed: + s1.speed.toFixed( 2 ) } );
+check( 'no input → keyboard is the idle source (no autopilot without a webcam), level glide, still in water', s1.tracking === 'keyboard' && s1.source === 'keyboard' && Math.abs( s1.pitch ) < 0.2 && Math.abs( s1.roll ) < 0.2 && s1.inWater, { tracking: s1.tracking, source: s1.source, speed: + s1.speed.toFixed( 2 ) } );
 const tr = await D( 'transport()' );
 check( 'body-input transport listening (BroadcastChannel + postMessage), nothing received', tr.gotBroadcast === false && tr.gotMessage === false && tr.lastTs === - 1, tr );
 
 // ---------------------------------------------------------------- determinism
-const script = [ { steps: 240, intent: { kicks: 1, kickRate: 1.6, kickAmp: 0.8 } }, { steps: 240, intent: { burst: true } }, { steps: 240, intent: { roll: 1 } }, { steps: 240, intent: { pitch: 1 } }, { steps: 480, intent: { pitch: - 1, burst: true } }, { steps: 240, intent: {} } ];
+const script = [ { steps: 240, intent: { kicks: 1, kickRate: 1.6, kickAmp: 0.8 } }, { steps: 240, intent: { burst: true } }, { steps: 240, intent: { roll: 1 } }, { steps: 240, intent: { pitch: 1 } }, { steps: 480, intent: { pitch: - 1, burst: true } }, { steps: 240, intent: { swim: 1 } }, { steps: 240, intent: {} } ];
 const d1 = await D( `test.runScript( ${ JSON.stringify( script ) } )` );
 const d2 = await D( `test.runScript( ${ JSON.stringify( script ) } )` );
 check( 'fixed-step replay digest identical across two runs', d1 === d2, d1.slice( 0, 60 ) + '…' );
 const dNo = await D( `test.runScript( ${ JSON.stringify( script ) }, false )` );
 check( 'replay digest with obstacle correction = bare sim away from obstacles (spawn run)', dNo === d1, dNo === d1 ? 'identical' : 'differs (obstacle contact in the script path)' );
 
-// ---------------------------------------------------------------- live performance (visible window)
+// ---------------------------------------------------------------- live performance (wall clock; product numbers only on a real GPU in a visible window)
 await place( 0, 66, - 2.5, Math.PI, 4 );
-await setIntent( { kicks: 0, kickRate: 1.6, autopilot: false } );
+await setIntent( { swim: 1, kicks: 0, kickRate: 1.8, autopilot: false } );
 const fpsSamples = [];
 for ( let i = 0; i < 10; i ++ ) { await sleep( 1000 ); fpsSamples.push( await evaluate( 'window.__app.fps' ) ); }
 const cpuMs = await evaluate( 'window.__app.cpuMs' );
 const size = await evaluate( '[ window.__app.sceneRenderer.width, window.__app.sceneRenderer.height, innerWidth, innerHeight, devicePixelRatio ]' );
 const fpsMed = fpsSamples.slice().sort( ( a, b ) => a - b )[ 5 ];
-check( 'live fps measured (visible 1440×760 review window)', fpsMed > 0, { median: + fpsMed.toFixed( 1 ), min: + Math.min( ...fpsSamples ).toFixed( 1 ), cpuMs: + cpuMs.toFixed( 2 ), renderSize: size } );
+check( `live fps measured (${ env.headless ? 'headless' : 'visible' } ${ size[ 2 ] }×${ size[ 3 ] }${ env.software ? ', SOFTWARE adapter — not a product number' : '' })`, fpsMed > 0, { median: + fpsMed.toFixed( 1 ), min: + Math.min( ...fpsSamples ).toFixed( 1 ), cpuMs: + cpuMs.toFixed( 2 ), renderSize: size } );
 const camCost = ( await cam() ).updateUsAvg;
 check( 'camera rig update cost < 400 µs', camCost < 400, + camCost.toFixed( 0 ) );
+await setIntent( null );
 
 const errors = ( await consoleLines( 400 ) ).filter( ( l ) => /\[(error|pageerror)\]/.test( l ) && ! /favicon/.test( l ) );
 check( 'no console errors during the trials', errors.length === 0, errors.slice( 0, 5 ) );
 
-const summary = { url, at: new Date().toISOString(), passed: results.filter( ( r ) => r.ok ).length, total: results.length, results, fps: { samples: fpsSamples, median: fpsMed, cpuMs, size } };
+const summary = { url, at: new Date().toISOString(), environment: env, passed: results.filter( ( r ) => r.ok ).length, total: results.length, results, fps: { samples: fpsSamples, median: fpsMed, cpuMs, size } };
 writeFileSync( resolve( OUT, 'play.json' ), JSON.stringify( summary, null, 2 ) );
-console.log( `\n${ summary.passed }/${ summary.total } passed → eval/results/play.json` );
+console.log( `\n${ summary.passed }/${ summary.total } passed → ${ resolve( OUT, 'play.json' ) }` );

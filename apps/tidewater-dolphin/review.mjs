@@ -11,10 +11,17 @@
 //   node review.mjs --pristine                       # pristine Tidewater  http://127.0.0.1:5189/
 //   node review.mjs --url=http://127.0.0.1:5199/?debug
 //   node review.mjs --display=builtin|secondary      # window placement (default builtin)
+//   node review.mjs --headless [--viewport=960x540]  # no window, no profile: Playwright's Chromium (or
+//                                                    # TIDEWATER_CHROMIUM=/path/to/chrome) on whatever WebGPU
+//                                                    # adapter it has; TIDEWATER_WEBGPU_ADAPTER=swiftshader forces
+//                                                    # Chrome's software adapter (slow, but every pixel of
+//                                                    # Tidewater's renderer — the cloud verification path).
+//                                                    # The same RPC endpoint, so test/*.mjs run unchanged.
 //
 // Control API (POST JSON to http://127.0.0.1:<port>/rpc; port in the profile's endpoint.json):
 //   { op: 'navigate', url }            { op: 'eval', expr }  (expr may be an async expression)
-//   { op: 'screenshot', path, type?, quality? }               { op: 'press', key }
+//   { op: 'screenshot', path, type?, quality? }               { op: 'press' | 'keydown' | 'keyup', key }
+//   { op: 'click' | 'mousemove', x, y, steps? }  { op: 'mousedown' | 'mouseup', button? }   { op: 'console', n? }
 //   { op: 'status' }
 
 import { chromium } from '@playwright/test';
@@ -34,6 +41,8 @@ const flag = ( name ) => argv.includes( `--${ name }` );
 const opt = ( name, dflt ) => ( argv.find( ( a ) => a.startsWith( `--${ name }=` ) ) ?? `--${ name }=${ dflt }` ).split( '=' ).slice( 1 ).join( '=' );
 
 const pristine = flag( 'pristine' );
+const headless = flag( 'headless' );
+const viewportArg = opt( 'viewport', '' ); // headless only, e.g. 960x540
 const base = pristine ? `http://127.0.0.1:${ PRISTINE_PORT }` : `http://127.0.0.1:${ APP_PORT }`;
 const urlArg = argv.find( ( a ) => a.startsWith( '--url=' ) )?.split( '=' ).slice( 1 ).join( '=' );
 const reviewUrl = urlArg ? ( urlArg.startsWith( 'http' ) ? urlArg : `${ base }${ urlArg.startsWith( '/' ) ? '' : '/' }${ urlArg }` ) : `${ base }/`;
@@ -115,14 +124,38 @@ if ( ! urlArg || urlArg.startsWith( '/' ) ) {
 
 }
 
-// --- one persistent Chrome window, one tab ---
-const context = await chromium.launchPersistentContext( USER_DATA_DIR, {
-	channel: 'chrome',
-	headless: false,
-	viewport: display.viewport,
-	args: [ '--deny-permission-prompts', '--disable-backgrounding-occluded-windows', '--autoplay-policy=no-user-gesture-required', ...display.args ],
-	permissions: [],
-} );
+// --- one persistent Chrome window, one tab (or one headless Chromium, no profile) ---
+let browser = null;
+let context;
+if ( headless ) {
+
+	const m = /^(\d+)x(\d+)$/.exec( viewportArg );
+	const viewport = m ? { width: Number( m[ 1 ] ), height: Number( m[ 2 ] ) } : display.viewport;
+	const adapter = process.env.TIDEWATER_WEBGPU_ADAPTER; // 'swiftshader' | 'default' | 'compat'
+	const args = [
+		'--ignore-gpu-blocklist', '--enable-unsafe-webgpu', '--disable-gpu-watchdog', '--disable-hang-monitor',
+		'--disable-gpu-process-crash-limit', '--disable-renderer-backgrounding', '--disable-background-timer-throttling',
+		'--autoplay-policy=no-user-gesture-required', '--deny-permission-prompts',
+	];
+	if ( adapter ) args.push( `--use-webgpu-adapter=${ adapter }` );
+	if ( typeof process.getuid === 'function' && process.getuid() === 0 ) args.push( '--no-sandbox' ); // containers
+	browser = await chromium.launch( { headless: true, executablePath: process.env.TIDEWATER_CHROMIUM || undefined, args } );
+	context = await browser.newContext( { viewport, permissions: [] } );
+	display.name = 'headless';
+	display.label = `headless ${ viewport.width }×${ viewport.height }${ adapter ? ` · adapter ${ adapter }` : '' }`;
+	display.viewport = viewport;
+
+} else {
+
+	context = await chromium.launchPersistentContext( USER_DATA_DIR, {
+		channel: 'chrome',
+		headless: false,
+		viewport: display.viewport,
+		args: [ '--deny-permission-prompts', '--disable-backgrounding-occluded-windows', '--autoplay-policy=no-user-gesture-required', ...display.args ],
+		permissions: [],
+	} );
+
+}
 
 await context.addInitScript( () => {
 
@@ -197,10 +230,19 @@ const server = createServer( ( req, res ) => {
 				case 'click':
 					await page.mouse.click( m.x ?? 700, m.y ?? 400 );
 					return reply( 200, { ok: true } );
+				case 'mousemove':
+					await page.mouse.move( m.x ?? 700, m.y ?? 400, { steps: m.steps ?? 1 } );
+					return reply( 200, { ok: true } );
+				case 'mousedown':
+					await page.mouse.down( { button: m.button ?? 'left' } );
+					return reply( 200, { ok: true } );
+				case 'mouseup':
+					await page.mouse.up( { button: m.button ?? 'left' } );
+					return reply( 200, { ok: true } );
 				case 'console':
 					return reply( 200, { ok: true, lines: consoleLog.slice( - ( m.n ?? 100 ) ) } );
 				case 'status':
-					return reply( 200, { ok: true, url: page.url(), viewport: page.viewportSize(), display: display.name, cameraMockHit: await page.evaluate( 'window.__mockedCameraAttempted' ).catch( () => null ) } );
+					return reply( 200, { ok: true, url: page.url(), viewport: page.viewportSize(), display: display.name, headless, cameraMockHit: await page.evaluate( 'window.__mockedCameraAttempted' ).catch( () => null ) } );
 				default:
 					return reply( 400, { ok: false, error: 'unknown op' } );
 
@@ -219,8 +261,8 @@ const server = createServer( ( req, res ) => {
 await new Promise( ( r ) => server.listen( 0, '127.0.0.1', r ) );
 writeFileSync( ENDPOINT_FILE, JSON.stringify( { port: server.address().port } ) );
 
-console.log( `viewport: ${ display.viewport.width }×${ display.viewport.height } · display: ${ display.label } · ${ display.args.join( ' ' ) }` );
-console.log( `camera mock: installed · Chrome channel: chrome · control port: ${ server.address().port }` );
+console.log( `viewport: ${ display.viewport.width }×${ display.viewport.height } · display: ${ display.label }${ headless ? '' : ' · ' + display.args.join( ' ' ) }` );
+console.log( `camera mock: installed · browser: ${ headless ? 'headless Chromium' : 'Chrome channel' } ${ context.browser()?.version?.() ?? '' } · control port: ${ server.address().port }` );
 console.log( `\nReview is live. Press Ctrl-C to close.\n` );
 
 await new Promise( ( r ) => { context.on( 'close', r ); process.on( 'SIGINT', r ); process.on( 'SIGTERM', r ); } );
@@ -228,5 +270,6 @@ console.log( '\nclosing…' );
 rmSync( ENDPOINT_FILE, { force: true } );
 server.close();
 await context.close().catch( () => {} );
+if ( browser ) await browser.close().catch( () => {} );
 if ( devServer ) { try { process.kill( - devServer.pid, 'SIGTERM' ); } catch {} }
 process.exit( 0 );

@@ -94,6 +94,12 @@ export interface EvalState {
   waterlineM: number;
   /** the dolphin is the active player (false in the walker / boat play modes) */
   controlled: boolean;
+  /** sim time, s (advances only while the sim steps — frame-rate-independent test pacing) */
+  time: number;
+  /** input source that produced the last intent */
+  source: 'keyboard' | 'gamepad' | 'body';
+  /** 0..1 held swim level of the last intent */
+  swimLevel: number;
 }
 
 export class DolphinPlayer {
@@ -154,8 +160,11 @@ export class DolphinPlayer {
         const ui = (window as unknown as { __ui?: { togglePanel?: (on?: boolean) => void } }).__ui;
         ui?.togglePanel?.();
       },
+      onHelp: () => {
+        const ui = (window as unknown as { __ui?: { toggleHelp?: (on?: boolean) => void } }).__ui;
+        ui?.toggleHelp?.();
+      },
     });
-    this.applyControlPrefs();
     this.obstacles = new TidewaterObstacles(host.colliders);
     this.obstacles.addBox(dock.x, dock.z, BOAT_HALF_BEAM, BOAT_HALF_LENGTH, dock.heading, -3, 3, 'boatDock');
     this.camCollision = new TidewaterCameraCollision(this.sampler, host.colliders, RIG.COLLISION_RADIUS, 5);
@@ -165,6 +174,7 @@ export class DolphinPlayer {
       waterlineAt: () => this.wl,
     });
     this.querySlot = host.query.allocate('dolphin', 1);
+    this.applyControlPrefs(); // after the rig exists (it sets the camera style, distance and lens)
     this.prevPitch = this.sim.state.pitch;
     this.statAt = performance.now();
 
@@ -237,14 +247,17 @@ export class DolphinPlayer {
     const p = this.controls.prefs();
     this.rig.setStyle(p.cameraStyle);
     this.rig.distScale = p.cameraDistance;
-    this.host.camera.fov = p.fov;
-    this.host.camera.updateProjectionMatrix();
+    // the chase lens belongs to the dolphin only while it is the player (the walker / boat keep Tidewater's 62°)
+    if (this.controlled) {
+      this.host.camera.fov = p.fov;
+      this.host.camera.updateProjectionMatrix();
+    }
   }
 
   cycleCameraStyle(): CameraStyle {
     const next = this.rig.cycleStyle();
     this.controls.setPrefs({ cameraStyle: next });
-    const label = next === 'follow' ? 'Follow' : next === 'remote' ? 'Remote' : 'Surface / Scenic';
+    const label = next === 'follow' ? 'Follow' : next === 'remote' ? 'Remote' : 'Surface';
     (window as unknown as { __ui?: { toast?: (m: string) => void } }).__ui?.toast?.(`Camera · ${label}`);
     return next;
   }
@@ -385,7 +398,7 @@ export class DolphinPlayer {
     } else if (!paused && control) {
       if (look.lookYaw || look.lookPitch) this.rig.addLook(look.lookYaw, look.lookPitch);
       const t0 = performance.now();
-      this.rig.update(rs as never, dtS, { bodyY: s.y });
+      this.rig.update(rs as never, dtS, { bodyY: s.y, steer: Math.max(Math.abs(intent.pitch), Math.abs(intent.roll)) });
       this.rigUs += (performance.now() - t0) * 1000;
       this.rigN++;
     }
@@ -451,6 +464,7 @@ export class DolphinPlayer {
 
   state(): EvalState {
     const s = this.sim.state;
+    const hud = this.controls.hudState();
     return {
       phase: s.phase,
       x: s.x, y: s.y, z: s.z,
@@ -462,7 +476,7 @@ export class DolphinPlayer {
       shoreDist: this.sim.shoreDistance(s.x, s.z),
       depthHere: this.sim.depthAt(s.x, s.z),
       assist: this.sim.assist,
-      tracking: this.controls.hudState().tracking,
+      tracking: hud.tracking,
       fps: this.fps,
       simHz: this.simHz,
       splashes: this.splashes,
@@ -471,6 +485,9 @@ export class DolphinPlayer {
       renderY: this.renderState ? this.renderState.y : s.y,
       waterlineM: this.wl,
       controlled: this.controlled,
+      time: s.time,
+      source: hud.source,
+      swimLevel: hud.swimLevel,
     };
   }
 

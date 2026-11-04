@@ -61,6 +61,17 @@
 // the mean so Tidewater's waves can pass through the lens during ordinary
 // shallow cruising. Remote and Scenic styles change follow tightness / skim
 // preference only — never the water shaders.
+//
+// CP10 controls pass: (1) chaseHeight() passed its smoothstep arguments in GLSL
+// order (edge0, edge1, x); the engine's MathUtils.smoothstep is (x, min, max),
+// so the skim never engaged and the eye sat 0.7 m in the air over a surfaced
+// dolphin — fixed, with the Follow eye now ≈ 0.10 m UNDER the mean at the
+// dolphin's surface ceiling (waves cross the lens both ways; the pristine
+// swimmer's eye in Surface style sits ≈ 0.10 m above). (2) The mouse / right-
+// stick orbit returns behind the dolphin by itself once the look input stops
+// and the dolphin is swimming (faster while the player steers), so a look never
+// leaves character-relative steering pointing sideways; a hovering dolphin keeps
+// the look where the player put it.
 
 import { Vector3, MathUtils } from '../../vendor/tidewater/src/engine/index.js';
 import type { SimState } from './sim';
@@ -115,8 +126,8 @@ export const RIG = {
   FOLLOW_DIST_BURST: 7.55,  // m behind at burst (lerp 0→9)    [§7.5: 13.75 × 0.55]
   HOVER_DIST: 3.3,          // m in SlowHover [DERIVED, flagged; §7.5: 6.0 × 0.55]
   HEIGHT: 1.1,              // m above the dolphin, deep water [§7.5: 2.0 × 0.55]
-  HEIGHT_SURFACE: 0.22,     // m above the sim body near mean water (eye ≈ −0.18 at SURFACE_Y)
-  HEIGHT_SCENIC: 0.38,      // Scenic: eye nearer mean, more sky in the upper frame
+  HEIGHT_SURFACE: 0.30,     // m above the sim body near mean water (eye ≈ −0.10 at SURFACE_Y: just under the mean, waves cross the lens)
+  HEIGHT_SCENIC: 0.50,      // Surface style: eye ≈ +0.10 above the mean — the swimmer's-eye view, waves wash over the lens
   SKIM_DEEP_Y: -3.6,        // below this, full HEIGHT
   SKIM_NEAR_Y: -0.55,       // at/above this, full surface skim
   LOOK_AHEAD: 3.44,         // m along the smoothed velocity   [§7.5: 6.25 × 0.55]
@@ -137,6 +148,13 @@ export const RIG = {
   FAR: 900,                 // pool far plane
   HOVER_SPEED: 0.75,        // m/s — SlowHover below (Track E min-control)
   FAST_SPEED: 5,            // m/s — FastTravel above
+  // --- look orbit (mouse drag / right stick) — CP10 controls pass ---
+  ORBIT_HOLD_S: 0.7,        // s after the last look input before the orbit starts returning behind
+  ORBIT_RELAX_TAU: 1.4,     // s — the orbit eases back behind the dolphin while it swims
+  ORBIT_RELAX_STEER_TAU: 0.6, // s — faster while the player is steering
+  ORBIT_RELAX_MIN_SPEED: 1.0, // m/s — a hovering dolphin keeps the look where the player put it
+  ORBIT_PITCH_MIN: -0.65,   // rad — look from below
+  ORBIT_PITCH_MAX: 0.5,     // rad — look from above
   // (cp02's SURFACE_BAND / SHIMMER_MIN_Y / SHIMMER_HOLD_S anti-shimmer hold is
   // deliberately absent in the Tidewater rig — see the header; a regression
   // test asserts it stays absent)
@@ -159,7 +177,7 @@ export const RIG = {
 /** Vertical chase offset: deep water keeps HEIGHT 1.1; near the mean the eye drops toward the surface. */
 export function chaseHeight(bodyY: number, air: boolean, style: CameraStyle = 'follow'): number {
   if (air) return RIG.HEIGHT;
-  const w = MathUtils.smoothstep(RIG.SKIM_DEEP_Y, RIG.SKIM_NEAR_Y, bodyY);
+  const w = MathUtils.smoothstep(bodyY, RIG.SKIM_DEEP_Y, RIG.SKIM_NEAR_Y); // engine order: (x, min, max)
   const hSurf = style === 'scenic' ? RIG.HEIGHT_SCENIC : RIG.HEIGHT_SURFACE;
   return MathUtils.lerp(RIG.HEIGHT, hSurf, w);
 }
@@ -233,6 +251,9 @@ export interface CameraEvalState {
   chaseHeightM: number;
   /** sim-body Y used for positioning (not the swell-ridden presentation Y) */
   bodyY: number;
+  /** current look-orbit offsets (mouse drag / right stick), rad */
+  orbitYawRad: number;
+  orbitPitchRad: number;
   losBlockedS: number;
   emergencyCount: number;
   /** rolling mean rig CPU cost per update, µs (measured by the caller) */
@@ -309,8 +330,10 @@ export class CameraRig {
   private followYaw = 0;
   private orbitYaw = 0;
   private orbitPitch = 0;
-  private lastHeight = RIG.HEIGHT;
+  private lastHeight: number = RIG.HEIGHT;
   private lastBodyY = 0;
+  /** seconds since the last look input (orbit relax timer) */
+  private lookIdleS = Infinity;
   /** 0.7–1.4 follow-distance multiplier from the menu */
   distScale = 1;
 
@@ -374,8 +397,9 @@ export class CameraRig {
 
   /** Mouse / right-stick look: yaw around the dolphin, pitch of the chase point. */
   addLook(yawDelta: number, pitchDelta: number): void {
-    this.orbitYaw += yawDelta;
-    this.orbitPitch = MathUtils.clamp(this.orbitPitch + pitchDelta, -0.65, 0.5);
+    this.orbitYaw = wrapAngle(this.orbitYaw + yawDelta);
+    this.orbitPitch = MathUtils.clamp(this.orbitPitch + pitchDelta, RIG.ORBIT_PITCH_MIN, RIG.ORBIT_PITCH_MAX);
+    this.lookIdleS = 0;
   }
 
   /**
@@ -401,8 +425,10 @@ export class CameraRig {
    * @param view.bodyY  sim-body height used for chase positioning. The presented
    *                    dolphin (s.y) may include swell-ride; passing the physical
    *                    Y stops the lens from riding every wave. Defaults to s.y.
+   * @param view.steer  0..1 magnitude of the player's steering input this frame
+   *                    (the look orbit returns behind faster while steering).
    */
-  update(s: SimState, dt: number, view?: { bodyY?: number }): void {
+  update(s: SimState, dt: number, view?: { bodyY?: number; steer?: number }): void {
     if (dt <= 0) return;
     const bodyY = view?.bodyY ?? s.y;
     this.lastBodyY = bodyY;
@@ -437,6 +463,18 @@ export class CameraRig {
     }
     this.prevDolphinRel = dolphinRel;
     this.prevWasAir = air;
+
+    // --- look orbit relax: once the player stops looking and the dolphin swims, the camera
+    // eases back behind it (character-relative steering stays readable); hovering holds the look
+    this.lookIdleS += dt;
+    if (this.lookIdleS > RIG.ORBIT_HOLD_S && speed > RIG.ORBIT_RELAX_MIN_SPEED && (this.orbitYaw !== 0 || this.orbitPitch !== 0)) {
+      const tau = (view?.steer ?? 0) > 0.3 ? RIG.ORBIT_RELAX_STEER_TAU : RIG.ORBIT_RELAX_TAU;
+      const kr = 1 - Math.exp(-dt / tau);
+      this.orbitYaw -= this.orbitYaw * kr;
+      this.orbitPitch -= this.orbitPitch * kr;
+      if (Math.abs(this.orbitYaw) < 1e-3) this.orbitYaw = 0;
+      if (Math.abs(this.orbitPitch) < 1e-3) this.orbitPitch = 0;
+    }
 
     // --- state parameter targets ---
     const speedDist = MathUtils.lerp(
@@ -691,6 +729,8 @@ export class CameraRig {
       style: this.style,
       chaseHeightM: this.lastHeight,
       bodyY: this.lastBodyY,
+      orbitYawRad: this.orbitYaw,
+      orbitPitchRad: this.orbitPitch,
       losBlockedS: this.losBlockedS,
       emergencyCount: this.emergencyCount,
       updateUsAvg: this.updateUsAvg,
@@ -708,5 +748,13 @@ function angleDelta(a: number, b: number): number {
   let x = (b - a) % (2 * Math.PI);
   if (x > Math.PI) x -= 2 * Math.PI;
   if (x < -Math.PI) x += 2 * Math.PI;
+  return x;
+}
+
+/** wrap to (−π, π] so the orbit always returns the short way */
+function wrapAngle(a: number): number {
+  let x = a % (2 * Math.PI);
+  if (x > Math.PI) x -= 2 * Math.PI;
+  if (x <= -Math.PI) x += 2 * Math.PI;
   return x;
 }

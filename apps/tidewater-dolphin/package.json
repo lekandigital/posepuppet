@@ -9,11 +9,13 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --port 5199",
     "typecheck": "tsc --noEmit",
-    "test": "tsx test/unit.ts",
+    "test": "tsx test/unit.ts && tsx test/controls.ts",
     "pristine": "npm --prefix vendor/tidewater run dev",
     "review": "node review.mjs",
     "capture": "node eval/capture.mjs",
-    "test:play": "node test/play.mjs"
+    "test:play": "node test/play.mjs",
+    "test:unit": "tsx test/unit.ts",
+    "test:controls": "tsx test/controls.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",

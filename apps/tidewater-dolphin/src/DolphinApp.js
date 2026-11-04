@@ -25,9 +25,9 @@
 //      mode: the line comes in, the rod goes away and its HUD / minimap / guide are
 //      hidden; the game state is kept for the session.
 //   3. The free camera (F) and the walker / boat keep Tidewater's 62° lens; the
-//      chase camera uses the BodyArcade rig's 55° lens; the lens follows the owner.
+//      chase camera uses the Dolphin Controls lens (55° default); the lens follows the owner.
 //   4. Pointer lock is requested on click only in the walker / boat modes (the
-//      chase camera has no mouse look).
+//      chase camera looks by dragging the view — no pointer lock).
 //   5. Wildlife is told who the viewer is (the dolphin, or Tidewater's player).
 //   6. ?noDolphin leaves the dolphin out of the scene (environment-parity captures).
 //
@@ -445,7 +445,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 
 			if ( window.__ui && window.__ui.isPointerOverUI ) return;
 			// CP10: pointer lock only for Tidewater's mouse-look modes (walker / boat); the chase
-			// camera has no mouse look, so in dolphin mode a click only unlocks audio
+			// camera looks by dragging the view, so in dolphin mode a click only unlocks audio
 			if ( this.playerMode !== 'dolphin' ) this.input.requestLock();
 			if ( this.audio ) this.audio.resume();
 
@@ -597,6 +597,13 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 
 	}
 
+	// CP10 controls pass: the chase lens is a Dolphin Controls preference (55° default, 40–75)
+	chaseFov() {
+
+		return this.dolphin ? this.dolphin.controls.prefs().fov : RIG.FOV;
+
+	}
+
 	// Free (debug) camera on F. CP10: in dolphin mode the dolphin holds still (its animation keeps
 	// cycling) while the free camera is out, and resumes on its chase camera where it was left; in
 	// the walker / boat modes Tidewater's own behaviour (the walker continues from the camera, the
@@ -616,7 +623,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 
 		} else if ( this.playerMode === 'dolphin' ) {
 
-			this.camera.fov = RIG.FOV;
+			this.camera.fov = this.chaseFov();
 			this.camera.updateProjectionMatrix();
 
 		} else if ( this.player.mode !== 'boat' && this.player.mode !== 'deck' ) {
@@ -695,7 +702,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 			this._moorIfDocked();
 			p.busy = false;
 			if ( document.pointerLockElement ) document.exitPointerLock?.();
-			this.camera.fov = RIG.FOV;
+			this.camera.fov = this.chaseFov();
 			this.camera.updateProjectionMatrix();
 			this.dolphin.resume();
 
